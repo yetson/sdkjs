@@ -841,6 +841,9 @@ DrawingObjectsController.prototype =
 
     drawSelect: function(pageIndex, drawingDocument)
     {
+		if (undefined !== drawingDocument.BeginDrawTracking)
+            drawingDocument.BeginDrawTracking();
+		
         var i;
         if(this.selection.textSelection)
         {
@@ -1004,7 +1007,11 @@ DrawingObjectsController.prototype =
         {
             drawingDocument.DrawTrackSelectShapes(this.selectionRect.x, this.selectionRect.y, this.selectionRect.w, this.selectionRect.h);
         }
-        return;
+      
+		if (undefined !== drawingDocument.EndDrawTracking)
+			drawingDocument.EndDrawTracking();
+
+		return;
     },
 
     selectObject: function(object, pageIndex)
