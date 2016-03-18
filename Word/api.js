@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -4105,41 +4105,42 @@ CTablePropLook.prototype.put_BandVer = function(v) {this.BandVer = v;};
 function CTableProp (tblProp)
 {
 	if (tblProp)
-	{
-        this.CanBeFlow = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
-        this.CellSelect = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
-        this.CellSelect = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
-		this.TableWidth = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
-		this.TableSpacing = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
-		this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new asc_CPaddings (tblProp.TableDefaultMargins) : null;
+    {
+        this.CanBeFlow           = (undefined != tblProp.CanBeFlow ? tblProp.CanBeFlow : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect ? tblProp.CellSelect : false );
+        this.CellSelect          = (undefined != tblProp.CellSelect) ? tblProp.CellSelect : false;
+        this.TableWidth          = (undefined != tblProp.TableWidth) ? tblProp.TableWidth : null;
+        this.TableSpacing        = (undefined != tblProp.TableSpacing) ? tblProp.TableSpacing : null;
+        this.TableDefaultMargins = (undefined != tblProp.TableDefaultMargins && null != tblProp.TableDefaultMargins) ? new asc_CPaddings(tblProp.TableDefaultMargins) : null;
 
-		this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins (tblProp.CellMargins) : null;
+        this.CellMargins = (undefined != tblProp.CellMargins && null != tblProp.CellMargins) ? new CMargins(tblProp.CellMargins) : null;
 
-		this.TableAlignment = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
-		this.TableIndent = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
-		this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
+        this.TableAlignment     = (undefined != tblProp.TableAlignment) ? tblProp.TableAlignment : null;
+        this.TableIndent        = (undefined != tblProp.TableIndent) ? tblProp.TableIndent : null;
+        this.TableWrappingStyle = (undefined != tblProp.TableWrappingStyle) ? tblProp.TableWrappingStyle : null;
 
-		this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new asc_CPaddings (tblProp.TablePaddings) : null;
+        this.TablePaddings = (undefined != tblProp.TablePaddings && null != tblProp.TablePaddings) ? new asc_CPaddings(tblProp.TablePaddings) : null;
 
-		this.TableBorders = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders (tblProp.TableBorders) : null;
-		this.CellBorders = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders (tblProp.CellBorders) : null;
-		this.TableBackground = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground (tblProp.TableBackground) : null;
-		this.CellsBackground = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground (tblProp.CellsBackground) : null;
-		this.Position = (undefined != tblProp.Position && null != tblProp.Position) ? new CPosition (tblProp.Position) : null;
-        this.PositionH = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
-        this.PositionV = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
+        this.TableBorders      = (undefined != tblProp.TableBorders && null != tblProp.TableBorders) ? new CBorders(tblProp.TableBorders) : null;
+        this.CellBorders       = (undefined != tblProp.CellBorders && null != tblProp.CellBorders) ? new CBorders(tblProp.CellBorders) : null;
+        this.TableBackground   = (undefined != tblProp.TableBackground && null != tblProp.TableBackground) ? new CBackground(tblProp.TableBackground) : null;
+        this.CellsBackground   = (undefined != tblProp.CellsBackground && null != tblProp.CellsBackground) ? new CBackground(tblProp.CellsBackground) : null;
+        this.Position          = (undefined != tblProp.Position && null != tblProp.Position) ? new CPosition(tblProp.Position) : null;
+        this.PositionH         = ( undefined != tblProp.PositionH && null != tblProp.PositionH ) ? new CTablePositionH(tblProp.PositionH) : undefined;
+        this.PositionV         = ( undefined != tblProp.PositionV && null != tblProp.PositionV ) ? new CTablePositionV(tblProp.PositionV) : undefined;
         this.Internal_Position = ( undefined != tblProp.Internal_Position ) ? tblProp.Internal_Position : undefined;
 
-        this.ForSelectedCells = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
-        this.TableStyle = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
-        this.TableLook = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
-        this.RowsInHeader = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
-        this.CellsVAlign = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign :c_oAscVertAlignJc.Top;
-        this.AllowOverlap = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
-        this.TableLayout  = tblProp.TableLayout;
+        this.ForSelectedCells   = (undefined != tblProp.ForSelectedCells) ? tblProp.ForSelectedCells : true;
+        this.TableStyle         = (undefined != tblProp.TableStyle) ? tblProp.TableStyle : null;
+        this.TableLook          = (undefined != tblProp.TableLook) ? new CTablePropLook(tblProp.TableLook) : null;
+        this.RowsInHeader       = (undefined != tblProp.RowsInHeader) ? tblProp.RowsInHeader : 0;
+        this.CellsVAlign        = (undefined != tblProp.CellsVAlign) ? tblProp.CellsVAlign : c_oAscVertAlignJc.Top;
+        this.AllowOverlap       = (undefined != tblProp.AllowOverlap) ? tblProp.AllowOverlap : undefined;
+        this.TableLayout        = tblProp.TableLayout;
         this.CellsTextDirection = tblProp.CellsTextDirection;
-        this.Locked = (undefined != tblProp.Locked) ? tblProp.Locked : false;
-	}
+        this.CellsNoWrap        = tblProp.CellsNoWrap;
+        this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
+    }
 	else
 	{
 		//Все свойства класса CTableProp должны быть undefined если они не изменялись
@@ -4220,6 +4221,8 @@ CTableProp.prototype.get_TableLayout = function() {return this.TableLayout;};
 CTableProp.prototype.put_TableLayout = function(v){this.TableLayout = v;};
 CTableProp.prototype.get_CellsTextDirection = function(){return this.CellsTextDirection;};
 CTableProp.prototype.put_CellsTextDirection = function(v){this.CellsTextDirection = v;};
+CTableProp.prototype.get_CellsNoWrap = function(){return this.CellsNoWrap;};
+CTableProp.prototype.put_CellsNoWrap = function(v){this.CellsNoWrap = v;};
 
 function CBorders (obj)
 {

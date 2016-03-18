@@ -292,8 +292,9 @@ CTable.prototype =
             var Prev_row = -1;
             var bFirstRow = true;
 
-            var VAlign = null;
+            var VAlign        = null;
             var TextDirection = null;
+            var NoWrap        = null;
 
             for ( var Index = 0; Index < this.Selection.Data.length; Index++ )
             {
@@ -306,16 +307,20 @@ CTable.prototype =
 
                 if ( 0 === Index )
                 {
-                    VAlign = Cell.Get_VAlign();
+                    VAlign        = Cell.Get_VAlign();
                     TextDirection = Cell.Get_TextDirection();
+                    NoWrap        = Cell.Get_NoWrap();
                 }
                 else
                 {
-                    if ( VAlign != Cell.Get_VAlign() )
+                    if (VAlign !== Cell.Get_VAlign())
                         VAlign = null;
 
                     if (TextDirection !== Cell.Get_TextDirection())
                         TextDirection = null;
+
+                    if (NoWrap !== Cell.Get_NoWrap())
+                        NoWrap = null;
                 }
 
                 if ( 0 === Index )
@@ -434,8 +439,9 @@ CTable.prototype =
                 }
             }
 
-            Pr.CellsVAlign = VAlign;
+            Pr.CellsVAlign        = VAlign;
             Pr.CellsTextDirection = TextDirection;
+            Pr.CellsNoWrap        = NoWrap;
 
             Pr.CellBorders =
             {
@@ -503,11 +509,12 @@ CTable.prototype =
                 };
             }
 
-            Pr.CellsVAlign = Cell.Get_VAlign();
+            Pr.CellsVAlign        = Cell.Get_VAlign();
+            Pr.CellsTextDirection = Cell.Get_TextDirection();
+            Pr.CellsNoWrap        = Cell.Get_NoWrap();
 
             Pr.CellsBackground = CellShd.Copy();
 
-            Pr.CellsTextDirection = Cell.Get_TextDirection();
 
             var Spacing = this.Content[0].Get_CellSpacing();
             if ( null === Spacing )
@@ -1906,6 +1913,25 @@ CTable.prototype =
                 {
                     this.CurCell.Set_TextDirectionFromApi(TextDirection);
                 }
+            }
+        }
+
+        // CellsNoWrap
+        if (undefined !== Props.CellsNoWrap && null !== Props.CellsNoWrap)
+        {
+            if (this.Selection.Use === true && table_Selection_Cell === this.Selection.Type)
+            {
+                var Count = this.Selection.Data.length;
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    var Pos  = this.Selection.Data[Index];
+                    var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+                    Cell.Set_NoWrap(Props.CellsNoWrap);
+                }
+            }
+            else
+            {
+                this.CurCell.Set_NoWrap(Props.CellsNoWrap);
             }
         }
 
