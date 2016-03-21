@@ -1660,22 +1660,21 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 			this.colStartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colStart );
 			this.colEndIndex = this.wb.getTableIndexColumnByName( this.tableName, this.colEnd );
 			if( !this.colStartIndex && !this.colEndIndex ){
-				return new cError( cErrorType.bad_reference );
+				return this.area =  new cError( cErrorType.bad_reference );
 			}
         }
         else {
             paramObj.startCol = this.oneColumn = val['oneColumn'].replace(/'#/g,"#");
 			this.oneColumnIndex = this.wb.getTableIndexColumnByName( this.tableName, this.oneColumn );
 			if( !this.oneColumnIndex ){
-				return new cError( cErrorType.bad_reference );
+				return this.area = new cError( cErrorType.bad_reference );
 			}
         }
 
         this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
         if ( !this.tableData ) {
-            this.area = new cError( cErrorType.bad_reference );
-            return;
+            return this.area = new cError( cErrorType.bad_reference );
         }
 		if( this.tableData.range ){
 			this.area = this.tableData.range.isOneCell() ?
@@ -1689,8 +1688,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 
         this.tableData = this.wb.getTableRangeForFormula( this.tableName, paramObj );
         if ( !this.tableData ) {
-            this.area = new cError( cErrorType.bad_reference );
-            return;
+			return this.area = new cError( cErrorType.bad_reference );
         }
 		if( this.tableData.range ){
 			this.area = this.tableData.range.isOneCell() ?
@@ -1710,8 +1708,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-                this.area = new cError( cErrorType.bad_reference );
-                return;
+				return this.area = new cError( cErrorType.bad_reference );
             }
 
             if ( range ) {
@@ -1730,7 +1727,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 			this.hdtcstartIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcstart );
 
 			if( !this.hdtcstartIndex ){
-				return new cError( cErrorType.bad_reference );
+				return this.area =  new cError( cErrorType.bad_reference );
 			}
 
             if ( this.hdtcend ) {
@@ -1739,7 +1736,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
 				this.hdtcendIndex = this.wb.getTableIndexColumnByName( this.tableName, this.hdtcend );
 
 				if( !this.hdtcendIndex ){
-					return new cError( cErrorType.bad_reference );
+					return this.area =  new cError( cErrorType.bad_reference );
 				}
 
             }
@@ -1748,8 +1745,7 @@ cStrucTable.prototype.createArea = function ( val, cell ) {
             data = this.wb.getTableRangeForFormula( this.tableName, paramObj );
 
             if ( !data ) {
-                this.area = new cError( cErrorType.bad_reference );
-                return;
+				return this.area = new cError( cErrorType.bad_reference );
             }
 
             if ( range ) {
@@ -4407,16 +4403,20 @@ parserFormula.prototype = {
                 else if ( _tableTMP = parserHelp.isTable.call( this, this.Formula, this.pCurrPos, local ) ) {
                     found_operand = new cStrucTable( _tableTMP, this.wb, this.ws, this.ws.getCell( this.cellAddress ) );
 
-					if(found_operand.type==cElementType.error) {
-						/*используется неверный именованный диапазон или таблица*/
-						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
-						this.outStack = [];
-						this.elemArr = [];
-						return false;
+					if(found_operand.type!=cElementType.error) {
+						this.RefPos.push( {start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length, isName: true, oper:found_operand } );
+						this.countRef++;
 					}
 
-                    this.RefPos.push( {start: this.pCurrPos - this.operand_str.length, end: this.pCurrPos, index: this.outStack.length, isName: true, oper:found_operand } );
-                    this.countRef++;
+//					if(found_operand.type==cElementType.error) {
+//						/*используется неверный именованный диапазон или таблица*/
+//						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
+//						this.outStack = [];
+//						this.elemArr = [];
+//						return false;
+//					}
+
+
                 }
 
                 /* Referens to DefinedNames */
@@ -4807,6 +4807,9 @@ parserFormula.prototype = {
 
     /* Сборка функции в инфиксную форму */
     assembleLocale: function ( locale, digitDelim ) {
+		if ( this.outStack.length == 1 && this.outStack[this.outStack.length - 1] instanceof cError ) {
+			return this.Formula;
+		}
         var currentElement = null,
             _count = this.outStack.length,
             elemArr = new Array( _count ),
