@@ -2632,6 +2632,15 @@ CChartSpace.prototype =
         return true;
     },
 
+    getNeedReflect: function()
+    {
+        if(!this.chartObj)
+        {
+            this.chartObj = new CChartsDrawer();
+        }
+        return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
+    },
+
     recalculateAxis: function()
     {
         if(this.chart && this.chart.plotArea && this.chart.plotArea.chart)
@@ -2718,6 +2727,8 @@ CChartSpace.prototype =
                 }
                 return;
             }
+
+            var bNeedReflect =  this.getNeedReflect();
             if(chart_type === historyitem_type_ScatterChart)
             {
                 var x_ax, y_ax;
@@ -2890,7 +2901,14 @@ CChartSpace.prototype =
                             {
                                 left_align_labels = false;
 
-                                right_gap = Math.max(last_hor_label_half_width, y_ax.labels.extX);
+                                if(bNeedReflect)
+                                {
+                                    right_gap = Math.max(last_hor_label_half_width, 0);
+                                }
+                                else
+                                {
+                                    right_gap = Math.max(last_hor_label_half_width, y_ax.labels.extX);
+                                }
                                 hor_interval_width = checkFiniteNumber((rect.w - right_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
@@ -2902,7 +2920,14 @@ CChartSpace.prototype =
                             }
                             case TICK_LABEL_POSITION_LOW:
                             {
-                                left_gap = Math.max(first_hor_label_half_width, y_ax.labels.extX);
+                                if(bNeedReflect)
+                                {
+                                    left_gap = Math.max(first_hor_label_half_width, 0);
+                                }
+                                else
+                                {
+                                    left_gap = Math.max(first_hor_label_half_width, y_ax.labels.extX);
+                                }
                                 hor_interval_width = checkFiniteNumber((rect.w-left_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 for(i = 0; i < arr_x_val.length; ++i)
                                 {
@@ -2928,7 +2953,14 @@ CChartSpace.prototype =
                                 if(y_ax.crosses === CROSSES_MAX)
                                 {
                                     left_align_labels = false;
-                                    right_gap = Math.max(right_gap, y_ax.labels.extX);
+                                    if(bNeedReflect)
+                                    {
+                                        right_gap = Math.max(right_gap, 0);
+                                    }
+                                    else
+                                    {
+                                        right_gap = Math.max(right_gap, y_ax.labels.extX);
+                                    }
 
                                     y_ax.labels.x = rect.x + rect.w - right_gap;
                                     y_ax.xPos = rect.x + rect.w - right_gap;
@@ -2941,7 +2973,7 @@ CChartSpace.prototype =
                                 else
                                 {
                                     hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
-                                    if(first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
+                                    if(!bNeedReflect && first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
                                     {
                                         hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses));
                                     }
@@ -2962,7 +2994,14 @@ CChartSpace.prototype =
                         {
                             case TICK_LABEL_POSITION_HIGH:
                             {
-                                left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
+                                if(bNeedReflect)
+                                {
+                                    left_gap = Math.max(0, last_hor_label_half_width);
+                                }
+                                else
+                                {
+                                    left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
+                                }
                                 hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
 
                                 y_ax.xPos = rect.x + rect.w - (crosses - arr_x_val[0])*hor_interval_width - first_hor_label_half_width;
@@ -2977,7 +3016,14 @@ CChartSpace.prototype =
                             {
                                 left_align_labels = false;
 
-                                right_gap = Math.max(y_ax.labels.extX, first_hor_label_half_width);
+                                if(bNeedReflect)
+                                {
+                                    right_gap = Math.max(0, first_hor_label_half_width);
+                                }
+                                else
+                                {
+                                    right_gap = Math.max(y_ax.labels.extX, first_hor_label_half_width);
+                                }
                                 hor_interval_width = checkFiniteNumber((rect.w - right_gap - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                 y_ax.xPos = rect.x + rect.w - right_gap - (crosses - arr_x_val[0])*hor_interval_width;
                                 for(i = 0; i < arr_x_val.length; ++i)
@@ -3003,7 +3049,14 @@ CChartSpace.prototype =
 
                                 if(y_ax.crosses === CROSSES_MAX)
                                 {
-                                    left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
+                                    if(bNeedReflect)
+                                    {
+                                        left_gap = Math.max(0, last_hor_label_half_width);
+                                    }
+                                    else
+                                    {
+                                        left_gap = Math.max(y_ax.labels.extX, last_hor_label_half_width);
+                                    }
                                     hor_interval_width = checkFiniteNumber((rect.w - left_gap - first_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
                                     y_ax.xPos = rect.x + rect.w - first_hor_label_half_width - (crosses-arr_x_val[0])*hor_interval_width;
                                     y_ax.labels.x = y_ax.xPos - ((arr_x_val[arr_x_val.length-1] - crosses)*hor_interval_width) - y_ax.labels.extX;
@@ -3012,7 +3065,7 @@ CChartSpace.prototype =
                                 {
                                     left_align_labels = false;
                                     hor_interval_width = checkFiniteNumber((rect.w - first_hor_label_half_width - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - arr_x_val[0]));
-                                    if(first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
+                                    if(!bNeedReflect && first_hor_label_half_width + (crosses-arr_x_val[0])*hor_interval_width < y_ax.labels.extX)
                                     {
                                         hor_interval_width = checkFiniteNumber((rect.w - y_ax.labels.extX - last_hor_label_half_width)/(arr_x_val[arr_x_val.length-1] - crosses));
                                     }
@@ -3263,6 +3316,7 @@ CChartSpace.prototype =
                     if(x_ax.labels)
                     {
                         arr_labels = x_ax.labels.arrLabels;
+                        x_ax.labels.align = bottom_align_labels;
                         if(bottom_align_labels)
                         {
                             var top_line = x_ax.labels.y + vert_gap;
@@ -3309,6 +3363,20 @@ CChartSpace.prototype =
 
                     if(y_ax.labels)
                     {
+                        if(bNeedReflect)
+                        {
+                            if(left_align_labels)
+                            {
+                                left_align_labels = false;
+                                y_ax.labels.x += y_ax.labels.extX;
+                            }
+                            else
+                            {
+                                left_align_labels = true;
+                                y_ax.labels.x -= y_ax.labels.extX;
+                            }
+                        }
+                        y_ax.labels.align = left_align_labels;
                         arr_labels = y_ax.labels.arrLabels;
                         if(left_align_labels)
                         {
@@ -3436,7 +3504,7 @@ CChartSpace.prototype =
 
                     /*если у нас шкала логарифмическая то будем вместо полученных значений использовать логарифм*/
 
-                    val_ax.labels = new CValAxisLabels(this);
+                    val_ax.labels = new CValAxisLabels(this, val_ax);
                     var max_width = 0;
                     val_ax.yPoints = [];
 
@@ -3625,7 +3693,14 @@ CChartSpace.prototype =
                             {
                                 left_val_ax_labels_align = false;
                                 val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
-                                point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                if(!bNeedReflect)
+                                {
+                                    point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                }
+                                else
+                                {
+                                    point_interval = rect.w/intervals_count;
+                                }
                                 val_ax.posX = val_ax.labels.x;
                                 if(cross_between === CROSS_BETWEEN_MID_CAT)
                                 {
@@ -3641,7 +3716,7 @@ CChartSpace.prototype =
                             else
                             {
                                 left_points_width = point_interval*(crosses-1);//общая ширина левых точек если считать что точки занимают все пространство
-                                if(left_points_width < val_ax.labels.extX)//подписи верт. оси выходят за пределы области построения
+                                if(!bNeedReflect && left_points_width < val_ax.labels.extX)//подписи верт. оси выходят за пределы области построения
                                 {
                                     var right_intervals_count = intervals_count - (crosses-1);//количесво интервалов правее вертикальной оси
                                     //скорректируем point_interval, поделив расстояние, которое осталось справа от подписей осей на количество интервалов справа
@@ -3679,23 +3754,54 @@ CChartSpace.prototype =
                         }
                         else if(labels_pos === TICK_LABEL_POSITION_LOW)//подписи слева от области построения
                         {
-                            point_interval = (rect.w -  val_ax.labels.extX)/intervals_count;
-                            val_ax.labels.x = rect.x;
-                            if(cross_between === CROSS_BETWEEN_MID_CAT)
+                            if(!bNeedReflect)
                             {
-                                for(i = 0; i < string_pts.length; ++i)
-                                    arr_cat_labels_points[i] = rect.x + val_ax.labels.extX + point_interval*i;
+                                point_interval = (rect.w -  val_ax.labels.extX)/intervals_count;
                             }
                             else
                             {
-                                for(i = 0; i < string_pts.length; ++i)
-                                    arr_cat_labels_points[i] = rect.x + val_ax.labels.extX + point_interval/2 + point_interval*i;
+                                point_interval = rect.w/intervals_count;
+                            }
+                            val_ax.labels.x = rect.x;
+                            if(cross_between === CROSS_BETWEEN_MID_CAT)
+                            {
+                                if(!bNeedReflect)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.x + val_ax.labels.extX + point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.x + point_interval*i;
+                                }
+                            }
+                            else
+                            {
+                                if(!bNeedReflect)
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.x + val_ax.labels.extX + point_interval/2 + point_interval*i;
+                                }
+                                else
+                                {
+                                    for(i = 0; i < string_pts.length; ++i)
+                                        arr_cat_labels_points[i] = rect.x + point_interval/2 + point_interval*i;
+                                }
                             }
                             val_ax.posX = val_ax.labels.x + val_ax.labels.extX + point_interval*(crosses-1);
                         }
                         else if(labels_pos === TICK_LABEL_POSITION_HIGH)//подписи справа от области построения
                         {
-                            point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            if(!bNeedReflect)
+                            {
+                                point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            }
+                            else
+                            {
+                                point_interval = rect.w/intervals_count;
+                            }
+
                             val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
                             left_val_ax_labels_align = false;
                             if(cross_between === CROSS_BETWEEN_MID_CAT)
@@ -3733,7 +3839,14 @@ CChartSpace.prototype =
                             if(val_ax.crosses === CROSSES_MAX)
                             {
                                 val_ax.labels.x = rect.x;
-                                point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                if(!bNeedReflect)
+                                {
+                                    point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                                }
+                                else
+                                {
+                                    point_interval = rect.w/intervals_count;
+                                }
                                 if(cross_between === CROSS_BETWEEN_MID_CAT)
                                 {
                                     for(i = 0; i < string_pts.length; ++i)
@@ -3744,13 +3857,21 @@ CChartSpace.prototype =
                                     for(i = 0; i < string_pts.length; ++i)
                                         arr_cat_labels_points[i] = rect.x + rect.w - point_interval/2 - point_interval*i;
                                 }
-                                val_ax.posX = val_ax.labels.x + val_ax.labels.extX;
+                                if(!bNeedReflect)
+                                {
+                                    val_ax.posX = val_ax.labels.x + val_ax.labels.extX;
+                                }
+                                else
+                                {
+                                    val_ax.posX = val_ax.labels.x;
+                                }
+
                             }
                             else
                             {
                                 left_val_ax_labels_align = false;
                                 right_point_width = point_interval*(crosses-1);
-                                if(right_point_width < val_ax.labels.extX)
+                                if(!bNeedReflect && right_point_width < val_ax.labels.extX)
                                 {
                                     val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
                                     var left_points_interval_count = intervals_count - (crosses - 1);
@@ -3787,7 +3908,14 @@ CChartSpace.prototype =
                         else if(labels_pos === TICK_LABEL_POSITION_LOW)//подписи справа от области построения
                         {
                             left_val_ax_labels_align = false;
-                            point_interval = (rect.w -  val_ax.labels.extX)/intervals_count;
+                            if(!bNeedReflect)
+                            {
+                                point_interval = (rect.w -  val_ax.labels.extX)/intervals_count;
+                            }
+                            else
+                            {
+                                point_interval = rect.w/intervals_count;
+                            }
                             val_ax.labels.x = rect.x + rect.w - val_ax.labels.extX;
 
                             if(cross_between === CROSS_BETWEEN_MID_CAT)
@@ -3800,11 +3928,26 @@ CChartSpace.prototype =
                                 for(i = 0; i < string_pts.length; ++i)
                                     arr_cat_labels_points[i] = val_ax.labels.x - point_interval/2 - point_interval*i;
                             }
-                            val_ax.posX = rect.x + rect.w - point_interval*(crosses-1) - val_ax.labels.extX;
+                            if(!bNeedReflect)
+                            {
+                                val_ax.posX = rect.x + rect.w - point_interval*(crosses-1) - val_ax.labels.extX;
+                            }
+                            else
+                            {
+                                val_ax.posX = rect.x + rect.w - point_interval*(crosses-1);
+                            }
+
                         }
                         else if(labels_pos === TICK_LABEL_POSITION_HIGH)//подписи слева от области построения
                         {
-                            point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            if(!bNeedReflect)
+                            {
+                                point_interval = (rect.w - val_ax.labels.extX)/intervals_count;
+                            }
+                            else
+                            {
+                                point_interval = rect.w/intervals_count;
+                            }
                             val_ax.labels.x = rect.x;
 
                             if(cross_between === CROSS_BETWEEN_MID_CAT)
@@ -4271,6 +4414,20 @@ CChartSpace.prototype =
                     var arr_labels, transform_text, local_text_transform;
                     if(val_ax.labels)
                     {
+                        if(bNeedReflect)
+                        {
+                            if(left_val_ax_labels_align)
+                            {
+                                left_val_ax_labels_align = false;
+                                val_ax.labels.x += val_ax.labels.extX;
+                            }
+                            else
+                            {
+                                left_val_ax_labels_align = true;
+                                val_ax.labels.x -= val_ax.labels.extX;
+                            }
+                        }
+                        val_ax.labels.align = left_val_ax_labels_align;
                         val_ax.labels.y = Math.min.apply(Math, arr_val_labels_points) - max_val_labels_text_height/2;
                         val_ax.labels.extY = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points) + max_val_labels_text_height;
                         arr_labels = val_ax.labels.arrLabels;
@@ -4333,6 +4490,7 @@ CChartSpace.prototype =
                             }
                             cat_ax.labels.extX = arr_cat_labels_points[arr_cat_labels_points.length-1] + max_cat_label_width/2 - cat_ax.labels.x;
 
+                            cat_ax.labels.align = cat_labels_align_bottom;
                             if(cat_labels_align_bottom)
                             {
                                 for(i = 0; i < cat_ax.labels.arrLabels.length; ++i)
@@ -5077,7 +5235,14 @@ CChartSpace.prototype =
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
-                                right_gap = Math.max(last_val_lbl_half_width, cat_ax_ext_x);
+                                if(!bNeedReflect)
+                                {
+                                    right_gap = Math.max(last_val_lbl_half_width, cat_ax_ext_x);
+                                }
+                                else
+                                {
+                                    right_gap = Math.max(last_val_lbl_half_width, 0);
+                                }
                                 cat_labels_align_left = false;//в данном случае подписи будут выравниваться по верхнему краю блока с подписями
                                 if(cat_ax.labels)
                                     cat_ax.labels.x = rect.x + rect.w - right_gap;
@@ -5086,7 +5251,7 @@ CChartSpace.prototype =
                             }
                             else
                             {
-                                if((crosses_val_ax - arr_val[0])*unit_width + first_val_lbl_half_width  < cat_ax_ext_x)
+                                if(!bNeedReflect && (crosses_val_ax - arr_val[0])*unit_width + first_val_lbl_half_width  < cat_ax_ext_x)
                                 {
                                     unit_width = checkFiniteNumber((rect.w -  cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length-1] - crosses_val_ax));
                                 }
@@ -5099,7 +5264,15 @@ CChartSpace.prototype =
                         }
                         else if(hor_labels_pos === TICK_LABEL_POSITION_LOW)
                         {
-                            left_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
+                            if(!bNeedReflect)
+                            {
+                                left_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
+                            }
+                            else
+                            {
+                                left_gap = Math.max(first_val_lbl_half_width, 0);
+                            }
+
 
                             unit_width = checkFiniteNumber((rect.w - left_gap - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
 
@@ -5114,7 +5287,15 @@ CChartSpace.prototype =
                         {
                             cat_labels_align_left = false;
 
-                            right_gap = Math.max(last_val_lbl_half_width, cat_ax_ext_x);
+                            if(!bNeedReflect)
+                            {
+                                right_gap = Math.max(last_val_lbl_half_width, cat_ax_ext_x);
+                            }
+                            else
+                            {
+                                right_gap = Math.max(last_val_lbl_half_width, 0);
+                            }
+
                             unit_width = checkFiniteNumber((rect.w - right_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.posX = rect.x +  first_val_lbl_half_width + (crosses_val_ax - arr_val[0])*unit_width;
 
@@ -5137,7 +5318,14 @@ CChartSpace.prototype =
                         {
                             if(cat_ax.crosses === CROSSES_MAX)
                             {
-                                left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
+                                if(!bNeedReflect)
+                                {
+                                    left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
+                                }
+                                else
+                                {
+                                    left_gap = Math.max(0, last_val_lbl_half_width);
+                                }
                                 unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                                 if(cat_ax.labels)
@@ -5146,7 +5334,7 @@ CChartSpace.prototype =
                             else
                             {
                                 cat_labels_align_left = false;
-                                if(first_val_lbl_half_width < cat_ax_ext_x)
+                                if(!bNeedReflect && first_val_lbl_half_width < cat_ax_ext_x)
                                 {
                                     unit_width = checkFiniteNumber((rect.w - cat_ax_ext_x - last_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                                 }
@@ -5160,7 +5348,15 @@ CChartSpace.prototype =
                         else if(hor_labels_pos === TICK_LABEL_POSITION_LOW)
                         {
                             cat_labels_align_left = false;
-                            right_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
+                            if(!bNeedReflect)
+                            {
+                                right_gap = Math.max(first_val_lbl_half_width, cat_ax_ext_x);
+                            }
+                            else
+                            {
+                                right_gap = Math.max(first_val_lbl_half_width, 0);
+                            }
+
                             unit_width = checkFiniteNumber((rect.w - last_val_lbl_half_width - right_gap)/(arr_val[arr_val.length-1] - arr_val[0]));
                             cat_ax.xPos = rect.x + last_val_lbl_half_width + (arr_val[arr_val.length-1] - crosses_val_ax)*crosses_val_ax;
                             if(cat_ax.labels)
@@ -5171,7 +5367,15 @@ CChartSpace.prototype =
                         }
                         else if(hor_labels_pos === TICK_LABEL_POSITION_HIGH)
                         {
-                            left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
+                            if(!bNeedReflect)
+                            {
+                                left_gap = Math.max(cat_ax_ext_x, last_val_lbl_half_width);
+                            }
+                            else
+                            {
+                                left_gap = Math.max(0, last_val_lbl_half_width);
+                            }
+
                             unit_width = checkFiniteNumber((rect.w - left_gap - first_val_lbl_half_width)/(arr_val[arr_val.length - 1] - arr_val[0]));
                             cat_ax.xPos = rect.x + rect.w - first_val_lbl_half_width - (crosses_val_ax - arr_val[0])*unit_width;
                             if(cat_ax.labels)
@@ -5196,6 +5400,8 @@ CChartSpace.prototype =
                         val_ax.labels.x = Math.min.apply(Math, arr_val_labels_points) - max_val_ax_label_width/2;
                         val_ax.labels.extX = Math.max.apply(Math, arr_val_labels_points) - Math.min.apply(Math, arr_val_labels_points) + max_val_ax_label_width;
                         //val_axis_labels_gap - вертикальный зазор
+
+                        val_ax.labels.align = bottom_val_ax_labels_align;
                         if(bottom_val_ax_labels_align)
                         {
                             var y_pos = val_ax.labels.y + val_axis_labels_gap;
@@ -5244,8 +5450,23 @@ CChartSpace.prototype =
                     {
                         cat_ax.labels.y = rect.y;
                         cat_ax.labels.extY = point_interval*intervals_count;
+
+                        if(bNeedReflect)
+                        {
+                            if(cat_labels_align_left)
+                            {
+                                cat_labels_align_left = false;
+                                cat_ax.labels.x += cat_ax.labels.extX;
+                            }
+                            else
+                            {
+                                cat_labels_align_left = true;
+                                cat_ax.labels.x -= cat_ax.labels.extX;
+                            }
+                        }
                         if(cat_labels_align_left)
                         {
+
 
                             if(width_flag === 0)
                             {
@@ -5412,24 +5633,40 @@ CChartSpace.prototype =
         {
             var oAxisByTypes = this.chart.plotArea.chart.getAxisByTypes();
             var oCatAx = oAxisByTypes.catAx[0], oValAx = oAxisByTypes.valAx[0], deltaX, deltaY, i, oAxisLabels, oLabel, oNewPos;
-            if(oCatAx && oValAx)
+            var oProcessor3D = this.chartObj && this.chartObj.processor3D;
+            if(oCatAx && oValAx && oProcessor3D)
             {
-                if(( (oCatAx.axPos === AX_POS_B || oCatAx.axPos === AX_POS_T) && oCatAx.transformXPoints && oCatAx.xPoints) &&
-                    ((oValAx.axPos === AX_POS_L || oValAx.axPos === AX_POS_R) && oValAx.transformYPoints && oValAx.yPoints))
+                if(( (oCatAx.axPos === AX_POS_B || oCatAx.axPos === AX_POS_T) && oCatAx.xPoints) &&
+                    ((oValAx.axPos === AX_POS_L || oValAx.axPos === AX_POS_R) && oValAx.yPoints))
                 {
                     oAxisLabels = oCatAx.labels;
 					
 					if(oAxisLabels)
 					{
-						 for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                        var dZPositionCatAxis = oProcessor3D.calculateZPositionCatAxis();
+                        var dPosY, dPosY2
+                        if(oAxisLabels.align)
+                        {
+                            dPosY = oAxisLabels.y*this.chartObj.calcProp.pxToMM;
+                            dPosY2 = oAxisLabels.y;
+                        }
+                        else
+                        {
+
+                            dPosY = (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM;
+                            dPosY2 = oAxisLabels.y + oAxisLabels.extY;
+                        }
+
+						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
-                                deltaX = oLabel.localTransformText.tx - oCatAx.xPoints[i].pos;
-                                deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
-                                oNewPos = oCatAx.transformXPoints[i];
-                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                                var oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
+                                var oCPosLabelY = oLabel.localTransformText.TransformPointY(oLabel.txBody.content.XLimit/2, 0);
+                                oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionCatAxis);
+
+                                oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
                             }
 						}
 					}
@@ -5438,36 +5675,68 @@ CChartSpace.prototype =
                     oAxisLabels = oValAx.labels;
 					if(oAxisLabels)
 					{
-						for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
+                        var dZPositionCatAxis = oProcessor3D.calculateZPositionValAxis();
+
+                        var dPosX, dPosX2;
+                        if(!oAxisLabels.align)
+                        {
+                            dPosX2 = oAxisLabels.x;
+                            dPosX =  oAxisLabels.x*this.chartObj.calcProp.pxToMM;
+                        }
+                        else
+                        {
+                            dPosX2 = oAxisLabels.x + oAxisLabels.extX;
+                            dPosX = (oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM;
+                        }
+
+                        for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
 						{
 							oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
-                                deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
-                                deltaY = oLabel.localTransformText.ty - oValAx.yPoints[i].pos;
-                                oNewPos = oValAx.transformYPoints[i];
-                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+                                oNewPos =  oProcessor3D.convertAndTurnPoint(dPosX, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                                oLabel.setPosition2(oLabel.localTransformText.tx - dPosX2 + oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
                             }
 						}
 					}
                     
                 }
-                else if(((oCatAx.axPos === AX_POS_L || oCatAx.axPos === AX_POS_R) && oCatAx.transformYPoints && oCatAx.yPoints) &&
-                    ((oValAx.axPos === AX_POS_T || oValAx.axPos === AX_POS_B) && oValAx.transformXPoints && oValAx.xPoints))
+                else if(((oCatAx.axPos === AX_POS_L || oCatAx.axPos === AX_POS_R) && oCatAx.yPoints) &&
+                    ((oValAx.axPos === AX_POS_T || oValAx.axPos === AX_POS_B) && oValAx.xPoints))
                 {
                     oAxisLabels = oValAx.labels;
 
                     if(oAxisLabels)
                     {
+                        var dZPositionValAxis = oProcessor3D.calculateZPositionValAxis();
+                        var dPosY, dPosY2
+                        if(oAxisLabels.align)
+                        {
+                            dPosY = oAxisLabels.y*this.chartObj.calcProp.pxToMM;
+                            dPosY2 = oAxisLabels.y;
+                        }
+                        else
+                        {
+
+                            dPosY = (oAxisLabels.y + oAxisLabels.extY)*this.chartObj.calcProp.pxToMM;
+                            dPosY2 = oAxisLabels.y + oAxisLabels.extY;
+                        }
+
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
                             if(oLabel)
                             {
-                                deltaX = oLabel.localTransformText.tx - oValAx.xPoints[i].pos;
-                                deltaY = oLabel.localTransformText.ty - oAxisLabels.y;
-                                oNewPos = oValAx.transformXPoints[i];
-                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+
+                                var oCPosLabelX = oLabel.localTransformText.TransformPointX(oLabel.txBody.content.XLimit/2, 0);
+                                var oCPosLabelY = oLabel.localTransformText.TransformPointY(oLabel.txBody.content.XLimit/2, 0);
+                                oNewPos = oProcessor3D.convertAndTurnPoint(oCPosLabelX*this.chartObj.calcProp.pxToMM, dPosY, dZPositionValAxis);
+
+                                oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM + oLabel.localTransformText.tx - oCPosLabelX, oLabel.localTransformText.ty - dPosY2 + oNewPos.y/this.chartObj.calcProp.pxToMM );
+
+
+                                //oNewPos = oProcessor3D.convertAndTurnPoint(oLabel.localTransformText.tx*this.chartObj.calcProp.pxToMM, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionValAxis);;
+                               //oLabel.setPosition2(oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
                             }
                         }
                     }
@@ -5477,15 +5746,28 @@ CChartSpace.prototype =
 
                     if(oAxisLabels)
                     {
+                        var dZPositionCatAxis = oProcessor3D.calculateZPositionCatAxis();
+                        var dPosX, dPosX2;
+                        if(oAxisLabels.align)
+                        {
+                            dPosX2 = oAxisLabels.x;
+                            dPosX =  oAxisLabels.x*this.chartObj.calcProp.pxToMM;
+                        }
+                        else
+                        {
+                            dPosX2 = oAxisLabels.x + oAxisLabels.extX;
+                            dPosX = (oAxisLabels.x + oAxisLabels.extX)*this.chartObj.calcProp.pxToMM;
+                        }
+
                         for(i = 0; i < oAxisLabels.arrLabels.length; ++i)
                         {
                             oLabel = oAxisLabels.arrLabels[i];
+
                             if(oLabel)
                             {
-                                deltaX = oLabel.localTransformText.tx - oAxisLabels.x;
-                                deltaY = oLabel.localTransformText.ty - oCatAx.yPoints[i].pos;
-                                oNewPos = oCatAx.transformYPoints[i];
-                                oLabel.setPosition2(oNewPos.x + deltaX, oNewPos.y + deltaY);
+
+                                    oNewPos =  oProcessor3D.convertAndTurnPoint(dPosX, oLabel.localTransformText.ty*this.chartObj.calcProp.pxToMM, dZPositionCatAxis);
+                                    oLabel.setPosition2(oLabel.localTransformText.tx - dPosX2 + oNewPos.x/this.chartObj.calcProp.pxToMM, oNewPos.y/this.chartObj.calcProp.pxToMM);
                             }
                         }
                     }
