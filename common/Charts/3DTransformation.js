@@ -382,7 +382,7 @@ Processor3D.prototype.convertAndTurnPointRAngAx = function(x, y, z)
 	var specialReverseDiff = this.widthCanvas / 2 + (this.left - this.right) / 2;
 	projectionPoint.offset(specialReverseDiff, centerYDiff, centerZDiff);
 	
-	return {x: projectionPoint.x, y: projectionPoint.y};
+	return {x: projectionPoint.x, y: projectionPoint.y, z: z};
 };
 
 Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z)
@@ -427,7 +427,7 @@ Processor3D.prototype.convertAndTurnPointPerspective = function(x, y, z)
 	var specialReverseDiffY = this.heightCanvas / 2 + (this.top - this.bottom) / 2; 
 	projectionPoint.offset(specialReverseDiffX, specialReverseDiffY, centerZDiff);
 	
-	return {x: projectionPoint.x, y: projectionPoint.y};
+	return {x: projectionPoint.x, y: projectionPoint.y, z: projectionPoint.z};
 };
 
 //functions for step transformation point
