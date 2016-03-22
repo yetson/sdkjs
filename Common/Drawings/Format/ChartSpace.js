@@ -390,6 +390,31 @@ function CheckObjectTextPr(oElement, oTextPr, oDrawingDocument)
     }
 }
 
+function CheckIncDecFontSize(oElement, bIncrease, oDrawingDocument,nDefaultSize)
+{
+    if(oElement)
+    {
+        if(!oElement.txPr)
+        {
+            oElement.setTxPr(CreateTextBodyFromString("", oDrawingDocument, oElement));
+        }
+        var oParaPr = oElement.txPr.content.Content[0].Pr.Copy();
+        oElement.txPr.content.Content[0].Set_DocumentIndex(0);
+        var oCopyTextPr;
+        if(oParaPr.DefaultRunPr)
+        {
+            oCopyTextPr = oParaPr.DefaultRunPr.Copy();
+        }
+        else
+        {
+            oCopyTextPr = new CTextPr();
+        }
+        oCopyTextPr.FontSize = FontSize_IncreaseDecreaseValue( bIncrease, isRealNumber(oCopyTextPr.FontSize) ? oCopyTextPr.FontSize : nDefaultSize);
+        oParaPr.DefaultRunPr = oCopyTextPr;
+        oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+    }
+}
+
 function CChartSpace()
 {
     this.chart = null;
@@ -519,7 +544,8 @@ CChartSpace.prototype =
             }
             else if(this.selection.axisLbls)
             {
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, this.selection.axisLbls.x, this.selection.axisLbls.y, this.selection.axisLbls.extX, this.selection.axisLbls.extY, false, false);
+                var oLabels = this.selection.axisLbls.labels
+                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
         }
     },
@@ -730,12 +756,9 @@ CChartSpace.prototype =
         {
             return this.selection.textSelection.txBody.content.Get_Paragraph_TextPr();
         }
-        else if(this.selection.axisLbls)
+        else if(this.selection.axisLbls && this.selection.axisLbls.labels)
         {
-            if(this.selection.axisLbls.axis)
-            {
-                return GetTextPrFormArrObjects(this.selection.axisLbls.arrLabels, true);
-            }
+            return GetTextPrFormArrObjects(this.selection.axisLbls.labels.arrLabels, true);
         }
         else if(isRealNumber(this.selection.dataLbls))
         {
@@ -764,9 +787,99 @@ CChartSpace.prototype =
         return new CTextPr();
     },
 
+
+    applyLabelsFunction: function(fCallback, value)
+    {
+        if(this.selection.title)
+        {
+            fCallback(this.selection.title, value, this.getDrawingDocument(), 18);
+        }
+        else if(this.selection.legend)
+        {
+            if(!isRealNumber(this.selection.legendEntry))
+            {
+                fCallback(this.selection.legend, value, this.getDrawingDocument(), 10);
+                for(var i = 0; i < this.selection.legend.legendEntryes.length; ++i)
+                {
+                    fCallback(this.selection.legend.legendEntryes[i], value, this.getDrawingDocument(), 10);
+                }
+            }
+            else
+            {
+                var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
+                if(!entry)
+                {
+                    entry = new CLegendEntry();
+                    entry.setIdx(this.selection.legendEntry);
+                    this.selection.legend.addLegendEntry(entry);
+                }
+                if(entry)
+                {
+                    fCallback(entry, value, this.getDrawingDocument(), 10);
+                }
+            }
+        }
+        else if(this.selection.axisLbls)
+        {
+            fCallback(this.selection.axisLbls, value, this.getDrawingDocument(), 10);
+        }
+        else if(isRealNumber(this.selection.dataLbls))
+        {
+            var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
+            if(ser)
+            {
+                var pts = getPtsFromSeries(ser);
+                if(!ser.dLbls)
+                {
+                    var oDlbls;
+                    if(this.chart.plotArea.chart.dLbls)
+                    {
+                        oDlbls = this.chart.plotArea.chart.dLbls.createDuplicate();
+                    }
+                    else
+                    {
+                        oDlbls = new CDLbls();
+                    }
+                    ser.setDLbls(oDlbls);
+                }
+                if(!isRealNumber(this.selection.dataLbl))
+                {
+                    fCallback(ser.dLbls, value, this.getDrawingDocument(), 10);
+                    for(var i = 0; i < pts.length; ++i)
+                    {
+                        var dLbl  = ser.dLbls.findDLblByIdx(pts[i].idx);
+                        if(dLbl)
+                        {
+                            fCallback(dLbl, value, this.getDrawingDocument(), 10);
+                        }
+                    }
+                }
+                else
+                {
+                    var pt = pts[this.selection.dataLbl];
+                    if(pt)
+                    {
+                        var dLbl  = ser.dLbls.findDLblByIdx(pt.idx);
+                        if(!dLbl)
+                        {
+                            dLbl = new CDLbl();
+                            dLbl.setIdx(pt.idx);
+                            ser.dLbls.addDLbl(dLbl);
+                        }
+                        fCallback(dLbl, value, this.getDrawingDocument(), 10);
+                    }
+                }
+            }
+        }
+    },
+
+    paragraphIncDecFontSize: function(bIncrease)
+    {
+        this.applyLabelsFunction(CheckIncDecFontSize, bIncrease);
+    },
+
     paragraphAdd: function(paraItem, bRecalculate)
     {
-        var content;
         if(paraItem.Type === para_TextPr)
         {
             var _paraItem;
@@ -779,108 +892,13 @@ CChartSpace.prototype =
             {
                 _paraItem = paraItem;
             }
-            if(this.selection.title && !this.selection.textSelection)
-            {
-                CheckObjectTextPr(this.selection.title, _paraItem.Value, this.getDrawingDocument());
-            }
-            else if(this.selection.legend)
-            {
-                if(!isRealNumber(this.selection.legendEntry))
-                {
-                    CheckObjectTextPr(this.selection.legend, paraItem.Value, this.getDrawingDocument());
-                    for(var i = 0; i < this.selection.legend.legendEntryes.length; ++i)
-                    {
-                        CheckObjectTextPr(this.selection.legend.legendEntryes[i], paraItem.Value, this.getDrawingDocument());
-                    }
-                }
-                else
-                {
-                    var entry = this.selection.legend.findLegendEntryByIndex(this.selection.legendEntry);
-                    if(!entry)
-                    {
-                        entry = new CLegendEntry();
-                        entry.setIdx(this.selection.legendEntry);
-                        this.selection.legend.addLegendEntry(entry);
-                    }
-                    if(entry)
-                    {
-                        CheckObjectTextPr(entry, paraItem.Value, this.getDrawingDocument());
-                    }
-                }
-            }
-            else  if(this.selection.textSelection)
-            {
-                this.selection.textSelection.checkDocContent();
-                this.selection.textSelection.paragraphAdd(_paraItem, bRecalculate);
-            }
-            else if(this.selection.axisLbls)
-            {
-                if(this.selection.axisLbls.axis)
-                {
-                    CheckObjectTextPr(this.selection.axisLbls.axis, paraItem.Value, this.getDrawingDocument());
-                }
-            }
-            else if(isRealNumber(this.selection.dataLbls))
-            {
-                var ser = this.chart.plotArea.chart.series[this.selection.dataLbls];
-                if(ser)
-                {
-                    var pts = getPtsFromSeries(ser);
-                    if(!ser.dLbls)
-                    {
-                        var oDlbls;
-                        if(this.chart.plotArea.chart.dLbls)
-                        {
-                            oDlbls = this.chart.plotArea.chart.dLbls.createDuplicate();
-                        }
-                        else
-                        {
-                            oDlbls = new CDLbls();
-                        }
-                        ser.setDLbls(oDlbls);
-                    }
-                    if(!isRealNumber(this.selection.dataLbl))
-                    {
-
-                        CheckObjectTextPr(ser.dLbls, paraItem.Value, this.getDrawingDocument());
-                        for(var i = 0; i < pts.length; ++i)
-                        {
-                            var dLbl  = ser.dLbls.findDLblByIdx(pts[i].idx);
-                            if(dLbl)
-                            {
-                                CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
-                            }
-                        }
-                    }
-                    else
-                    {
-                        var pt = pts[this.selection.dataLbl];
-                        if(pt)
-                        {
-                            var dLbl  = ser.dLbls.findDLblByIdx(pt.idx);
-                            if(!dLbl)
-                            {
-                                dLbl = new CDLbl();
-                                dLbl.setIdx(pt.idx);
-                                ser.dLbls.addDLbl(dLbl);
-                            }
-                            CheckObjectTextPr(dLbl, paraItem.Value, this.getDrawingDocument());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                //TODO: другие случаи будут обработаны в след. версиях
-            }
-        }
-        else
-        {
             if(this.selection.textSelection)
             {
                 this.selection.textSelection.checkDocContent();
                 this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
+                return;
             }
+            this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
         }
     },
 
