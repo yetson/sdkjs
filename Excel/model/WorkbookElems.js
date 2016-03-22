@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -4817,6 +4817,9 @@ FilterColumn.prototype.isHideValue = function(val, isDateTimeFormat, top10Length
 		res = this.CustomFiltersObj.isHideValue(val);
 	else if(this.Top10)
 		res = this.Top10.isHideValue(val, top10Length);
+	else if(this.ColorFilter)
+		res = this.ColorFilter.isHideValue(val);
+		
 	return res;
 };
 FilterColumn.prototype.clean = function() {
@@ -5333,6 +5336,9 @@ ColorFilter.prototype.clone = function() {
 		res.dxf = this.dxf.clone();
 	}
 	return res;
+};
+ColorFilter.prototype.isHideValue = function() {
+	return false;
 };
 
 ColorFilter.prototype.asc_getCellColor = function () { return this.CellColor; };

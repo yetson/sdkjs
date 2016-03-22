@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -2984,7 +2984,7 @@
 					
 				var api = window["Asc"]["editor"];
 				var ws = api.wb.getWorksheet();
-				bIsTablePartContainActiveRange = ws.autoFilters.isTablePartContainActiveRange();
+				bIsTablePartContainActiveRange = ws.model.autoFilters.isTablePartContainActiveRange(ws.activeRange);
             }
             else
             {

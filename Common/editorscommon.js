@@ -1,4 +1,4 @@
-/*
+﻿/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -1463,7 +1463,7 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 				return c_oAscError.ID.MaxDataSeriesError;
 		} else if (c_oAscSelectionDialogType.FormatTable === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
-			if (true === wb.getWorksheet().autoFilters.isRangeIntersectionTableOrFilter(dataRange))
+			if (true === wb.getWorksheet().model.autoFilters.isRangeIntersectionTableOrFilter(dataRange))
 				return c_oAscError.ID.AutoFilterDataRangeError;
 		}
 	}
