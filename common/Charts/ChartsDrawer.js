@@ -2590,6 +2590,8 @@ drawBarChart.prototype =
 		this.paths = {};
 		this.summBarVal = [];
 		
+		this.sortZIndexPaths = [];
+		
 		this._reCalculateBars();
 	},
 	
@@ -5736,6 +5738,7 @@ function drawHBarChart()
 	this.cChartDrawer = null;
 	this.cShapeDrawer = null;
 	this.paths = {};
+	this.sortZIndexPaths = [];
 	
 	this.summBarVal = [];
 }
@@ -5748,6 +5751,8 @@ drawHBarChart.prototype =
 	{
 		this.paths = {};
 		this.summBarVal = [];
+		
+		this.sortZIndexPaths = [];
 		
 		this.chartProp = chartsDrawer.calcProp;
 		this.cChartDrawer = chartsDrawer;
@@ -5911,6 +5916,8 @@ drawHBarChart.prototype =
 					point8 = this.cChartDrawer._convertAndTurnPoint(x8, y8, z8);
 					
 					paths = this.cChartDrawer.calculateRect3D(point1, point2, point3, point4, point5, point6, point7, point8, val);
+					
+					this.sortZIndexPaths.push({seria: i, point: idx, paths: paths, x: point1.x, y: point1.y, zIndex: point1.z});
 				}
 				else
 				{
@@ -5930,6 +5937,17 @@ drawHBarChart.prototype =
 			if(seria.length)
 				seriesCounter++;
         }
+		
+		if(this.cChartDrawer.nDimensionCount === 3)
+		{
+			this.sortZIndexPaths.sort (function sortArr(a, b)
+			{
+				if(b.zIndex == a.zIndex)
+					return  b.y - a.y;
+				else
+					return  b.zIndex - a.zIndex;
+			});
+		}
     },
 	
 	_getOptionsForDrawing: function(ser, point, onlyLessNull)
@@ -6203,8 +6221,9 @@ drawHBarChart.prototype =
 		
 		return path;
 	},
-
-	_DrawBars3D: function()
+	
+	//TODO delete after test
+	_DrawBars3D2: function()
 	{
 		var t = this;
 		var draw = function(onlyLessNull)
@@ -6283,6 +6302,65 @@ drawHBarChart.prototype =
 				drawReverse();
 		}
 	},
+	
+	
+	_DrawBars3D: function()
+	{
+		var t = this;
+		var processor3D = this.cChartDrawer.processor3D;
+		
+		var verges = 
+		{
+			front: 0,
+			down: 1,
+			left: 2,
+			right: 3,
+			up: 4,
+			unfront: 5
+		};
+		
+		var drawVerges = function(i, j, paths, onlyLessNull, start, stop)
+		{
+			var brush, pen, options;
+			options = t._getOptionsForDrawing(i, j, onlyLessNull);
+			if(options !== null)
+			{
+				pen = options.pen;
+				brush = options.brush;
+				
+				for(var k = start; k <= stop; k++)
+				{
+					t._drawBar3D(paths[k], pen, brush, k);
+				}
+			}
+		};
+		
+		var draw = function(onlyLessNull, start, stop)
+		{
+			for(var i = 0; i < t.sortZIndexPaths.length; i++)
+			{
+				drawVerges(t.sortZIndexPaths[i].seria, t.sortZIndexPaths[i].point, t.sortZIndexPaths[i].paths, onlyLessNull, start, stop);
+			}
+		};
+		
+		if(this.chartProp.subType === "standard")
+		{
+			draw(true, verges.front, verges.unfront);
+			draw(false, verges.front, verges.unfront);
+		}
+		else
+		{
+			draw(true, verges.down, verges.up);
+			draw(false, verges.down, verges.up);
+			
+			draw(true, verges.unfront, verges.unfront);
+			draw(false, verges.unfront, verges.unfront);
+			
+			draw(true, verges.front, verges.front);
+			draw(false, verges.front, verges.front);
+		}
+	},
+	
 	
 	_drawBar3D: function(path, pen, brush, k)
 	{
