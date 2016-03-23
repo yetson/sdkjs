@@ -464,7 +464,7 @@ function cError( val ) {
 
     switch ( val ) {
 		case cErrorLocal["value"]:
-        case "#VALUE!":
+		case cErrorOrigin["value"]:
         case cErrorType.wrong_value_type:
         {
             this.value = "#VALUE!";
@@ -472,7 +472,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["nil"]:
-        case "#NULL!":
+		case cErrorOrigin["nil"]:
         case cErrorType.null_value:
         {
             this.value = "#NULL!";
@@ -480,7 +480,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["div"]:
-        case "#DIV/0!":
+		case cErrorOrigin["div"]:
         case cErrorType.division_by_zero:
         {
             this.value = "#DIV/0!";
@@ -488,7 +488,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["ref"]:
-        case "#REF!":
+		case cErrorOrigin["ref"]:
         case cErrorType.bad_reference:
         {
             this.value = "#REF!";
@@ -496,7 +496,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["name"]:
-        case "#NAME?":
+		case cErrorOrigin["name"]:
         case cErrorType.wrong_name:
         {
             this.value = "#NAME?";
@@ -504,7 +504,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["num"]:
-        case "#NUM!":
+		case cErrorOrigin["num"]:
         case cErrorType.not_numeric:
         {
             this.value = "#NUM!";
@@ -512,7 +512,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["na"]:
-        case "#N/A":
+		case cErrorOrigin["na"]:
         case cErrorType.not_available:
         {
             this.value = "#N/A";
@@ -520,7 +520,7 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["getdata"]:
-        case "#GETTING_DATA":
+		case cErrorOrigin["getdata"]:
         case cErrorType.getting_data:
         {
             this.value = "#GETTING_DATA";
@@ -528,14 +528,13 @@ function cError( val ) {
             break;
         }
 		case cErrorLocal["uf"]:
-        case "#UNSUPPORTED_FUNCTION!":
+		case cErrorOrigin["uf"]:
         case cErrorType.unsupported_function:
         {
             this.value = "#UNSUPPORTED_FUNCTION!";
             this.errorType = cErrorType.unsupported_function;
             break;
         }
-
     }
 
     return this;
@@ -545,6 +544,74 @@ cError.prototype = Object.create( cBaseType.prototype );
 cError.prototype.tocNumber = cError.prototype.tocString = cError.prototype.tocBool = cError.prototype.tocEmpty = function () {
     return this;
 };
+cError.prototype.toLocaleString = function () {
+	switch ( this.value ) {
+		case cErrorOrigin["value"]:
+		case cErrorType.wrong_value_type:
+		{
+			return cErrorLocal["value"];
+			break;
+		}
+		case cErrorOrigin["nil"]:
+		case cErrorType.null_value:
+		{
+			return cErrorLocal["nil"];
+			break;
+		}
+		case cErrorOrigin["div"]:
+		case cErrorType.division_by_zero:
+		{
+			return cErrorLocal["div"];
+			break;
+		}
+
+		case cErrorOrigin["ref"]:
+		case cErrorType.bad_reference:
+		{
+			return cErrorLocal["ref"];
+			break;
+		}
+
+		case cErrorOrigin["name"]:
+		case cErrorType.wrong_name:
+		{
+			return cErrorLocal["name"];
+			break;
+		}
+
+		case cErrorOrigin["num"]:
+		case cErrorType.not_numeric:
+		{
+			return cErrorLocal["num"];
+			break;
+		}
+
+		case cErrorOrigin["na"]:
+		case cErrorType.not_available:
+		{
+			return cErrorLocal["na"];
+			break;
+		}
+
+		case cErrorOrigin["getdata"]:
+		case cErrorType.getting_data:
+		{
+			return cErrorLocal["getdata"];
+			break;
+		}
+
+		case cErrorOrigin["uf"]:
+		case cErrorType.unsupported_function:
+		{
+			return cErrorLocal["uf"];
+			break;
+		}
+	}
+	return cErrorLocal["na"];
+};
+/*cError.prototype.toString = function () {
+	return new cString( this.value ? cBoolLocal["t"].toUpperCase() : cBoolLocal["f"].toUpperCase() );
+};*/
 
 /** @constructor */
 function cArea( val, ws ) {/*Area means "A1:E5" for example*/
@@ -4333,7 +4400,7 @@ parserFormula.prototype = {
                 }
 
                 /* Errors */
-                else if ( parserHelp.isError.call( this, this.Formula, this.pCurrPos ) ) {
+                else if ( parserHelp.isError.call( this, this.Formula, this.pCurrPos, local ) ) {
                     found_operand = new cError( this.operand_str );
                 }
 

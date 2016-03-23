@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 if (typeof String.prototype.startsWith != 'function') {
 	String.prototype.startsWith = function (str){
@@ -583,6 +583,7 @@ function test_defName(){
 
 var cStrucTableLocalColumns = {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"},
 	cBoolLocal = {"t":"TRUE","f":"FALSE"},
+	cErrorOrigin = {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"},
 	cErrorLocal = {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"};
 
 
@@ -636,7 +637,7 @@ function build_rx_bool(local){
 }
 
 function build_rx_error_local(local){
-	rx_error_local = build_rx_error(null/*local*/);
+	rx_error_local = build_rx_error(local);
 }
 function build_rx_error(local){
 	cErrorLocal = ( local ? local : {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"} );
