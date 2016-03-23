@@ -3153,7 +3153,7 @@ function Woorksheet(wb, _index, sId){
 	this.sheetPr = null;
 	this.aFormulaExt = null;
 	
-	this.autoFilters = new asc.AutoFilters(this);
+	this.autoFilters = asc.AutoFilters !== undefined ? new asc.AutoFilters(this) : null;
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
