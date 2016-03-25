@@ -3182,6 +3182,10 @@ DrawingObjectsController.prototype =
                                     finish_dlbl_pos = DLBL_POS_CTR;
                                 }
                             }
+                            if(chart.view3D)
+                            {
+                                finish_dlbl_pos = null;
+                            }
                             break;
                         }
                         case historyitem_type_LineChart:
