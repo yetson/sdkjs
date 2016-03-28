@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 function CMathFractionPr()
@@ -327,7 +303,12 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     var ArgSzNumDen = ArgSize.Copy();
 
-    if(RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION)) // уменьшае размер числителя и знаменателя
+    var oMathSettings = Get_WordDocumentDefaultMathSettings();
+
+    var bInlineBarFaction = RPI.bInline == true && (this.Pr.type === BAR_FRACTION || this.Pr.type == NO_BAR_FRACTION),
+        bReduceSize       = (RPI.bSmallFraction || RPI.bDecreasedComp == true) && true == oMathSettings.Get_SmallFrac();
+
+    if(bInlineBarFaction || bReduceSize) // уменьшае размер числителя и знаменателя
     {
         ArgSzNumDen.Decrease();        // для контентов числителя и знаменателя
         this.ArgSize.SetValue(-1);     // для CtrPrp
@@ -346,17 +327,24 @@ CFraction.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInf
 
     this.ApplyProperties(RPI);
 
-    var NewRPI = RPI.Copy();
+    var bDecreasedComp = RPI.bDecreasedComp,
+        bSmallFraction = RPI.bSmallFraction;
+
     if(this.Pr.type !== LINEAR_FRACTION)
-        NewRPI.bDecreasedComp = true;
+        RPI.bDecreasedComp = true;
+
+    RPI.bSmallFraction = true;
 
     // setGaps обязательно после того как смержили CtrPrp (Set_CompiledCtrPrp)
 
     if(this.bInside == false)
         GapsInfo.setGaps(this, this.TextPrControlLetter.FontSize);
 
-    this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
-    this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, NewRPI);
+    this.Numerator.PreRecalc(this, ParaMath, ArgSzNumDen, RPI);
+    this.Denominator.PreRecalc(this, ParaMath, ArgSzNumDen, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
+    RPI.bSmallFraction = bSmallFraction;
 };
 CFraction.prototype.recalculateSize = function(oMeasure)
 {

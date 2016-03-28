@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 function CRPI()
@@ -34,22 +10,8 @@ function CRPI()
     this.bMathFunc                 = false;
     this.bRecalcCtrPrp             = false; // пересчет ctrPrp нужен, когда на Undo и тп изменился размер первого Run, а ctrPrp уже для мат объектов пересчитались
     this.bCorrect_ConvertFontSize  = false;
+    this.bSmallFraction            = false;
 }
-CRPI.prototype.Copy = function()
-{
-    var RPI = new CRPI();
-
-    RPI.bInline                   = this.bInline;
-    RPI.bDecreasedComp            = this.bDecreasedComp;
-    RPI.bChangeInline             = this.bChangeInline;
-    RPI.bNaryInline               = this.bNaryInline;
-    RPI.bEqArray                  = this.bEqArray;
-    RPI.bMathFunc                 = this.bMathFunc;
-    RPI.bRecalcCtrPrp             = this.bRecalcCtrPrp;
-    RPI.bCorrect_ConvertFontSize  = this.bCorrect_ConvertFontSize;
-
-    return RPI;
-};
 CRPI.prototype.MergeMathInfo = function(MathInfo)
 {
     this.bInline                   = MathInfo.bInline || (MathInfo.bInternalRanges == true && MathInfo.bStartRanges == false);
@@ -1331,10 +1293,9 @@ CMathContent.prototype.Correct_Content = function(bInnerCorrection)
             {
                 bEmptyContent = false;
             }
-
         }
 
-        if(bEmptyContent)
+        if(bEmptyContent == true && this.bRoot == false)
         {
             this.Content[0].fillPlaceholders();
             this.Content[0].Recalc_CompiledPr(true);
@@ -1497,7 +1458,7 @@ CMathContent.prototype.GetMathTextPrForMenu = function(ContentPos, Depth)
 
     return this.Content[pos].GetMathTextPrForMenu(ContentPos, Depth + 1);
 };
-CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, PosForMenu)
+CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, StartPos, EndPos)
 {
     if ( true === ApplyToAll )
     {
@@ -1508,10 +1469,10 @@ CMathContent.prototype.Apply_TextPr = function(TextPr, IncFontSize, ApplyToAll, 
     {
         var StartPos, EndPos, bMenu = false;
 
-        if(PosForMenu !== undefined)
+        if(StartPos !== undefined && EndPos !== undefined)
         {
-            StartPos = PosForMenu.StartPos;
-            EndPos   = PosForMenu.EndPos;
+            StartPos = StartPos;
+            EndPos   = EndPos;
 
             bMenu = true;
         }
