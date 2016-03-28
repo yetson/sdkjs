@@ -8288,6 +8288,7 @@ Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 		nStartCol = merged.bbox.c1;
 	}
 	lockDraw(this.worksheet.workbook);
+	var isSortColor = !!(colorText || colorFill);
 	var oRes = null;
 	var oThis = this;
 	var bAscent = false;
@@ -8358,7 +8359,7 @@ Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 						sText = val;
 					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
 				}
-				else if(colorFill || colorText)
+				else if(isSortColor)
 				{
 					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
 				}
@@ -8415,7 +8416,7 @@ Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 		return res;
 	};
 	
-	if(colorText || colorFill)
+	if(isSortColor)
 	{
 		var newArrayNeedColor = [];
 		var newArrayAnotherColor = [];
