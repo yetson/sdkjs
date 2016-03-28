@@ -25,8 +25,6 @@
 module.exports = function(grunt) {
 	require('google-closure-compiler').grunt(grunt);
     var revision="unknown", defaultConfig, packageFile;
-	
-	var path = require('path');
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
@@ -170,7 +168,7 @@ module.exports = function(grunt) {
 		grunt.initConfig({
 			pkg: grunt.file.readJSON(defaultConfig),
 			'closure-compiler': {
-				build: {
+				sdk: {
 					files: {
 						'<%= pkg.compile.sdk.dst %>': packageFile['compile']['sdk']['src']
 					},
@@ -182,12 +180,15 @@ module.exports = function(grunt) {
 						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
 						create_source_map: map_file_path,
 						source_map_format: "V3"*/
+					}
+				},
+				defines: {
+					files: {
+						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
 					},
-					defines: {
-						options: {
-							compilation_level: 'SIMPLE',
-							warning_level: 'QUIET'
-						}
+					options: {
+						compilation_level: 'SIMPLE',
+						warning_level: 'QUIET'
 					}
 				}
 			},
