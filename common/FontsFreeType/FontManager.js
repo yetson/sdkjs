@@ -1335,6 +1335,8 @@ function CFontManager()
 
     this.LOAD_MODE = 40970;
 
+    this.IsAdvanceNeedBoldFonts = true;
+
     this.AfterLoad = function()
     {
         if (null == this.m_pFont)
@@ -1718,5 +1720,10 @@ function CFontManager()
 
             this.LOAD_MODE = 40970;
         }
+    }
+
+    this.SetAdvanceNeedBoldFonts = function(value)
+    {
+        this.IsAdvanceNeedBoldFonts = value;
     }
 }
