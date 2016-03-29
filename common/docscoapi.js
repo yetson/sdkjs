@@ -1300,7 +1300,7 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount;
+      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
       }
@@ -1308,7 +1308,7 @@
         t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
       }
       //Try reconect
-      if (t.attemptCount < t.maxAttemptCount) {
+      if (!bIsDisconnectAtAll) {
         t._tryReconnect();
       }
     };
