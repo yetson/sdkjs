@@ -1922,7 +1922,7 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			changeTableStyleInfo: function(tableName, optionType)
+			changeFormatTableInfo: function(tableName, optionType)
 			{
 				var tablePart = this._getFilterByDisplayName(tableName);
 				
@@ -1933,26 +1933,46 @@ var maxIndividualValues = 10000;
 				
 				switch(optionType)
 				{
-					case c_oAscChangeTableStyleInfo.showColumnStripes:
+					case c_oAscChangeTableStyleInfo.columnBanded:
 					{
 						tablePart.TableStyleInfo.ShowColumnStripes = !tablePart.TableStyleInfo.ShowColumnStripes;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.showFirstColumn:
+					case c_oAscChangeTableStyleInfo.columnFirst:
 					{
 						tablePart.TableStyleInfo.ShowFirstColumn = !tablePart.TableStyleInfo.ShowFirstColumn;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.showLastColumn:
+					case c_oAscChangeTableStyleInfo.columnLast:
 					{
 						tablePart.TableStyleInfo.ShowLastColumn = !tablePart.TableStyleInfo.ShowLastColumn;
 						break;
 					}
-					case c_oAscChangeTableStyleInfo.showRowStripes:
+					case c_oAscChangeTableStyleInfo.rowBanded:
 					{
 						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
 						break;
 					}
+					case c_oAscChangeTableStyleInfo.rowHeader:
+					{
+						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						break;
+					}
+					/*case c_oAscChangeTableStyleInfo.rowTotal:
+					{
+						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.rowHeader:
+					{
+						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						break;
+					}
+					case c_oAscChangeTableStyleInfo.filterButton:
+					{
+						tablePart.TableStyleInfo.ShowRowStripes = !tablePart.TableStyleInfo.ShowRowStripes;
+						break;
+					}*/
 				}
 				
 				//TODO add to history
