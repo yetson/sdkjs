@@ -23,15 +23,17 @@
  *
 */
 module.exports = function(grunt) {
-    var revision="unknown", defaultConfig, packageFile, toolsConfig, toolsFile;
-	
-	var path = require('path');
+	require('google-closure-compiler').grunt(grunt);
+    var revision="unknown", defaultConfig, packageFile;
+	var path = grunt.option('src') || './configs';
+	var level = grunt.option('level') || 'ADVANCED';
+	var formatting = grunt.option('formatting') || '';
+	var nomap = grunt.option('nomap') || '';
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-exec');
-	grunt.loadNpmTasks('grunt-closure-tools');
 	grunt.loadNpmTasks('grunt-replace');
 	
 	grunt.registerTask('get_svn_info', 'Initialize svn information', function () {
@@ -51,33 +53,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('setup_tools', 'Initialize tools.', function(){
-        toolsConfig = 'tools.json';
-        toolsFile = require('./' + toolsConfig);
-
-        if (toolsFile)
-            grunt.log.ok('Tools config loaded successfully'.green);
-        else
-            grunt.log.error().writeln('Could not load config file'.red);
-    });
-	
-	grunt.registerTask('cleanup_deploy_folder_init', 'Initialize tools.', function(){
-		grunt.initConfig({
-			clean: {
-				options: {
-					force: true
-				},
-				menu:[
-					toolsFile['menu_path']
-				]
-			}
-		});
-    });	
-	
-	grunt.registerTask('cleanup_deploy_folder',  ['cleanup_deploy_folder_init', 'clean']);
-	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
-        defaultConfig = './sdk_configs/webword.json';
+        defaultConfig = path + '/webword.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -87,7 +64,7 @@ module.exports = function(grunt) {
     });
 
 	grunt.registerTask('build_nativeword_init', 'Initialize build NativeWord SDK.', function(){
-        defaultConfig = './sdk_configs/nativeword.json';
+        defaultConfig = path + '/nativeword.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -97,7 +74,7 @@ module.exports = function(grunt) {
     });
 	
     grunt.registerTask('build_webexcel_init', 'Initialize build WebExcel SDK.', function(){
-        defaultConfig = './sdk_configs/webexcel.json';
+        defaultConfig = path + '/webexcel.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -107,7 +84,7 @@ module.exports = function(grunt) {
     });
 
     grunt.registerTask('build_webpowerpoint_init', 'Initialize build WebPowerPoint SDK.', function(){
-        defaultConfig = './sdk_configs/webpowerpoint.json';
+        defaultConfig = path + '/webpowerpoint.json';
         packageFile = require(defaultConfig);
 
         if (packageFile)
@@ -127,16 +104,12 @@ module.exports = function(grunt) {
         }
     });
 	
-	grunt.registerTask('build_webword',     ['setup_tools', 'build_webword_init', 'build_sdk']);
-	grunt.registerTask('build_nativeword', ['setup_tools', 'build_nativeword_init', 'build_sdk']);
-    grunt.registerTask('build_webexcel',  ['setup_tools', 'build_webexcel_init', 'build_sdk']);
-    grunt.registerTask('build_webpowerpoint', ['setup_tools', 'build_webpowerpoint_init', 'build_sdk']);
-	
-	grunt.registerTask('deploy_sdk_all', ['setup_tools', 'build_webword_init', 'deploy_sdk', 'build_webexcel_init', 'deploy_sdk', 'build_webpowerpoint_init', 'deploy_sdk']);
-	
-	grunt.registerTask('build_all_without_deploy', ['setup_tools', 'build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
-	grunt.registerTask('build_all', ['build_all_without_deploy', 'deploy_sdk_all']);
-	grunt.registerTask('cleanup_and_build_all', ['setup_tools', 'cleanup_deploy_folder', 'build_all']);
+	grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
+	grunt.registerTask('build_nativeword', ['build_nativeword_init', 'build_sdk']);
+    grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
+    grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
+		
+	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 
 	grunt.registerTask('up_sdk_src_init', 'Update SDK source', function() {
 		grunt.initConfig({
@@ -158,36 +131,7 @@ module.exports = function(grunt) {
 	grunt.registerTask('update_sources_webpowerpoint', ['build_webpowerpoint_init', 'up_sdk_src_init', 'exec']);
 
 	grunt.registerTask('update_sources', ['update_sources_webword', 'update_sources_webexcel', 'update_sources_webpowerpoint']);
-
-	grunt.registerTask('commit_logs_init', function() {
-		var build_num = packageFile['info']['build'];
-		var svn_rev = packageFile['update_src']['revision'];
 		
-		if(undefined !== process.env['BUILD_NUMBER'])
-			build_num = parseInt(process.env['BUILD_NUMBER']);
-			
-		if(undefined !== process.env['SVN_REVISION'])
-			svn_rev = parseInt(process.env['SVN_REVISION']);
-			
-		var commit_message ='\"Version: '+ packageFile['info']['version'] + 
-							' (build:' + build_num + ')' +
-							' from svn rev: ' + svn_rev + '\"';
-        grunt.initConfig({
-			exec: {
-				store_log: {
-					command: 'svn.exe commit ' + packageFile['deploy']['store_log']['dst'] + ' -q -m ' + commit_message,
-					stdout: false
-				}
-			}
-        });
-    });	
-	
-	grunt.registerTask('commit_logs_webword', ['build_webword_init', 'commit_logs_init', 'exec']);
-	grunt.registerTask('commit_logs_webexcel', ['build_webexcel_init', 'commit_logs_init', 'exec']);
-	grunt.registerTask('commit_logs_webpowerpoint', ['build_webpowerpoint_init', 'commit_logs_init', 'exec']);
-	
-	grunt.registerTask('commit_logs', ['commit_logs_webword', 'commit_logs_webexcel', 'commit_logs_webpowerpoint']);
-	
     grunt.registerTask('increment_build', function() {
 		var pkg = grunt.file.readJSON(defaultConfig);
 		pkg.info.build = parseInt(pkg.info.build) + 1;
@@ -221,40 +165,60 @@ module.exports = function(grunt) {
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
 		var concat_res = {};
-		var closureHome = (undefined !== process.env['CLOSURE_HOME'])? process.env['CLOSURE_HOME'] : "" ;
-		var compilerFile = path.join(closureHome, toolsFile['closure_compiler']);
-		grunt.log.ok('compilerFile = %s'.green, compilerFile);
 		concat_res[packageFile['compile']['sdk']['dst']] = [
 					packageFile['compile']['sdk']['dst'],
 					packageFile['compile']['defines']['dst'],
 					map_record_file_path ];
+		var srcFiles = packageFile['compile']['sdk']['common'];
+		var sdkOpt = {
+			compilation_level: compilation_level,
+			warning_level: 'QUIET',
+			externs: packageFile['compile']['sdk']['externs']/*,
+			create_source_map: map_file_path,
+			source_map_format: "V3"*/
+		};
+		var definesOpt = {
+			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
+			warning_level: 'QUIET'
+		};
+		if (formatting) {
+			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
+		}
+		if (!nomap) {
+			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
+			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
+		}
+		
+		if (grunt.option('private')) {
+			srcFiles.concat(packageFile['compile']['sdk']['private']);
+		}
+		if (grunt.option('desktop')) {
+			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
+		}
+		if (grunt.option('exclude_mobile')) {
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFiles = srcFiles.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});
+		}
+		
+		var cc = require('google-closure-compiler').compiler;
+		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
+
 		grunt.initConfig({
-			closureCompiler: {
-				options: {
-					compilerFile: compilerFile,
-					javaFlags: ['-Xms2048m']
-				},
+			pkg: packageFile,
+			'closure-compiler': {
 				sdk: {
-					TEMPcompilerOpts: {
-						compilation_level: compilation_level,
-						externs: packageFile['compile']['sdk']['externs'],
-						define: packageFile['compile']['sdk']['define'],
-						warning_level: 'QUIET',
-						variable_renaming_report: packageFile['compile']['sdk']['log'] + '/variable.map',
-						property_renaming_report: packageFile['compile']['sdk']['log'] + '/property.map'/*,
-						create_source_map: map_file_path,
-						source_map_format: "V3"*/
+					files: {
+						'<%= pkg.compile.sdk.dst %>': srcFiles
 					},
-					src: packageFile['compile']['sdk']['src'],
-					dest: packageFile['compile']['sdk']['dst']
+					options: sdkOpt
 				},
 				defines: {
-					TEMPcompilerOpts: {
-						compilation_level: 'SIMPLE',
-						warning_level: 'QUIET'
+					files: {
+						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
 					},
-					src: packageFile['compile']['defines']['src'],
-					dest: packageFile['compile']['defines']['dst']
+					options: definesOpt
 				}
 			},
 			create_map_file: {},
@@ -263,7 +227,6 @@ module.exports = function(grunt) {
 				packageFile['compile']['defines']['dst'],
 				map_record_file_path
 			],
-			pkg: grunt.file.readJSON(defaultConfig),
 			replace: {
 				version: {
 					options: {
@@ -281,20 +244,8 @@ module.exports = function(grunt) {
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:ADVANCED', 'closureCompiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler', 'concat', 'replace', 'clean']);
-		
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:ADVANCED', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native_fast', ['compile_sdk_init:WHITESPACE_ONLY', 'closureCompiler:sdk', 'concat', 'replace', 'clean']);
-	
-	grunt.registerTask('deploy_sdk_init', function() {
-        grunt.initConfig({
-		    pkg: grunt.file.readJSON(toolsConfig),
-            copy:  packageFile['deploy']['copy']
-        });
-    });
-	
-	grunt.registerTask('deploy_sdk', ['deploy_sdk_init', 'copy']);
-	 
-	grunt.registerTask('default', ['get_svn_info', 'build_all_without_deploy']);
+	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
+	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
+		 
+	grunt.registerTask('default', ['get_svn_info', 'build_all']);
 };

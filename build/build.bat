@@ -2,6 +2,4 @@
 cd /D %~dp0
 
 @echo on
-call grunt.cmd
-
-pause
+call grunt --no-color

@@ -1,8 +1,6 @@
 @echo off
 cd /D %~dp0
 
-echo Installation grunt-cli
+echo Installation
 call npm install -g grunt-cli
-
 call npm install
-
