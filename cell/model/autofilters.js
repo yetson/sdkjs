@@ -1922,15 +1922,8 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
-			changeFormatTableInfo: function(tableName, optionType)
-			{
-				var tablePart = this._getFilterByDisplayName(tableName);
-				
-				if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
-				{
-					return false;
-				}
-				
+			changeFormatTableInfo: function(tablePart, optionType)
+			{	
 				switch(optionType)
 				{
 					case c_oAscChangeTableStyleInfo.columnBanded:
@@ -1974,6 +1967,9 @@ var maxIndividualValues = 10000;
 						break;
 					}*/
 				}
+				
+				this._cleanStyleTable(tablePart.Ref);
+				this._setColorStyleTable(tablePart.Ref, tablePart);
 				
 				//TODO add to history
 			},
