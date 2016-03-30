@@ -687,6 +687,11 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.af_deleteCellsInTable(tableName, optionType);
   };
+  
+  spreadsheet_api.prototype.asc_changeDisplayNameTable = function(tableName, newName) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeDisplayNameTable(tableName, newName);
+  };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;

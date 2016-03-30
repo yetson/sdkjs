@@ -12825,26 +12825,31 @@
         var endRow = this.activeRange.r2;
 		
 		var newActiveRange = null;
+		var val;
 		switch(optionType)
 		{
 			case c_oAscInsertOptions.InsertTableRowAbove:
 			{
 				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableRowBelow:
 			{
 				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow - 1, tablePart.Ref.c2, endRow - 1);
+				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColLeft:
 			{
 				newActiveRange = new Asc.Range(startCol - 1, tablePart.Ref.r1, endCol - 1, tablePart.Ref.r2);
+				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColRight:
 			{
 				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 		}
@@ -12852,7 +12857,7 @@
 		if(newActiveRange !== null)
 		{
 			t.activeRange = newActiveRange;
-			t.changeWorksheet("insCell");
+			t.changeWorksheet("insCell", val);
 			t.activeRange = acitveRange;
 		}
 	};
@@ -12876,16 +12881,19 @@
         var endRow = this.activeRange.r2;
 		
 		var newActiveRange = null;
+		var val;
 		switch(optionType)
 		{
 			case c_oAscInsertOptions.DeleteColumns:
 			{
 				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				val = c_oAscInsertOptions.DeleteCellsAndShiftLeft;
 				break;
 			}
 			case c_oAscInsertOptions.DeleteRows:
 			{
 				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				val = c_oAscInsertOptions.DeleteCellsAndShiftTop;
 				break;
 			}
 		}
@@ -12893,9 +12901,26 @@
 		if(newActiveRange !== null)
 		{
 			t.activeRange = newActiveRange;
-			t.changeWorksheet("delCell");
+			t.changeWorksheet("delCell", val);
 			t.activeRange = acitveRange;
 		}
+	};
+	
+	WorksheetView.prototype.af_changeDisplayNameTable = function(tableName, newName)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange.clone();
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart)
+        {
+            return false;
+        }
+		
+		//TODO тестовый вариант. нужно сделать методы и добавлять в историю
+		tablePart.DisplayName = newName;
 	};
     /*
      * Export
