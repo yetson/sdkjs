@@ -3372,6 +3372,8 @@ var editor;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
   prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
   prot["asc_changeFormatTableInfo"] = prot.asc_changeFormatTableInfo;
+  prot["asc_insertCellsInTable"] = prot.asc_insertCellsInTable;
+  prot["asc_deleteCellsInTable"] = prot.asc_deleteCellsInTable;
 
   // Drawing objects interface
 
