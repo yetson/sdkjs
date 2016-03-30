@@ -4462,6 +4462,7 @@ function sparklineGroup() {
 	this.colorLast = null;
 	this.colorHigh = null;
 	this.colorLow = null;
+	this.f = '??';
 
 	this.arrSparklines = [];
 }
