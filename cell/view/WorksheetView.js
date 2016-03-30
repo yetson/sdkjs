@@ -12896,6 +12896,11 @@
 				val = c_oAscInsertOptions.DeleteCellsAndShiftTop;
 				break;
 			}
+			case c_oAscInsertOptions.DeleteTable:
+			{
+				t.model.autoFilters.isEmptyAutoFilters(tablePart.Ref);
+				break;
+			}
 		}
 		
 		if(newActiveRange !== null)
