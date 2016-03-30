@@ -7302,6 +7302,7 @@
 			}
 			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
 			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null ? true : false;
+			cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
 			
 			//cell_info.formatTableInfo.filterButton = curTablePart.HeaderRowCount !== null ? true : false;
 		}
