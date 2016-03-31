@@ -2024,10 +2024,15 @@ function DrawingObjects() {
         }
     };
 
-    _this.drawSparkLineGroup = function(oSparkLineGroup, oDrawingContext)
+    _this.drawSparkLineGroups = function(oDrawingContext, oSparkLineGroups, range)
     {
-
-    },
+        for(var i = 0; i < oSparkLineGroups.arrSparklineGroup.length; ++i) {
+            var oSparklineGroup = oSparkLineGroups.arrSparklineGroup[i];
+            oSparklineGroup.updateCache(range);
+            for(var j = 0; j < oSparklineGroup.arrSparklines.length; ++j) {
+            }
+        }
+    };
 
     _this.rebuildChartGraphicObjects = function(data)
     {
