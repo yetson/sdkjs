@@ -4267,7 +4267,8 @@ ParaDrawing.prototype =
             RelativeFrom : this.PositionH.RelativeFrom,
             UseAlign     : this.PositionH.Align,
             Align        : ( true === this.PositionH.Align ? this.PositionH.Value : undefined ),
-            Value        : ( true === this.PositionH.Align ? 0 : this.PositionH.Value )
+            Value        : ( true === this.PositionH.Align ? 0 : this.PositionH.Value ),
+            Percent      : this.PositionH.Percent
         };
 
         Props.PositionV =
@@ -4275,7 +4276,8 @@ ParaDrawing.prototype =
             RelativeFrom : this.PositionV.RelativeFrom,
             UseAlign     : this.PositionV.Align,
             Align        : ( true === this.PositionV.Align ? this.PositionV.Value : undefined ),
-            Value        : ( true === this.PositionV.Align ? 0 : this.PositionV.Value )
+            Value        : ( true === this.PositionV.Align ? 0 : this.PositionV.Value ),
+            Percent      : this.PositionV.Percent
         };
 
         Props.Internal_Position = this.Internal_Position;
