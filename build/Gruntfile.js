@@ -23,7 +23,7 @@
  *
 */
 module.exports = function(grunt) {
-	require('google-closure-compiler').grunt(grunt);
+	require('google-closure-compiler').grunt(grunt, ['-Xms2048m']);
     var revision="unknown", defaultConfig, packageFile;
 	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
@@ -183,10 +183,6 @@ module.exports = function(grunt) {
 		if (grunt.option('desktop')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
-	
-		
-		var cc = require('google-closure-compiler').compiler;
-		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
 
 		grunt.initConfig({
 			pkg: packageFile,
