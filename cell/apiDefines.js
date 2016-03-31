@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
