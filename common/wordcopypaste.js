@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 function CDocumentReaderMode()
 {
@@ -380,9 +380,6 @@ function Editor_Copy(api, bCut)
                 __oncut = null;
 
                 if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content)) {
-                    ElemToSelect.innerHTML = "";
-                    Editor_Copy_Event(e, ElemToSelect);
-
 					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
                     api.WordControl.m_oLogicDocument.Remove(1, true, true);
                     api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
@@ -399,14 +396,12 @@ function Editor_Copy(api, bCut)
 
                 ElemToSelect.oncopy = __oncopy;
                 __oncopy = null;
-
-                ElemToSelect.innerHTML = "";
-                Editor_Copy_Event(e, ElemToSelect);
             }
 
             window["AscDesktopEditor"]["Copy"]();
         }
 
+		ElemToSelect.innerHTML = "";
         return;
     }       
 

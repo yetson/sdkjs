@@ -1,12 +1,12 @@
 GRUNT = grunt
-GRUNT_FLAGS = --no-color -v
+GRUNT_FLAGS = --private=true --no-color -v 
 
 OUTPUT_DIR = deploy
 OUTPUT = $(OUTPUT_DIR)
 
 WEBAPPS_DIR = web-apps
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
-GRUNT_FILES = build/deploy/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
+GRUNT_FILES = build/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
 
 all: $(WEBAPPS)
 

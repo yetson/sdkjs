@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (function(window, undefined) {
   'use strict';
@@ -710,7 +710,6 @@
 
   DocsCoApi.prototype.disconnect = function() {
     // Отключаемся сами
-    clearInterval(this.pingIntervalID);
     this.isCloseCoAuthoring = true;
     this._send({"type": "close"});
     this._state = ConnectionState.ClosedCoAuth;
@@ -738,10 +737,6 @@
     if (typeof cursor === 'string') {
       this._send({"type": "cursor", "cursor": cursor});
     }
-  };
-
-  DocsCoApi.prototype.ping = function() {
-    this._send({'type': 'ping'});
   };
 
   DocsCoApi.prototype._sendPrebuffered = function() {
@@ -1154,8 +1149,6 @@
 
       //Send prebuffered
       this._sendPrebuffered();
-
-      this.pingIntervalID = setInterval(function() {t.ping();}, this.pingInterval);
     }
     //TODO: Add errors
   };
@@ -1172,9 +1165,6 @@
     this._isPresentation = c_oEditorId.Presentation === editorType;
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
-
-    this.pingInterval = 60 * 1000;
-    this.pingIntervalID = null;
 
     this._initSocksJs();
   };
@@ -1300,7 +1290,7 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount;
+      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
       }
@@ -1308,7 +1298,7 @@
         t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
       }
       //Try reconect
-      if (t.attemptCount < t.maxAttemptCount) {
+      if (!bIsDisconnectAtAll) {
         t._tryReconnect();
       }
     };

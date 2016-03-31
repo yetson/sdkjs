@@ -23,9 +23,9 @@
  *
 */
 module.exports = function(grunt) {
-	require('google-closure-compiler').grunt(grunt);
+	require('google-closure-compiler').grunt(grunt, ['-Xms2048m']);
     var revision="unknown", defaultConfig, packageFile;
-	var path = grunt.option('src') || './sdk_configs';
+	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
 	var nomap = grunt.option('nomap') || '';
@@ -35,23 +35,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
-	
-	grunt.registerTask('get_svn_info', 'Initialize svn information', function () {
-		// Instruct this task to wait until we call the done() method to continue
-		var done = this.async();
-		
-		grunt.util.spawn({
-			cmd: 'svnversion',
-			args: ['../../'],
-			}, function (error, result, code) {
-				if (null === error) {
-					revision = result;
-				}
-				
-				// All done, continue to the next tasks
-				done();
-		});
-	});
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = path + '/webword.json';
@@ -141,13 +124,7 @@ module.exports = function(grunt) {
 			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
 			pkg.info.build = packageFile['info']['build'];
 		}
-		if(undefined !== process.env['SVN_REVISION']){
-			packageFile['info']['rev'] = process.env['SVN_REVISION'];
-		}
-		else{
-			grunt.log.ok('Use revision number \"' + revision + '\" from svnversion!'.yellow);
-			packageFile['info']['rev'] = revision;
-		}
+		packageFile['info']['rev'] = process.env['SVN_REVISION'] || revision;
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
 	
@@ -182,21 +159,30 @@ module.exports = function(grunt) {
 			warning_level: 'QUIET'
 		};
 		if (formatting) {
-			console.log('formatting');
 			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
 		}
 		if (!nomap) {
 			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
+		}		
+		
+		if (grunt.option('mobile')) {				
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFiles = srcFiles.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});		
+			var mobileFiles = packageFile['compile']['sdk']['mobile'];
+			if(mobileFiles){
+				srcFiles = mobileFiles.concat(srcFiles);
+			}
 		}
 		
+		if (grunt.option('private')) {
+			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
+		}
 		if (grunt.option('desktop')) {
-			console.log('desktop');
-			srcFiles.concat(packageFile['compile']['sdk']['desktop']);
+			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
-		
-		var cc = require('google-closure-compiler').compiler;
-		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
 
 		grunt.initConfig({
 			pkg: packageFile,
@@ -226,7 +212,7 @@ module.exports = function(grunt) {
 						variables: {
 							Version: packageFile['info']['version'],
 							Build: packageFile['info']['build'].toString(),
-							Rev: packageFile['info']['rev'].toString()
+							Rev: (packageFile['info']['rev'] || 1).toString()
 						}
 					},
 					files: {
@@ -240,5 +226,5 @@ module.exports = function(grunt) {
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
 	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
 		 
-	grunt.registerTask('default', ['get_svn_info', 'build_all']);
+	grunt.registerTask('default', ['build_all']);
 };

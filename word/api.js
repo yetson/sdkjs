@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 function CAscSection()
 {
@@ -4139,6 +4139,7 @@ function CTableProp (tblProp)
         this.TableLayout        = tblProp.TableLayout;
         this.CellsTextDirection = tblProp.CellsTextDirection;
         this.CellsNoWrap        = tblProp.CellsNoWrap;
+        this.CellsWidth         = tblProp.CellsWidth;
         this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
     }
 	else
@@ -4223,6 +4224,9 @@ CTableProp.prototype.get_CellsTextDirection = function(){return this.CellsTextDi
 CTableProp.prototype.put_CellsTextDirection = function(v){this.CellsTextDirection = v;};
 CTableProp.prototype.get_CellsNoWrap = function(){return this.CellsNoWrap;};
 CTableProp.prototype.put_CellsNoWrap = function(v){this.CellsNoWrap = v;};
+CTableProp.prototype.get_CellsWidth = function (){return this.CellsWidth;};
+CTableProp.prototype.put_CellsWidth = function (v){this.CellsWidth = v;};
+
 
 function CBorders (obj)
 {
@@ -6733,6 +6737,9 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     oAdditionalData["outputformat"] = filetype;
     oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
 	if (options.isNoData) {
 		;//nothing
 	} else if (null == options.oDocumentMailMerge &&  c_oAscFileType.PDF === filetype) {
