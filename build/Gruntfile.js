@@ -173,7 +173,7 @@ module.exports = function(grunt) {
 			});		
 			var mobileFiles = packageFile['compile']['sdk']['mobile'];
 			if(mobileFiles){
-				srcFiles = srcFiles.concat(mobileFiles);
+				srcFiles = mobileFiles.concat(srcFiles);
 			}
 		}
 		
