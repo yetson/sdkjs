@@ -1922,6 +1922,31 @@ var maxIndividualValues = 10000;
 				return result;
 			},
 			
+			getTableIntersectionRange: function(range)
+			{
+				var worksheet = this.worksheet;
+				var res = null;
+				
+				var tableParts = worksheet.TableParts; 
+				if(tableParts)
+				{
+					for(var i = 0; i < tableParts.length; i++)
+					{
+						if(tableParts[i].Ref.intersection(range))
+						{
+							if(res === null)
+							{
+								res = [];
+							}
+							
+							res.push(worksheet.TableParts[i]);
+						}
+					}
+				}
+				
+				return res;
+			},
+			
 			changeFormatTableInfo: function(tablePart, optionType)
 			{	
 				switch(optionType)
@@ -3825,21 +3850,6 @@ var maxIndividualValues = 10000;
 				return res;
 			},
 			
-			_isIntersectionTableParts: function(range)
-			{
-				var worksheet = this.worksheet;
-				
-				var tableParts = worksheet.TableParts;
-				var tablePart;
-				for(var i = 0; i < tableParts.length; i++)
-				{
-					tablePart = tableParts[i];
-					if(tablePart.Ref.intersection(range))
-						return true;
-				}
-				return false;
-			},
-			
 			_cleanFilterColumnsAndSortState: function(autoFilterElement, activeCells)
 			{
 				var worksheet = this.worksheet;
@@ -4001,17 +4011,17 @@ var maxIndividualValues = 10000;
 						var tableRef = worksheet.TableParts[i].Ref;
 						if(tableRef.r1 >= range.r2)
 						{
-							if(range.c1 < tableRef.c1 && range.c2 < tableRef.c2 && range.c2 >= tableRef.c1)
+							if(tableRef.c1 < range.c1 && tableRef.c2 > range.c1 && tableRef.c2 <= range.c2)
 							{
 								result = true;
 								break;
 							}
-							else if(range.c1 > tableRef.c1 && range.c2 > tableRef.c2 && range.c1 >= tableRef.c1)
+							else if(tableRef.c1 >= range.c1 && tableRef.c1 < range.c2 && tableRef.c2 > range.c2)
 							{
 								result = true;
 								break;
 							}
-							else if((range.c1 > tableRef.c1 && range.c2 <= tableRef.c2) || (range.c1 >= tableRef.c1 && range.c2 < tableRef.c2))
+							else if((tableRef.c1 <= range.c1 && tableRef.c2 > range.c2) || (tableRef.c1 < range.c1 && tableRef.c2 >= range.c2))
 							{
 								result = true;
 								break;
@@ -4021,6 +4031,41 @@ var maxIndividualValues = 10000;
 				}
 				
 				return result;
+			},
+			
+			isPartTablePartsRightRange: function(range)
+			{
+				var worksheet = this.worksheet;
+				var res = false;
+				
+				if(worksheet.TableParts && worksheet.TableParts.length)
+				{
+					for(var i = 0; i < worksheet.TableParts.length; i++)
+					{
+						var tableRef = worksheet.TableParts[i].Ref;
+						
+						if(tableRef.c1 >= range.c2)
+						{
+							if(tableRef.r1 < range.r1 && tableRef.r2 > range.r1 && tableRef.r2 <= range.r2)
+							{
+								result = true;
+								break;
+							}
+							else if(tableRef.r1 >= range.r1 && tableRef.r1 < range.r2 && tableRef.r2 > range.r2)
+							{
+								result = true;
+								break;
+							}
+							else if((tableRef.r1 <= range.r1 && tableRef.r2 > range.r2) || (tableRef.r1 < range.r1 && tableRef.r2 >= range.r2))
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+				}
+				
+				return res;
 			},
 			
 			_isPartAutoFilterUnderRange: function(range)
