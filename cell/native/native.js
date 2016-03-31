@@ -2930,13 +2930,6 @@ function OfflineEditor () {
 
                 if (null == drawingDocument.m_oDocumentRenderer) {
                     if (drawingDocument.m_bIsSelection) {
-                       // if (drawingDocument.m_bIsSelection) {
-                           // trackOverlay.m_oControl.HtmlElement.style.display = "block";
-
-                            //if (null == trackOverlay.m_oContext)
-                            //    trackOverlay.m_oContext = trackOverlay.m_oControl.HtmlElement.getContext('2d');
-                        //}
-
                         drawingDocument.private_StartDrawSelection(trackOverlay);
                         this.worksheet.objectRender.controller.drawTextSelection();
                         drawingDocument.private_EndDrawSelection();
@@ -2952,8 +2945,7 @@ function OfflineEditor () {
                         this.worksheet.objectRender.controller.drawTracks(shapeOverlayCtx);
                         shapeOverlayCtx.put_GlobalAlpha(true, 1);
                     }
-                }
-                else {
+                } else {
 
                     ctx.fillStyle = "rgba(51,102,204,255)";
                     ctx.beginPath();
@@ -5439,7 +5431,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
             }
         }
 
-        return {id:graphicsInfo.id, ischart: ischart};
+        return {id:graphicsInfo.id, ischart: ischart, 'textselect': (null !== ws.objectRender.controller.selection.textSelection)};
     }
 
     _s.cellPin = pin;
@@ -5615,6 +5607,9 @@ function offline_mouse_up(x, y, isViewerMode, isRangeResize, isChartRange, index
     ws.visibleRange = range;
 
     return ret;
+}
+function offline_process_input_commands(comands) {
+
 }
 
 function offline_get_selection(x, y, width, height, autocorrection) {return _s.getSelection(x, y, width, height, autocorrection);}
