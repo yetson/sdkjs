@@ -4430,9 +4430,11 @@ CellArea.prototype = {
 	}
 };
 
+/** @constructor */
 function sparklineGroups() {
 	this.arrSparklineGroup = [];
 }
+/** @constructor */
 function sparklineGroup() {
 	// attributes
 	this.manualMax = undefined;
@@ -4466,17 +4468,14 @@ function sparklineGroup() {
 	this.arrSparklines = [];
     this.arrCachedSparklines = [];
 }
-
 sparklineGroup.prototype.clearCached = function()
 {
     this.arrCachedSparklines.length = 0;
 };
-
 sparklineGroup.prototype.addView = function(oSparklineView)
 {
     this.arrCachedSparklines.push(oSparklineView);
 };
-
 sparklineGroup.prototype.draw = function(oDrawingContext)
 {
     var graphics = new CGraphics();
@@ -4491,6 +4490,7 @@ sparklineGroup.prototype.updateCache = function(wsView)
 {
     wsView.objectRender.createSparklineViews(this);
 };
+/** @constructor */
 function sparkline() {
 	this.sqref = '??'; // ToDo добавить значение по умолчанию
 	this.f = '??';
