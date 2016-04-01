@@ -10187,7 +10187,7 @@
         return true;
     };
 
-    WorksheetView.prototype.changeWorksheet = function ( prop, val ) {
+    WorksheetView.prototype.changeWorksheet = function ( prop, val, displayNameFormatTable ) {
         // Проверка глобального лока
         if ( this.collaborativeEditing.getGlobalLock() ) {
             return;
@@ -10321,7 +10321,7 @@
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftRight() ) {
+                            if ( range.addCellsShiftRight(displayNameFormatTable) ) {
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
@@ -10342,7 +10342,7 @@
                         functionModelAction = function () {
                             History.Create_NewPoint();
                             History.StartTransaction();
-                            if ( range.addCellsShiftBottom() ) {
+                            if ( range.addCellsShiftBottom(displayNameFormatTable) ) {
                                 fullRecalc = true;
                                 reinitRanges = true;
                                 t.cellCommentator.updateCommentsDependencies( true, val, arn );
@@ -12810,7 +12810,7 @@
     {
 		var t = this;
         var ws = this.model;
-		var acitveRange = this.activeRange;
+		var activeRange = this.activeRange;
 
         var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
@@ -12840,16 +12840,14 @@
 			{
 				newActiveRange.c1 = tablePart.Ref.c1;
 				newActiveRange.c2 = tablePart.Ref.c2;
-				newActiveRange.r1 = startRow + (endRow - startRow) + 1;
-				newActiveRange.r2 = endRow + (endRow - startRow) + 1;
+				newActiveRange.r1 = tablePart.Ref.r2 + 1;
+				newActiveRange.r2 = tablePart.Ref.r2 + 1;
 				
 				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColLeft:
 			{
-				newActiveRange.c1 = startCol - 1;
-				newActiveRange.c2 = endCol - 1;
 				newActiveRange.r1 = tablePart.Ref.r1;
 				newActiveRange.r2 = tablePart.Ref.r2;
 				
@@ -12858,8 +12856,8 @@
 			}
 			case c_oAscInsertOptions.InsertTableColRight:
 			{
-				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
-				
+				newActiveRange.c1 = tablePart.Ref.c2 + 1;
+				newActiveRange.c2 = tablePart.Ref.c2 + 1;
 				newActiveRange.r1 = tablePart.Ref.r1;
 				newActiveRange.r2 = tablePart.Ref.r2;
 				
@@ -12871,8 +12869,15 @@
 		if(val !== null)
 		{
 			t.activeRange = newActiveRange;
-			t.changeWorksheet("insCell", val);
-			t.activeRange = acitveRange;
+			if(optionType === c_oAscInsertOptions.InsertTableColRight || optionType === c_oAscInsertOptions.InsertTableRowBelow)
+			{
+				t.changeWorksheet("insCell", val, tableName);
+			}
+			else
+			{
+				t.changeWorksheet("insCell", val);
+			}
+			t.activeRange = activeRange;
 		}
 	};
 	
@@ -12880,7 +12885,7 @@
     {
 		var t = this;
         var ws = this.model;
-		var acitveRange = this.activeRange.clone();
+		var acitveRange = this.activeRange;
 
         var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
 
@@ -12894,19 +12899,23 @@
         var startRow = this.activeRange.r1;
         var endRow = this.activeRange.r2;
 		
-		var newActiveRange = null;
-		var val;
+		var newActiveRange = this.activeRange.clone();
+		var val = null;
 		switch(optionType)
 		{
 			case c_oAscDeleteOptions.DeleteColumns:
 			{
-				newActiveRange = new Asc.Range(startCol, tablePart.Ref.r1, endCol, tablePart.Ref.r2);
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				
 				val = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
 				break;
 			}
 			case c_oAscDeleteOptions.DeleteRows:
 			{
-				newActiveRange = new Asc.Range(tablePart.Ref.c1, startRow, tablePart.Ref.c2, endRow);
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				
 				val = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
 				break;
 			}
@@ -12917,7 +12926,7 @@
 			}
 		}
 		
-		if(newActiveRange !== null)
+		if(val !== null)
 		{
 			t.activeRange = newActiveRange;
 			t.changeWorksheet("delCell", val);
@@ -12939,6 +12948,7 @@
         }
 		
 		//TODO тестовый вариант. нужно сделать методы и добавлять в историю
+		//ws.workbook.dependencyFormulas.changeDefName( tableName, newName );
 		tablePart.DisplayName = newName;
 	};
 	

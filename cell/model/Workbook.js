@@ -4816,7 +4816,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
     this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
 };
-Woorksheet.prototype._shiftCellsRight=function(oBBox){
+Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
 	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
 	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
@@ -4851,9 +4851,9 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight );
+    this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 };
-Woorksheet.prototype._shiftCellsBottom=function(oBBox){
+Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
 	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
 	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
@@ -4886,7 +4886,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	}
 
 	History.Add(g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown );
+    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
@@ -7929,11 +7929,11 @@ Range.prototype.removeHyperlink = function (val, removeStyle) {
 Range.prototype.deleteCellsShiftUp=function(preDeleteAction){
 	return this._shiftUpDown(true, preDeleteAction);
 };
-Range.prototype.addCellsShiftBottom=function(){
-	return this._shiftUpDown(false);
+Range.prototype.addCellsShiftBottom=function(displayNameFormatTable){
+	return this._shiftUpDown(false, null, displayNameFormatTable);
 };
-Range.prototype.addCellsShiftRight=function(){
-	return this._shiftLeftRight(false);
+Range.prototype.addCellsShiftRight=function(displayNameFormatTable){
+	return this._shiftLeftRight(false, null,displayNameFormatTable);
 };
 Range.prototype.deleteCellsShiftLeft=function(preDeleteAction){
 	return this._shiftLeftRight(true, preDeleteAction);
@@ -7975,7 +7975,7 @@ Range.prototype._canShiftLeftRight=function(bLeft){
 	}
 	return {aColsToDelete: aColsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction){
+Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction, displayNameFormatTable){
 	var canShiftRes = this._canShiftLeftRight(bLeft);
 	if(null === canShiftRes)
 		return false;
@@ -8034,7 +8034,7 @@ Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction){
 	else
 	{
 		if(c_oRangeType.Range == nRangeType)
-			this.worksheet._shiftCellsRight(oBBox);
+			this.worksheet._shiftCellsRight(oBBox, displayNameFormatTable);
 		else
 			this.worksheet._insertColsBefore(oBBox.c1, nWidth);
 	}
@@ -8087,7 +8087,7 @@ Range.prototype._canShiftUpDown=function(bUp){
 	}
 	return {aRowsToDelete: aRowsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftUpDown = function (bUp, preDeleteAction) {
+Range.prototype._shiftUpDown = function (bUp, preDeleteAction, displayNameFormatTable) {
 	var canShiftRes = this._canShiftUpDown(bUp);
 	if(null === canShiftRes)
 		return false;
@@ -8146,7 +8146,7 @@ Range.prototype._shiftUpDown = function (bUp, preDeleteAction) {
 	else
 	{
 		if(c_oRangeType.Range == nRangeType)
-			this.worksheet._shiftCellsBottom(oBBox);
+			this.worksheet._shiftCellsBottom(oBBox, displayNameFormatTable);
 		else
 			this.worksheet._insertRowsBefore(oBBox.r1, nHeight);
 	}
