@@ -5792,7 +5792,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
         _s.isShapeAction = true;
         ws.visibleRange = range;
 
-        if (!graphicsInfo.object.graphicObject instanceof CChartSpace) {
+        if (graphicsInfo.object && !graphicsInfo.object.graphicObject instanceof CChartSpace) {
             ws.isChartAreaEditMode = false;
         }
 
