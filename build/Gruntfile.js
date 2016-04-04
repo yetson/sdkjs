@@ -114,16 +114,22 @@ module.exports = function(grunt) {
 	grunt.registerTask('update_sources_webpowerpoint', ['build_webpowerpoint_init', 'up_sdk_src_init', 'exec']);
 
 	grunt.registerTask('update_sources', ['update_sources_webword', 'update_sources_webexcel', 'update_sources_webpowerpoint']);
-		
+	
+  grunt.registerTask('add_build_number', function() {
+    var pkg = grunt.file.readJSON(defaultConfig);
+
+    if(undefined !== process.env['BUILD_NUMBER']) {
+      grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
+      packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
+      pkg.info.build = packageFile['info']['build'];
+      packageFile['info']['rev'] = process.env['SVN_REVISION'] || revision;
+      grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));    
+    }
+  });
+    
     grunt.registerTask('increment_build', function() {
 		var pkg = grunt.file.readJSON(defaultConfig);
 		pkg.info.build = parseInt(pkg.info.build) + 1;
-
-		if(undefined !== process.env['BUILD_NUMBER']) {
-			grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
-			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
-			pkg.info.build = packageFile['info']['build'];
-		}
 		packageFile['info']['rev'] = process.env['SVN_REVISION'] || revision;
 		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
     });
@@ -177,7 +183,7 @@ module.exports = function(grunt) {
 			}
 		}
 		
-		if (grunt.option('private')) {
+		if (!grunt.option('noprivate')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
 		}
 		if (grunt.option('desktop')) {

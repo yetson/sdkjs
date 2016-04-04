@@ -187,6 +187,7 @@
     },
     "tasks": {
         "build": [
+            "add_build_number",
             "compile_sdk"
         ]
     }

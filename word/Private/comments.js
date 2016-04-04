@@ -47,3 +47,4 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
     return Comment.Get_Id();
   }
 };
+asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;

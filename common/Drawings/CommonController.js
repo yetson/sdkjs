@@ -37,6 +37,18 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 function CheckShapeBodyAutoFitReset(oShape)
 {
+    var oParaDrawing = getParaDrawing(oShape);
+    if(oParaDrawing)
+    {
+        if(oParaDrawing.SizeRelH)
+        {
+            oParaDrawing.SetSizeRelH(undefined);
+        }
+        if(oParaDrawing.SizeRelV)
+        {
+            oParaDrawing.SetSizeRelV(undefined);
+        }
+    }
     if(oShape instanceof CShape)
     {
         var oPropsToSet = null;
@@ -352,6 +364,37 @@ function DrawingObjectsController(drawingObjects)
 
 DrawingObjectsController.prototype =
 {
+
+    //for mobile spreadsheet editor
+    startEditTextCurrentShape: function()
+    {
+        if(this.selectedObjects.length === 1 && this.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+        {
+            var oShape = this.selectedObjects[0];
+            var oContent = oShape.getDocContent();
+            if(oContent)
+            {
+                this.resetInternalSelection();
+                this.selection.textSelection = oShape;
+                oContent.Cursor_MoveToEndPos(false);
+                this.updateSelectionState();
+                this.updateOverlay();
+            }
+            else
+            {
+                var oThis = this;
+                this.checkSelectedObjectsAndCallback(function(){
+                    oShape.createTextBody();
+                    var oContent = oShape.getDocContent();
+                    oThis.resetInternalSelection();
+                    oThis.selection.textSelection = oShape;
+                    oContent.Cursor_MoveToEndPos(false);
+                    oThis.updateSelectionState();
+                }, [], false, historydescription_Spreadsheet_AddNewParagraph);
+            }
+
+        }
+    },
 
     canReceiveKeyPress: function()
     {

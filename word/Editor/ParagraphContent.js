@@ -3816,6 +3816,15 @@ CAnchorPosition.prototype =
         return this.CalcY;
     },
 
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
+        var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
+
+        this.Top_Margin    = TopY;
+        this.Bottom_Margin = this.Page_H - BottomY;
+    },
+
     Correct_Values : function(bInline, PageLimits, AllowOverlap, UseTextWrap, OtherFlowObjects)
     {
         if ( true != bInline )
@@ -4087,6 +4096,10 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
         B: 0
     };
 
+    this.SizeRelH = undefined;
+    this.SizeRelV = undefined;
+    //{RelativeFrom      : c_oAscRelativeFromH.Column, Percent: ST_PositivePercentage}
+
     this.AllowOverlap = true;
 
     //привязка к параграфу
@@ -4280,6 +4293,26 @@ ParaDrawing.prototype =
             Percent      : this.PositionV.Percent
         };
 
+
+
+        if(this.SizeRelH)
+        {
+            Props.SizeRelH =
+            {
+                RelativeFrom: this.SizeRelH.RelativeFrom,
+                Percent: this.SizeRelH.Percent
+            };
+        }
+
+        if(this.SizeRelV)
+        {
+            Props.SizeRelV =
+            {
+                RelativeFrom: this.SizeRelV.RelativeFrom,
+                Percent: this.SizeRelV.Percent
+            };
+        }
+
         Props.Internal_Position = this.Internal_Position;
 
         Props.Locked = this.Lock.Is_Locked();
@@ -4394,6 +4427,19 @@ ParaDrawing.prototype =
         }
     },
 
+    SetSizeRelH : function(oSize)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetSizeRelH, Old: this.SizeRelH, New: oSize});
+        this.SizeRelH = oSize;
+    },
+
+
+    SetSizeRelV : function(oSize)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetSizeRelV, Old: this.SizeRelV, New: oSize});
+        this.SizeRelV = oSize;
+    },
+
     getXfrmExtX: function()
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
@@ -4504,6 +4550,15 @@ ParaDrawing.prototype =
                 }
             }
         }
+        if(undefined != Props.SizeRelH)
+        {
+            this.SetSizeRelH({RelativeFrom: Props.SizeRelH.RelativeFrom, Percent: Props.SizeRelH.Percent});
+        }
+
+        if(undefined != Props.SizeRelV)
+        {
+            this.SetSizeRelV({RelativeFrom: Props.SizeRelV.RelativeFrom, Percent: Props.SizeRelV.Percent});
+        }
         if(bNeedUpdateWH)
         {
             this.setExtent(newW, newH);
@@ -4579,7 +4634,7 @@ ParaDrawing.prototype =
             this.Height = 0;
             return;
         }
-        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()))
+        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
         {
             this.Width        = this.Extent.W;
             this.Height       = this.Extent.H;
@@ -4835,6 +4890,14 @@ ParaDrawing.prototype =
 
         this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
         this.useWrap = this.Use_TextWrap();
+    },
+
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        this.Internal_Position.Update_PositionYHeaderFooter(TopMarginY, BottomMarginY);
+        this.Internal_Position.Calculate_Y(this.Is_Inline(), this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
+        this.Y = this.Internal_Position.CalcY;
+        this.updatePosition3(this.PageNum, this.X, this.Y, this.PageNum);
     },
 
     Reset_SavedPosition : function()
@@ -5268,7 +5331,6 @@ ParaDrawing.prototype =
         {
             if(this.GraphicObj.CheckNeedRecalcAutoFit(oSectPr))
             {
-                //this.GraphicObj.recalculate();
                 if(this.GraphicObj)
                 {
                     this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
@@ -5286,6 +5348,16 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                this.SizeRelH = Data.Old;
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                this.SizeRelV = Data.Old;
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.OldEE.L;
@@ -5433,6 +5505,16 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                this.SizeRelH = Data.New;
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                this.SizeRelV = Data.New;
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.NewEE.L;
@@ -5598,6 +5680,22 @@ ParaDrawing.prototype =
 
                     case historyitem_SetExtent:
                     {
+                        var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+                        if(Run)
+                        {
+                            Run.RecalcInfo.Measure = true;
+                        }
+                        break;
+                    }
+
+                    case historyitem_Drawing_SetSizeRelH:
+                    case historyitem_Drawing_SetSizeRelV:
+                    {
+                        if( this.GraphicObj)
+                        {
+                            this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
+                            this.GraphicObj.addToRecalculate();
+                        }
                         var Run = this.Parent.Get_DrawingObjectRun( this.Id );
                         if(Run)
                         {
@@ -5824,6 +5922,21 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                if(Data.New)
+                {
+                    Writer.WriteBool(true);
+                    Writer.WriteLong(Data.New.RelativeFrom);
+                    Writer.WriteDouble(Data.New.Percent);
+                }
+                else
+                {
+                    Writer.WriteBool(false);
+                }
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 writeDouble(Writer, Data.NewEE.L);
@@ -6003,6 +6116,34 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                if(Reader.GetBool())
+                {
+                    this.SizeRelH = {};
+                    this.SizeRelH.RelativeFrom = Reader.GetLong();
+                    this.SizeRelH.Percent = Reader.GetDouble();
+                }
+                else
+                {
+                    this.SizeRelH = undefined;
+                }
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                if(Reader.GetBool())
+                {
+                    this.SizeRelV = {};
+                    this.SizeRelV.RelativeFrom = Reader.GetLong();
+                    this.SizeRelV.Percent = Reader.GetDouble();
+                }
+                else
+                {
+                    this.SizeRelV = undefined;
+                }
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = readDouble(Reader);

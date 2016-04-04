@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
@@ -250,11 +250,6 @@ var c_oAscPrintType = {
   ActiveSheets: 0,	// Активные листы
   EntireWorkbook: 1,	// Всю книгу
   Selection: 2		// Выделенный фрагмент
-};
-// Тип печати
-var c_oAscLayoutPageType = {
-  FitToWidth: 0,	// На всю ширину
-  ActualSize: 1		// По реальным размерам
 };
 
 /** @enum */
