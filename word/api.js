@@ -2212,9 +2212,6 @@ CDocInfoProp.prototype.put_SymbolsWSCount = function(v){ this.SymbolsWSCount = v
 /*asc_docs_api.prototype.sync_CursorLockCallBack = function(isLock){
 	this.asc_fireCallback("asc_onCursorLock",isLock);
 }*/
-asc_docs_api.prototype.sync_PrintCallBack = function(){
-	this.asc_fireCallback("asc_onPrint");
-};
 asc_docs_api.prototype.sync_UndoCallBack = function(){
 	this.asc_fireCallback("asc_onUndo");
 };
