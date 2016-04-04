@@ -389,7 +389,7 @@
         }, "showCellEditorCursor": function() {
           self._onShowCellEditorCursor.apply(self, arguments);
         }, "print": function() {
-          self.Api.asc_Print();
+          self.Api.onPrint();
         }, "addFunction": function() {
           self.insertFormulaInEditor.apply(self, arguments);
         }, "canvasClick": function() {
