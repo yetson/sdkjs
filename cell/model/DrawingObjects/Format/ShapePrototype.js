@@ -123,6 +123,10 @@ CShape.prototype.hitInTextRect = function (x, y)
     }
     else
     {
+        if (window.AscDisableTextSelection)
+            return;
+
+
         return this.hitInTextRectWord(x, y);
     }
 
