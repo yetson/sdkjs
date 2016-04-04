@@ -8739,7 +8739,7 @@
             this.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical );
             this._cleanSelectionMoveRange();
         }
-        else if ( resmove === -1 && this.model.autoFilters.checkMoveRangeIntoApplyAutoFilter( arnTo ) ) {
+        else if ( resmove === -1 && this.af_isCheckMoveRange( arnFrom, arnTo ) ) {
             var t = this;
             this.model.workbook.handlers.trigger( "asc_onConfirmAction", c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
                 if ( can ) {
@@ -12842,21 +12842,50 @@
             return false;
         }
 		
+		var insertCellsAndShiftDownRight = function(arn, displayName, type)
+		{
+			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "insCell" );
+			if ( isCheckChangeAutoFilter === false ) {
+				return;
+			}
+
+			var callback = function (isSuccess) {
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				var shiftCells = type === c_oAscInsertOptions.InsertCellsAndShiftRight ? range.addCellsShiftRight(displayName) : range.addCellsShiftBottom(displayName);
+				if ( shiftCells ) {
+					t.cellCommentator.updateCommentsDependencies( true, type, arn );
+					t.objectRender.updateDrawingObject( true, type, arn );
+					t._onUpdateFormatTable(range, false, true);
+				}
+				History.EndTransaction();
+			};
+
+			var changedRange = new asc_Range( arn.c1, arn.r1, arn.c2, gc_nMaxRow0 );
+			t._isLockedCells( changedRange, null, callback );
+		};
+		
 		var startCol = this.activeRange.c1;
         var endCol = this.activeRange.c2;
         var startRow = this.activeRange.r1;
         var endRow = this.activeRange.r2;
 		
 		var newActiveRange = this.activeRange.clone();
-		var val = null;
+		var displayName = null;
+		var type = null;
 		switch(optionType)
 		{
 			case c_oAscInsertOptions.InsertTableRowAbove:
 			{
 				newActiveRange.c1 = tablePart.Ref.c1;
 				newActiveRange.c2 = tablePart.Ref.c2;
+				type = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				
-				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableRowBelow:
@@ -12865,16 +12894,17 @@
 				newActiveRange.c2 = tablePart.Ref.c2;
 				newActiveRange.r1 = tablePart.Ref.r2 + 1;
 				newActiveRange.r2 = tablePart.Ref.r2 + 1;
+				displayName = tableName;
+				type = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				
-				val = c_oAscInsertOptions.InsertCellsAndShiftDown;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColLeft:
 			{
 				newActiveRange.r1 = tablePart.Ref.r1;
 				newActiveRange.r2 = tablePart.Ref.r2;
+				type = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				
-				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 			case c_oAscInsertOptions.InsertTableColRight:
@@ -12883,25 +12913,14 @@
 				newActiveRange.c2 = tablePart.Ref.c2 + 1;
 				newActiveRange.r1 = tablePart.Ref.r1;
 				newActiveRange.r2 = tablePart.Ref.r2;
+				displayName = tableName;
+				type = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				
-				val = c_oAscInsertOptions.InsertCellsAndShiftRight;
 				break;
 			}
 		}
 		
-		if(val !== null)
-		{
-			t.activeRange = newActiveRange;
-			if(optionType === c_oAscInsertOptions.InsertTableColRight || optionType === c_oAscInsertOptions.InsertTableRowBelow)
-			{
-				t.changeWorksheet("insCell", val, tableName);
-			}
-			else
-			{
-				t.changeWorksheet("insCell", val);
-			}
-			t.activeRange = activeRange;
-		}
+		insertCellsAndShiftDownRight(newActiveRange, displayName, type)
 	};
 	
 	WorksheetView.prototype.af_deleteCellsInTable = function(tableName, optionType)
@@ -12916,6 +12935,36 @@
         {
             return false;
         }
+		
+		var deleteCellsAndShiftLeftTop = function(arn, type)
+		{
+			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "delCell" );
+			if ( isCheckChangeAutoFilter === false ) {
+				return;
+			}
+
+			var callback = function () {
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				if ( isCheckChangeAutoFilter === true ) {
+					t.model.autoFilters.isEmptyAutoFilters( arn, type );
+				}
+				
+				var deleteCells = type === c_oAscInsertOptions.InsertCellsAndShiftRight ? range.deleteCellsShiftLeft() : range.deleteCellsShiftUp();
+				if ( deleteCells ) {
+					t.cellCommentator.updateCommentsDependencies( true, type, arn );
+					t.objectRender.updateDrawingObject( true, type, arn );
+					t._onUpdateFormatTable(range, false, true);
+				}
+				
+				History.EndTransaction();
+			};
+
+			var changedRange = new asc_Range( arn.c1, arn.r1, gc_nMaxCol0, arn.r2 );
+			t._isLockedCells( changedRange, null, callback );
+		};
 		
 		var startCol = this.activeRange.c1;
         var endCol = this.activeRange.c2;
@@ -12951,9 +13000,7 @@
 		
 		if(val !== null)
 		{
-			t.activeRange = newActiveRange;
-			t.changeWorksheet("delCell", val);
-			t.activeRange = acitveRange;
+			deleteCellsAndShiftLeftTop(newActiveRange, val);
 		}
 	};
 	
