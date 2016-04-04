@@ -4456,7 +4456,7 @@ function sparklineGroup() {
 	this.rightToLeft = false;
 
 	// elements
-	this.colorSeries = null; // ToDo добавить значения по умолчанию
+	this.colorSeries = null;
 	this.colorNegative = null;
 	this.colorAxis = null;
 	this.colorMarkers = null;
@@ -4464,7 +4464,7 @@ function sparklineGroup() {
 	this.colorLast = null;
 	this.colorHigh = null;
 	this.colorLow = null;
-	this.f = '??';
+	this.f = null;
 	this.arrSparklines = [];
 	this.arrCachedSparklines = [];
 }
@@ -4492,11 +4492,14 @@ sparklineGroup.prototype.updateCache = function(range) {
 };
 /** @constructor */
 function sparkline() {
-	this.sqref = '??'; // ToDo добавить значение по умолчанию
-	this.f = '??';
+	this.sqref = null;
+	this.f = null;
 }
+sparkline.prototype.setSqref = function(sqref) {
+	this.sqref = Asc.g_oRangeCache.getAscRange(sqref);
+};
 sparkline.prototype.checkInRange = function(range) {
-	range.intersectionSimple(this.sqref);
+	return this.sqref ? range.isIntersect(this.sqref) : false;
 };
 
 // For Auto Filters
