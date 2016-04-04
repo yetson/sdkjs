@@ -4118,7 +4118,7 @@ parserFormula.prototype = {
              }*/
 
             /* Operators*/
-            if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) || parserHelp.isNextPtg.call( this, this.Formula, this.pCurrPos ) ) {
+            if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos) || parserHelp.isNextPtg.call(this, this.Formula, this.pCurrPos)) {
                 wasLeftParentheses = false;
                 wasRigthParentheses = false;
                 found_operator = null;
@@ -4350,7 +4350,7 @@ parserFormula.prototype = {
                         arr.addElement( new cNumber( parseFloat( this.operand_str ) ) );
                         operator = { isOperator: false, operatorName: ""};
                     }
-                    else if ( parserHelp.isOperator.call( this, this.Formula, this.pCurrPos ) ) {
+                    else if (parserHelp.isOperator.call(this, this.Formula, this.pCurrPos)) {
                         operator.isOperator = true;
                         operator.operatorName = this.operand_str;
                     }
