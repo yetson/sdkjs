@@ -203,6 +203,12 @@
     }
   };
 
+  CDocsCoApi.prototype.sendChangesError = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.sendChangesError(data);
+    }
+  };
+
   CDocsCoApi.prototype.askLock = function(arrayBlockId, callback) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.askLock(arrayBlockId, callback);
@@ -736,6 +742,12 @@
   DocsCoApi.prototype.sendCursor = function(cursor) {
     if (typeof cursor === 'string') {
       this._send({"type": "cursor", "cursor": cursor});
+    }
+  };
+
+  DocsCoApi.prototype.sendChangesError = function(data) {
+    if (typeof data === 'string') {
+      this._send({'type': 'changesError', 'stack': data});
     }
   };
 
