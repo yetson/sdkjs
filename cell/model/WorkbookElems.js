@@ -4721,6 +4721,16 @@ TablePart.prototype.isShowButton = function()
 	return res;
 };
 
+TablePart.prototype.generateTotalsRowLabel = function()
+{
+	if(!this.TableColumns)
+	{
+		return;
+	}
+	
+	this.TableColumns[0].generateTotalsRowLabel();
+};
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
@@ -4922,6 +4932,14 @@ TableColumn.prototype.clone = function() {
 	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
 	return res;
 };
+TableColumn.prototype.generateTotalsRowLabel = function(){
+	//TODO добавить в перевод
+	if(this.TotalsRowLabel === null)
+	{	
+		this.TotalsRowLabel = "Summary";
+	}
+};
+
 /** @constructor */
 function TableStyleInfo() {
 	this.Name = null;
