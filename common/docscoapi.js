@@ -1324,5 +1324,5 @@
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
-  window["CDocsCoApi"] = CDocsCoApi;
+  asc.CDocsCoApi = CDocsCoApi;
 })(window);
