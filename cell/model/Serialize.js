@@ -23,7 +23,7 @@
  *
 */
 "use strict";
-(function($, window, undefined) {
+(function(window, undefined) {
 
     /** @enum */
     var c_oSerFormat = {
@@ -7856,4 +7856,4 @@
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 }
-    )(jQuery, window);
+    )(window);
