@@ -16421,6 +16421,15 @@ CDocument.prototype.Get_SectionProps = function()
 
     return new CDocumentSectionProps(SectPr);
 };
+CDocument.prototype.Get_FirstParagraph = function()
+{
+    if (type_Paragraph == this.Content[0].GetType())
+        return this.Content[0];
+    else if (type_Table == this.Content[0].GetType())
+        return this.Content[0].Get_FirstParagraph();
+
+    return null;
+};
 //----------------------------------------------------------------------------------------------------------------------
 // Settings
 //----------------------------------------------------------------------------------------------------------------------
