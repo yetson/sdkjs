@@ -2663,8 +2663,8 @@
 				ShowFirstColumn: false,
 				ShowLastColumn: false,
 				ShowRowStripes: true,
-				HeaderRowCount: null,
-				TotalsRowCount: 0
+				HeaderRowCount: true,
+				TotalsRowCount: false
 			};
 		}
 		

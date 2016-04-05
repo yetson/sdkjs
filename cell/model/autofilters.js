@@ -2233,6 +2233,11 @@ var maxIndividualValues = 10000;
 				History.EndTransaction();
 			},
 			
+			changeTableRange: function(tableName, range)
+			{
+				
+			},
+			
 			_clearRange: function(range, isClearText)
 			{
 				range.setTableStyle(null);
