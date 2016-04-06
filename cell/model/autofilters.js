@@ -747,6 +747,9 @@ var maxIndividualValues = 10000;
 					case historyitem_AutoFilter_ChangeTableRef:
 						this.changeTableRange(data.displayName, data.moveTo);
 						break;
+					case historyitem_AutoFilter_ChangeTableName:
+						this.changeDisplayNameTable(data.displayName, data.val);
+						break;
 				}
 				History.TurnOn();
 			},
@@ -814,6 +817,19 @@ var maxIndividualValues = 10000;
 								
 								break;
 							}	
+						}
+					}
+				}
+				else if(type === historyitem_AutoFilter_ChangeTableName)
+				{
+					var oldName = cloneData.newDisplayName;
+					
+					for(var l = 0; l < worksheet.TableParts.length; l++)
+					{
+						if(oldName === worksheet.TableParts[l].DisplayName)
+						{							
+							worksheet.TableParts[l] = cloneData.oldFilter.clone(null);
+							break;
 						}
 					}
 				}
@@ -2254,6 +2270,34 @@ var maxIndividualValues = 10000;
 				
 				this._cleanStyleTable(oldFilter.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, true);
+			},
+			
+			changeDisplayNameTable: function(tableName, newName)
+			{
+				var tablePart = this._getFilterByDisplayName(tableName);
+				var worksheet = this.worksheet;
+				
+				if(!tablePart)
+				{
+					return false;
+				}
+				
+				var oldFilter = tablePart.clone(null);
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				//TODO добавлять в историю смену именного диапазона
+				var oldNamedrange = worksheet.workbook.dependencyFormulas.getDefNameNodeByName(tablePart.DisplayName);
+				var newNamedrange = oldNamedrange.clone();
+				newNamedrange.Name = newName;
+				oldNamedrange.changeDefName(newNamedrange);
+				
+				tablePart.changeDisplayName(newName);
+				
+				this._addHistoryObj({oldFilter: oldFilter, newFilterRef: tablePart.Ref.clone(), newDisplayName: newName}, historyitem_AutoFilter_ChangeTableName,
+						{activeCells: tablePart.Ref.clone(), val: newName, displayName: tableName});
+				
+				History.EndTransaction();
 			},
 			
 			_clearRange: function(range, isClearText)
