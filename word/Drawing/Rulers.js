@@ -209,6 +209,8 @@ function CHorRuler()
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
 
+    this.Units = c_oAscRulerUnits.Inch;
+
     this.InitTablePict = function()
     {
         var _data = g_memory.ctx.createImageData(7, 8);
@@ -600,8 +602,7 @@ function CHorRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
-        var lCount2 = (left_margin / mm_1_4) >> 0;
+        var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
 
         var middleVert = (this.m_nTop + this.m_nBottom) / 2;
         var part1 = 1;
@@ -609,93 +610,178 @@ function CHorRuler()
 
         context.font = "7pt Arial";
 
-        var index = 0;
-        var num = 0;
-        for (var i = 1; i < lCount1; i++)
+        if (this.Units == c_oAscRulerUnits.Millimeter)
         {
-            var lXPos = ((left_margin + i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
+            var lCount2 = (left_margin / mm_1_4) >> 0;
 
-            if (index == 4)
-                index = 0;
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lXPos = ((left_margin + i * mm_1_4) >> 0) + 0.5;
+                index++;
 
-            if (0 == index)
-            {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
-                lXPos -= (lWidthText / 2.0);
-                context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part2);
-                context.lineTo(lXPos, middleVert + part2);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
+                var lXPos = ((left_margin - i * mm_1_4) >> 0) + 0.5;
+                index++;
+
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
         }
-
-        index = 0;
-        num = 0;
-        for (var i = 1; i <= lCount2; i++)
+        else if (this.Units == c_oAscRulerUnits.Inch)
         {
-            var lXPos = ((left_margin - i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((width - left_margin) / inch_1_8) >> 0;
+            var lCount2 = (left_margin / inch_1_8) >> 0;
 
-            if (index == 4)
-                index = 0;
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lXPos = ((left_margin + i * inch_1_8) >> 0) + 0.5;
+                index++;
 
-            if (0 == index)
-            {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
-                lXPos -= (lWidthText / 2.0);
-                context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part2);
-                context.lineTo(lXPos, middleVert + part2);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
+                var lXPos = ((left_margin - i * inch_1_8) >> 0) + 0.5;
+                index++;
+
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
         }
 
@@ -2504,6 +2590,8 @@ function CVerRuler()
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
 
+    this.Units = c_oAscRulerUnits.Inch;
+
     this.CheckCanvas = function()
     {
         this.m_dZoom = this.m_oWordControl.m_nZoomValue / 100;
@@ -2715,8 +2803,7 @@ function CVerRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
-        var lCount2 = (top_margin / mm_1_4) >> 0;
+        var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
 
         var middleHor = (this.m_nLeft + this.m_nRight) / 2;
         var part1 = 1;
@@ -2724,108 +2811,208 @@ function CVerRuler()
 
         context.font = "7pt Arial";
 
-        var index = 0;
-        var num = 0;
-        for (var i = 1; i < lCount1; i++)
+        if (this.Units == c_oAscRulerUnits.Millimeter)
         {
-            var lYPos = ((top_margin + i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
+            var lCount2 = (top_margin / mm_1_4) >> 0;
 
-            if (index == 4)
-                index = 0;
-
-            if (0 == index)
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                num++;
-                // number
+                var lYPos = ((top_margin + i * mm_1_4) >> 0) + 0.5;
+                index++;
 
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
+                if (index == 4)
+                    index = 0;
 
-                context.translate(middleHor, lYPos);
-                context.rotate(-Math.PI / 2);
-                context.fillText(strNum, -lWidthText / 2.0, 4);
+                if (0 == index)
+                {
+                    num++;
+                    // number
 
-                if (!this.IsRetina)
-                    context.setTransform(1, 0, 0, 1, 0, 5);
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
                 else
-                    context.setTransform(2, 0, 0, 2, 0, 10);
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(middleHor - part2, lYPos);
-                context.lineTo(middleHor + part2, lYPos);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin - i * mm_1_4) >> 0) + 0.5;
+                index++;
+
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
         }
-
-        index = 0;
-        num = 0;
-        for (var i = 1; i <= lCount2; i++)
+        else if (this.Units == c_oAscRulerUnits.Inch)
         {
-            var lYPos = ((top_margin - i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((height - top_margin) / inch_1_8) >> 0;
+            var lCount2 = (top_margin / inch_1_8) >> 0;
 
-            if (index == 4)
-                index = 0;
-
-            if (0 == index)
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
+                var lYPos = ((top_margin + i * inch_1_8) >> 0) + 0.5;
+                index++;
 
-                context.translate(middleHor, lYPos);
-                context.rotate(-Math.PI / 2);
-                context.fillText(strNum, -lWidthText / 2.0, 4);
+                if (index == 8)
+                    index = 0;
 
-                if (!this.IsRetina)
-                    context.setTransform(1, 0, 0, 1, 0, 5);
-                else
-                    context.setTransform(2, 0, 0, 2, 0, 10);
+                if (0 == index)
+                {
+                    num++;
+                    // number
+
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(middleHor - part2, lYPos);
-                context.lineTo(middleHor + part2, lYPos);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin - i * inch_1_8) >> 0) + 0.5;
+                index++;
+
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
         }
 
