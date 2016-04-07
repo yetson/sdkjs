@@ -97,10 +97,19 @@ function CVerRulerRepaintChecker()
     this.BlitTop = 0;
 }
 
-function RulerCorrectPosition(val, mm_1_8, mm_1_4, margin)
+function RulerCorrectPosition(_ruler, val, margin)
 {
     if (global_keyboardEvent.AltKey)
         return val;
+
+    var mm_1_4 = 10 / 4;
+
+    if (_ruler.Units == c_oAscDocumentUnits.Inch)
+        mm_1_4 = 25.4 / 16;
+    else if (_ruler.Units == c_oAscDocumentUnits.Point)
+        mm_1_4 = 25.4 / 12;
+
+    var mm_1_8 = mm_1_4 / 2;
 
     if (undefined === margin)
         return (((val + mm_1_8) / mm_1_4) >> 0) * mm_1_4;
@@ -208,6 +217,8 @@ function CHorRuler()
     this.IsDrawAnyMarkers = true;
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
+
+    this.Units = c_oAscDocumentUnits.Millimeter;
 
     this.InitTablePict = function()
     {
@@ -376,7 +387,7 @@ function CHorRuler()
         return widthNew;
     }
 
-    this.CreateBackground = function(cachedPage)
+    this.CreateBackground = function(cachedPage, isattack)
     {
         if (window["NATIVE_EDITOR_ENJINE"])
             return;
@@ -402,7 +413,7 @@ function CHorRuler()
         if (this.CurrentObjectType == RULER_OBJECT_TYPE_COLUMNS)
             markup = this.m_oColumnMarkup;
 
-        if (this.CurrentObjectType == checker.Type && width == checker.Width)
+        if (isattack !== true && this.CurrentObjectType == checker.Type && width == checker.Width)
         {
             if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
             {
@@ -600,8 +611,7 @@ function CHorRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
-        var lCount2 = (left_margin / mm_1_4) >> 0;
+        var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
 
         var middleVert = (this.m_nTop + this.m_nBottom) / 2;
         var part1 = 1;
@@ -609,93 +619,243 @@ function CHorRuler()
 
         context.font = "7pt Arial";
 
-        var index = 0;
-        var num = 0;
-        for (var i = 1; i < lCount1; i++)
+        if (this.Units == c_oAscDocumentUnits.Millimeter)
         {
-            var lXPos = ((left_margin + i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((width - left_margin) / mm_1_4) >> 0;
+            var lCount2 = (left_margin / mm_1_4) >> 0;
 
-            if (index == 4)
-                index = 0;
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lXPos = ((left_margin + i * mm_1_4) >> 0) + 0.5;
+                index++;
 
-            if (0 == index)
-            {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
-                lXPos -= (lWidthText / 2.0);
-                context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part2);
-                context.lineTo(lXPos, middleVert + part2);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
+                var lXPos = ((left_margin - i * mm_1_4) >> 0) + 0.5;
+                index++;
+
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
         }
-
-        index = 0;
-        num = 0;
-        for (var i = 1; i <= lCount2; i++)
+        else if (this.Units == c_oAscDocumentUnits.Inch)
         {
-            var lXPos = ((left_margin - i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((width - left_margin) / inch_1_8) >> 0;
+            var lCount2 = (left_margin / inch_1_8) >> 0;
 
-            if (index == 4)
-                index = 0;
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
+            {
+                var lXPos = ((left_margin + i * inch_1_8) >> 0) + 0.5;
+                index++;
 
-            if (0 == index)
-            {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
-                lXPos -= (lWidthText / 2.0);
-                context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
+                var lXPos = ((left_margin - i * inch_1_8) >> 0) + 0.5;
+                index++;
+
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part2);
+                    context.lineTo(lXPos, middleVert + part2);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else if (2 == index)
+        }
+        else if (this.Units == c_oAscDocumentUnits.Point)
+        {
+            var point_1_12 = 25.4 * dKoef_mm_to_pix / 12;
+
+            var lCount1 = ((width - left_margin) / point_1_12) >> 0;
+            var lCount2 = (left_margin / point_1_12) >> 0;
+
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                // 1/2
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part2);
-                context.lineTo(lXPos, middleVert + part2);
-                context.stroke();
+                var lXPos = ((left_margin + i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/12
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
-            else
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(lXPos, middleVert - part1);
-                context.lineTo(lXPos, middleVert + part1);
-                context.stroke();
+                var lXPos = ((left_margin - i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+                    lXPos -= (lWidthText / 2.0);
+                    context.fillText(strNum, lXPos, this.m_nBottom - 3);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/12
+                    context.beginPath();
+                    context.moveTo(lXPos, middleVert - part1);
+                    context.lineTo(lXPos, middleVert + part1);
+                    context.stroke();
+                }
             }
         }
 
@@ -956,7 +1116,7 @@ function CHorRuler()
             }
             case 1:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -982,7 +1142,7 @@ function CHorRuler()
             }
             case 2:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 var min = this.m_dMarginLeft;
                 if ((this.m_dMarginLeft + this.m_dIndentLeft) > min)
@@ -1010,7 +1170,7 @@ function CHorRuler()
             }
             case 3:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 var min = 0;
                 if (this.m_dIndentLeftFirst < this.m_dIndentLeft)
@@ -1051,7 +1211,7 @@ function CHorRuler()
             }
             case 4:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -1079,7 +1239,7 @@ function CHorRuler()
             }
             case 5:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -1107,7 +1267,7 @@ function CHorRuler()
             }
             case 6:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 if (newVal > (this.m_oPage.width_mm))
                     newVal = this.m_oPage.width_mm;
@@ -1139,7 +1299,7 @@ function CHorRuler()
             }
             case 7:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var newVal = RulerCorrectPosition(this, _x, _margin_left);
 
                 this.m_dCurrentTabNewPosition = newVal - _margin_left;
 
@@ -1163,7 +1323,7 @@ function CHorRuler()
             }
             case 8:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var _min = 0;
@@ -1208,7 +1368,7 @@ function CHorRuler()
             }
             case 9:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var markup = this.m_oColumnMarkup;
@@ -1357,7 +1517,7 @@ function CHorRuler()
             }
             case 10:
             {
-                var newVal = RulerCorrectPosition(_x, mm_1_8, mm_1_4, this.TableMarginLeftTrackStart);
+                var newVal = RulerCorrectPosition(this, _x, this.TableMarginLeftTrackStart);
 
                 // сначала определим граничные условия
                 var markup = this.m_oColumnMarkup;
@@ -1813,7 +1973,7 @@ function CHorRuler()
                 var mm_1_4 = 10 / 4;
                 var mm_1_8 = mm_1_4 / 2;
 
-                var _new_tab_pos = RulerCorrectPosition(_x, mm_1_8, mm_1_4, _margin_left);
+                var _new_tab_pos = RulerCorrectPosition(this, _x, _margin_left);
                 _new_tab_pos -= _margin_left;
 
                 this.m_arrTabs[this.m_arrTabs.length] = new CTab(_new_tab_pos, word_control.m_nTabsType);
@@ -2504,6 +2664,8 @@ function CVerRuler()
 
     this.SimpleChanges = new RulerCheckSimpleChanges();
 
+    this.Units = c_oAscDocumentUnits.Millimeter;
+
     this.CheckCanvas = function()
     {
         this.m_dZoom = this.m_oWordControl.m_nZoomValue / 100;
@@ -2548,7 +2710,7 @@ function CVerRuler()
         return heightNew;
     }
 
-    this.CreateBackground = function(cachedPage)
+    this.CreateBackground = function(cachedPage, isattack)
     {
         if (window["NATIVE_EDITOR_ENJINE"])
             return;
@@ -2572,7 +2734,7 @@ function CVerRuler()
         var checker = this.RepaintChecker;
         var markup = this.m_oTableMarkup;
 
-        if (this.CurrentObjectType == checker.Type && height == checker.Height)
+        if (isattack !== true && this.CurrentObjectType == checker.Type && height == checker.Height)
         {
             if (this.CurrentObjectType == RULER_OBJECT_TYPE_PARAGRAPH)
             {
@@ -2715,8 +2877,7 @@ function CVerRuler()
         context.fillStyle = "#585B5E";
 
         var mm_1_4 = 10 * dKoef_mm_to_pix / 4;
-        var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
-        var lCount2 = (top_margin / mm_1_4) >> 0;
+        var inch_1_8 = 25.4 * dKoef_mm_to_pix / 8;
 
         var middleHor = (this.m_nLeft + this.m_nRight) / 2;
         var part1 = 1;
@@ -2724,108 +2885,288 @@ function CVerRuler()
 
         context.font = "7pt Arial";
 
-        var index = 0;
-        var num = 0;
-        for (var i = 1; i < lCount1; i++)
+        if (this.Units == c_oAscDocumentUnits.Millimeter)
         {
-            var lYPos = ((top_margin + i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((height - top_margin) / mm_1_4) >> 0;
+            var lCount2 = (top_margin / mm_1_4) >> 0;
 
-            if (index == 4)
-                index = 0;
-
-            if (0 == index)
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                num++;
-                // number
+                var lYPos = ((top_margin + i * mm_1_4) >> 0) + 0.5;
+                index++;
 
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
+                if (index == 4)
+                    index = 0;
 
-                context.translate(middleHor, lYPos);
-                context.rotate(-Math.PI / 2);
-                context.fillText(strNum, -lWidthText / 2.0, 4);
+                if (0 == index)
+                {
+                    num++;
+                    // number
 
-                if (!this.IsRetina)
-                    context.setTransform(1, 0, 0, 1, 0, 5);
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
                 else
-                    context.setTransform(2, 0, 0, 2, 0, 10);
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
-            }
-            else if (2 == index)
-            {
-                // 1/2
-                context.beginPath();
-                context.moveTo(middleHor - part2, lYPos);
-                context.lineTo(middleHor + part2, lYPos);
-                context.stroke();
-            }
-            else
-            {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin - i * mm_1_4) >> 0) + 0.5;
+                index++;
+
+                if (index == 4)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (1 == index)
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
+                else if (2 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else
+                {
+                    // 1/4
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
         }
-
-        index = 0;
-        num = 0;
-        for (var i = 1; i <= lCount2; i++)
+        else if (this.Units == c_oAscDocumentUnits.Inch)
         {
-            var lYPos = ((top_margin - i * mm_1_4) >> 0) + 0.5;
-            index++;
+            var lCount1 = ((height - top_margin) / inch_1_8) >> 0;
+            var lCount2 = (top_margin / inch_1_8) >> 0;
 
-            if (index == 4)
-                index = 0;
-
-            if (0 == index)
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                num++;
-                // number
-                var strNum = "" + num;
-                var lWidthText = context.measureText(strNum).width;
+                var lYPos = ((top_margin + i * inch_1_8) >> 0) + 0.5;
+                index++;
 
-                context.translate(middleHor, lYPos);
-                context.rotate(-Math.PI / 2);
-                context.fillText(strNum, -lWidthText / 2.0, 4);
+                if (index == 8)
+                    index = 0;
 
-                if (!this.IsRetina)
-                    context.setTransform(1, 0, 0, 1, 0, 5);
-                else
-                    context.setTransform(2, 0, 0, 2, 0, 10);
+                if (0 == index)
+                {
+                    num++;
+                    // number
+
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else if (1 == index)
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin - i * inch_1_8) >> 0) + 0.5;
+                index++;
+
+                if (index == 8)
+                    index = 0;
+
+                if (0 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + num;
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (4 == index)
+                {
+                    // 1/2
+                    context.beginPath();
+                    context.moveTo(middleHor - part2, lYPos);
+                    context.lineTo(middleHor + part2, lYPos);
+                    context.stroke();
+                }
+                else if (inch_1_8 > 8)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else if (2 == index)
+        }
+        else if (this.Units == c_oAscDocumentUnits.Point)
+        {
+            var point_1_12 = 25.4 * dKoef_mm_to_pix / 12;
+
+            var lCount1 = ((height - top_margin) / point_1_12) >> 0;
+            var lCount2 = (top_margin / point_1_12) >> 0;
+
+            var index = 0;
+            var num = 0;
+            for (var i = 1; i < lCount1; i++)
             {
-                // 1/2
-                context.beginPath();
-                context.moveTo(middleHor - part2, lYPos);
-                context.lineTo(middleHor + part2, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin + i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
-            else
+
+            index = 0;
+            num = 0;
+            for (var i = 1; i <= lCount2; i++)
             {
-                // 1/4
-                context.beginPath();
-                context.moveTo(middleHor - part1, lYPos);
-                context.lineTo(middleHor + part1, lYPos);
-                context.stroke();
+                var lYPos = ((top_margin - i * point_1_12) >> 0) + 0.5;
+                index++;
+
+                if (index == 12)
+                    index = 0;
+
+                if (0 == index || 6 == index)
+                {
+                    num++;
+                    // number
+                    var strNum = "" + (num * 36);
+                    var lWidthText = context.measureText(strNum).width;
+
+                    context.translate(middleHor, lYPos);
+                    context.rotate(-Math.PI / 2);
+                    context.fillText(strNum, -lWidthText / 2.0, 4);
+
+                    if (!this.IsRetina)
+                        context.setTransform(1, 0, 0, 1, 0, 5);
+                    else
+                        context.setTransform(2, 0, 0, 2, 0, 10);
+                }
+                else if (point_1_12 > 5)
+                {
+                    // 1/8
+                    context.beginPath();
+                    context.moveTo(middleHor - part1, lYPos);
+                    context.lineTo(middleHor + part1, lYPos);
+                    context.stroke();
+                }
             }
         }
 
@@ -2914,7 +3255,7 @@ function CVerRuler()
             }
             case 1:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal > (this.m_dMarginBottom - 30))
                     newVal = this.m_dMarginBottom - 30;
@@ -2933,7 +3274,7 @@ function CVerRuler()
             }
             case 2:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < (this.m_dMarginTop + 30))
                     newVal = this.m_dMarginTop + 30;
@@ -2952,7 +3293,7 @@ function CVerRuler()
             }
             case 3:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal > this.header_bottom)
                     newVal = this.header_bottom;
@@ -2971,7 +3312,7 @@ function CVerRuler()
             }
             case 4:
             {
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < 0)
                     newVal = 0;
@@ -3003,7 +3344,7 @@ function CVerRuler()
                     _max = this.m_oTableMarkup.Rows[this.DragTablePos].Y + this.m_oTableMarkup.Rows[this.DragTablePos].H;
                 }
 
-                var newVal = RulerCorrectPosition(_y, mm_1_8, mm_1_4, this.m_dMarginTop);
+                var newVal = RulerCorrectPosition(this, _y, this.m_dMarginTop);
 
                 if (newVal < _min)
                     newVal = _min;

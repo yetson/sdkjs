@@ -110,6 +110,8 @@ function CDistance(L, T, R, B)
     this.B = B;
 }
 
+
+
 function checkObjectInArray(aObjects, oObject)
 {
     var i;
@@ -800,6 +802,13 @@ DrawingObjectsController.prototype =
     getLeftTopSelectedObject: function(pageIndex)
     {
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+	
+	createWatermarkImage: function(sImageUrl)
+	{
+        return ExecuteNoHistory(function(){
+            return this.createImage(sImageUrl, 0, 0, 110, 61.875);
+        }, this, []);
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)

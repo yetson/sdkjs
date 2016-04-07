@@ -817,6 +817,13 @@ var contentchanges_Remove = 2;
 
 var offlineMode = '_offline_';
 
+// ToDo поправить
+var c_oAscDocumentUnits = {
+    Millimeter  : 0,
+    Inch        : 1,
+    Point       : 2
+};
+
 //------------------------------------------------------------export---------------------------------------------------
 if (undefined === window['Asc']) {
   window['Asc'] = {};
