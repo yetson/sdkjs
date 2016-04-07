@@ -31,11 +31,10 @@
  */
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
@@ -1749,4 +1748,4 @@
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
 }
-)(jQuery, window);
+)(window);
