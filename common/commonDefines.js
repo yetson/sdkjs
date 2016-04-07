@@ -689,6 +689,12 @@ var c_oAscCellTextDirection = {
     BTLR : 0x02
 };
 
+var c_oAscDocumentUnits = {
+  Millimeter  : 0,
+  Inch        : 1,
+  Point       : 2
+};
+
 
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
@@ -817,13 +823,6 @@ var contentchanges_Remove = 2;
 
 var offlineMode = '_offline_';
 
-// ToDo поправить
-var c_oAscDocumentUnits = {
-    Millimeter  : 0,
-    Inch        : 1,
-    Point       : 2
-};
-
 //------------------------------------------------------------export---------------------------------------------------
 if (undefined === window['Asc']) {
   window['Asc'] = {};
@@ -875,5 +874,6 @@ window['Asc']['c_oAscLineBeginType'] = c_oAscLineBeginType;
 window['Asc']['c_oAscLineBeginSize'] = c_oAscLineBeginSize;
 window['Asc']['c_oAscVertDrawingText'] = c_oAscVertDrawingText;
 window['Asc']['c_oAscCellTextDirection'] = c_oAscCellTextDirection;
+window['Asc']['c_oAscDocumentUnits'] = c_oAscDocumentUnits;
 window['Asc']['c_oAscMaxTooltipLength'] = c_oAscMaxTooltipLength;
 window['Asc']['c_oAscMaxCellOrCommentLength'] = c_oAscMaxCellOrCommentLength;
