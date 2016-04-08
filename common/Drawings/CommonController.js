@@ -37,6 +37,18 @@ var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
 function CheckShapeBodyAutoFitReset(oShape)
 {
+    var oParaDrawing = getParaDrawing(oShape);
+    if(oParaDrawing)
+    {
+        if(oParaDrawing.SizeRelH)
+        {
+            oParaDrawing.SetSizeRelH(undefined);
+        }
+        if(oParaDrawing.SizeRelV)
+        {
+            oParaDrawing.SetSizeRelV(undefined);
+        }
+    }
     if(oShape instanceof CShape)
     {
         var oPropsToSet = null;
@@ -97,6 +109,8 @@ function CDistance(L, T, R, B)
     this.R = R;
     this.B = B;
 }
+
+
 
 function checkObjectInArray(aObjects, oObject)
 {
@@ -350,8 +364,51 @@ function DrawingObjectsController(drawingObjects)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
+function CanStartEditText(oController)
+{
+    var oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
+    if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+    {
+        return true;
+    }
+    return false;
+}
+
 DrawingObjectsController.prototype =
 {
+
+
+    //for mobile spreadsheet editor
+    startEditTextCurrentShape: function()
+    {
+        if(!CanStartEditText(this))
+        {
+            return;
+        }
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oShape = oSelector.selectedObjects[0];
+        var oContent = oShape.getDocContent();
+        if(oContent)
+        {
+            oSelector.resetInternalSelection();
+            oSelector.selection.textSelection = oShape;
+            oContent.Cursor_MoveToEndPos(false);
+            this.updateSelectionState();
+            this.updateOverlay();
+        }
+        else
+        {
+            var oThis = this;
+            this.checkSelectedObjectsAndCallback(function(){
+                oShape.createTextBody();
+                var oContent = oShape.getDocContent();
+                oSelector.resetInternalSelection();
+                oSelector.selection.textSelection = oShape;
+                oContent.Cursor_MoveToEndPos(false);
+                oThis.updateSelectionState();
+            }, [], false, historydescription_Spreadsheet_AddNewParagraph);
+        }
+    },
 
     canReceiveKeyPress: function()
     {
@@ -756,6 +813,13 @@ DrawingObjectsController.prototype =
     getLeftTopSelectedObject: function(pageIndex)
     {
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+	
+	createWatermarkImage: function(sImageUrl)
+	{
+        return ExecuteNoHistory(function(){
+            return this.createImage(sImageUrl, 0, 0, 110, 61.875);
+        }, this, []);
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
@@ -6576,7 +6640,7 @@ DrawingObjectsController.prototype =
         if (isRealObject(props.shapeProps))
         {
             shape_props = new asc_CImgProperty();
-            shape_props.fromGroup = props.shapeProps.fromGroup;
+            shape_props.fromGroup = CanStartEditText(this);
             shape_props.ShapeProperties = new asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;

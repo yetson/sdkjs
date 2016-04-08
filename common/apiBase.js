@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
@@ -89,7 +89,7 @@ function baseEditorsApi(name) {
 
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new window['CDocsCoApi']();
+  this.CoAuthoringApi = new Asc.CDocsCoApi();
   this.isCoAuthoringEnable = true;
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];
@@ -286,6 +286,9 @@ baseEditorsApi.prototype.IsNeedDefaultFonts = function() {
       break;
   }
   return res;
+};
+baseEditorsApi.prototype.onPrint = function() {
+  this.sendEvent("asc_onPrint");
 };
 // Open
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {

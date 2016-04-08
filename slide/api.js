@@ -40,8 +40,6 @@ function asc_docs_api(name)
   asc_docs_api.superclass.constructor.call(this, name);
   this.editorId = c_oEditorId.Presentation;
 
-    var CSpellCheckApi  = window["CSpellCheckApi"];
-
     History    = new CHistory();
     g_oTableId = new CTableId();
 
@@ -1280,9 +1278,6 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
 /*asc_docs_api.prototype.sync_CursorLockCallBack = function(isLock){
 	this.asc_fireCallback("asc_onCursorLock",isLock);
 }*/
-asc_docs_api.prototype.sync_PrintCallBack = function(){
-	this.asc_fireCallback("asc_onPrint");
-};
 asc_docs_api.prototype.sync_UndoCallBack = function(){
 	this.asc_fireCallback("asc_onUndo");
 };
@@ -3815,6 +3810,16 @@ asc_docs_api.prototype.asc_GetViewRulers = function()
 {
     return this.WordControl.m_bIsRuler;
 };
+asc_docs_api.prototype.asc_SetDocumentUnits = function(_units)
+{
+    if (this.WordControl && this.WordControl.m_oHorRuler && this.WordControl.m_oVerRuler)
+    {
+        this.WordControl.m_oHorRuler.Units = _units;
+        this.WordControl.m_oVerRuler.Units = _units;
+        this.WordControl.UpdateHorRulerBack(true);
+        this.WordControl.UpdateVerRulerBack(true);
+    }
+};
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
@@ -4738,6 +4743,9 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
 	if(c_oAscFileType.PDF == filetype)
 	{
 		var dd = editor.WordControl.m_oDrawingDocument;

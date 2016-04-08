@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (function(window, undefined) {
   'use strict';
@@ -200,6 +200,12 @@
   CDocsCoApi.prototype.sendCursor = function(cursor) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.sendCursor(cursor);
+    }
+  };
+
+  CDocsCoApi.prototype.sendChangesError = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.sendChangesError(data);
     }
   };
 
@@ -736,6 +742,12 @@
   DocsCoApi.prototype.sendCursor = function(cursor) {
     if (typeof cursor === 'string') {
       this._send({"type": "cursor", "cursor": cursor});
+    }
+  };
+
+  DocsCoApi.prototype.sendChangesError = function(data) {
+    if (typeof data === 'string') {
+      this._send({'type': 'changesError', 'stack': data});
     }
   };
 
@@ -1324,5 +1336,5 @@
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
-  window["CDocsCoApi"] = CDocsCoApi;
+  asc.CDocsCoApi = CDocsCoApi;
 })(window);

@@ -22,14 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* DrawingContext.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(function (/** jQuery */$, /** Window */window, undefined) {
+(function (/** Window */window, undefined) {
 
 	/*
 	 * Import
@@ -937,7 +937,9 @@
 			if (!_r && !_g && !_b) {
 				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
 			} else {
-				var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
+				var canvD = document.createElement('canvas');
+				canvD.width = nW;
+				canvD.height = nH;
 				var ctxD = canvD.getContext("2d");
 				var pixDst = ctxD.getImageData(0, 0, nW, nH);
 				var dstP = pixDst.data;
@@ -1271,4 +1273,4 @@
 	window["Asc"].DrawingContext   = DrawingContext;
 	window["Asc"].Matrix           = Matrix;
 
-})(jQuery, window);
+})(window);

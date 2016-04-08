@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* Utils.js
  *
@@ -31,11 +31,10 @@
  */
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
@@ -1079,33 +1078,38 @@
 		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
 		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
 		/** @constructor */
-		function asc_CPageSetup (obj) {
-			if ( !(this instanceof asc_CPageSetup) ) {
-				return new asc_CPageSetup(obj);
-			}
+		function asc_CPageSetup () {
+			this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
+			this.width = c_oAscPrintDefaultSettings.PageWidth;
+			this.height = c_oAscPrintDefaultSettings.PageHeight;
 
-			if (obj) {
-				this.orientation = obj.orientation;
-				this.width = obj.width;
-				this.height = obj.height;
-			}
+			this.fitToWidth = false; //ToDo can be a number
+			this.fitToHeight = false; //ToDo can be a number
+
+			// ToDo
+			this.blackAndWhite = false;
+			this.cellComments = 0; // none ST_CellComments
+			this.copies = 1;
+			this.draft = false;
+			this.errors = 0; // displayed ST_PrintError
+			this.firstPageNumber = -1;
+			this.pageOrder = 0; // downThenOver ST_PageOrder
+			this.scale = 100;
+			this.useFirstPageNumber = false;
+			this.usePrinterDefaults = true;
 
 			return this;
 		}
-		asc_CPageSetup.prototype.init = function () {
-			if (null == this.orientation)
-				this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
-			if (null == this.width)
-				this.width = c_oAscPrintDefaultSettings.PageWidth;
-			if (null == this.height)
-				this.height = c_oAscPrintDefaultSettings.PageHeight;
-		};
 		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
 		asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
 		asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
 		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
 		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
 		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
+		asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
+		asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
+		asc_CPageSetup.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
+		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
 		function asc_CPageOptions (obj) {
@@ -1129,7 +1133,6 @@
 
 			if (!this.pageSetup)
 				this.pageSetup = new asc_CPageSetup();
-			this.pageSetup.init();
 
 			if (null == this.gridLines)
 				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
@@ -1186,30 +1189,14 @@
 		}
 		/** @constructor */
 		function asc_CAdjustPrint () {
-			if ( !(this instanceof asc_CAdjustPrint) ) {
-				return new asc_CAdjustPrint();
-			}
 			// Вид печати
 			this.printType = c_oAscPrintType.ActiveSheets;
-			// Вид печати
-			this.layoutPageType = c_oAscLayoutPageType.ActualSize;
-
-			// По ширине
-			this.fitToWidth = false;
-			// По высоте
-			this.fitToHeight = false;
+			// ToDo сюда же start и end page index
 
 			return this;
 		}
 		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
-		asc_CAdjustPrint.prototype.asc_getLayoutPageType = function () { return this.layoutPageType; };
 		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
-		asc_CAdjustPrint.prototype.asc_setLayoutPageType = function (val) { this.layoutPageType = val; };
-
-		asc_CAdjustPrint.prototype.getFitToWidth = function () { return this.fitToWidth; };
-		asc_CAdjustPrint.prototype.getFitToHeight = function () { return this.fitToHeight; };
-		asc_CAdjustPrint.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
-		asc_CAdjustPrint.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {
@@ -1688,6 +1675,10 @@
 		prot["asc_setOrientation"] = prot.asc_setOrientation;
 		prot["asc_setWidth"] = prot.asc_setWidth;
 		prot["asc_setHeight"] = prot.asc_setHeight;
+		prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
+		prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
+		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
+		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
 		window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
 		prot = asc_CPageOptions.prototype;
@@ -1706,11 +1697,7 @@
 		window["Asc"]["asc_CAdjustPrint"] = window["Asc"].asc_CAdjustPrint = asc_CAdjustPrint;
 		prot = asc_CAdjustPrint.prototype;
 		prot["asc_getPrintType"] = prot.asc_getPrintType;
-		prot["asc_getLayoutPageType"] = prot.asc_getLayoutPageType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
-		prot["asc_setLayoutPageType"] = prot.asc_setLayoutPageType;
-		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
-		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
 		window["Asc"].asc_CLockInfo = asc_CLockInfo;
 
@@ -1761,4 +1748,4 @@
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
 }
-)(jQuery, window);
+)(window);

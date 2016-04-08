@@ -1,6 +1,6 @@
 {
     "info": {
-        "version": "3.7.0",
+        "version": "3.8.0",
         "build": 148
     },
     "update_src": {
@@ -180,14 +180,12 @@
                 "../../web-apps/vendor/xregexp/xregexp-all-min.js",
                 "../../web-apps/vendor/jszip/jszip.min.js",
                 "../../web-apps/vendor/jszip-utils/jszip-utils.min.js",
-                "../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js",
-                "../../web-apps/vendor/perfect-scrollbar/src/jquery.mousewheel.js",
-                "../../web-apps/vendor/perfect-scrollbar/src/perfect-scrollbar.js"
+                "../../web-apps/vendor/jsrsasign/jsrsasign-latest-all-min.js"
             ],
             "map": "sdk-all.js.map",
             "log": "../cell/Build/Log"
         },
-        "defines": {
+		"defines": {
             "src": [
                 "../common/Shapes/EditorSettings.js",
                 "../common/commonDefines.js",
@@ -201,6 +199,7 @@
     },
     "tasks": {
         "build": [
+            "add_build_number",
             "compile_sdk"
         ]
     }

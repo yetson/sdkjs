@@ -2555,6 +2555,94 @@ CShape.prototype =
                         this.extY = this.parent.Extent.H;
                     }
                 }
+                else
+                {
+                        var oParaDrawing = getParaDrawing(this);
+                        if(oParaDrawing)
+                        {
+                            if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
+                            {
+                                this.m_oSectPr = null;
+                                var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+                                if(oParentParagraph)
+                                {
+
+                                    var oSectPr = oParentParagraph.Get_SectPr();
+                                    if(oSectPr)
+                                    {
+                                        if(oParaDrawing.SizeRelH)
+                                        {
+                                            switch(oParaDrawing.SizeRelH.RelativeFrom)
+                                            {
+                                                case c_oAscSizeRelFromH.sizerelfromhMargin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right();
+                                                    break;
+                                                }
+                                                case c_oAscSizeRelFromH.sizerelfromhPage:
+                                                {
+                                                    this.extX = oSectPr.Get_PageWidth();
+                                                    break;
+                                                }
+                                                case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Left();
+                                                    break;
+                                                }
+
+                                                case c_oAscSizeRelFromH.sizerelfromhRightMargin:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Right();
+                                                    break;
+                                                }
+                                                default:
+                                                {
+                                                    this.extX = oSectPr.Get_PageMargin_Left();
+                                                    break;
+                                                }
+                                            }
+                                            this.extX *= oParaDrawing.SizeRelH.Percent;
+                                        }
+                                        if(oParaDrawing.SizeRelV)
+                                        {
+                                            switch(oParaDrawing.SizeRelV.RelativeFrom)
+                                            {
+                                                case c_oAscSizeRelFromV.sizerelfromvMargin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
+                                                    break;
+                                                }
+                                                case c_oAscSizeRelFromV.sizerelfromvPage:
+                                                {
+                                                    this.extY = oSectPr.Get_PageHeight();
+                                                    break;
+                                                }
+                                                case c_oAscSizeRelFromV.sizerelfromvTopMargin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Top();
+                                                    break;
+                                                }
+                                                case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Bottom();
+                                                    break;
+                                                }
+                                                default:
+                                                {
+                                                    this.extY = oSectPr.Get_PageMargin_Top();
+                                                    break;
+                                                }
+                                            }
+                                            this.extY *= oParaDrawing.SizeRelV.Percent;
+                                        }
+                                        this.m_oSectPr = new CSectionPr();
+                                        this.m_oSectPr.Copy(oSectPr);
+                                    }
+                                }
+                            }
+                        }
+
+                }
             }
             else
             {
@@ -2942,7 +3030,9 @@ CShape.prototype =
     {
         var Width, Height, Width2, Height2;
         var bRet = false;
-        if(this.checkAutofit())
+        var oParaDrawing = getParaDrawing(this);
+        var bSizRel = (oParaDrawing && (oParaDrawing.SizeRelH || oParaDrawing.SizeRelV));
+        if(this.checkAutofit() || bSizRel )
         {
             if(oSectPr)
             {
@@ -2951,6 +3041,10 @@ CShape.prototype =
                     this.recalcBounds();
                     this.recalcText();
                     this.recalcGeometry();
+                    if(bSizRel)
+                    {
+                        this.recalcTransform();
+                    }
                     bRet = true;
                 }
                 else
@@ -2967,6 +3061,10 @@ CShape.prototype =
                         this.recalcBounds();
                         this.recalcText();
                         this.recalcGeometry();
+                        if(bSizRel)
+                        {
+                            this.recalcTransform();
+                        }
                     }
                     return bRet;
                 }
@@ -4414,8 +4512,20 @@ CShape.prototype =
 
     getAllRasterImages: function(images)
     {
-        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof this.spPr.Fill.fill.RasterImageId === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
+        if(this.spPr && this.spPr.Fill && this.spPr.Fill.fill && typeof (this.spPr.Fill.fill.RasterImageId) === "string" && this.spPr.Fill.fill.RasterImageId.length > 0)
             images.push(this.spPr.Fill.fill.RasterImageId);
+
+
+        var compiled_style = this.getCompiledStyle();
+        var parents = this.getParentObjects();
+        if (isRealObject(parents.theme) && isRealObject(compiled_style) && isRealObject(compiled_style.fillRef))
+        {
+            var brush = parents.theme.getFillStyle(compiled_style.fillRef.idx, compiled_style.fillRef.Color);
+            if(brush && brush.fill && typeof (brush.fill.RasterImageId) === "string" && brush.fill.RasterImageId.length > 0)
+            {
+                images.push(brush.fill.RasterImageId);
+            }
+        }
         var oContent = this.getDocContent();
         if(oContent)
         {

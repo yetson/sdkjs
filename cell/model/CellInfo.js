@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (
 	/**
@@ -171,6 +171,8 @@
 		
 		/** @constructor */
 		function asc_CAutoFilterInfo() {
+			this.tableStyleName = null;
+			this.tableName = null;
 			this.isApplyAutoFilter = false;   // Кнопка очистить фильтр: false - disable, true - pressed button
 			this.isAutoFilter = false;  // Кнопка автофильтр (также влияет на formatTable и Sort). Возможные состояния:
 										// - null - мы в пересечении с таблицой (но не полностью в ней)
@@ -178,6 +180,8 @@
 		}
 
 		asc_CAutoFilterInfo.prototype = {
+			asc_getTableStyleName: function () { return this.tableStyleName; },
+			asc_getTableName: function () { return this.tableName; },
 			asc_getIsAutoFilter: function () { return this.isAutoFilter; },
 			asc_getIsApplyAutoFilter: function () { return this.isApplyAutoFilter; }
 		};
@@ -185,80 +189,12 @@
 		window["Asc"].asc_CAutoFilterInfo = window["Asc"]["asc_CAutoFilterInfo"] = asc_CAutoFilterInfo;
 		prot = asc_CAutoFilterInfo.prototype;
 
+		prot["asc_getTableStyleName"] = prot.asc_getTableStyleName;
+		prot["asc_getTableName"]	  = prot.asc_getTableName;
 		prot["asc_getIsAutoFilter"]	  = prot.asc_getIsAutoFilter;
 		prot["asc_getIsApplyAutoFilter"] = prot.asc_getIsApplyAutoFilter;
-
-
-        /** @constructor */
-        function asc_CFormatTableInfo() {
-			this.tableStyleName = null;
-			this.tableName = null;
-			
-            this.isShowColumnStripes = null;
-            this.isShowFirstColumn = null;
-            this.isShowLastColumn = null;
-            this.isShowRowStripes = null;
-			this.isShowTotalRow = null;
-			this.isShowHeaderRow = null;
-			
-			this.tableRange = null;
-			
-			this.isInsertRowAbove = null;
-			this.isInsertRowBelow = null;
-			this.isInsertColumnLeft = null;
-			this.isInsertColumnRight = null;
-			this.isDeleteRow = null;
-			this.isDeleteColumn = null;
-			this.isDeleteTable = null;
-        }
-
-        asc_CFormatTableInfo.prototype = {
-			asc_getTableStyleName: function () { return this.tableStyleName; },
-			asc_getTableName: function () { return this.tableName; },
-			
-			asc_getFirstRow: function () { return this.firstRow; },
-			asc_getLastRow: function () { return this.lastRow; },
-			asc_getBandHor: function () { return this.bandHor; },
-			asc_getFirstCol: function () { return this.firstCol; },
-			asc_getLastCol: function () { return this.lastCol; },
-			asc_getBandVer: function () { return this.bandVer; },
-			asc_getFilterButton: function () { return this.filterButton; },
-			asc_getTableRange: function () { return this.tableRange; },
-			
-			asc_getIsInsertRowAbove: function () { return this.isInsertRowAbove; },
-			asc_getIsInsertRowBelow: function () { return this.isInsertRowBelow; },
-			asc_getIsInsertColumnLeft: function () { return this.isInsertColumnLeft; },
-			asc_getIsInsertColumnRight: function () { return this.isInsertColumnRight; },
-			asc_getIsDeleteRow: function () { return this.isDeleteRow; },
-			asc_getIsDeleteColumn: function () { return this.isDeleteColumn; },
-			asc_getIsDeleteTable: function () { return this.isDeleteTable; }
-        };
-
-        window["Asc"].asc_CFormatTableInfo = window["Asc"]["asc_CFormatTableInfo"] = asc_CFormatTableInfo;
-        prot = asc_CFormatTableInfo.prototype;
 		
-		prot["asc_getTableStyleName"]   = prot.asc_getTableStyleName;
-		prot["asc_getTableName"]	    = prot.asc_getTableName;
 		
-        prot["asc_getFirstRow"]         = prot.asc_getFirstRow;
-        prot["asc_getLastRow"]          = prot.asc_getLastRow;
-        prot["asc_getBandHor"]	        = prot.asc_getBandHor;
-        prot["asc_getFirstCol"]         = prot.asc_getFirstCol;
-		prot["asc_getLastCol"]	        = prot.asc_getLastCol;
-        prot["asc_getBandVer"]          = prot.asc_getBandVer;
-		prot["asc_getFilterButton"]     = prot.asc_getFilterButton;
-		
-		prot["asc_getTableRange"]       = prot.asc_getTableRange;
-		
-		prot["asc_getIsInsertRowAbove"] = prot.asc_getIsInsertRowAbove;
-        prot["asc_getIsInsertRowBelow"] = prot.asc_getIsInsertRowBelow;
-        prot["asc_getIsInsertColumnLeft"]  = prot.asc_getIsInsertColumnLeft;
-        prot["asc_getIsInsertColumnRight"] = prot.asc_getIsInsertColumnRight;
-		prot["asc_getIsDeleteRow"]	    = prot.asc_getIsDeleteRow;
-        prot["asc_getIsDeleteColumn"]   = prot.asc_getIsDeleteColumn;
-		prot["asc_getIsDeleteTable"]    = prot.asc_getIsDeleteTable;
-
-
 		/** @constructor */
 		function asc_CCellInfo() {
 			this.name = null;
@@ -279,7 +215,6 @@
 			this.numFormatType = null;
 			this.angle = null;
 			this.autoFilterInfo = null;
-            this.formatTableInfo = null;
 		}
 
 		asc_CCellInfo.prototype = {
@@ -301,7 +236,6 @@
 			asc_getNumFormatType: function(){ return this.numFormatType; },
 			asc_getAngle: function () { return this.angle; },
 			asc_getAutoFilterInfo: function () { return this.autoFilterInfo; },
-            asc_getFormatTableInfo: function () { return this.formatTableInfo; },
 			asc_getIsFormatTable: function() {return null},//TODO DELETE
 			asc_getIsAutoFilter: function() {return null},//TODO DELETE
 			asc_getTableStyleName:  function() {return null},//TODO DELETE
@@ -329,7 +263,6 @@
 		prot["asc_getNumFormatType"]	= prot.asc_getNumFormatType;
 		prot["asc_getAngle"]			= prot.asc_getAngle;
 		prot["asc_getAutoFilterInfo"]	= prot.asc_getAutoFilterInfo;
-        prot["asc_getFormatTableInfo"]	= prot.asc_getFormatTableInfo;
 		prot["asc_getIsFormatTable"]	= prot.asc_getIsFormatTable;//TODO DELETE
 		prot["asc_getIsAutoFilter"]  	= prot.asc_getIsAutoFilter;//TODO DELETE
 		prot["asc_getTableStyleName"]  	= prot.asc_getTableStyleName;//TODO DELETE

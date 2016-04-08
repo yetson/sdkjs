@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* WorkbookView.js
  *
@@ -389,7 +389,7 @@
         }, "showCellEditorCursor": function() {
           self._onShowCellEditorCursor.apply(self, arguments);
         }, "print": function() {
-          self.Api.asc_Print();
+          self.Api.onPrint();
         }, "addFunction": function() {
           self.insertFormulaInEditor.apply(self, arguments);
         }, "canvasClick": function() {
@@ -2387,19 +2387,19 @@
     var activeWs;
     var printPagesData = new asc_CPrintPagesData();
     var printType = adjustPrint.asc_getPrintType();
-//			var layoutPageType = adjustPrint.asc_getLayoutPageType();
-    var bFitToWidth = adjustPrint.getFitToWidth();
-    var bFitToHeight = adjustPrint.getFitToHeight();
-    if (printType == c_oAscPrintType.ActiveSheets) {
+    if (printType === c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
-      printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
-    } else if (printType == c_oAscPrintType.EntireWorkbook) {
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
+          activeWs);
+    } else if (printType === c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/i, bFitToWidth, bFitToHeight);
+        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false,
+          /*indexWorksheet*/i);
         if (null !== arrPages) {
           if (null === printPagesData.arrPages) {
             printPagesData.arrPages = [];
@@ -2407,10 +2407,12 @@
           printPagesData.arrPages = printPagesData.arrPages.concat(arrPages);
         }
       }
-    } else if (printType == c_oAscPrintType.Selection) {
+    } else if (printType === c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
-      printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
+          activeWs);
     }
 
     return printPagesData;

@@ -11093,7 +11093,7 @@ CDocument.prototype =
             }
             else // Ctrl + P - print
             {
-                this.DrawingDocument.m_oWordControl.m_oApi.asc_Print();
+                this.DrawingDocument.m_oWordControl.m_oApi.onPrint();
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -11776,7 +11776,7 @@ CDocument.prototype =
         return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
     },
 
-    Internal_Content_Add : function(Position, NewObject)
+    Internal_Content_Add : function(Position, NewObject, bDoNotCheckLastElement)
     {
         // Position = this.Content.length  допускается
         if ( Position < 0 || Position > this.Content.length )
@@ -11811,7 +11811,7 @@ CDocument.prototype =
         this.Check_SectionLastParagraph();
 
         // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
+        if ( type_Table == this.Content[this.Content.length - 1].GetType() && true !== bDoNotCheckLastElement)
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
 
         // Запоминаем, что нам нужно произвести переиндексацию элементов
@@ -16420,6 +16420,15 @@ CDocument.prototype.Get_SectionProps = function()
     var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
     return new CDocumentSectionProps(SectPr);
+};
+CDocument.prototype.Get_FirstParagraph = function()
+{
+    if (type_Paragraph == this.Content[0].GetType())
+        return this.Content[0];
+    else if (type_Table == this.Content[0].GetType())
+        return this.Content[0].Get_FirstParagraph();
+
+    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

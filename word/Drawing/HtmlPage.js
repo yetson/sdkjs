@@ -3918,21 +3918,21 @@ function CEditorPage(api)
         this.m_oApi.sync_currentPageCallback(drDoc.m_lCurrentPage);
     }
 
-    this.UpdateHorRulerBack = function()
+    this.UpdateHorRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
         {
-            this.m_oHorRuler.CreateBackground(drDoc.m_arrPages[drDoc.m_lCurrentPage]);
+            this.m_oHorRuler.CreateBackground(drDoc.m_arrPages[drDoc.m_lCurrentPage], isattack);
         }
         this.UpdateHorRuler();
     }
-    this.UpdateVerRulerBack = function()
+    this.UpdateVerRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.m_lCurrentPage && drDoc.m_lCurrentPage < drDoc.m_lPagesCount)
         {
-            this.m_oVerRuler.CreateBackground(drDoc.m_arrPages[drDoc.m_lCurrentPage]);
+            this.m_oVerRuler.CreateBackground(drDoc.m_arrPages[drDoc.m_lCurrentPage], isattack);
         }
         this.UpdateVerRuler();
     }

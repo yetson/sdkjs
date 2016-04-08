@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var c_oAscZoomType = {
   Current: 0,
@@ -33,36 +33,6 @@ var c_oAscZoomType = {
 var c_oAscCollaborativeMarksShowType = {
   All: 0,
   LastChanges: 1
-};
-
-var c_oAscHAnchor = {
-  Margin: 0x00,
-  Page: 0x01,
-  Text: 0x02,
-
-  PageInternal: 0xFF // только для внутреннего использования
-};
-var c_oAscXAlign = {
-  Center: 0x00,
-  Inside: 0x01,
-  Left: 0x02,
-  Outside: 0x03,
-  Right: 0x04
-};
-
-var c_oAscYAlign = {
-  Bottom: 0x00,
-  Center: 0x01,
-  Inline: 0x02,
-  Inside: 0x03,
-  Outside: 0x04,
-  Top: 0x05
-};
-
-var c_oAscVAnchor = {
-  Margin: 0x00,
-  Page: 0x01,
-  Text: 0x02
 };
 
 var c_oAscVertAlignJc = {
@@ -216,3 +186,16 @@ var c_oAscLockTypeElemPresentation = {
 
 var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
+
+//------------------------------------------------------------export---------------------------------------------------
+if (undefined === window['Asc']) {
+  window['Asc'] = {};
+}
+window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
+window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
+window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
+window['Asc']['c_oAscError'] = c_oAscError;
+window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
+window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
+window['Asc']['c_oAscSlideTransitionTypes'] = c_oAscSlideTransitionTypes;
+window['Asc']['c_oAscSlideTransitionParams'] = c_oAscSlideTransitionParams;

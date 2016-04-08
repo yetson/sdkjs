@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 (/**
  * @param {Window} window
  * @param {undefined} undefined
@@ -120,3 +120,4 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     CollaborativeEditing.Apply_Changes();
   }
 };
+baseEditorsApi.prototype['asc_showRevision'] = baseEditorsApi.prototype.asc_showRevision;

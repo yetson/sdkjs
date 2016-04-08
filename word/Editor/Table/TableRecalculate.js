@@ -634,6 +634,7 @@ CTable.prototype.private_RecalculateGrid = function()
             MaxTableW += 2 * TableSpacing;
 
         // 4. Рассчитаем желаемую ширину таблицы таблицы
+        // Цифра 2 означает добавочная разница
         var MaxContent2 = [];
         var SumMin = 0, SumMinMargin = 0, SumMinContent = 0, SumMax = 0, SumMaxContent2 = 0;
         var TableGrid2 = [];
@@ -665,9 +666,30 @@ CTable.prototype.private_RecalculateGrid = function()
         if ( SumMin < MaxTableW )
         {
             // SumMin < MaxTableW, значит у нас есть свободное пространство для распределения
-            // Если SumMax < MaxTableW, тогда все колонки делаем по ширине MaxContent[CurCol] + MinMargin[CurCol],
-            // в противном случаем значение (MaxTableW - SumMin) распределяем между колонками в отношении
-            // MaxContent[CurCol] / SumMaxContent
+            // У нас есть три типа ширины: Min < Preffered < Max
+
+            var SumMin = 0, SumPreffered = 0, SumMax = 0;
+            var PreffOverMin = [], MaxOverPreff = [];
+            var SumPreffOverMin = 0, SumMaxOverPreff = 0;
+            var PreffContent = [];
+
+            for (var CurCol = 0; CurCol < GridCount; ++CurCol)
+            {
+                var MinW   = MinMargin[CurCol] + MinContent[CurCol];
+                var MaxW   = MinMargin[CurCol] + MaxContent[CurCol];
+                var PreffW = (true === MaxFlags[CurCol] ? MaxW : MinW);
+
+                SumMin       += MinW;
+                SumPreffered += PreffW;
+                SumMax       += MaxW;
+
+                PreffContent[CurCol] = PreffW - MinMargin[CurCol];
+                PreffOverMin[CurCol] = Math.max(0, PreffW - MinW);
+                MaxOverPreff[CurCol] = Math.max(0, MaxW - PreffW);
+
+                SumPreffOverMin += PreffOverMin[CurCol];
+                SumMaxOverPreff += MaxOverPreff[CurCol];
+            }
 
             if ( SumMax <= MaxTableW || SumMaxContent2 < 0.001 )
             {
@@ -688,28 +710,50 @@ CTable.prototype.private_RecalculateGrid = function()
             // максимальным значениям.
             if (tblwidth_Mm === TablePr.TableW.Type || tblwidth_Pct === TablePr.TableW.Type)
             {
-                if (SumMin < TableW)
+                if (SumMin >= TableW)
                 {
-                    if (SumMax < TableW)
+                    // Выставляем минимальные значения
+                    for (var CurCol = 0; CurCol < GridCount; ++CurCol)
                     {
-                        for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                        {
-                            this.TableGridCalc[CurCol] = MinMargin[CurCol] + MaxContent[CurCol] + (TableW - SumMax) * (MinMargin[CurCol] + MaxContent[CurCol]) / SumMax;
-                        }
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol];
                     }
-                    else
+                }
+                else if (SumPreffered >= TableW && SumPreffOverMin > 0.001)
+                {
+                    // Растягиваем только те колонки, в которых заданы предпочитаемые ширины
+                    for (var CurCol = 0; CurCol < GridCount; ++CurCol)
                     {
-                        for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
-                        {
-                            this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (TableW - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
-                        }
+                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (TableW - SumMin) * PreffOverMin[CurCol] / SumPreffOverMin;
                     }
                 }
                 else
                 {
-                    for ( var CurCol = 0; CurCol < GridCount; CurCol++ )
+                    // Если данное условие выполняется, значит у нас все ячейки с предпочитаемыми значениями, тогда
+                    // мы растягиваем все ячейки равномерно. Если не выполняется, значит есть ячейки, в которых
+                    // предпочитаемое значение не задано, и тогда растягиваем только такие ячейки.
+                    if (Math.abs(SumMax - SumPreffered) < 0.001)
                     {
-                        this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol];
+                        if (SumMax >= TableW)
+                        {
+                            for (var CurCol = 0; CurCol < GridCount; ++CurCol)
+                            {
+                                this.TableGridCalc[CurCol] = MinMargin[CurCol] + MinContent[CurCol] + (TableW - SumMin) * MaxContent2[CurCol] / SumMaxContent2;
+                            }
+                        }
+                        else
+                        {
+                            for (var CurCol = 0; CurCol < GridCount; CurCol++)
+                            {
+                                this.TableGridCalc[CurCol] = MinMargin[CurCol] + MaxContent[CurCol] + (TableW - SumMax) * (MinMargin[CurCol] + MaxContent[CurCol]) / SumMax;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (var CurCol = 0; CurCol < GridCount; ++CurCol)
+                        {
+                            this.TableGridCalc[CurCol] = MinMargin[CurCol] + PreffContent[CurCol] + (TableW - SumPreffered) * MaxOverPreff[CurCol] / SumMaxOverPreff;
+                        }
                     }
                 }
             }
@@ -2338,7 +2382,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         // В данном значении не учитываются маргины
         RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
-        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage) || CurRow != FirstRow))
+        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
 

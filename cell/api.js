@@ -22,15 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var editor;
 (/**
- * @param {jQuery} $
  * @param {Window} window
  * @param {undefined} undefined
  */
-  function($, window, undefined) {
+  function(window, undefined) {
 
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
@@ -892,6 +891,9 @@ var editor;
     oAdditionalData["vkey"] = this.documentVKey;
     oAdditionalData["outputformat"] = sFormat;
     oAdditionalData["title"] = changeFileExtention(this.documentTitle, getExtentionByFormat(sFormat));
+    if (DownloadType.Print === options.downloadType) {
+      oAdditionalData["inline"] = 1;
+    }
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
       var pdf_writer = new CPdfPrinter();
@@ -1397,6 +1399,7 @@ var editor;
       }
       if (0 < arrChanges.length || null !== deleteIndex || null !== excelAdditionalInfo) {
         this.CoAuthoringApi.saveChanges(arrChanges, deleteIndex, excelAdditionalInfo);
+        History.CanNotAddChanges = true;
       } else {
         this.CoAuthoringApi.unLockDocument(true);
       }
@@ -3216,11 +3219,14 @@ var editor;
     var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
-    if (1 == _param)
-    {
-      _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook);
-      _adjustPrint.asc_setFitToWidth(true);
-      _adjustPrint.asc_setFitToHeight(true);
+    if (1 == _param) {
+      var countWorksheets = _adjustPrint.asc_setPrintType(c_oAscPrintType.EntireWorkbook), printOptions;
+      this.wbModel.getWorksheetCount();
+      for (var j = 0; j < countWorksheets; ++j) {
+        printOptions = this.wbModel.getWorksheet(j).PagePrintOptions;
+        printOptions.asc_setFitToWidth(true);
+        printOptions.asc_setFitToHeight(true);
+      }
     }
 
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
@@ -3510,7 +3516,6 @@ var editor;
   prot["asc_continueSaving"] = prot.asc_continueSaving;
 
   // Version History
-  prot["asc_showRevision"] = prot.asc_showRevision;
   prot["asc_undoAllChanges"] = prot.asc_undoAllChanges;
 
   prot["asc_setLocalization"] = prot.asc_setLocalization;
@@ -3530,4 +3535,4 @@ var editor;
   
   prot['asc_isOffline'] = prot.asc_isOffline;
   prot['asc_getUrlType'] = prot.asc_getUrlType;
-})(jQuery, window);
+})(window);

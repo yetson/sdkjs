@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
@@ -125,19 +125,14 @@ var c_oAscInsertOptions = {
   InsertCellsAndShiftRight: 1,
   InsertCellsAndShiftDown: 2,
   InsertColumns: 3,
-  InsertRows: 4,
-  InsertTableRowAbove: 5,
-  InsertTableRowBelow: 6,
-  InsertTableColLeft: 7,
-  InsertTableColRight: 8
+  InsertRows: 4
 };
 
 var c_oAscDeleteOptions = {
   DeleteCellsAndShiftLeft: 1,
   DeleteCellsAndShiftTop: 2,
   DeleteColumns: 3,
-  DeleteRows: 4,
-  DeleteTable: 5
+  DeleteRows: 4
 };
 
 var c_oAscBorderOptions = {
@@ -184,8 +179,7 @@ var c_oAscSelectionDialogType = {
   None: 0,
   FormatTable: 1,
   Chart: 2,
-  DefinedName: 3,
-  FormatTableChangeRange: 4
+  DefinedName: 3
 };
 
 var c_oAscGraphicOption = {
@@ -257,11 +251,6 @@ var c_oAscPrintType = {
   EntireWorkbook: 1,	// Всю книгу
   Selection: 2		// Выделенный фрагмент
 };
-// Тип печати
-var c_oAscLayoutPageType = {
-  FitToWidth: 0,	// На всю ширину
-  ActualSize: 1		// По реальным размерам
-};
 
 /** @enum */
 var c_oAscCustomAutoFilter = {
@@ -282,23 +271,6 @@ var c_oAscCustomAutoFilter = {
 var c_oAscChangeFilterOptions = {
   filter: 1,
   style: 2
-};
-
-var c_oAscChangeSelectionFormatTable = {
-    all: 1,
-    data: 2,
-    row: 3,
-    column: 4
-};
-
-var c_oAscChangeTableStyleInfo = {
-    columnFirst: 1,
-    columnLast: 2,
-    columnBanded: 3,
-    rowHeader: 4,
-    rowTotal: 5,
-    rowBanded: 6,
-	filterButton: 7
 };
 
 // Состояние редактора ячейки
@@ -401,3 +373,29 @@ var c_oAscPopUpSelectorType = {
   Range: 2,
   Table: 3
 };
+
+//------------------------------------------------------------export---------------------------------------------------
+if (undefined === window['Asc']) {
+  window['Asc'] = {};
+}
+window['Asc']['c_oAscError'] = c_oAscError;
+window['Asc']['c_oAscConfirm'] = c_oAscConfirm;
+window['Asc']['c_oAscMergeOptions'] = c_oAscMergeOptions;
+window['Asc']['c_oAscInsertOptions'] = c_oAscInsertOptions;
+window['Asc']['c_oAscDeleteOptions'] = c_oAscDeleteOptions;
+window['Asc']['c_oAscBorderOptions'] = c_oAscBorderOptions;
+window['Asc']['c_oAscCleanOptions'] = c_oAscCleanOptions;
+window['Asc']['c_oAscSelectionType'] = c_oAscSelectionType;
+window['Asc']['c_oAscSelectionDialogType'] = c_oAscSelectionDialogType;
+window['Asc']['c_oAscHyperlinkType'] = c_oAscHyperlinkType;
+window['Asc']['c_oAscMouseMoveType'] = c_oAscMouseMoveType;
+window['Asc']['c_oAscMouseMoveLockedObjectType'] = c_oAscMouseMoveLockedObjectType;
+window['Asc']['c_oAscPrintType'] = c_oAscPrintType;
+window['Asc']['c_oAscCustomAutoFilter'] = c_oAscCustomAutoFilter;
+window['Asc']['c_oAscChangeFilterOptions'] = c_oAscChangeFilterOptions;
+window['Asc']['c_oAscCellEditorState'] = c_oAscCellEditorState;
+window['Asc']['c_oAscAutoFilterTypes'] = c_oAscAutoFilterTypes;
+window['Asc']['c_oAscFindLookIn'] = c_oAscFindLookIn;
+window['Asc']['c_oAscGetDefinedNamesList'] = c_oAscGetDefinedNamesList;
+window['Asc']['c_oAscDefinedNameReason'] = c_oAscDefinedNameReason;
+window['Asc']['c_oAscPopUpSelectorType'] = c_oAscPopUpSelectorType;
