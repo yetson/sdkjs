@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿function CAutoshapeTrack()
+function CAutoshapeTrack()
 {
     this.IsTrack            = true;
 

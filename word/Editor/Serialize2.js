@@ -352,7 +352,10 @@ var c_oSerRunType = {
 	delText: 15,
     del: 16,
     ins: 17,
-    columnbreak: 18
+    columnbreak: 18,
+	cr: 19,
+	nonBreakHyphen: 20,
+	softHyphen: 21
 };
 var c_oSerImageType = {
     MediaId:0,
@@ -4130,7 +4133,13 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
             switch ( item.Type )
             {
                 case para_Text:
-                    sCurText += encodeSurrogateChar(item.Value);
+                    if (item.Is_NoBreakHyphen()) {
+                        sCurText = this.WriteText(sCurText, delText);
+                        oThis.memory.WriteByte(c_oSerRunType.nonBreakHyphen);
+                        oThis.memory.WriteLong(c_oSerPropLenType.Null);
+                    } else {
+                        sCurText += encodeSurrogateChar(item.Value);
+                    }
                     break;
                 case para_Space:
                     sCurText += " ";
@@ -8422,6 +8431,19 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			if(null != oDrawing.content.GraphicObj)
 				oNewElem = oDrawing.content;
 		}
+        else if (c_oSerRunType.cr === type)
+        {
+            oNewElem = new ParaNewLine( break_Line );
+        }
+        else if (c_oSerRunType.nonBreakHyphen === type)
+        {
+            oNewElem = new ParaText(String.fromCharCode(0x2013));
+            oNewElem.Set_SpaceAfter(false);
+        }
+        else if (c_oSerRunType.softHyphen === type)
+        {
+            //todo
+        }
         else
             res = c_oSerConstants.ReadUnknown;
         if (null != oNewElem)
@@ -9221,6 +9243,19 @@ function Binary_oMathReader(stream, oReadResult)
         else if (c_oSerRunType.columnbreak === type)
         {
             oNewElem = new ParaNewLine( break_Column );
+        }
+        else if (c_oSerRunType.cr === type)
+        {
+            oNewElem = new ParaNewLine( break_Line );
+        }
+        else if (c_oSerRunType.nonBreakHyphen === type)
+        {
+            oNewElem = new ParaText(String.fromCharCode(0x2013));
+            oNewElem.Set_SpaceAfter(false);
+        }
+        else if (c_oSerRunType.softHyphen === type)
+        {
+            //todo
         }
         else if (c_oSerRunType._LastRun === type)
             this.oReadResult.bLastRun = true;

@@ -185,7 +185,7 @@
             "map": "sdk-all.js.map",
             "log": "../cell/Build/Log"
         },
-        "defines": {
+		"defines": {
             "src": [
                 "../common/Shapes/EditorSettings.js",
                 "../common/commonDefines.js",

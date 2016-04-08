@@ -291,8 +291,6 @@ function asc_docs_api(name)
         window["AscDesktopEditor"]["CreateEditorApi"]();
     }
 
-    var CSpellCheckApi  = window["CSpellCheckApi"];
-
     History    = new CHistory();
     g_oTableId = new CTableId();
 
@@ -329,7 +327,7 @@ function asc_docs_api(name)
   this.isCoMarksDraw = false;
 
 	// Spell Checking
-	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
+	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new Asc.CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
@@ -7178,11 +7176,11 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 
     if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
     {
-        window["CDocsCoApi"].prototype.askSaveChanges = function(callback)
+      Asc.CDocsCoApi.prototype.askSaveChanges = function(callback)
         {
             callback({"saveLock": false});
         };
-        window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+      Asc.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
         {
             if (window["native"]["SaveChanges"])
                 window["native"]["SaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
