@@ -421,3 +421,5 @@ window['Asc']['c_oAscFindLookIn'] = c_oAscFindLookIn;
 window['Asc']['c_oAscGetDefinedNamesList'] = c_oAscGetDefinedNamesList;
 window['Asc']['c_oAscDefinedNameReason'] = c_oAscDefinedNameReason;
 window['Asc']['c_oAscPopUpSelectorType'] = c_oAscPopUpSelectorType;
+window['Asc']['c_oAscChangeSelectionFormatTable'] = c_oAscChangeSelectionFormatTable;
+window['Asc']['c_oAscChangeTableStyleInfo'] = c_oAscChangeTableStyleInfo;
