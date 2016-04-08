@@ -82,6 +82,8 @@ var c_oAscError = {
     AutoFilterMoveToHiddenRangeError: -53,
     LockedAllError: -54,
     LockedWorksheetRename: -55,
+    FTChangeTableRangeError: -56,
+    FTRangeIncludedOtherTables: -57,
 
     PasteMaxRangeError: -65,
 
