@@ -125,14 +125,19 @@ var c_oAscInsertOptions = {
   InsertCellsAndShiftRight: 1,
   InsertCellsAndShiftDown: 2,
   InsertColumns: 3,
-  InsertRows: 4
+  InsertRows: 4,
+  InsertTableRowAbove: 5,
+  InsertTableRowBelow: 6,
+  InsertTableColLeft: 7,
+  InsertTableColRight: 8
 };
 
 var c_oAscDeleteOptions = {
   DeleteCellsAndShiftLeft: 1,
   DeleteCellsAndShiftTop: 2,
   DeleteColumns: 3,
-  DeleteRows: 4
+  DeleteRows: 4, 
+  DeleteTable: 5
 };
 
 var c_oAscBorderOptions = {
@@ -271,6 +276,23 @@ var c_oAscCustomAutoFilter = {
 var c_oAscChangeFilterOptions = {
   filter: 1,
   style: 2
+};
+
+var c_oAscChangeSelectionFormatTable = {
+	all: 1,
+	data: 2,
+	row: 3,
+	column: 4
+};
+
+var c_oAscChangeTableStyleInfo = {
+	columnFirst: 1,
+	columnLast: 2,
+	columnBanded: 3,
+	rowHeader: 4,
+	rowTotal: 5,
+	rowBanded: 6,
+	filterButton: 7
 };
 
 // Состояние редактора ячейки
