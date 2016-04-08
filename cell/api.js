@@ -3474,7 +3474,6 @@ var editor;
   prot["asc_continueSaving"] = prot.asc_continueSaving;
 
   // Version History
-  prot["asc_showRevision"] = prot.asc_showRevision;
   prot["asc_undoAllChanges"] = prot.asc_undoAllChanges;
 
   prot["asc_setLocalization"] = prot.asc_setLocalization;
