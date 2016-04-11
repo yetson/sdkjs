@@ -714,7 +714,7 @@
     };
 
     if (this.Api.isMobileVersion) {
-      this.MobileTouchManager = new CMobileTouchManager();
+      this.MobileTouchManager = new AscCommonExcel.CMobileTouchManager();
       this.MobileTouchManager.Init(this);
     }
     return this;
