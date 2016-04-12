@@ -1229,7 +1229,7 @@ var editor;
             } else if (lockType === AscCommonExcel.c_oAscLockTypeElem.Range || lockType === AscCommonExcel.c_oAscLockTypeElem.Sheet) {
               ws.updateSelection();
             }
-          } else if (-1 !== lockSheetId && 0 === lockSheetId.indexOf(CCellCommentator.sStartCommentId)) {
+          } else if (-1 !== lockSheetId && 0 === lockSheetId.indexOf(AscCommonExcel.CCellCommentator.sStartCommentId)) {
             // Коммментарий
             t.handlers.trigger("asc_onLockComment", lockElem.Element["rangeOrObjectId"], e["user"]);
           }
@@ -3040,7 +3040,7 @@ var editor;
   spreadsheet_api.prototype._onCheckCommentRemoveLock = function(lockElem) {
     var res = false;
     var sheetId = lockElem["sheetId"];
-    if (-1 !== sheetId && 0 === sheetId.indexOf(CCellCommentator.sStartCommentId)) {
+    if (-1 !== sheetId && 0 === sheetId.indexOf(AscCommonExcel.CCellCommentator.sStartCommentId)) {
       // Коммментарий
       res = true;
       this.handlers.trigger("asc_onUnLockComment", lockElem["rangeOrObjectId"]);
