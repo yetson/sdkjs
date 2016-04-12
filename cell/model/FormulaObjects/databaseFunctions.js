@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Database'] = cFormulaFunctionGroup['Database'] || [];
 cFormulaFunctionGroup['Database'].push(
     cDAVERAGE,
@@ -111,3 +117,4 @@ function cDVARP() {
 }
 
 cDVARP.prototype = Object.create( cBaseFunction.prototype );
+})(window);
