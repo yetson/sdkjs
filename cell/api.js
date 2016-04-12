@@ -1080,7 +1080,7 @@ var editor;
     }
 
     if (window.USER_AGENT_SAFARI_MACOS) {
-      setInterval(SafariIntervalFocus2, 10);
+      setInterval(AscCommonExcel.SafariIntervalFocus2, 10);
     }
   };
 
