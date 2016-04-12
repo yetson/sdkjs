@@ -352,7 +352,7 @@ function GraphicOption(ws, type, range, offset) {
 }
 
 GraphicOption.prototype.isScrollType = function() {
-	return ((this.type === c_oAscGraphicOption.ScrollVertical) || (this.type === c_oAscGraphicOption.ScrollHorizontal));
+	return ((this.type === AscCommonExcel.c_oAscGraphicOption.ScrollVertical) || (this.type === AscCommonExcel.c_oAscGraphicOption.ScrollHorizontal));
 };
 
 GraphicOption.prototype.getUpdatedRange = function() {
@@ -1496,7 +1496,7 @@ function DrawingObjects() {
             var addImageObject = function (_image) {
 
                 if (!_image.Image) {
-                    worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                    worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
                 } else {
 
                     var drawingObject = _this.createDrawingObject();
@@ -1577,7 +1577,7 @@ function DrawingObjects() {
             var addImageObject = function (_image) {
 
                 if ( !_image.Image ) {
-                    worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                    worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
                 }
                 else {
                     if ( api.isImageChangeUrl ) {
@@ -2027,7 +2027,7 @@ function DrawingObjects() {
                     {		// Insert
                         switch (operType)
                         {
-                            case c_oAscInsertOptions.InsertColumns:
+                            case Asc.c_oAscInsertOptions.InsertColumns:
                             {
                                 count = updateRange.c2 - updateRange.c1 + 1;
                                 // Position
@@ -2043,11 +2043,11 @@ function DrawingObjects() {
 
                             }
                                 break;
-                            case c_oAscInsertOptions.InsertCellsAndShiftRight:
+                            case Asc.c_oAscInsertOptions.InsertCellsAndShiftRight:
 
                                 break;
 
-                            case c_oAscInsertOptions.InsertRows:
+                            case Asc.c_oAscInsertOptions.InsertRows:
                             {
                                 // Position
                                 count = updateRange.r2 - updateRange.r1 + 1;
@@ -2063,7 +2063,7 @@ function DrawingObjects() {
                                     metrics = null;
                             }
                                 break;
-                            case c_oAscInsertOptions.InsertCellsAndShiftDown:
+                            case Asc.c_oAscInsertOptions.InsertCellsAndShiftDown:
 
                                 break;
                         }
@@ -2071,7 +2071,7 @@ function DrawingObjects() {
                     else {				// Delete
                         switch (operType)
                         {
-                            case c_oAscDeleteOptions.DeleteColumns:
+                            case Asc.c_oAscDeleteOptions.DeleteColumns:
                             {
 
                                 // Position
@@ -2116,12 +2116,12 @@ function DrawingObjects() {
 
                             }
                                 break;
-                            case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+                            case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
                                 // Range
 
                                 break;
 
-                            case c_oAscDeleteOptions.DeleteRows:
+                            case Asc.c_oAscDeleteOptions.DeleteRows:
                             {
 
                                 // Position
@@ -2165,7 +2165,7 @@ function DrawingObjects() {
 
                             }
                                 break;
-                            case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+                            case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop:
                                 // Range
 
                                 break;
@@ -2596,7 +2596,7 @@ function DrawingObjects() {
 
         function imageLoaded(_image) {
             if ( !_image.Image ) {
-                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
             }
             else
                 _this.showDrawingObjects(true);
@@ -2939,21 +2939,21 @@ function DrawingObjects() {
         }
         if(selection.chartSelection && selection.chartSelection.selection.textSelection)
         {
-            return c_oAscSelectionType.RangeChartText;
+            return Asc.c_oAscSelectionType.RangeChartText;
         }
         if(selection.textSelection)
         {
-            return c_oAscSelectionType.RangeShapeText;
+            return Asc.c_oAscSelectionType.RangeShapeText;
         }
         if(selected_objects[0] )
         {
             if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace && selected_objects.length === 1)
-                return c_oAscSelectionType.RangeChart;
+                return Asc.c_oAscSelectionType.RangeChart;
 
             if(selected_objects[0].getObjectType() === historyitem_type_ImageShape)
-                return c_oAscSelectionType.RangeImage;
+                return Asc.c_oAscSelectionType.RangeImage;
 
-            return c_oAscSelectionType.RangeShape;
+            return Asc.c_oAscSelectionType.RangeShape;
 
         }
         return undefined;
@@ -2980,7 +2980,7 @@ function DrawingObjects() {
     _this.updateSizeDrawingObjects = function(target, bNoChangeCoords) {
 
 		if(!History.Is_On() || true === bNoChangeCoords){
-            if (target.target === c_oTargetType.RowResize) {
+            if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
                 for (i = 0; i < aObjects.length; i++) {
                     drawingObject = aObjects[i];
                     if (drawingObject.from.row >= target.row) {
@@ -2999,7 +2999,7 @@ function DrawingObjects() {
         }
 
         var i, bNeedRecalc = false, drawingObject, coords;
-        if (target.target === c_oTargetType.RowResize) {
+        if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
             for (i = 0; i < aObjects.length; i++) {
                 drawingObject = aObjects[i];
 
@@ -3171,7 +3171,7 @@ function ObjectLocker(ws) {
         worksheet.collaborativeEditing.onStartCheckLock();
         for ( var i = 0; i < aObjectId.length; i++ ) {
 
-            var lockInfo = worksheet.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, /*subType*/null, sheetId, aObjectId[i] );
+            var lockInfo = worksheet.collaborativeEditing.getLockInfo( AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null, sheetId, aObjectId[i] );
 
             if ( false === worksheet.collaborativeEditing.getCollaborativeEditing() ) {
                 // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование

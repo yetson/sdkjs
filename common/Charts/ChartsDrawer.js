@@ -233,7 +233,7 @@ CChartsDrawer.prototype =
 			
 			if(this.nDimensionCount !== 3)
 			{
-				if(this.calcProp.type === "Line" && this.calcProp.type === "Scatter")
+				if(this.calcProp.type === "Line" || this.calcProp.type === "Scatter")
 				{
 					this.cShapeDrawer.bIsNoSmartAttack = true;
 					this.chart.draw(this);
@@ -3721,7 +3721,7 @@ drawLineChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		
 		//todo возможно стоит проверить fill.type на FILL_TYPE_NOFILL и рисовать отдельно границы, если они заданы!
-		brush = pen.Fill;
+		//brush = pen.Fill;
 		if(brush.fill.color === undefined)
 			return;
 		

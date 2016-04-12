@@ -2542,7 +2542,7 @@
         this.WriteSheetViewPane = function (oPane) {
             var oThis = this;
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();
@@ -6016,7 +6016,7 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Comment == type )
             {
-                var oCommentCoords = new Asc.asc_CCommentCoords();
+                var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadComment(t,l, oCommentCoords, aCommentData);

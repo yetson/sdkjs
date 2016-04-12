@@ -696,6 +696,23 @@ var c_oAscDocumentUnits = {
 };
 
 
+// Print default options (in mm)
+var c_oAscPrintDefaultSettings = {
+    // Размеры страницы при печати
+    PageWidth: 210,
+    PageHeight: 297,
+    PageOrientation: c_oAscPageOrientation.PagePortrait,
+
+    // Поля для страницы при печати
+    PageLeftField: 17.8,
+    PageRightField: 17.8,
+    PageTopField: 19.1,
+    PageBottomField: 19.1,
+
+    PageGridLines: 0,
+    PageHeadings: 0
+};
+
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
     [ 1,    720,   "DOS-720",          "Arabic (OEM 720)" ],
@@ -838,6 +855,9 @@ window['Asc']['c_oAscAsyncActionType'] = c_oAscAsyncActionType;
 window['Asc']['c_oAscNumFormatType'] = c_oAscNumFormatType;
 window['Asc']['c_oAscDrawingLayerType'] = c_oAscDrawingLayerType;
 window['Asc']['c_oAscTypeSelectElement'] = c_oAscTypeSelectElement;
+window['Asc']['linerule_AtLeast'] = linerule_AtLeast;
+window['Asc']['linerule_Auto'] = linerule_Auto;
+window['Asc']['linerule_Exact'] = linerule_Exact;
 window['Asc']['c_oAscShdClear'] = shd_Clear; //ToDo по идее должны совпадать переменные
 window['Asc']['c_oAscShdNil'] = shd_Nil;
 window['Asc']['c_oAscChartTitleShowSettings'] = c_oAscChartTitleShowSettings;
