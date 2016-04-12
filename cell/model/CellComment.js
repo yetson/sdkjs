@@ -491,7 +491,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 		if (!oComment.bDocument)
 			sheetId += this.worksheet.model.getId();
 
-		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null,
 			sheetId, objectGuid);
 
 		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
@@ -700,7 +700,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 	var i, comment;
 	if (bInsert) {
 		switch (operType) {
-			case c_oAscInsertOptions.InsertCellsAndShiftDown:
+			case Asc.c_oAscInsertOptions.InsertCellsAndShiftDown:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -710,7 +710,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertCellsAndShiftRight:
+			case Asc.c_oAscInsertOptions.InsertCellsAndShiftRight:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -720,7 +720,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertColumns:
+			case Asc.c_oAscInsertOptions.InsertColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol >= updateRange.c1) {
@@ -730,7 +730,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertRows:
+			case Asc.c_oAscInsertOptions.InsertRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow >= updateRange.r1) {
@@ -742,7 +742,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 		}
 	} else {
 		switch (operType) {
-			case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -754,7 +754,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -766,7 +766,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteColumns:
+			case Asc.c_oAscDeleteOptions.DeleteColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol > updateRange.c2) {
@@ -778,7 +778,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteRows:
+			case Asc.c_oAscDeleteOptions.DeleteRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow > updateRange.r2) {
