@@ -22,13 +22,6 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 03.02.14
- * Time: 14:26
- * To change this template use File | Settings | File Templates.
- */
 "use strict";
 (
 /**

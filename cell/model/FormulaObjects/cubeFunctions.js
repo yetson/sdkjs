@@ -24,15 +24,12 @@
 */
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
- */
-
-
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Cube'] = [
     cCUBEKPIMEMBER,
     cCUBEMEMBER,
@@ -175,3 +172,4 @@ function cCUBEVALUE() {
 }
 
 cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype );
+})(window);
