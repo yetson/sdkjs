@@ -30,7 +30,8 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
-cFormulaFunctionGroup['Cube'] = [
+cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
+cFormulaFunctionGroup['Cube'].push(
     cCUBEKPIMEMBER,
     cCUBEMEMBER,
     cCUBEMEMBERPROPERTY,
@@ -38,7 +39,7 @@ cFormulaFunctionGroup['Cube'] = [
     cCUBESET,
     cCUBESETCOUNT,
     cCUBEVALUE
-];
+);
 
 function cCUBEKPIMEMBER() {
 //    cBaseFunction.call( this, "CUBEKPIMEMBER" );
