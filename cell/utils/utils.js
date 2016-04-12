@@ -1046,10 +1046,6 @@
 
 		/** @constructor */
 		function asc_CPageMargins (obj) {
-			if ( !(this instanceof asc_CPageMargins) ) {
-				return new asc_CPageMargins(obj);
-			}
-
 			if (obj) {
 				this.left = obj.left;
 				this.right = obj.right;
@@ -1113,10 +1109,6 @@
 
 		/** @constructor */
 		function asc_CPageOptions (obj) {
-			if ( !(this instanceof asc_CPageOptions) ) {
-				return new asc_CPageOptions(obj);
-			}
-
 			if (obj) {
 				this.pageMargins = obj.pageMargins;
 				this.pageSetup = obj.pageSetup;
@@ -1149,10 +1141,6 @@
 		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
 
 		function CPagePrint () {
-			if ( !(this instanceof CPagePrint) ) {
-				return new CPagePrint();
-			}
-
 			this.pageWidth = 0;
 			this.pageHeight = 0;
 
@@ -1179,9 +1167,6 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			if ( !(this instanceof CPrintPagesData) ) {
-				return new CPrintPagesData();
-			}
 			this.arrPages = null;
 			this.currentIndex = 0;
 
@@ -1221,10 +1206,6 @@
 			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			if (!(this instanceof asc_CSheetViewSettings)) {
-				return new asc_CSheetViewSettings();
-			}
-
 			this.Properties = g_oCSheetViewSettingsProperties;
 
 			// Показывать ли сетку
@@ -1283,10 +1264,6 @@
 
 		/** @constructor */
 		function asc_CPane () {
-			if (!(this instanceof asc_CPane)) {
-				return new asc_CPane();
-			}
-
 			this.state = null;
 			this.topLeftCell = null;
 			this.xSplit = 0;
@@ -1320,10 +1297,6 @@
 		};
 
 		function RedoObjectParam () {
-			if (!(this instanceof RedoObjectParam)) {
-				return new RedoObjectParam();
-			}
-
 			this.bIsOn = false;
 			this.bIsReInit = false;
 			this.oChangeWorksheetUpdate = {};
