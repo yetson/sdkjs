@@ -2207,12 +2207,12 @@ DrawingObjectsController.prototype =
         }
 
         var aGroups = [];
-        if(isRealNumber(props.Width) && isRealNumber(props.Height))
+        if(isRealNumber(props.Width) || isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
-                if(!props.SizeRelH)
+                if(!props.SizeRelH && isRealNumber(props.Width))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                     if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
@@ -2220,7 +2220,7 @@ DrawingObjectsController.prototype =
                         objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
                     }
                 }
-                if(!props.SizeRelV)
+                if(!props.SizeRelV && isRealNumber(props.Height))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
                     if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
@@ -2247,7 +2247,7 @@ DrawingObjectsController.prototype =
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
-            if(!props.SizeRelH && !props.SizeRelV)
+            if(!props.SizeRelH && !props.SizeRelV && isRealNumber(props.Width) && isRealNumber(props.Height))
             {
                 for(i = 0; i < objects_by_type.images.length; ++i)
                 {
