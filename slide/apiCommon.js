@@ -1235,5 +1235,3 @@ function CAscTableStyle()
 CAscTableStyle.prototype.get_Id = function(){ return this.Id; }
 CAscTableStyle.prototype.get_Image = function(){ return this.Image; }
 CAscTableStyle.prototype.get_Type = function(){ return this.Type; }
-
-CAscSlideProps
