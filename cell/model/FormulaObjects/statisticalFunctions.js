@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Statistical'] = cFormulaFunctionGroup['Statistical'] || [];
 cFormulaFunctionGroup['Statistical'].push(
     cAVEDEV,
@@ -5435,4 +5441,5 @@ function cZTEST() {
     cBaseFunction.call( this, "ZTEST" );
 }
 
-cZTEST.prototype = Object.create( cBaseFunction.prototype )
+cZTEST.prototype = Object.create( cBaseFunction.prototype );
+})(window);
