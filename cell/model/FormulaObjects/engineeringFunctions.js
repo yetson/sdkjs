@@ -25,6 +25,12 @@
 
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var NumberBase = {
     BIN:2,
     OCT:8,
@@ -2812,3 +2818,4 @@ cOCT2HEX.prototype.getInfo = function () {
         args:"( number [ , num-hex-digits ] )"
     };
 }
+})(window);
