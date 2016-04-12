@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var startRangeCurrentDateSystem = 1;
 
 function getPMT( rate, nper, pv, fv, flag ) {
@@ -6434,3 +6440,11 @@ cYIELDMAT.prototype.getInfo = function () {
     };
 };
 
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].getPMT = getPMT;
+window['AscCommonExcel'].getIPMT = getIPMT;
+window['AscCommonExcel'].getcoupdaybs = getcoupdaybs;getcoupdays
+window['AscCommonExcel'].getcoupdays = getcoupdays;getcoupnum
+window['AscCommonExcel'].getcoupnum = getcoupnum;
+})(window);
