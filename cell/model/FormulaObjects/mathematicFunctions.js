@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 cFormulaFunctionGroup['Mathematic'] = cFormulaFunctionGroup['Mathematic'] || [];
 cFormulaFunctionGroup['Mathematic'].push(
     cABS,
@@ -4713,3 +4719,4 @@ cTRUNC.prototype.getInfo = function () {
         args:"( x [ , number-digits ] )"
     };
 }
+})(window);
