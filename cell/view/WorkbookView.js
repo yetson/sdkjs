@@ -49,6 +49,14 @@
   var asc_CPrintPagesData = asc.CPrintPagesData;
   var asc_getcvt = asc.getCvtRatio;
   var asc_CSP = asc.asc_CStylesPainter;
+  var c_oTargetType = AscCommonExcel.c_oTargetType;
+  var c_oAscError = asc.c_oAscError;
+  var c_oAscCleanOptions = asc.c_oAscCleanOptions;
+  var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
+  var c_oAscMouseMoveType = asc.c_oAscMouseMoveType;
+  var c_oAscCellEditorState = asc.c_oAscCellEditorState;
+  var c_oAscPopUpSelectorType = asc.c_oAscPopUpSelectorType;
+  
 
   function WorkbookCommentsModel(handlers) {
     this.workbook = {handlers: handlers};
@@ -192,7 +200,7 @@
     this.stateFormatPainter = c_oAscFormatPainterState.kOff;
     this.rangeFormatPainter = null;
 
-    this.selectionDialogType = Asc.c_oAscSelectionDialogType.None;
+    this.selectionDialogType = c_oAscSelectionDialogType.None;
     this.copyActiveSheet = -1;
 
     // Комментарии для всего документа
@@ -764,7 +772,7 @@
       info = ws.getSelectionInfo();
     }
     // При редактировании ячейки не нужно пересылать изменения
-    if (this.input && false === ws.getCellEditMode() && Asc.c_oAscSelectionDialogType.None === this.selectionDialogType) {
+    if (this.input && false === ws.getCellEditMode() && c_oAscSelectionDialogType.None === this.selectionDialogType) {
       // Сами запретим заходить в строку формул, когда выделен shape
       if (this.lastSendInfoRangeIsSelectOnShape) {
         this.input.disabled = true;
@@ -857,7 +865,7 @@
 
   // Окончание выделения
   WorkbookView.prototype._onChangeSelectionDone = function(x, y) {
-    if (Asc.c_oAscSelectionDialogType.None !== this.selectionDialogType) {
+    if (c_oAscSelectionDialogType.None !== this.selectionDialogType) {
       return;
     }
     var ws = this.getWorksheet();
@@ -876,7 +884,7 @@
 
     var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
-    if (AscCommonExcel.c_oTargetType.Hyperlink === ct.target) {
+    if (c_oTargetType.Hyperlink === ct.target) {
       // Проверим замерженность
       var isHyperlinkClick = false;
       if ((ar.c1 === ar.c2 && ar.r1 === ar.r2) || isSelectOnShape) {
@@ -936,7 +944,7 @@
       // Отправление эвента об удалении всего листа (именно удалении, т.к. если просто залочен, то не рисуем рамку вокруг)
       if (undefined !== ct.userIdAllSheet) {
         arrMouseMoveObjects.push(new asc_CMM({
-          type: Asc.c_oAscMouseMoveType.LockedObject,
+          type: c_oAscMouseMoveType.LockedObject,
           x: ct.lockAllPosLeft,
           y: ct.lockAllPosTop,
           userId: ct.userIdAllSheet,
@@ -946,7 +954,7 @@
         // Отправление эвента о залоченности свойств всего листа (только если не удален весь лист)
         if (undefined !== ct.userIdAllProps) {
           arrMouseMoveObjects.push(new asc_CMM({
-            type: Asc.c_oAscMouseMoveType.LockedObject,
+            type: c_oAscMouseMoveType.LockedObject,
             x: ct.lockAllPosLeft,
             y: ct.lockAllPosTop,
             userId: ct.userIdAllProps,
@@ -957,7 +965,7 @@
       // Отправление эвента о наведении на залоченный объект
       if (undefined !== ct.userId) {
         arrMouseMoveObjects.push(new asc_CMM({
-          type: Asc.c_oAscMouseMoveType.LockedObject,
+          type: c_oAscMouseMoveType.LockedObject,
           x: ct.lockRangePosLeft,
           y: ct.lockRangePosTop,
           userId: ct.userId,
@@ -968,7 +976,7 @@
       // Проверяем комментарии ячейки
       if (undefined !== ct.commentIndexes) {
         arrMouseMoveObjects.push(new asc_CMM({
-          type: Asc.c_oAscMouseMoveType.Comment,
+          type: c_oAscMouseMoveType.Comment,
           x: ct.commentCoords.asc_getLeftPX(),
           reverseX: ct.commentCoords.asc_getReverseLeftPX(),
           y: ct.commentCoords.asc_getTopPX(),
@@ -976,14 +984,14 @@
         }));
       }
       // Проверяем гиперссылку
-      if (ct.target === AscCommonExcel.c_oTargetType.Hyperlink) {
+      if (ct.target === c_oTargetType.Hyperlink) {
         if (true === ctrlKey) {
           // Мы без нажатия на гиперлинк
         } else {
           ct.cursor = ct.cellCursor.cursor;
         }
         arrMouseMoveObjects.push(new asc_CMM({
-          type: Asc.c_oAscMouseMoveType.Hyperlink, x: x, y: y, hyperlink: ct.hyperlink
+          type: c_oAscMouseMoveType.Hyperlink, x: x, y: y, hyperlink: ct.hyperlink
         }));
       }
 
@@ -992,19 +1000,19 @@
        */
       if (0 === arrMouseMoveObjects.length) {
         // Отправляем эвент, что мы ни на какой области
-        arrMouseMoveObjects.push(new asc_CMM({type: Asc.c_oAscMouseMoveType.None}));
+        arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.None}));
       }
       // Отсылаем эвент с объектами
       this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
 
-      if (ct.target === AscCommonExcel.c_oTargetType.MoveRange && ctrlKey && ct.cursor == "move") {
+      if (ct.target === c_oTargetType.MoveRange && ctrlKey && ct.cursor == "move") {
         ct.cursor = "copy";
       }
 
       if (canvasElem.style.cursor !== ct.cursor) {
         canvasElem.style.cursor = ct.cursor;
       }
-      if (ct.target === AscCommonExcel.c_oTargetType.ColumnHeader || ct.target === AscCommonExcel.c_oTargetType.RowHeader) {
+      if (ct.target === c_oTargetType.ColumnHeader || ct.target === c_oTargetType.RowHeader) {
         ws.drawHighlightedHeaders(ct.col, ct.row);
       } else {
         ws.cleanHighlightedHeaders();
@@ -1015,9 +1023,9 @@
 
   WorkbookView.prototype._onResizeElement = function(target, x, y) {
     var arrMouseMoveObjects = [];
-    if (target.target === AscCommonExcel.c_oTargetType.ColumnResize) {
+    if (target.target === c_oTargetType.ColumnResize) {
       arrMouseMoveObjects.push(this.getWorksheet().drawColumnGuides(target.col, x, y, target.mouseX));
-    } else if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
+    } else if (target.target === c_oTargetType.RowResize) {
       arrMouseMoveObjects.push(this.getWorksheet().drawRowGuides(target.row, x, y, target.mouseY));
     }
 
@@ -1026,7 +1034,7 @@
      */
     if (0 === arrMouseMoveObjects.length) {
       // Отправляем эвент, что мы ни на какой области
-      arrMouseMoveObjects.push(new asc_CMM({type: Asc.c_oAscMouseMoveType.None}));
+      arrMouseMoveObjects.push(new asc_CMM({type: c_oAscMouseMoveType.None}));
     }
     // Отсылаем эвент с объектами
     this.handlers.trigger("asc_onMouseMove", arrMouseMoveObjects);
@@ -1038,9 +1046,9 @@
       if (ws.objectRender) {
         ws.objectRender.saveSizeDrawingObjects();
       }
-      if (target.target === AscCommonExcel.c_oTargetType.ColumnResize) {
+      if (target.target === c_oTargetType.ColumnResize) {
         ws.changeColumnWidth(target.col, x, target.mouseX);
-      } else if (target.target === AscCommonExcel.c_oTargetType.RowResize) {
+      } else if (target.target === c_oTargetType.RowResize) {
         ws.changeRowHeight(target.row, y, target.mouseY);
       }
 
@@ -1050,7 +1058,7 @@
     ws.draw();
 
     // Отсылаем окончание смены размеров (в FF не срабатывало обычное движение)
-    this.handlers.trigger("asc_onMouseMove", [new asc_CMM({type: Asc.c_oAscMouseMoveType.None})]);
+    this.handlers.trigger("asc_onMouseMove", [new asc_CMM({type: c_oAscMouseMoveType.None})]);
   };
 
   // Обработка автозаполнения
@@ -1185,8 +1193,8 @@
     var ws = this.getWorksheet();
     var ct = ws.getCursorTypeFromXY(x, y, this.controller.settings.isViewerMode);
 
-    if (ct.target === AscCommonExcel.c_oTargetType.ColumnResize || ct.target === AscCommonExcel.c_oTargetType.RowResize) {
-      ct.target === AscCommonExcel.c_oTargetType.ColumnResize ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
+    if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
+      ct.target === c_oTargetType.ColumnResize ? ws.optimizeColWidth(ct.col) : ws.optimizeRowHeight(ct.row);
       asc_applyFunction(callback);
     } else {
       if (ct.col >= 0 && ct.row >= 0) {
@@ -1194,7 +1202,7 @@
       }
 
       // Для нажатия на колонку/строку/all/frozenMove обрабатывать dblClick не нужно
-      if (AscCommonExcel.c_oTargetType.ColumnHeader === ct.target || AscCommonExcel.c_oTargetType.RowHeader === ct.target || AscCommonExcel.c_oTargetType.Corner === ct.target || AscCommonExcel.c_oTargetType.FrozenAnchorH === ct.target || AscCommonExcel.c_oTargetType.FrozenAnchorV === ct.target) {
+      if (c_oTargetType.ColumnHeader === ct.target || c_oTargetType.RowHeader === ct.target || c_oTargetType.Corner === ct.target || c_oTargetType.FrozenAnchorH === ct.target || c_oTargetType.FrozenAnchorV === ct.target) {
         asc_applyFunction(callback);
         return;
       }
@@ -1236,7 +1244,7 @@
       }
 
       t.input.disabled = false;
-      t.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
+      t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
       // Эвент от предыдущего нажатия на символ или на backspace
       if (event) {
         if ("keydown" === event.type) {
@@ -1309,7 +1317,7 @@
 	  }
 
     if (isCellEditMode) {
-      this.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
+      this.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
     }
     // Обновляем состояние Undo/Redo
     History._sendCanUndoRedo();
@@ -1326,7 +1334,7 @@
   };
 
   WorkbookView.prototype._onEmpty = function() {
-    this.getWorksheet().emptySelection(Asc.c_oAscCleanOptions.Text);
+    this.getWorksheet().emptySelection(c_oAscCleanOptions.Text);
   };
 
   WorkbookView.prototype._onAddColumn = function() {
@@ -1477,11 +1485,11 @@
 
     }
 
-    if (Asc.c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
+    if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
       // Когда идет выбор диапазона, то должны на закрываемом листе отменить выбор диапазона
       tmpWorksheet = this.getWorksheet();
       selectionRange = tmpWorksheet.activeRange.clone(true);
-      tmpWorksheet.setSelectionDialogMode(Asc.c_oAscSelectionDialogType.None);
+      tmpWorksheet.setSelectionDialogMode(c_oAscSelectionDialogType.None);
     }
     if (this.stateFormatPainter) {
       // Должны отменить выбор на закрываемом листе
@@ -1528,7 +1536,7 @@
       ws.draw();
     }
 
-    if (Asc.c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
+    if (c_oAscSelectionDialogType.Chart === this.selectionDialogType) {
       // Когда идет выбор диапазона, то на показываемом листе должны выставить нужный режим
       ws.setSelectionDialogMode(this.selectionDialogType, selectionRange);
       this.handlers.trigger("asc_onSelectionRangeChanged", ws.getSelectionRangeValue());
@@ -1802,7 +1810,7 @@
       formulaName = formulaName.toUpperCase();
       for (i = 0; i < this.formulasList.length; ++i) {
         if (0 === this.formulasList[i].indexOf(formulaName)) {
-          arrResult.push(new Asc.asc_CCompleteMenu(this.formulasList[i], Asc.c_oAscPopUpSelectorType.Func));
+          arrResult.push(new Asc.asc_CCompleteMenu(this.formulasList[i], c_oAscPopUpSelectorType.Func));
         }
       }
       defNamesList = this.getDefinedNames(Asc.c_oAscGetDefinedNamesList.WorksheetWorkbook);
@@ -1810,7 +1818,7 @@
       for (i = 0; i < defNamesList.length; ++i) {
         defName = defNamesList[i];
         if (0 === defName.Name.toLowerCase().indexOf(formulaName)) {
-          arrResult.push(new Asc.asc_CCompleteMenu(defName.Name, !defName.isTable ? Asc.c_oAscPopUpSelectorType.Range : Asc.c_oAscPopUpSelectorType.Table));
+          arrResult.push(new Asc.asc_CCompleteMenu(defName.Name, !defName.isTable ? c_oAscPopUpSelectorType.Range : c_oAscPopUpSelectorType.Table));
         }
       }
     }
@@ -1831,12 +1839,12 @@
   WorkbookView.prototype.insertFormulaInEditor = function(name, type, autoComplete) {
     var t = this, ws = this.getWorksheet(), cursorPos, isNotFunction;
 
-    if (Asc.c_oAscPopUpSelectorType.None === type) {
+    if (c_oAscPopUpSelectorType.None === type) {
       this.getWorksheet().setSelectionInfo("value", name, /*onlyActive*/true);
       return;
     }
 
-    isNotFunction = Asc.c_oAscPopUpSelectorType.Func !== type;
+    isNotFunction = c_oAscPopUpSelectorType.Func !== type;
 
     // Проверяем, открыт ли редактор
     if (ws.getCellEditMode()) {
@@ -1893,13 +1901,13 @@
           t.setCellEditMode(true);
           ws.setCellEditMode(true);
 
-          t.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editStart);
+          t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editStart);
           if (isNotFunction) {
             t.skipHelpSelector = true;
           }
           // Открываем, с выставлением позиции курсора
           if (!ws.openCellEditorWithText(t.cellEditor, name, cursorPos, /*isFocus*/false, /*activeRange*/arn)) {
-            t.handlers.trigger("asc_onEditCell", Asc.c_oAscCellEditorState.editEnd);
+            t.handlers.trigger("asc_onEditCell", c_oAscCellEditorState.editEnd);
             t.setCellEditMode(false);
             t.controller.setStrictClose(false);
             t.controller.setFormulaEditMode(false);
@@ -1986,7 +1994,7 @@
       //	return;
 
       t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
-      ws.emptySelection(Asc.c_oAscCleanOptions.All);
+      ws.emptySelection(c_oAscCleanOptions.All);
     } else if (!window.USER_AGENT_SAFARI_MACOS) {
       v = t.cellEditor.cutSelection();
       if (v) {
@@ -2005,7 +2013,7 @@
       ws = t.getWorksheet();
       var result = t.clipboard.copyRangeButton(ws.getSelectedRange(), ws, true);
       if (result) {
-        ws.emptySelection(Asc.c_oAscCleanOptions.All);
+        ws.emptySelection(c_oAscCleanOptions.All);
       }
       return result;
     } else {
@@ -2076,7 +2084,7 @@
       return;
     }
 
-    if (Asc.c_oAscSelectionDialogType.None === selectionDialogType) {
+    if (c_oAscSelectionDialogType.None === selectionDialogType) {
       this.selectionDialogType = selectionDialogType;
       this.getWorksheet().setSelectionDialogMode(selectionDialogType, selectRange);
       if (this.copyActiveSheet !== this.wsActive) {
@@ -2091,7 +2099,7 @@
 
       var index, tmpSelectRange = parserHelp.parse3DRef(selectRange);
       if (tmpSelectRange) {
-        if (Asc.c_oAscSelectionDialogType.Chart === selectionDialogType) {
+        if (c_oAscSelectionDialogType.Chart === selectionDialogType) {
           // Получаем sheet по имени
           var ws = this.model.getWorksheetByName(tmpSelectRange.sheet);
           if (!ws || ws.getHidden()) {
@@ -2296,7 +2304,7 @@
         t.handlers.trigger("asc_onEditDefName", oldName, newName);
         t.handlers.trigger("asc_onRefreshDefNameList");
       } else {
-        t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.LockCreateDefName, Asc.c_oAscError.Level.NoCritical);
+        t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
       }
       t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
     };
@@ -2325,7 +2333,7 @@
           t.handlers.trigger("asc_onDelDefName", t.model.delDefinesNames(oldName));
           t.handlers.trigger("asc_onRefreshDefNameList");
         } else {
-          t.handlers.trigger("asc_onError", Asc.c_oAscError.ID.LockCreateDefName, Asc.c_oAscError.Level.NoCritical);
+          t.handlers.trigger("asc_onError", c_oAscError.ID.LockCreateDefName, c_oAscError.Level.NoCritical);
         }
         t._onSelectionNameChanged(ws.getSelectionName(/*bRangeText*/false));
       };

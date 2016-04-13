@@ -41,9 +41,11 @@
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
-	var cElementType = AscCommonExcel.cElementType;
-
 	var asc = window["Asc"];
+	
+	var cElementType = AscCommonExcel.cElementType;
+	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;
+	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
 
 	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
@@ -134,7 +136,7 @@
 		this.noUpdateMode = false;
 		this.selectionBegin = -1;
 		this.selectionEnd = -1;
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		this.hasCursor = false;
 		this.hasFocus = false;
 		this.newTextFormat = undefined;
@@ -145,7 +147,7 @@
 		this.isOpened = false;
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
-		this.m_nEditorState = Asc.c_oAscCellEditorState.editEnd; // Состояние редактора
+		this.m_nEditorState = c_oAscCellEditorState.editEnd; // Состояние редактора
 		this.isUpdateValue = true;							// Обновлять ли состояние строки при вводе в TextArea
 
 		// Функции, которые будем отключать
@@ -388,7 +390,7 @@
 		this.objAutoComplete = {};
 
 		// Сброс состояния редактора
-		this.m_nEditorState = Asc.c_oAscCellEditorState.editEnd;
+		this.m_nEditorState = c_oAscCellEditorState.editEnd;
 		this.handlers.trigger( "closed" );
 		return true;
 	};
@@ -800,7 +802,7 @@
 		this.topLineIndex = 0;
 		this.selectionBegin = -1;
 		this.selectionEnd = -1;
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		this.hasCursor = false;
 
 		this.undoList = [];
@@ -1092,7 +1094,7 @@
 		if ( undefined === isFormula ) {
 			isFormula = this.isFormula();
 		}
-		var editorState = isFormula ? Asc.c_oAscCellEditorState.editFormula : "" === this._getFragmentsText( this.options.fragments ) ? Asc.c_oAscCellEditorState.editEmptyCell : Asc.c_oAscCellEditorState.editText;
+		var editorState = isFormula ? c_oAscCellEditorState.editFormula : "" === this._getFragmentsText( this.options.fragments ) ? c_oAscCellEditorState.editEmptyCell : c_oAscCellEditorState.editText;
 
 		if ( this.m_nEditorState !== editorState ) {
 			this.m_nEditorState = editorState;
@@ -1857,7 +1859,7 @@
 
 		function doChangeSelection( coordTmp ) {
 			// ToDo реализовать для слова.
-			if ( AscCommonExcel.c_oAscCellEditorSelectState.word === t.isSelectMode ) {
+			if ( c_oAscCellEditorSelectState.word === t.isSelectMode ) {
 				return;
 			}
 			var pos = t._findCursorPosition( coordTmp );
@@ -2613,7 +2615,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseUp = function ( event ) {
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		if ( this.callTopLineMouseup ) {
 			this._topLineMouseUp();
 		}
@@ -2622,7 +2624,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseMove = function ( event ) {
-		if ( AscCommonExcel.c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
+		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
 			this._changeSelection( this._getCoordinates( event ) );
 		}
 		return true;
@@ -2643,7 +2645,7 @@
 
 		if ( 0 === event.button ) {
 			if ( 1 === this.clickCounter.getClickCount() % 2 ) {
-				this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.char;
+				this.isSelectMode = c_oAscCellEditorSelectState.char;
 				if ( !event.shiftKey ) {
 					this._showCursor();
 					pos = this._findCursorPosition( coord );
@@ -2657,7 +2659,7 @@
 			}
 			else {
 				// Dbl click
-				this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.word;
+				this.isSelectMode = c_oAscCellEditorSelectState.word;
 				// Окончание слова
 				var endWord = this.textRender.getNextWord( this.cursorPos );
 				// Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
@@ -2676,7 +2678,7 @@
 			this.handlers.trigger( 'onContextMenu', event );
 			return true;
 		}
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		return true;
 	};
 
@@ -2685,7 +2687,7 @@
 		var coord = this._getCoordinates( event );
 		this.clickCounter.mouseMoveEvent( coord.x, coord.y );
 		this.hasCursor = true;
-		if ( AscCommonExcel.c_oAscCellEditorSelectState.no !== this.isSelectMode ) {
+		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode ) {
 			this._changeSelection( coord );
 		}
 		return true;

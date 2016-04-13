@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 /** @constructor */
@@ -133,8 +136,8 @@ baseEditorsApi.prototype._baseInit = function() {
 
   // init OnMessage
   InitOnMessage(function(error, url) {
-    if (Asc.c_oAscError.ID.No !== error) {
-      t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+    if (c_oAscError.ID.No !== error) {
+      t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
     } else {
       t._addImageUrl(url);
     }
@@ -431,7 +434,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
     t._onEndPermissions();
   };
   this.CoAuthoringApi.onWarning = function(e) {
-    t.sendEvent('asc_onError', Asc.c_oAscError.ID.Warning, Asc.c_oAscError.Level.NoCritical);
+    t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
   /**
    * Event об отсоединении от сервера
@@ -448,7 +451,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
       t.sendEvent('asc_onCoAuthoringDisconnect');
       // И переходим в режим просмотра т.к. мы не можем сохранить файл
       t.asc_setViewMode(true);
-      t.sendEvent('asc_onError', isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect, Asc.c_oAscError.Level.NoCritical);
+      t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
   this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
@@ -474,14 +477,14 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
                   })
                 }
               } else {
-                t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
+                t.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
               }
               break;
             case "needparams":
               t._onNeedParams(input["data"]);
               break;
             case "err":
-              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.Critical);
+              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
               break;
           }
           break;
@@ -490,7 +493,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
             t.fCurCallback(input);
             t.fCurCallback = null;
           } else {
-            t.sendEvent("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
+            t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
           break;
       }
@@ -546,21 +549,21 @@ baseEditorsApi.prototype.asc_addImage = function() {
   ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
     t._uploadCallback(error, files);
   }, function(error) {
-    if (Asc.c_oAscError.ID.No !== error) {
-      t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+    if (c_oAscError.ID.No !== error) {
+      t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
     }
     t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
   });
 };
 baseEditorsApi.prototype._uploadCallback = function(error, files) {
   var t = this;
-  if (Asc.c_oAscError.ID.No !== error) {
-    this.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+  if (c_oAscError.ID.No !== error) {
+    this.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
   } else {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
-      if (Asc.c_oAscError.ID.No !== error) {
-        t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+      if (c_oAscError.ID.No !== error) {
+        t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
       } else {
         t._addImageUrl(url);
       }

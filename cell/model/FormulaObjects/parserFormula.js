@@ -30,6 +30,9 @@
 * @param {undefined} undefined
 */
 function (window, undefined) {
+  // Import
+  var c_oAscError = Asc.c_oAscError;
+  
 /** @enum */
 var cElementType = {
     number: 0,
@@ -3863,7 +3866,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         } else if (this.operand_str == " ") {
           continue;
         } else {
-          this.error.push(Asc.c_oAscError.ID.FrmlWrongOperator);
+          this.error.push(c_oAscError.ID.FrmlWrongOperator);
           this.outStack = [];
           this.elemArr = [];
           return false;
@@ -3888,7 +3891,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
             found_operator = new cFormulaOperators[this.operand_str]();
             this.operand_expected = true;
           } else {
-            this.error.push(Asc.c_oAscError.ID.FrmlWrongOperator);
+            this.error.push(c_oAscError.ID.FrmlWrongOperator);
             this.outStack = [];
             this.elemArr = [];
             return false;
@@ -3934,7 +3937,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       } else {
         while (this.elemArr.length != 0 && !((top_elem = this.elemArr[this.elemArr.length - 1]).name == "(" )) {
           if (top_elem.name in cFormulaOperators && this.operand_expected) {
-            this.error.push(Asc.c_oAscError.ID.FrmlOperandExpected);
+            this.error.push(c_oAscError.ID.FrmlOperandExpected);
             this.outStack = [];
             this.elemArr = [];
             return false;
@@ -3946,7 +3949,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       if (this.elemArr.length == 0 || top_elem == null/* && !wasLeftParentheses */) {
         this.outStack = [];
         this.elemArr = [];
-        this.error.push(Asc.c_oAscError.ID.FrmlWrongCountParentheses);
+        this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
         return false;
       }
 
@@ -3957,7 +3960,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         if (top_elem.getArguments() > func.getMaxArguments()) {
           this.outStack = [];
           this.elemArr = [];
-          this.error.push(Asc.c_oAscError.ID.FrmlWrongMaxArgument);
+          this.error.push(c_oAscError.ID.FrmlWrongMaxArgument);
           return false;
         } else {
           if (top_elem.getArguments() >= func.getMinArguments()) {
@@ -3965,7 +3968,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           } else {
             this.outStack = [];
             this.elemArr = [];
-            this.error.push(Asc.c_oAscError.ID.FrmlWrongCountArgument);
+            this.error.push(c_oAscError.ID.FrmlWrongCountArgument);
             return false;
           }
         }
@@ -3974,7 +3977,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           (!this.elemArr[this.elemArr.length - 1] || this.elemArr[this.elemArr.length - 1].name == "(" )) {
           this.outStack = [];
           this.elemArr = [];
-          this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           return false;
         }
         // for (int i = 0; i < left_p.ParametersNum - 1; ++i)
@@ -4011,14 +4014,14 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       }
 
       if (this.operand_expected) {
-        this.error.push(Asc.c_oAscError.ID.FrmlWrongOperator);
+        this.error.push(c_oAscError.ID.FrmlWrongOperator);
         this.outStack = [];
         this.elemArr = [];
         return false;
       }
 
       if (!wasLeftParentheses) {
-        this.error.push(Asc.c_oAscError.ID.FrmlWrongCountParentheses);
+        this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
         this.outStack = [];
         this.elemArr = [];
         return false;
@@ -4049,7 +4052,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
             } else {
               this.outStack = [];
               this.elemArr = [];
-              this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+              this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
               return false;
             }
           }
@@ -4062,7 +4065,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           this.outStack = [];
           this.elemArr = [];
           /*в массиве используется недопустимый параметр*/
-          this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           return false;
         }
       }
@@ -4070,7 +4073,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         this.outStack = [];
         this.elemArr = [];
         /*размер массива не согласован*/
-        this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+        this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
         return false;
       }
       this.outStack.push(arr);
@@ -4086,7 +4089,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       }
 
       if (!this.operand_expected) {
-        this.error.push(Asc.c_oAscError.ID.FrmlWrongOperator);
+        this.error.push(c_oAscError.ID.FrmlWrongOperator);
         this.outStack = [];
         this.elemArr = [];
         return false;
@@ -4115,7 +4118,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         };
 
         if (!(wsF && wsT)) {
-          this.error.push(Asc.c_oAscError.ID.FrmlWrongReferences);
+          this.error.push(c_oAscError.ID.FrmlWrongReferences);
           this.outStack = [];
           this.elemArr = [];
           return false;
@@ -4188,7 +4191,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
 
 //					if(found_operand.type==cElementType.error) {
 //						/*используется неверный именованный диапазон или таблица*/
-//						this.error.push( Asc.c_oAscError.ID.FrmlAnotherParsingError );
+//						this.error.push( c_oAscError.ID.FrmlAnotherParsingError );
 //						this.outStack = [];
 //						this.elemArr = [];
 //						return false;
@@ -4219,7 +4222,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
         if (this.operand_str != ".") {
           found_operand = new cNumber(parseFloat(this.operand_str));
         } else {
-          this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           this.outStack = [];
           this.elemArr = [];
           return false;
@@ -4246,7 +4249,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
           this.elemArr.push(found_operator);
           this.f.push(found_operator);
         } else {
-          this.error.push(Asc.c_oAscError.ID.FrmlWrongFunctionName);
+          this.error.push(c_oAscError.ID.FrmlWrongFunctionName);
           this.outStack = [];
           this.elemArr = [];
           return false;
@@ -4264,7 +4267,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       } else {
         if (this.operand_str == null || this.operand_str == "'") {
           this.outStack.push(new cError(cErrorType.wrong_name));
-          this.error.push(Asc.c_oAscError.ID.FrmlAnotherParsingError);
+          this.error.push(c_oAscError.ID.FrmlAnotherParsingError);
           return this.isParsed = false;
         }
         if (parserHelp.isName.call(this, this.Formula, this.pCurrPos, this.wb, this.ws)[0]) {
@@ -4290,7 +4293,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   if (this.operand_expected) {
     this.outStack = [];
     this.elemArr = [];
-    this.error.push(Asc.c_oAscError.ID.FrmlOperandExpected);
+    this.error.push(c_oAscError.ID.FrmlOperandExpected);
     return false;
   }
   var operand, parenthesesNotEnough = false;
@@ -4302,7 +4305,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
     } else if (operand.name == "(" || operand.name == ")") {
       this.outStack = [];
       this.elemArr = [];
-      this.error.push(Asc.c_oAscError.ID.FrmlWrongCountParentheses);
+      this.error.push(c_oAscError.ID.FrmlWrongCountParentheses);
       return false;
     } else {
       this.outStack.push(operand);
@@ -4310,7 +4313,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
   }
   this.parenthesesNotEnough = parenthesesNotEnough;
   if (this.parenthesesNotEnough) {
-    this.error.push(Asc.c_oAscError.ID.FrmlParenthesesCorrectCount);
+    this.error.push(c_oAscError.ID.FrmlParenthesesCorrectCount);
     return this.isParsed = false;
   }
 
