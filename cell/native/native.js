@@ -6668,6 +6668,7 @@ function offline_calculate_complete_range(x, y, w, h) {
 function offline_set_translate(translate) {_s.translate = translate;}
 
 function offline_apply_event(type,params) {
+    var _borderOptions = Asc.c_oAscBorderOptions;
     var _stream = null;
     var _return = undefined;
     var _current = {pos: 0};
@@ -7110,7 +7111,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border) {
-                            borders[c_oAscBorderOptions.Left] = border;
+                            borders[_borderOptions.Left] = border;
                         }
                         break;
                     }
@@ -7120,7 +7121,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Top] = border;
+                            borders[_borderOptions.Top] = border;
                         }
                         break;
                     }
@@ -7130,7 +7131,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Right] = border;
+                            borders[_borderOptions.Right] = border;
                         }
                         break;
                     }
@@ -7140,7 +7141,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Bottom] = border;
+                            borders[_borderOptions.Bottom] = border;
                         }
                         break;
                     }
@@ -7150,7 +7151,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.DiagD] = border;
+                            borders[_borderOptions.DiagD] = border;
                         }
                         break;
                     }
@@ -7160,7 +7161,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.DiagU] = border;
+                            borders[_borderOptions.DiagU] = border;
                         }
                         break;
                     }
@@ -7170,7 +7171,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.InnerV] = border;
+                            borders[_borderOptions.InnerV] = border;
                         }
                         break;
                     }
@@ -7180,7 +7181,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.InnerH] = border;
+                            borders[_borderOptions.InnerH] = border;
                         }
                         break;
                     }
