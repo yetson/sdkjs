@@ -22,16 +22,15 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 12:25
- * To change this template use File | Settings | File Templates.
- */
 
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var NumberBase = {
     BIN:2,
     OCT:8,
@@ -941,7 +940,8 @@ Complex.prototype = {
 
 };
 
-cFormulaFunctionGroup['Engineering'] = [
+cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
+cFormulaFunctionGroup['Engineering'].push(
     cBESSELI,
     cBESSELJ,
     cBESSELK,
@@ -980,25 +980,8 @@ cFormulaFunctionGroup['Engineering'] = [
     cIMSUM,
     cOCT2BIN,
     cOCT2DEC,
-    cOCT2HEX,
-
-    /*new funcions with _xlnf-prefix*/
-    cBITAND,
-    cBITLSHIFT,
-    cBITOR,
-    cBITRSHIFT,
-    cBITXOR,
-    cERF_PRECISE,
-    cERFC_PRECISE,
-    cIMCOSH,
-    cIMCOT,
-    cIMCSC,
-    cIMCSCH,
-    cIMSEC,
-    cIMSECH,
-    cIMSINH,
-    cIMTAN
-];
+    cOCT2HEX
+);
 
 function cBESSELI() {
     cBaseFunction.call( this, "BESSELI", 2, 2 );
@@ -2835,3 +2818,4 @@ cOCT2HEX.prototype.getInfo = function () {
         args:"( number [ , num-hex-digits ] )"
     };
 }
+})(window);

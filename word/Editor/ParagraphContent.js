@@ -340,6 +340,14 @@ ParaText.prototype =
             this.Flags &= PARATEXT_FLAGS_NON_SPACEAFTER;
     },
 
+    Is_NoBreakHyphen : function()
+    {
+        if (false === this.Is_SpaceAfter() && (this.Value === 0x002D || this.Value === 0x2013))
+            return true;
+
+        return false;
+    },
+
     Write_ToBinary : function(Writer)
     {
         // Long : Type
@@ -3816,6 +3824,15 @@ CAnchorPosition.prototype =
         return this.CalcY;
     },
 
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        var TopY    = Math.max(this.Page_Y, Math.min(TopMarginY, this.Page_H));
+        var BottomY = Math.max(this.Page_Y, Math.min(BottomMarginY, this.Page_H));
+
+        this.Top_Margin    = TopY;
+        this.Bottom_Margin = this.Page_H - BottomY;
+    },
+
     Correct_Values : function(bInline, PageLimits, AllowOverlap, UseTextWrap, OtherFlowObjects)
     {
         if ( true != bInline )
@@ -4087,6 +4104,10 @@ function ParaDrawing(W, H, GraphicObj, DrawingDocument, DocumentContent, Parent)
         B: 0
     };
 
+    this.SizeRelH = undefined;
+    this.SizeRelV = undefined;
+    //{RelativeFrom      : c_oAscRelativeFromH.Column, Percent: ST_PositivePercentage}
+
     this.AllowOverlap = true;
 
     //привязка к параграфу
@@ -4267,7 +4288,8 @@ ParaDrawing.prototype =
             RelativeFrom : this.PositionH.RelativeFrom,
             UseAlign     : this.PositionH.Align,
             Align        : ( true === this.PositionH.Align ? this.PositionH.Value : undefined ),
-            Value        : ( true === this.PositionH.Align ? 0 : this.PositionH.Value )
+            Value        : ( true === this.PositionH.Align ? 0 : this.PositionH.Value ),
+            Percent      : this.PositionH.Percent
         };
 
         Props.PositionV =
@@ -4275,8 +4297,29 @@ ParaDrawing.prototype =
             RelativeFrom : this.PositionV.RelativeFrom,
             UseAlign     : this.PositionV.Align,
             Align        : ( true === this.PositionV.Align ? this.PositionV.Value : undefined ),
-            Value        : ( true === this.PositionV.Align ? 0 : this.PositionV.Value )
+            Value        : ( true === this.PositionV.Align ? 0 : this.PositionV.Value ),
+            Percent      : this.PositionV.Percent
         };
+
+
+
+        if(this.SizeRelH && this.SizeRelH.Percent > 0)
+        {
+            Props.SizeRelH =
+            {
+                RelativeFrom: ConvertRelSizeHToRelPosition(this.SizeRelH.RelativeFrom),
+                Value: (this.SizeRelH.Percent*100) >> 0
+            };
+        }
+
+        if(this.SizeRelV && this.SizeRelV.Percent > 0)
+        {
+            Props.SizeRelV =
+            {
+                RelativeFrom: ConvertRelSizeVToRelPosition(this.SizeRelV.RelativeFrom),
+                Value: (this.SizeRelV.Percent*100) >> 0
+            };
+        }
 
         Props.Internal_Position = this.Internal_Position;
 
@@ -4392,6 +4435,19 @@ ParaDrawing.prototype =
         }
     },
 
+    SetSizeRelH : function(oSize)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetSizeRelH, Old: this.SizeRelH, New: oSize});
+        this.SizeRelH = oSize;
+    },
+
+
+    SetSizeRelV : function(oSize)
+    {
+        History.Add(this, {Type: historyitem_Drawing_SetSizeRelV, Old: this.SizeRelV, New: oSize});
+        this.SizeRelV = oSize;
+    },
+
     getXfrmExtX: function()
     {
         if(isRealObject(this.GraphicObj) && isRealObject(this.GraphicObj.spPr) && isRealObject(this.GraphicObj.spPr.xfrm))
@@ -4423,34 +4479,28 @@ ParaDrawing.prototype =
         }
     },
 
-    Set_Props : function(Props)
-    {
+    Set_Props : function(Props) {
         var bCheckWrapPolygon = false;
-        if ( undefined != Props.WrappingStyle )
-        {
-            if ( drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings )
-            {
-                this.Set_Distance( 3.2,  0,  3.2, 0 );
+        if (undefined != Props.WrappingStyle) {
+            if (drawing_Inline === this.DrawingType && c_oAscWrapStyle2.Inline != Props.WrappingStyle && undefined === Props.Paddings) {
+                this.Set_Distance(3.2, 0, 3.2, 0);
             }
 
-            this.Set_DrawingType( c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor );
-            if(c_oAscWrapStyle2.Inline === Props.WrappingStyle)
-            {
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h))
-                {
+            this.Set_DrawingType(c_oAscWrapStyle2.Inline === Props.WrappingStyle ? drawing_Inline : drawing_Anchor);
+            if (c_oAscWrapStyle2.Inline === Props.WrappingStyle) {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w) && isRealNumber(this.GraphicObj.bounds.h)) {
                     this.setExtent(this.GraphicObj.bounds.w, this.GraphicObj.bounds.h);
                 }
             }
-            if ( c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle )
-            {
-                this.Set_WrappingType( WRAPPING_TYPE_NONE );
-                this.Set_BehindDoc( c_oAscWrapStyle2.Behind === Props.WrappingStyle ? true : false );
+            if (c_oAscWrapStyle2.Behind === Props.WrappingStyle || c_oAscWrapStyle2.InFront === Props.WrappingStyle) {
+                this.Set_WrappingType(WRAPPING_TYPE_NONE);
+                this.Set_BehindDoc(c_oAscWrapStyle2.Behind === Props.WrappingStyle ? true : false);
             }
-            else
-            {
-                switch ( Props.WrappingStyle )
-                {
-                    case c_oAscWrapStyle2.Square      : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
+            else {
+                switch (Props.WrappingStyle) {
+                    case c_oAscWrapStyle2.Square      :
+                        this.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+                        break;
                     case c_oAscWrapStyle2.Tight       :
                     {
                         bCheckWrapPolygon = true;
@@ -4463,45 +4513,67 @@ ParaDrawing.prototype =
                         bCheckWrapPolygon = true;
                         break;
                     }
-                    case c_oAscWrapStyle2.TopAndBottom: this.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM); break;
-                    default                           : this.Set_WrappingType(WRAPPING_TYPE_SQUARE);         break;
+                    case c_oAscWrapStyle2.TopAndBottom:
+                        this.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM);
+                        break;
+                    default                           :
+                        this.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+                        break;
                 }
 
-                this.Set_BehindDoc( false );
+                this.Set_BehindDoc(false);
             }
         }
 
-        if ( undefined != Props.Paddings )
-            this.Set_Distance( Props.Paddings.Left,  Props.Paddings.Top,  Props.Paddings.Right,  Props.Paddings.Bottom );
+        if (undefined != Props.Paddings)
+            this.Set_Distance(Props.Paddings.Left, Props.Paddings.Top, Props.Paddings.Right, Props.Paddings.Bottom);
 
-        if ( undefined != Props.AllowOverlap )
-            this.Set_AllowOverlap( Props.AllowOverlap );
+        if (undefined != Props.AllowOverlap)
+            this.Set_AllowOverlap(Props.AllowOverlap);
 
         var bNeedUpdateWH = false, newW = this.Extent.W, newH = this.Extent.H;
-        if ( undefined != Props.PositionH )
-        {
-            this.Set_PositionH( Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
-            if(Props.PositionH.UseAlign)
-            {
+        if (undefined != Props.PositionH) {
+            this.Set_PositionH(Props.PositionH.RelativeFrom, Props.PositionH.UseAlign, ( true === Props.PositionH.UseAlign ? Props.PositionH.Align : Props.PositionH.Value ), Props.PositionH.Percent);
+            if (Props.PositionH.UseAlign) {
                 bNeedUpdateWH = true;
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w))
-                {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.w)) {
                     newW = this.GraphicObj.bounds.w;
                 }
             }
         }
-        if ( undefined != Props.PositionV )
-        {
-            this.Set_PositionV( Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
-            if(this.PositionV.UseAlign)
-            {
+        if (undefined != Props.PositionV) {
+            this.Set_PositionV(Props.PositionV.RelativeFrom, Props.PositionV.UseAlign, ( true === Props.PositionV.UseAlign ? Props.PositionV.Align : Props.PositionV.Value ), Props.PositionV.Percent);
+            if (this.PositionV.UseAlign) {
                 bNeedUpdateWH = true;
-                if(isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h))
-                {
+                if (isRealObject(this.GraphicObj.bounds) && isRealNumber(this.GraphicObj.bounds.h)) {
                     newH = this.GraphicObj.bounds.h;
                 }
             }
         }
+        if (undefined != Props.SizeRelH) {
+            this.SetSizeRelH({
+                RelativeFrom: ConvertRelPositionHToRelSize(Props.SizeRelH.RelativeFrom),
+                Percent: Props.SizeRelH.Value / 100.0
+            });
+        }
+
+        if (undefined != Props.SizeRelV) {
+            this.SetSizeRelV({
+                RelativeFrom: ConvertRelPositionVToRelSize(Props.SizeRelV.RelativeFrom),
+                Percent: Props.SizeRelV.Value / 100.0
+            });
+        }
+
+        if (this.SizeRelH && !this.SizeRelV)
+        {
+            this.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+        }
+
+        if (this.SizeRelV && !this.SizeRelH)
+        {
+            this.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+        }
+
         if(bNeedUpdateWH)
         {
             this.setExtent(newW, newH);
@@ -4577,7 +4649,7 @@ ParaDrawing.prototype =
             this.Height = 0;
             return;
         }
-        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()))
+        if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H) && (!this.GraphicObj.checkAutofit || !this.GraphicObj.checkAutofit()) && !this.SizeRelH && !this.SizeRelV)
         {
             this.Width        = this.Extent.W;
             this.Height       = this.Extent.H;
@@ -4682,6 +4754,14 @@ ParaDrawing.prototype =
         }
         c.Set_BehindDoc(this.behindDoc);
         c.Set_RelativeHeight(this.RelativeHeight);
+        if(this.SizeRelH)
+        {
+            c.SetSizeRelH({RelativeFrom: this.SizeRelH.RelativeFrom, Percent: this.SizeRelH.Percent});
+        }
+        if(this.SizeRelV)
+        {
+            c.SetSizeRelV({RelativeFrom: this.SizeRelV.RelativeFrom, Percent: this.SizeRelV.Percent});
+        }
         if(isRealNumber(this.Extent.W) && isRealNumber(this.Extent.H))
         {
             c.setExtent(this.Extent.W, this.Extent.H);
@@ -4833,6 +4913,14 @@ ParaDrawing.prototype =
 
         this.updatePosition3( this.PageNum, this.X, this.Y, OldPageNum );
         this.useWrap = this.Use_TextWrap();
+    },
+
+    Update_PositionYHeaderFooter : function(TopMarginY, BottomMarginY)
+    {
+        this.Internal_Position.Update_PositionYHeaderFooter(TopMarginY, BottomMarginY);
+        this.Internal_Position.Calculate_Y(this.Is_Inline(), this.PositionV.RelativeFrom, this.PositionV.Align, this.PositionV.Value, this.PositionV.Percent);
+        this.Y = this.Internal_Position.CalcY;
+        this.updatePosition3(this.PageNum, this.X, this.Y, this.PageNum);
     },
 
     Reset_SavedPosition : function()
@@ -5266,7 +5354,6 @@ ParaDrawing.prototype =
         {
             if(this.GraphicObj.CheckNeedRecalcAutoFit(oSectPr))
             {
-                //this.GraphicObj.recalculate();
                 if(this.GraphicObj)
                 {
                     this.GraphicObj.recalcWrapPolygon && this.GraphicObj.recalcWrapPolygon();
@@ -5284,6 +5371,16 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                this.SizeRelH = Data.Old;
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                this.SizeRelV = Data.Old;
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.OldEE.L;
@@ -5431,6 +5528,16 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                this.SizeRelH = Data.New;
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                this.SizeRelV = Data.New;
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.NewEE.L;
@@ -5596,6 +5703,22 @@ ParaDrawing.prototype =
 
                     case historyitem_SetExtent:
                     {
+                        var Run = this.Parent.Get_DrawingObjectRun( this.Id );
+                        if(Run)
+                        {
+                            Run.RecalcInfo.Measure = true;
+                        }
+                        break;
+                    }
+
+                    case historyitem_Drawing_SetSizeRelH:
+                    case historyitem_Drawing_SetSizeRelV:
+                    {
+                        if( this.GraphicObj)
+                        {
+                            this.GraphicObj.handleUpdateExtents && this.GraphicObj.handleUpdateExtents();
+                            this.GraphicObj.addToRecalculate();
+                        }
                         var Run = this.Parent.Get_DrawingObjectRun( this.Id );
                         if(Run)
                         {
@@ -5822,6 +5945,21 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                if(Data.New)
+                {
+                    Writer.WriteBool(true);
+                    Writer.WriteLong(Data.New.RelativeFrom);
+                    Writer.WriteDouble(Data.New.Percent);
+                }
+                else
+                {
+                    Writer.WriteBool(false);
+                }
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 writeDouble(Writer, Data.NewEE.L);
@@ -6001,6 +6139,34 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
+            case historyitem_Drawing_SetSizeRelH:
+            {
+                if(Reader.GetBool())
+                {
+                    this.SizeRelH = {};
+                    this.SizeRelH.RelativeFrom = Reader.GetLong();
+                    this.SizeRelH.Percent = Reader.GetDouble();
+                }
+                else
+                {
+                    this.SizeRelH = undefined;
+                }
+                break;
+            }
+            case historyitem_Drawing_SetSizeRelV:
+            {
+                if(Reader.GetBool())
+                {
+                    this.SizeRelV = {};
+                    this.SizeRelV.RelativeFrom = Reader.GetLong();
+                    this.SizeRelV.Percent = Reader.GetDouble();
+                }
+                else
+                {
+                    this.SizeRelV = undefined;
+                }
+                break;
+            }
             case historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = readDouble(Reader);

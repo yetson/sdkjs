@@ -40,8 +40,6 @@ function asc_docs_api(name)
   asc_docs_api.superclass.constructor.call(this, name);
   this.editorId = c_oEditorId.Presentation;
 
-    var CSpellCheckApi  = window["CSpellCheckApi"];
-
     History    = new CHistory();
     g_oTableId = new CTableId();
 
@@ -1280,9 +1278,6 @@ asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
 /*asc_docs_api.prototype.sync_CursorLockCallBack = function(isLock){
 	this.asc_fireCallback("asc_onCursorLock",isLock);
 }*/
-asc_docs_api.prototype.sync_PrintCallBack = function(){
-	this.asc_fireCallback("asc_onPrint");
-};
 asc_docs_api.prototype.sync_UndoCallBack = function(){
 	this.asc_fireCallback("asc_onUndo");
 };
@@ -1833,13 +1828,13 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                   image_url = firstUrl;
                   fApplyCallback();
                 } else {
-                  oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                  oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
                 }
               } else {
-                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
             }
             oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           };
@@ -2751,13 +2746,13 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 					if(firstUrl) {
 						t.AddImageUrlAction(firstUrl);
 					} else {
-						t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+						t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
 					}
 				} else {
-					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
 				}
 			} else {
-				t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
 			}
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		};
@@ -2928,13 +2923,13 @@ asc_docs_api.prototype.ImgApply = function(obj){
                 ImagePr.ImageUrl = firstUrl;
                 fApplyCallback();
               } else {
-                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
             }
           } else {
-            oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+            oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
           }
           oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
         };
@@ -3814,6 +3809,16 @@ asc_docs_api.prototype.asc_SetViewRulersChange = function()
 asc_docs_api.prototype.asc_GetViewRulers = function()
 {
     return this.WordControl.m_bIsRuler;
+};
+asc_docs_api.prototype.asc_SetDocumentUnits = function(_units)
+{
+    if (this.WordControl && this.WordControl.m_oHorRuler && this.WordControl.m_oVerRuler)
+    {
+        this.WordControl.m_oHorRuler.Units = _units;
+        this.WordControl.m_oVerRuler.Units = _units;
+        this.WordControl.UpdateHorRulerBack(true);
+        this.WordControl.UpdateVerRulerBack(true);
+    }
 };
 
 asc_docs_api.prototype.SetMobileVersion = function(val)
@@ -4709,7 +4714,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
 	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
-			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+			t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.Critical);
 			return;
 		}
 
@@ -4749,20 +4754,20 @@ function _downloadAs(editor, filetype, actionType, options)
 	else
 		dataContainer.data = editor.WordControl.SaveDocument();
     var fCallback = function(input) {
-      var error = c_oAscError.ID.Unknown;
+      var error = Asc.c_oAscError.ID.Unknown;
       if(null != input && command == input["type"]) {
         if('ok' == input["status"]){
           var url = input["data"];
           if(url) {
-            error = c_oAscError.ID.No;
+            error = Asc.c_oAscError.ID.No;
             editor.processSavedFile(url, options.downloadType);
           }
         } else {
           error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
-      if (c_oAscError.ID.No != error) {
-        editor.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
+      if (Asc.c_oAscError.ID.No != error) {
+        editor.asc_fireCallback("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
       }
       if (actionType) {
         editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);

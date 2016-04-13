@@ -35,8 +35,20 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
-function CheckShapeBodyAutoFitReset(oShape)
+function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
 {
+    var oParaDrawing = getParaDrawing(oShape);
+    if(oParaDrawing && !(bNoResetRelSize === true))
+    {
+        if(oParaDrawing.SizeRelH)
+        {
+            oParaDrawing.SetSizeRelH(undefined);
+        }
+        if(oParaDrawing.SizeRelV)
+        {
+            oParaDrawing.SetSizeRelV(undefined);
+        }
+    }
     if(oShape instanceof CShape)
     {
         var oPropsToSet = null;
@@ -98,6 +110,148 @@ function CDistance(L, T, R, B)
     this.B = B;
 }
 
+
+function ConvertRelPositionHToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromH.InsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhInsideMargin;
+        }
+        case c_oAscRelativeFromH.LeftMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhLeftMargin;
+        }
+        case c_oAscRelativeFromH.Margin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhMargin;
+        }
+        case c_oAscRelativeFromH.OutsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhOutsideMargin;
+        }
+        case c_oAscRelativeFromH.Page:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+        case c_oAscRelativeFromH.RightMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhRightMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+    }
+}
+
+function ConvertRelPositionVToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromV.BottomMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvBottomMargin;
+        }
+        case c_oAscRelativeFromV.InsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvInsideMargin;
+        }
+        case c_oAscRelativeFromV.Margin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+        case c_oAscRelativeFromV.OutsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvOutsideMargin;
+        }
+        case c_oAscRelativeFromV.Page:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvPage;
+        }
+        case c_oAscRelativeFromV.TopMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvTopMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+    }
+}
+
+function ConvertRelSizeHToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromH.sizerelfromhMargin:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhPage:
+        {
+            return c_oAscRelativeFromH.Page;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
+        {
+            return c_oAscRelativeFromH.LeftMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhRightMargin:
+        {
+            return c_oAscRelativeFromH.RightMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhInsideMargin:
+        {
+            return c_oAscRelativeFromH.InsideMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhOutsideMargin:
+        {
+            return c_oAscRelativeFromH.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+    }
+}
+
+
+function ConvertRelSizeVToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromV.sizerelfromvMargin:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvPage:
+        {
+            return c_oAscRelativeFromV.Page;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvTopMargin:
+        {
+            return c_oAscRelativeFromV.TopMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
+        {
+            return c_oAscRelativeFromV.BottomMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvInsideMargin:
+        {
+            return c_oAscRelativeFromV.InsideMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvOutsideMargin:
+        {
+            return c_oAscRelativeFromV.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+    }
+}
+
 function checkObjectInArray(aObjects, oObject)
 {
     var i;
@@ -133,7 +287,7 @@ function CheckStockChart(oDrawingObjects, oApi)
         {
             if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
             {
-                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.StockChartError, Asc.c_oAscError.Level.NoCritical);
                 oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                 return false;
             }
@@ -350,8 +504,51 @@ function DrawingObjectsController(drawingObjects)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
+function CanStartEditText(oController)
+{
+    var oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
+    if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+    {
+        return true;
+    }
+    return false;
+}
+
 DrawingObjectsController.prototype =
 {
+
+
+    //for mobile spreadsheet editor
+    startEditTextCurrentShape: function()
+    {
+        if(!CanStartEditText(this))
+        {
+            return;
+        }
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oShape = oSelector.selectedObjects[0];
+        var oContent = oShape.getDocContent();
+        if(oContent)
+        {
+            oSelector.resetInternalSelection();
+            oSelector.selection.textSelection = oShape;
+            oContent.Cursor_MoveToEndPos(false);
+            this.updateSelectionState();
+            this.updateOverlay();
+        }
+        else
+        {
+            var oThis = this;
+            this.checkSelectedObjectsAndCallback(function(){
+                oShape.createTextBody();
+                var oContent = oShape.getDocContent();
+                oSelector.resetInternalSelection();
+                oSelector.selection.textSelection = oShape;
+                oContent.Cursor_MoveToEndPos(false);
+                oThis.updateSelectionState();
+            }, [], false, historydescription_Spreadsheet_AddNewParagraph);
+        }
+    },
 
     canReceiveKeyPress: function()
     {
@@ -756,6 +953,13 @@ DrawingObjectsController.prototype =
     getLeftTopSelectedObject: function(pageIndex)
     {
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+	
+	createWatermarkImage: function(sImageUrl)
+	{
+        return ExecuteNoHistory(function(){
+            return this.createImage(sImageUrl, 0, 0, 110, 61.875);
+        }, this, []);
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
@@ -2003,41 +2207,70 @@ DrawingObjectsController.prototype =
         }
 
         var aGroups = [];
-        if(isRealNumber(props.Width) && isRealNumber(props.Height))
+        if(isRealNumber(props.Width) || isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
-                objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
-                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i]);
+                if(!props.SizeRelH && isRealNumber(props.Width))
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                if(!props.SizeRelV && isRealNumber(props.Height))
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                }
+                if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                {
+                    var oDrawing =  objects_by_type.shapes[i].parent;
+                    if (oDrawing.SizeRelH && !oDrawing.SizeRelV)
+                    {
+                        oDrawing.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                    if (oDrawing.SizeRelV && !oDrawing.SizeRelH)
+                    {
+                        oDrawing.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i], true);
                 if(objects_by_type.shapes[i].group)
                 {
                     checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
-            for(i = 0; i < objects_by_type.images.length; ++i)
+            if(!props.SizeRelH && !props.SizeRelV && isRealNumber(props.Width) && isRealNumber(props.Height))
             {
-                CheckSpPrXfrm(objects_by_type.images[i]);
-                objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.images[i].group)
+                for(i = 0; i < objects_by_type.images.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.images[i]);
+                    objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.images[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    }
+                    objects_by_type.images[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.images[i].checkDrawingBaseCoords();
-            }
-            for(i = 0; i < objects_by_type.charts.length; ++i)
-            {
-                CheckSpPrXfrm(objects_by_type.charts[i]);
-                objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.charts[i].group)
+                for(i = 0; i < objects_by_type.charts.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.charts[i]);
+                    objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.charts[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    }
+                    objects_by_type.charts[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.charts[i].checkDrawingBaseCoords();
             }
         }
 
@@ -2897,8 +3130,7 @@ DrawingObjectsController.prototype =
                 if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
                 {
                     new_chart_type = new CScatterChart();
-                    plot_area.addChart(new_chart_type, 0);
-                    new_chart_type.setFromOtherChart(chart_type);
+                    replaceChart(plot_area, chart_type, new_chart_type);
                     for(var j = 0; j < new_chart_type.series.length; ++j)
                     {
                         new_chart_type.series[j].setMarker(null);
@@ -6576,7 +6808,7 @@ DrawingObjectsController.prototype =
         if (isRealObject(props.shapeProps))
         {
             shape_props = new asc_CImgProperty();
-            shape_props.fromGroup = props.shapeProps.fromGroup;
+            shape_props.fromGroup = CanStartEditText(this);
             shape_props.ShapeProperties = new asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
@@ -6987,11 +7219,11 @@ DrawingObjectsController.prototype =
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
                 var editor = window["Asc"]["editor"];
-                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
-                if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
-                    || check === c_oAscError.ID.MaxDataSeriesError)
+                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, Asc.c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
+                if(check === Asc.c_oAscError.ID.StockChartError || check === Asc.c_oAscError.ID.DataRangeError
+                    || check === Asc.c_oAscError.ID.MaxDataSeriesError)
                 {
-                    editor.wbModel.handlers.trigger("asc_onError", check, c_oAscError.Level.NoCritical);
+                    editor.wbModel.handlers.trigger("asc_onError", check, Asc.c_oAscError.Level.NoCritical);
                     this.drawingObjects.sendGraphicObjectProps();
                     return;
                 }
@@ -8327,7 +8559,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
         var addImageObject = function (_image) {
 
             if ( !_image.Image ) {
-                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
+                worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
             }
             else {
 

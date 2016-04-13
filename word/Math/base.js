@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 /**
@@ -47,7 +23,6 @@ function CMathBase(bInside)
     this.CtrPrp 			 = new CTextPr();
     this.CompiledCtrPrp 	 = new CTextPr(); 
     this.TextPrControlLetter = new CTextPr();
-	//this.CtrPr               = new CCtrPr();
 
     this.ArgSize             = new CMathArgSize();
 
@@ -283,33 +258,29 @@ CMathBase.prototype.align = function(pos_x, pos_y)
     if(this.alignment.hgt[pos_x] == MCJC_CENTER)
     {
         var maxAsc = 0;
-        var _ascent;
 
         for(var j = 0; j < this.nCol; j++)
         {
-            _ascent = this.elements[pos_x][j].size.ascent;
+            var _ascent = this.elements[pos_x][j].size.ascent;
             maxAsc = ( maxAsc > _ascent ) ? maxAsc : _ascent;
         }
-        PosAlign.y = (maxAsc - this.elements[pos_x][pos_y].size.ascent);
+        PosAlign.y = maxAsc - this.elements[pos_x][pos_y].size.ascent;
     }
-    else
+    else if(this.alignment.hgt[pos_x] == MCJC_LEFT)
+    {
+        PosAlign.y = 0;
+    }
+    else // MCJC_RIGHT
     {
         var maxH = 0;
-        var _h;
 
         for(var j = 0; j < this.nCol; j++)
         {
-            _h = this.elements[pos_x][j].size.height;
+            var _h = this.elements[pos_x][j].size.height;
             maxH = ( maxH > _h ) ? maxH : _h;
         }
 
-        var coeffHgt;
-        if(this.alignment.hgt[pos_x] == MCJC_RIGHT)
-            coeffHgt = 1;
-        else
-            coeffHgt = 0;
-
-        PosAlign.y = (maxH - this.elements[pos_x][pos_y].size.height)*coeffHgt;
+        PosAlign.y = maxH - this.elements[pos_x][pos_y].size.height;
     }
 
     var maxW  = 0;
@@ -321,16 +292,10 @@ CMathBase.prototype.align = function(pos_x, pos_y)
 
     if(this.alignment.wdt[pos_y] == MCJC_CENTER)
         PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*0.5;
-    else
-    {
-        var coeffWdt;
-        if(this.alignment.wdt[pos_y] == MCJC_RIGHT)
-            coeffWdt = 1;
-        else
-            coeffWdt = 0;
-
-        PosAlign.x = (maxW - this.elements[pos_x][pos_y].size.width)*coeffWdt;
-    }
+    else if(this.alignment.hgt[pos_x] == MCJC_LEFT)
+        PosAlign.x = 0;
+    else // MCJC_RIGHT
+        PosAlign.x = maxW - this.elements[pos_x][pos_y].size.width;
 
     return PosAlign;
 };
@@ -2022,7 +1987,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
     var bContainCompareOper = PRS.bContainCompareOper;
 
     var bOneLine = PRS.bMath_OneLine;
-    var MathFirstItem = PRS.MathFirstItem;
+
     this.bOneLine = this.bCanBreak == false || PRS.bMath_OneLine == true;
 
     if(this.kind !== MATH_DELIMITER)
@@ -2055,7 +2020,7 @@ CMathBase.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
         this.recalculateSize(g_oTextMeasurer);
 
-        this.UpdatePRS_OneLine(PRS, WordLen, MathFirstItem);
+        this.UpdatePRS_OneLine(PRS, WordLen, PRS.MathFirstItem);
         this.Bounds.SetWidth(0, 0, this.size.width);
         this.Bounds.UpdateMetrics(0, 0, this.size);
     }

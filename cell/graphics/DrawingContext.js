@@ -22,14 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* DrawingContext.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(function (/** jQuery */$, /** Window */window, undefined) {
+(function (/** Window */window, undefined) {
 
 	/*
 	 * Import
@@ -937,7 +937,9 @@
 			if (!_r && !_g && !_b) {
 				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
 			} else {
-				var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
+				var canvD = document.createElement('canvas');
+				canvD.width = nW;
+				canvD.height = nH;
 				var ctxD = canvD.getContext("2d");
 				var pixDst = ctxD.getImageData(0, 0, nW, nH);
 				var dstP = pixDst.data;
@@ -1050,7 +1052,7 @@
 	};
 
 	DrawingContext.prototype.dashLineCleverHor = function (x1, y, x2) {
-		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+		var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
 		var _x1 = this._mct.transformPointX(x1, y);
 		var _y  = this._mct.transformPointY(x1, y) - 1;
 		var _x2 = this._mct.transformPointX(x2, y);
@@ -1071,7 +1073,7 @@
 		}
 	};
 	DrawingContext.prototype.dashLineCleverVer = function (x, y1, y2) {
-		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+		var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
 		var _y1 = this._mct.transformPointY(x, y1);
 		var _x  = this._mct.transformPointX(x, y1) - 1;
 		var _y2 = this._mct.transformPointY(x, y2);
@@ -1271,4 +1273,4 @@
 	window["Asc"].DrawingContext   = DrawingContext;
 	window["Asc"].Matrix           = Matrix;
 
-})(jQuery, window);
+})(window);

@@ -23,8 +23,8 @@
  *
 */
 module.exports = function(grunt) {
-	require('google-closure-compiler').grunt(grunt);
-    var revision="unknown", defaultConfig, packageFile;
+	require('google-closure-compiler').grunt(grunt, ['-Xms2048m']);
+    var defaultConfig, packageFile;
 	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
@@ -32,8 +32,6 @@ module.exports = function(grunt) {
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-replace');
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
@@ -89,70 +87,24 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
 	grunt.registerTask('build_nativeword', ['build_nativeword_init', 'build_sdk']);
-    grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
-    grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
-		
+	grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
+	grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
+
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
-
-	grunt.registerTask('up_sdk_src_init', 'Update SDK source', function() {
-		grunt.initConfig({
-			exec: {
-				update_sources: {
-					command: 'svn.exe up -q --non-interactive -r ' + packageFile['update_src']['revision'] + ' ' + packageFile['update_src']['src'],
-					stdout: true
-				},				
-				update_logs: {
-					command: 'svn.exe up -q --non-interactive -r HEAD ' + packageFile['compile']['sdk']['log'],
-					stdout: true
-				}
-			}
-		});
-    });
-	
-	grunt.registerTask('update_sources_webword', ['build_webword_init', 'up_sdk_src_init', 'exec']);
-	grunt.registerTask('update_sources_webexcel', ['build_webexcel_init', 'up_sdk_src_init', 'exec']);
-	grunt.registerTask('update_sources_webpowerpoint', ['build_webpowerpoint_init', 'up_sdk_src_init', 'exec']);
-
-	grunt.registerTask('update_sources', ['update_sources_webword', 'update_sources_webexcel', 'update_sources_webpowerpoint']);
-		
-    grunt.registerTask('increment_build', function() {
-		var pkg = grunt.file.readJSON(defaultConfig);
-		pkg.info.build = parseInt(pkg.info.build) + 1;
-
-		if(undefined !== process.env['BUILD_NUMBER']) {
-			grunt.log.ok('Use Jenkins build number as sdk-all build number!'.yellow);
-			packageFile['info']['build'] = parseInt(process.env['BUILD_NUMBER']);
-			pkg.info.build = packageFile['info']['build'];
-		}
-		packageFile['info']['rev'] = process.env['SVN_REVISION'] || revision;
-		grunt.file.write(defaultConfig, JSON.stringify(pkg, null, 4));
-    });
-	
-	grunt.registerTask('create_map_file', function() {
-		//Не нашел как передать параметры в таску, поэтому  продублировал код.	
-		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';	
-		var map_record = '//@ sourceMappingURL=' + packageFile['compile']['source_map']['url'] + '/' + map_file_path;
-
-		var map_record_file_path = map_file_path + '.tmp';
-		grunt.file.write(map_record_file_path, map_record);
-	});
 	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
 		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
 		var map_record_file_path = map_file_path + '.tmp';
-		var concat_res = {};
-		concat_res[packageFile['compile']['sdk']['dst']] = [
-					packageFile['compile']['sdk']['dst'],
-					packageFile['compile']['defines']['dst'],
-					map_record_file_path ];
+		var concat_src = [
+			packageFile['compile']['sdk']['dst'],
+			packageFile['compile']['defines']['dst'],
+			map_record_file_path ];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
-			externs: packageFile['compile']['sdk']['externs']/*,
-			create_source_map: map_file_path,
-			source_map_format: "V3"*/
+			externs: packageFile['compile']['sdk']['externs']
 		};
 		var definesOpt = {
 			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
@@ -166,7 +118,7 @@ module.exports = function(grunt) {
 			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
 		}		
 		
-		if (grunt.option('mobile')) {				
+		if (grunt.option('mobile')) {
 			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
 			srcFiles = srcFiles.filter(function(item) {
 				return -1 === excludeFiles.indexOf(item);
@@ -177,16 +129,12 @@ module.exports = function(grunt) {
 			}
 		}
 		
-		if (grunt.option('private')) {
+		if (!grunt.option('noprivate')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
 		}
 		if (grunt.option('desktop')) {
 			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
 		}
-	
-		
-		var cc = require('google-closure-compiler').compiler;
-		cc.prototype.spawnOptions = {env: {'JAVA_OPTS': '-Xms2048m'}};
 
 		grunt.initConfig({
 			pkg: packageFile,
@@ -204,8 +152,16 @@ module.exports = function(grunt) {
 					options: definesOpt
 				}
 			},
-			create_map_file: {},
-			concat: concat_res,
+			concat: {
+				options: {
+					banner: '(function(window, undefined) {',
+					footer: '})(window);'
+				},
+				dist: {
+					src: concat_src,
+					dest: '<%= pkg.compile.sdk.dst %>'
+				}
+			},
 			clean: [ 
 				packageFile['compile']['defines']['dst'],
 				map_record_file_path
@@ -214,9 +170,8 @@ module.exports = function(grunt) {
 				version: {
 					options: {
 						variables: {
-							Version: packageFile['info']['version'],
-							Build: packageFile['info']['build'].toString(),
-							Rev: (packageFile['info']['rev'] || 1).toString()
+							Version: process.env['PRODUCT_VERSION'],
+							Build: process.env['BUILD_NUMBER']
 						}
 					},
 					files: {

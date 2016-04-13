@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 function CAscSection()
 {
@@ -291,8 +291,6 @@ function asc_docs_api(name)
         window["AscDesktopEditor"]["CreateEditorApi"]();
     }
 
-    var CSpellCheckApi  = window["CSpellCheckApi"];
-
     History    = new CHistory();
     g_oTableId = new CTableId();
 
@@ -329,7 +327,7 @@ function asc_docs_api(name)
   this.isCoMarksDraw = false;
 
 	// Spell Checking
-	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new CSpellCheckApi() : new CSpellCheckApi_desktop();
+	this.SpellCheckApi = (window["AscDesktopEditor"] === undefined) ? new Asc.CSpellCheckApi() : new CSpellCheckApi_desktop();
 	this.isSpellCheckEnable = true;
 
     // это чтобы сразу показать ридер, без возможности вернуться в редактор/вьюер
@@ -750,7 +748,7 @@ asc_docs_api.prototype.OpenDocument2 = function(url, gObject)
 		this.FontLoader.LoadDocumentFonts(this.WordControl.m_oLogicDocument.Fonts, false);
 	}
 	else
-		editor.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+		editor.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.MobileUnexpectedCharCount,Asc.c_oAscError.Level.Critical);
     
 	//callback
 	editor.DocumentOrientation = (null == editor.WordControl.m_oLogicDocument) ? true : !editor.WordControl.m_oLogicDocument.Orientation;
@@ -2082,13 +2080,13 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 		this.mailMergeFileData = null;
     g_fLoadFileContent(url, function(result) {
       if (null === result) {
-        t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+        t.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.MailMergeLoadFile, Asc.c_oAscError.Level.NoCritical);
         return;
       }
       try {
         t.asc_StartMailMergeByList(JSON.parse(result));
       } catch (e) {
-        t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
+        t.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.MailMergeLoadFile, Asc.c_oAscError.Level.NoCritical);
       }
     });
 	} else {
@@ -2212,9 +2210,6 @@ CDocInfoProp.prototype.put_SymbolsWSCount = function(v){ this.SymbolsWSCount = v
 /*asc_docs_api.prototype.sync_CursorLockCallBack = function(isLock){
 	this.asc_fireCallback("asc_onCursorLock",isLock);
 }*/
-asc_docs_api.prototype.sync_PrintCallBack = function(){
-	this.asc_fireCallback("asc_onPrint");
-};
 asc_docs_api.prototype.sync_UndoCallBack = function(){
 	this.asc_fireCallback("asc_onUndo");
 };
@@ -4139,6 +4134,7 @@ function CTableProp (tblProp)
         this.TableLayout        = tblProp.TableLayout;
         this.CellsTextDirection = tblProp.CellsTextDirection;
         this.CellsNoWrap        = tblProp.CellsNoWrap;
+        this.CellsWidth         = tblProp.CellsWidth;
         this.Locked             = (undefined != tblProp.Locked) ? tblProp.Locked : false;
     }
 	else
@@ -4223,6 +4219,9 @@ CTableProp.prototype.get_CellsTextDirection = function(){return this.CellsTextDi
 CTableProp.prototype.put_CellsTextDirection = function(v){this.CellsTextDirection = v;};
 CTableProp.prototype.get_CellsNoWrap = function(){return this.CellsNoWrap;};
 CTableProp.prototype.put_CellsNoWrap = function(v){this.CellsNoWrap = v;};
+CTableProp.prototype.get_CellsWidth = function (){return this.CellsWidth;};
+CTableProp.prototype.put_CellsWidth = function (v){this.CellsWidth = v;};
+
 
 function CBorders (obj)
 {
@@ -4581,13 +4580,13 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
                     if(firstUrl) {
                         t.AddImageUrlAction(firstUrl, imgProp);
                     } else {
-                        t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                        t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
                     }
                 } else {
-                    t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                    t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
                 }
             } else {
-                t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
             }
             t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
         };
@@ -4900,13 +4899,13 @@ asc_docs_api.prototype.ImgApply = function(obj)
                                 fReplaceCallback(firstUrl);
                                 fApplyCallback();
                             } else {
-                                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                                oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
                             }
                         } else {
-                            oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                            oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
                         }
                     } else {
-                        oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
+                        oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
                     }
                     oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                 };
@@ -6350,6 +6349,17 @@ asc_docs_api.prototype.asc_GetViewRulers = function()
     return this.WordControl.m_bIsRuler;
 };
 
+asc_docs_api.prototype.asc_SetDocumentUnits = function(_units)
+{
+    if (this.WordControl && this.WordControl.m_oHorRuler && this.WordControl.m_oVerRuler)
+    {
+        this.WordControl.m_oHorRuler.Units = _units;
+        this.WordControl.m_oVerRuler.Units = _units;
+        this.WordControl.UpdateHorRulerBack(true);
+        this.WordControl.UpdateVerRulerBack(true);
+    }
+};
+
 asc_docs_api.prototype.SetMobileVersion = function(val)
 {
     this.isMobileVersion = val;
@@ -6699,7 +6709,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
 	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error) {
-			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
+			t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.Critical);
 			return;
 		}
 
@@ -6805,16 +6815,16 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     var fCallback = null;
     if (!options.isNoCallback) {
         fCallback = function (input) {
-          var error = c_oAscError.ID.Unknown;
+          var error = Asc.c_oAscError.ID.Unknown;
           //input = {'type': command, 'status': 'err', 'data': -80};
           if (null != input && command == input['type']) {
             if ('ok' == input['status']){
               if (options.isNoUrl) {
-                error = c_oAscError.ID.No;
+                error = Asc.c_oAscError.ID.No;
               } else {
                 var url = input['data'];
                 if (url) {
-                  error = c_oAscError.ID.No;
+                  error = Asc.c_oAscError.ID.No;
                   editor.processSavedFile(url, options.downloadType);
                 }
               }
@@ -6822,8 +6832,8 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
               error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
             }
           }
-          if (c_oAscError.ID.No != error) {
-            editor.asc_fireCallback('asc_onError', options.errorDirect || error, c_oAscError.Level.NoCritical);
+          if (Asc.c_oAscError.ID.No != error) {
+            editor.asc_fireCallback('asc_onError', options.errorDirect || error, Asc.c_oAscError.Level.NoCritical);
           }
           // Меняем тип состояния (на никакое)
           editor.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
@@ -7148,7 +7158,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
             this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
         }
         else
-            this.asc_fireCallback("asc_onError", c_oAscError.ID.MobileUnexpectedCharCount, c_oAscError.Level.Critical);
+            this.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.MobileUnexpectedCharCount, Asc.c_oAscError.Level.Critical);
     }
     else
     {
@@ -7161,16 +7171,16 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
             this.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
         }
         else
-            this.asc_fireCallback("asc_onError",c_oAscError.ID.MobileUnexpectedCharCount,c_oAscError.Level.Critical);
+            this.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.MobileUnexpectedCharCount,Asc.c_oAscError.Level.Critical);
     }
 
     if (window["NATIVE_EDITOR_ENJINE"] === true && undefined != window["native"])
     {
-        window["CDocsCoApi"].prototype.askSaveChanges = function(callback)
+      Asc.CDocsCoApi.prototype.askSaveChanges = function(callback)
         {
             callback({"saveLock": false});
         };
-        window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+      Asc.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
         {
             if (window["native"]["SaveChanges"])
                 window["native"]["SaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);

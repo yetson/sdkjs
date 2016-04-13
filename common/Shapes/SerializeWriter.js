@@ -2364,10 +2364,16 @@ function CBinaryFileWriter()
                     oThis.EndRecord();
                 }
 
-                if (true === fill.tile)
+                if (null != fill.tile)
                 {
                     oThis.StartRecord(2);
                     oThis.WriteUChar(g_nodeAttributeStart);
+                    oThis._WriteInt2(0, fill.tile.sx);
+                    oThis._WriteInt2(1, fill.tile.sy);
+                    oThis._WriteInt2(2, fill.tile.tx);
+                    oThis._WriteInt2(3, fill.tile.ty);
+                    oThis._WriteLimit2(4, fill.tile.algn);
+                    oThis._WriteLimit2(5, fill.tile.flip);
                     oThis.WriteUChar(g_nodeAttributeEnd);
                     oThis.EndRecord();
                 }

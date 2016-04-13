@@ -287,7 +287,8 @@ CTable.prototype =
             var Border_insideH = null;
             var Border_insideV = null;
 
-            var CellShd = null;
+            var CellShd   = null;
+            var CellWidth = undefined;
 
             var Prev_row = -1;
             var bFirstRow = true;
@@ -300,10 +301,11 @@ CTable.prototype =
             {
                 var Pos = this.Selection.Data[Index];
                 var Row = this.Content[Pos.Row];
-                var Cell = Row.Get_Cell( Pos.Cell );
+                var Cell        = Row.Get_Cell( Pos.Cell );
                 var Cell_borders = Cell.Get_Borders();
                 var Cell_margins = Cell.Get_Margins();
-                var Cell_shd = Cell.Get_Shd();
+                var Cell_shd     = Cell.Get_Shd();
+                var Cell_w       = Cell.Get_W();
 
                 if ( 0 === Index )
                 {
@@ -331,6 +333,22 @@ CTable.prototype =
                 {
                     if ( null != CellShd && ( CellShd.Value != Cell_shd.Value || CellShd.Color.r != Cell_shd.Color.r || CellShd.Color.g != Cell_shd.Color.g || CellShd.Color.b != Cell_shd.Color.b ) )
                         CellShd = null;
+                }
+
+                if (0 === Index)
+                {
+                    if (tblwidth_Auto === Cell_w.Type)
+                        CellWidth = null;
+                    else if (tblwidth_Mm === Cell_w.Type)
+                        CellWidth = Cell_w.W;
+                    else// if (tblwidth_Pct === Cell_w.Type)
+                        CellWidth = -Cell_w.W;
+                }
+                else
+                {
+                    if ((tblwidth_Auto === Cell_w.Type && null !== CellWidth)
+                        || (undefined === CellWidth || null === CellWidth || Math.abs(CellWidth - Cell_w.W) > 0.001))
+                        CellWidth = undefined;
                 }
 
                 // Крайняя левая ли данная ячейка в выделении?
@@ -442,6 +460,7 @@ CTable.prototype =
             Pr.CellsVAlign        = VAlign;
             Pr.CellsTextDirection = TextDirection;
             Pr.CellsNoWrap        = NoWrap;
+            Pr.CellsWidth         = CellWidth;
 
             Pr.CellBorders =
             {
@@ -489,6 +508,7 @@ CTable.prototype =
             var CellMargins = Cell.Get_Margins();
             var CellBorders = Cell.Get_Borders();
             var CellShd     = Cell.Get_Shd();
+            var CellW       = Cell.Get_W();
 
             if ( true === Cell.Is_TableMargins() )
             {
@@ -515,6 +535,12 @@ CTable.prototype =
 
             Pr.CellsBackground = CellShd.Copy();
 
+            if (tblwidth_Auto === CellW.Type)
+                Pr.CellsWidth = null;
+            else if (tblwidth_Mm === CellW.Type)
+                Pr.CellsWidth = CellW.W;
+            else// if (tblwidth_Pct === CellW.Type)
+                Pr.CellsWidth = -CellW.W;
 
             var Spacing = this.Content[0].Get_CellSpacing();
             if ( null === Spacing )
@@ -1935,6 +1961,36 @@ CTable.prototype =
             }
         }
 
+        // CellsWidth
+        if (undefined !== Props.CellsWidth)
+        {
+            if (this.Selection.Use === true && table_Selection_Cell === this.Selection.Type)
+            {
+                var Count = this.Selection.Data.length;
+                for (var Index = 0; Index < Count; ++Index)
+                {
+                    var Pos  = this.Selection.Data[Index];
+                    var Cell = this.Content[Pos.Row].Get_Cell(Pos.Cell);
+
+                    if (null === Props.CellsWidth)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
+                    else if (Props.CellsWidth > -0.001)
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                    else
+                        Cell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+                }
+            }
+            else
+            {
+                if (null === Props.CellsWidth)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Auto, 0));
+                else if (Props.CellsWidth > -0.001)
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Mm, Props.CellsWidth));
+                else
+                    this.CurCell.Set_W(new CTableMeasurement(tblwidth_Pct, Math.abs(Props.CellsWidth)));
+            }
+        }
+
         return true;
     },
 
@@ -3230,6 +3286,8 @@ CTable.prototype =
         {
             if (true != this.Is_EmptyPage(CurPage))
                 break;
+
+            CurPage++;
         }
 
         this.private_StartTrackTable(CurPage);
@@ -6403,7 +6461,7 @@ CTable.prototype =
         // При селекте внутри ячейки мы селектим содержимое ячейки
         if (0 === this.Parent.Selection_Is_OneElement() && this.Selection.StartPos.Pos.Row === this.Selection.EndPos.Pos.Row && this.Selection.StartPos.Pos.Cell === this.Selection.EndPos.Pos.Cell)
         {
-            this.CurCell.Content_Selection_SetStart(this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex, this.Selection.StartPos.MouseEvent);
+            this.CurCell.Content_Selection_SetStart(this.Selection.StartPos.X, this.Selection.StartPos.Y, this.Selection.StartPos.PageIndex - this.CurCell.Content.Get_StartPage_Relative(), this.Selection.StartPos.MouseEvent);
 
             this.Selection.Type = table_Selection_Text;
 
@@ -9712,18 +9770,21 @@ CTable.prototype =
         return { Grid_start : Grid_start, Grid_end : Grid_end, RowsInfo : RowsInfo, bCanMerge : bCanMerge };
     },
 
-    // Объединяем заселекченные ячейки
-    Cell_Merge : function()
+    /**
+     * Объединяем выделенные ячейки таблицы.
+     * @param isClearMerge - используем или нет рассчетные данные (true - не используем, false - default value)
+     */
+    Cell_Merge : function(isClearMerge)
     {
         var bApplyToInnerTable = false;
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             bApplyToInnerTable = this.CurCell.Content.Table_MergeCells();
 
         if ( true === bApplyToInnerTable )
-            return;
+            return false;
 
         if ( true != this.Selection.Use || table_Selection_Cell != this.Selection.Type || this.Selection.Data.length <= 1 )
-            return;
+            return false;
 
         // В массиве this.Selection.Data идет список ячеек по строкам (без разрывов)
         // Перед объединением мы должны проверить совпадают ли начальная и конечная колонки
@@ -9735,7 +9796,7 @@ CTable.prototype =
         var RowsInfo   = Temp.RowsInfo;
 
         if ( false === bCanMerge )
-            return;
+            return false;
 
         // Объединяем содержимое всех ячеек в левую верхнюю ячейку. (Все выделенные
         // ячейки идут у нас последовательно, начиная с левой верхней), и объединяем
@@ -9758,13 +9819,16 @@ CTable.prototype =
             }
         }
 
-        // Выставим ширину результируещей ячейки
-        var SumW = 0;
-        for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+        if (true !== isClearMerge)
         {
-            SumW += this.TableGridCalc[CurGridCol];
+            // Выставим ширину результируещей ячейки
+            var SumW = 0;
+            for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+            {
+                SumW += this.TableGridCalc[CurGridCol];
+            }
+            Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
         }
-        Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
 
         // Теперь нам надо удалить лишние ячейки и добавить ячейки с
         // вертикальным объединением.
@@ -9798,16 +9862,9 @@ CTable.prototype =
             }
         }
 
-        // У ряда, который содержит полученную ячейку мы выставляем минимальную высоту
-        // сумму высот объединенных строк.
-        //var Summary_VMerge = this.Internal_GetVertMergeCount( Pos_tl.Row, Grid_start, Grid_end - Grid_start + 1 );
-        //var Summary_Height = this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].H + this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].Y - this.RowsInfo[Pos_tl.Row].Y;
-
         // Удаляем лишние строки
-        this.Internal_Check_TableRows(true);
-
-        var PageNum = 0;
-        for ( PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
+        this.Internal_Check_TableRows(true !== isClearMerge ? true : false);
+        for (var PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
         {
             if ( Pos_tl.Row <= this.Pages[PageNum + 1].FirstRow )
                 break;
@@ -9821,9 +9878,14 @@ CTable.prototype =
         this.Selection.Data = [ Pos_tl ];
 
         this.CurCell = Cell_tl;
-        
-        // Запускаем пересчет
-        this.Internal_Recalculate_1();
+
+        if (true !== isClearMerge)
+        {
+            // Запускаем пересчет
+            this.Internal_Recalculate_1();
+        }
+
+        return true;
     },
 
     // Разделяем текущую ячейку
@@ -9878,7 +9940,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Rows must be between 1 and " + VMerge_count
                 var ErrData = new CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
+                editor.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.SplitCellMaxRows,Asc.c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
             else if ( 0 != VMerge_count % Rows )
@@ -9886,7 +9948,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value must be a divisor of the number " + VMerge_count
                 var ErrData = new CErrorData();
                 ErrData.put_Value( VMerge_count );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
+                editor.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.SplitCellRowsDivider,Asc.c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }
@@ -9912,7 +9974,7 @@ CTable.prototype =
                 // Сообщение об ошибке : "Value Cols must be a between 1 and " + MaxCols
                 var ErrData = new CErrorData();
                 ErrData.put_Value( MaxCols );
-                editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
+                editor.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.SplitCellMaxCols,Asc.c_oAscError.Level.NoCritical, ErrData );
                 return false;
             }
         }
@@ -13257,6 +13319,24 @@ CTable.prototype.Is_TableFirstRowOnNewPage = function(CurRow)
     }
 
     return false;
+};
+CTable.prototype.private_UpdateCellsGrid = function()
+{
+    for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+    {
+        var Row        = this.Content[nCurRow];
+        var BeforeInfo = Row.Get_Before();
+        var CurGridCol = BeforeInfo.GridBefore;
+
+        for (var nCurCell = 0, nCellsCount = Row.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+        {
+            var Cell = Row.Get_Cell(nCurCell);
+            var GridSpan = Cell.Get_GridSpan();
+            Cell.Set_Metrics(CurGridCol, 0, 0, 0, 0, 0, 0);
+            Row.Update_CellInfo(nCurCell);
+            CurGridCol += GridSpan;
+        }
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

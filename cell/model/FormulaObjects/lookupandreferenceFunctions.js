@@ -24,19 +24,18 @@
 */
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
- */
-
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 function _getRowTitle( row ) {
     return "" + (row + 1);
 }
 
-cFormulaFunctionGroup['LookupAndReference'] = [
+cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
+cFormulaFunctionGroup['LookupAndReference'].push(
     cADDRESS,
     cAREAS,
     cCHOOSE,
@@ -54,11 +53,8 @@ cFormulaFunctionGroup['LookupAndReference'] = [
     cROWS,
     cRTD,
     cTRANSPOSE,
-    cVLOOKUP,
-
-    /*new funcions with _xlnf-prefix*/
-    cFORMULATEXT
-];
+    cVLOOKUP
+);
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );
@@ -326,8 +322,6 @@ function cGETPIVOTDATA() {
 }
 
 cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype );
-
-var g_oHLOOKUPCache = new VHLOOKUPCache( true );
 
 function cHLOOKUP() {
 //    cBaseFunction.call( this, "HLOOKUP" );
@@ -1405,7 +1399,6 @@ VHLOOKUPCache.prototype.clean = function () {
     this.cacheId = {};
     this.cacheRanges = {};
 };
-var g_oVLOOKUPCache = new VHLOOKUPCache( false );
 
 function cVLOOKUP() {
 //    cBaseFunction.call( this, "VLOOKUP" );
@@ -1645,3 +1638,12 @@ cVLOOKUP.prototype.getInfo = function () {
         args:"( lookup-value  ,  table-array  ,  col-index-num  [  ,  [  range-lookup-flag  ] ] )"
     };
 };
+
+var g_oVLOOKUPCache = new VHLOOKUPCache( false );
+var g_oHLOOKUPCache = new VHLOOKUPCache( true );
+
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].g_oVLOOKUPCache = g_oVLOOKUPCache;
+window['AscCommonExcel'].g_oHLOOKUPCache = g_oHLOOKUPCache;
+})(window);

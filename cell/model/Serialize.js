@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -22,8 +22,8 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
-(function($, window, undefined) {
+"use strict";
+(function(window, undefined) {
 
     /** @enum */
     var c_oSerFormat = {
@@ -2608,7 +2608,7 @@
         this.WriteSheetViewPane = function (oPane) {
             var oThis = this;
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();
@@ -6179,7 +6179,7 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Comment == type )
             {
-                var oCommentCoords = new Asc.asc_CCommentCoords();
+                var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
@@ -8108,4 +8108,4 @@
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 }
-    )(jQuery, window);
+    )(window);

@@ -24,27 +24,22 @@
 */
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:22
- * To change this template use File | Settings | File Templates.
- */
-
-cFormulaFunctionGroup['Logical'] = [
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+cFormulaFunctionGroup['Logical'] = cFormulaFunctionGroup['Logical'] || [];
+cFormulaFunctionGroup['Logical'].push(
     cAND,
     cFALSE,
     cIF,
     cIFERROR,
     cNOT,
     cOR,
-    cTRUE,
-
-    /*new funcions with _xlnf-prefix*/
-    cIFNA,
-    cXOR
-];
+    cTRUE
+);
 
 function cAND() {
 //    cBaseFunction.call( this, "AND" );
@@ -452,3 +447,4 @@ cTRUE.prototype.getInfo = function () {
         args:"()"
     };
 };
+})(window);

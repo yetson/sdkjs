@@ -2517,11 +2517,20 @@ CDocument.prototype =
 
         if (true === this.RecalcInfo.Can_RecalcObject())
         {
-            Element.Set_DocumentIndex(Index);
-            Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+            var ElementPageIndex = 0;
+            if ((0 === Index && 0 === PageIndex) || Index != StartIndex || (Index === StartIndex && true === bResetStartElement))
+            {
+                Element.Set_DocumentIndex(Index);
+                Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+                ElementPageIndex = 0;
+            }
+            else
+            {
+                ElementPageIndex = PageIndex - Element.PageNum;
+            }
 
-            var TempRecalcResult = Element.Recalculate_Page(0);
-            this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
+            var TempRecalcResult = Element.Recalculate_Page(ElementPageIndex);
+            this.RecalcInfo.Set_FlowObject(Element, ElementPageIndex, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
 
             if (((0 === Index && 0 === PageIndex) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage() && true !== isColumns)
             {
@@ -11093,7 +11102,7 @@ CDocument.prototype =
             }
             else // Ctrl + P - print
             {
-                this.DrawingDocument.m_oWordControl.m_oApi.asc_Print();
+                this.DrawingDocument.m_oWordControl.m_oApi.onPrint();
                 bRetValue = keydownresult_PreventAll;
             }
         }
@@ -11207,6 +11216,12 @@ CDocument.prototype =
             bUpdateSelection = false;
             bRetValue = keydownresult_PreventAll;
         }
+        //else if (e.KeyCode === 113)
+        //{
+        //    // Для теста
+        //    TEST_BUILDER();
+        //    bRetValue = keydownresult_PreventAll;
+        //}
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
             var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -11776,7 +11791,7 @@ CDocument.prototype =
         return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
     },
 
-    Internal_Content_Add : function(Position, NewObject)
+    Internal_Content_Add : function(Position, NewObject, bDoNotCheckLastElement)
     {
         // Position = this.Content.length  допускается
         if ( Position < 0 || Position > this.Content.length )
@@ -11811,7 +11826,7 @@ CDocument.prototype =
         this.Check_SectionLastParagraph();
 
         // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
+        if ( type_Table == this.Content[this.Content.length - 1].GetType() && true !== bDoNotCheckLastElement)
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
 
         // Запоминаем, что нам нужно произвести переиндексацию элементов
@@ -16420,6 +16435,15 @@ CDocument.prototype.Get_SectionProps = function()
     var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
     return new CDocumentSectionProps(SectPr);
+};
+CDocument.prototype.Get_FirstParagraph = function()
+{
+    if (type_Paragraph == this.Content[0].GetType())
+        return this.Content[0];
+    else if (type_Table == this.Content[0].GetType())
+        return this.Content[0].Get_FirstParagraph();
+
+    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

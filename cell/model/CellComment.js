@@ -22,19 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
-/* CellComment.js
-*
-* Author: Dmitry Vikulov
-* Date:   06/02/2013
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
 */
-
-//-----------------------------------------------------------------------------------
-// CommentCoords
-//-----------------------------------------------------------------------------------
-
-//{ ASC Classes
+function (window, undefined) {
 /** @constructor */
 function asc_CCommentCoords(obj) {
 
@@ -92,8 +87,6 @@ function asc_CCommentCoords(obj) {
 		this.bSizeWithCells = obj.bSizeWithCells;
 	}
 }
-
-// Prototype
 asc_CCommentCoords.prototype = {
 
 	asc_setRow: function(val) { this.nRow = val; },
@@ -160,30 +153,24 @@ asc_CCommentCoords.prototype = {
 	asc_getSizeWithCells: function() { return this.bSizeWithCells; }
 };
 
-window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCommentCoords;
-
-//-----------------------------------------------------------------------------------
-// CommentData
-//-----------------------------------------------------------------------------------
-var g_oCCommentDataProperties = {
-	wsId: 0,
-	nCol: 1,
-	nRow: 2,
-	nId: 3,
-	nLevel: 5,
-	sText: 6,
-	sQuoteText: 7,
-	sTime: 8,
-	sUserId: 9,
-	sUserName: 10,
-	bDocument: 11,
-	bSolved: 12,
-	aReplies: 13,
-	bHidden: 14
-};
 /** @constructor */
 function asc_CCommentData(obj) {
-	this.Properties = g_oCCommentDataProperties;
+	this.Properties = {
+		wsId: 0,
+		nCol: 1,
+		nRow: 2,
+		nId: 3,
+		nLevel: 5,
+		sText: 6,
+		sQuoteText: 7,
+		sTime: 8,
+		sUserId: 9,
+		sUserName: 10,
+		bDocument: 11,
+		bSolved: 12,
+		aReplies: 13,
+		bHidden: 14
+	};
 
 	this.bHidden = false;
 	this.wsId = null;
@@ -228,8 +215,6 @@ function asc_CCommentData(obj) {
 		}
 	}
 }
-
-// Prototype
 asc_CCommentData.prototype = {
 	guid: function () {
 		function S4() {
@@ -360,71 +345,15 @@ asc_CCommentData.prototype = {
 	}
 };
 
-window["Asc"]["asc_CCommentData"] = window["Asc"].asc_CCommentData = asc_CCommentData;
-prot = asc_CCommentData.prototype;
-
-prot["asc_putRow"] = prot.asc_putRow;
-prot["asc_getRow"] = prot.asc_getRow;
-
-prot["asc_putCol"] = prot.asc_putCol;
-prot["asc_getCol"] = prot.asc_getCol;
-
-prot["asc_putId"] = prot.asc_putId;
-prot["asc_getId"] = prot.asc_getId;
-
-prot["asc_putLevel"] = prot.asc_putLevel;
-prot["asc_getLevel"] = prot.asc_getLevel;
-
-prot["asc_putParent"] = prot.asc_putParent;
-prot["asc_getParent"] = prot.asc_getParent;
-
-prot["asc_putText"] = prot.asc_putText;
-prot["asc_getText"] = prot.asc_getText;
-
-prot["asc_putQuoteText"] = prot.asc_putQuoteText;
-prot["asc_getQuoteText"] = prot.asc_getQuoteText;
-
-prot["asc_putTime"] = prot.asc_putTime;
-prot["asc_getTime"] = prot.asc_getTime;
-
-prot["asc_putUserId"] = prot.asc_putUserId;
-prot["asc_getUserId"] = prot.asc_getUserId;
-
-prot["asc_putUserName"] = prot.asc_putUserName;
-prot["asc_getUserName"] = prot.asc_getUserName;
-
-prot["asc_putDocumentFlag"] = prot.asc_putDocumentFlag;
-prot["asc_getDocumentFlag"] = prot.asc_getDocumentFlag;
-
-prot["asc_putHiddenFlag"] = prot.asc_putHiddenFlag;
-prot["asc_getHiddenFlag"] = prot.asc_getHiddenFlag;
-
-prot["asc_putSolved"] = prot.asc_putSolved;
-prot["asc_getSolved"] = prot.asc_getSolved;
-
-prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
-prot["asc_getReply"] = prot.asc_getReply;
-
-prot["asc_addReply"] = prot.asc_addReply;
-
-prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
-
-//}
-
-//-----------------------------------------------------------------------------------
-// CompositeCommentData
-//-----------------------------------------------------------------------------------
-var g_oCompositeCommentDataProperties = {
-		commentBefore: 0,
-		commentAfter: 1
-	};
 function CompositeCommentData() {
 	this.commentBefore = null;
 	this.commentAfter = null;
 
-	this.Properties = g_oCompositeCommentDataProperties;
+	this.Properties = {
+		commentBefore: 0,
+		commentAfter: 1
+	};
 }
-
 CompositeCommentData.prototype = {
 	//	For collaborative editing
 	getType: function() {
@@ -451,9 +380,6 @@ CompositeCommentData.prototype = {
 	}
 };
 
-//-----------------------------------------------------------------------------------
-// CellCommentator
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function CCellCommentator(currentSheet) {
 	this.worksheet = currentSheet;
@@ -491,7 +417,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 		if (!oComment.bDocument)
 			sheetId += this.worksheet.model.getId();
 
-		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null,
 			sheetId, objectGuid);
 
 		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
@@ -700,7 +626,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 	var i, comment;
 	if (bInsert) {
 		switch (operType) {
-			case c_oAscInsertOptions.InsertCellsAndShiftDown:
+			case Asc.c_oAscInsertOptions.InsertCellsAndShiftDown:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow >= updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -710,7 +636,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertCellsAndShiftRight:
+			case Asc.c_oAscInsertOptions.InsertCellsAndShiftRight:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol >= updateRange.c1) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -720,7 +646,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertColumns:
+			case Asc.c_oAscInsertOptions.InsertColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol >= updateRange.c1) {
@@ -730,7 +656,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscInsertOptions.InsertRows:
+			case Asc.c_oAscInsertOptions.InsertRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow >= updateRange.r1) {
@@ -742,7 +668,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 		}
 	} else {
 		switch (operType) {
-			case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nRow > updateRange.r1) && (comment.nCol >= updateRange.c1) && (comment.nCol <= updateRange.c2)) {
@@ -754,7 +680,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+			case Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if ((comment.nCol > updateRange.c2) && (comment.nRow >= updateRange.r1) && (comment.nRow <= updateRange.r2)) {
@@ -766,7 +692,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteColumns:
+			case Asc.c_oAscDeleteOptions.DeleteColumns:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nCol > updateRange.c2) {
@@ -778,7 +704,7 @@ CCellCommentator.prototype.updateCommentsDependencies = function(bInsert, operTy
 				}
 				break;
 
-			case c_oAscDeleteOptions.DeleteRows:
+			case Asc.c_oAscDeleteOptions.DeleteRows:
 				for (i = 0; i < this.aComments.length; i++) {
 					comment = new asc_CCommentData(this.aComments[i]);
 					if (comment.nRow > updateRange.r2) {
@@ -1540,3 +1466,43 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			break;
 	}
 };
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window["AscCommonExcel"].asc_CCommentCoords = asc_CCommentCoords;
+	window["AscCommonExcel"].CCellCommentator = CCellCommentator;
+
+	window['Asc'] = window['Asc'] || {};
+	window["Asc"]["asc_CCommentData"] = window["Asc"].asc_CCommentData = asc_CCommentData;
+	prot = asc_CCommentData.prototype;
+	prot["asc_putRow"] = prot.asc_putRow;
+	prot["asc_getRow"] = prot.asc_getRow;
+	prot["asc_putCol"] = prot.asc_putCol;
+	prot["asc_getCol"] = prot.asc_getCol;
+	prot["asc_putId"] = prot.asc_putId;
+	prot["asc_getId"] = prot.asc_getId;
+	prot["asc_putLevel"] = prot.asc_putLevel;
+	prot["asc_getLevel"] = prot.asc_getLevel;
+	prot["asc_putParent"] = prot.asc_putParent;
+	prot["asc_getParent"] = prot.asc_getParent;
+	prot["asc_putText"] = prot.asc_putText;
+	prot["asc_getText"] = prot.asc_getText;
+	prot["asc_putQuoteText"] = prot.asc_putQuoteText;
+	prot["asc_getQuoteText"] = prot.asc_getQuoteText;
+	prot["asc_putTime"] = prot.asc_putTime;
+	prot["asc_getTime"] = prot.asc_getTime;
+	prot["asc_putUserId"] = prot.asc_putUserId;
+	prot["asc_getUserId"] = prot.asc_getUserId;
+	prot["asc_putUserName"] = prot.asc_putUserName;
+	prot["asc_getUserName"] = prot.asc_getUserName;
+	prot["asc_putDocumentFlag"] = prot.asc_putDocumentFlag;
+	prot["asc_getDocumentFlag"] = prot.asc_getDocumentFlag;
+	prot["asc_putHiddenFlag"] = prot.asc_putHiddenFlag;
+	prot["asc_getHiddenFlag"] = prot.asc_getHiddenFlag;
+	prot["asc_putSolved"] = prot.asc_putSolved;
+	prot["asc_getSolved"] = prot.asc_getSolved;
+	prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
+	prot["asc_getReply"] = prot.asc_getReply;
+	prot["asc_addReply"] = prot.asc_addReply;
+	prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
+})(window);

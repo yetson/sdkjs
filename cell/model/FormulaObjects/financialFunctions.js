@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 var startRangeCurrentDateSystem = 1;
 
 function getPMT( rate, nper, pv, fv, flag ) {
@@ -217,17 +223,17 @@ function lcl_GetCoupncd( settl, matur, freq ) {
 
 function getcoupdaybs( settl, matur, frequency, basis ) {
     var n = lcl_GetCouppcd( settl, matur, frequency );
-    return diffDate( n, settl, basis );
+    return AscCommonExcel.diffDate( n, settl, basis );
 }
 
 function getcoupdays( settl, matur, frequency, basis ) {
-    if ( basis == DayCountBasis.ActualActual ) {
+    if ( basis == AscCommonExcel.DayCountBasis.ActualActual ) {
         var m = lcl_GetCouppcd( settl, matur, frequency ),
             n = new Date( m );
         n.addMonths( 12 / frequency );
-        return diffDate( m, n, basis );
+        return AscCommonExcel.diffDate( m, n, basis );
     }
-    return new cNumber( daysInYear( 0, basis ) / frequency );
+    return new cNumber( AscCommonExcel.daysInYear( 0, basis ) / frequency );
 }
 
 function getcoupnum( settl, matur, frequency ) {
@@ -241,7 +247,7 @@ function getcoupdaysnc( settl, matur, frequency, basis ) {
     if ( (basis !== 0) && (basis !== 4) ) {
 
         lcl_GetCoupncd( settl, matur, frequency );
-        return diffDate( settl, matur, basis );
+        return AscCommonExcel.diffDate( settl, matur, basis );
 
     }
 
@@ -324,9 +330,9 @@ function getYield( settle, mat, coup, price, redemp, freq, base ) {
 
 function getyieldmat( settle, mat, issue, rate, price, base ) {
 
-    var issMat = yearFrac( issue, mat, base );
-    var issSet = yearFrac( issue, settle, base );
-    var setMat = yearFrac( settle, mat, base );
+    var issMat = AscCommonExcel.yearFrac( issue, mat, base );
+    var issSet = AscCommonExcel.yearFrac( issue, settle, base );
+    var setMat = AscCommonExcel.yearFrac( settle, mat, base );
 
     var y = (1 + issMat * rate) / (price / 100 + issSet * rate) - 1;
     y /= setMat;
@@ -368,7 +374,7 @@ function getduration( settlement, maturity, coupon, yld, frequency, basis ) {
 
 function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequency, basis ) {
     function positiveDaysBetween( d1, d2, b ) {
-        var res = diffDate( d1, d2, b ).getValue();
+        var res = AscCommonExcel.diffDate( d1, d2, b ).getValue();
         return res > 0 ? res : 0;
     }
 
@@ -431,7 +437,7 @@ function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequen
         for ( var index = nc; index >= 1; index-- ) {
 
             earlyCoupon = addMonth( lateCoupon, numMonthsNeg, false );
-            NLi = basis == DayCountBasis.ActualActual ? positiveDaysBetween( earlyCoupon, lateCoupon, basis ) : E;
+            NLi = basis == AscCommonExcel.DayCountBasis.ActualActual ? positiveDaysBetween( earlyCoupon, lateCoupon, basis ) : E;
             DCi = index > 1 ? NLi : positiveDaysBetween( iss, lateCoupon, basis );
             startDate = iss > earlyCoupon ? iss : earlyCoupon;
             endDate = settl < lateCoupon ? settl : lateCoupon;
@@ -441,11 +447,11 @@ function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequen
 
         }
 
-        if ( basis == DayCountBasis.Actual360 || basis == DayCountBasis.Actual365 ) {
+        if ( basis == AscCommonExcel.DayCountBasis.Actual360 || basis == AscCommonExcel.DayCountBasis.Actual365 ) {
             DSC = positiveDaysBetween( settl, getcoupncd( settl, firstCoup, frequency ), basis );
         }
         else {
-            DSC = E - diffDate( lcl_GetCouppcd( settl, firstCoup, frequency ), settl, basis );
+            DSC = E - AscCommonExcel.diffDate( lcl_GetCouppcd( settl, firstCoup, frequency ), settl, basis );
         }
 
         var Nq = coupNumber( firstCoup, settl, numMonths, true );
@@ -468,14 +474,8 @@ function oddFPrice( settl, matur, iss, firstCoup, rate, yld, redemption, frequen
     return res;
 }
 
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:19
- * To change this template use File | Settings | File Templates.
- */
-cFormulaFunctionGroup['Financial'] = [
+cFormulaFunctionGroup['Financial'] = cFormulaFunctionGroup['Financial'] || [];
+cFormulaFunctionGroup['Financial'].push(
     cACCRINT,
     cACCRINTM,
     cAMORDEGRC,
@@ -528,12 +528,8 @@ cFormulaFunctionGroup['Financial'] = [
     cXNPV,
     cYIELD,
     cYIELDDISC,
-    cYIELDMAT,
-
-    /*new funcions with _xlnf-prefix*/
-    cPDURATION,
-    cRRI
-];
+    cYIELDMAT
+);
 
 function cACCRINT() {
 //    cBaseFunction.call( this, "ACCRINT" );
@@ -679,7 +675,7 @@ cACCRINT.prototype.Calculate = function ( arg ) {
     }
 
     firstDate = new Date( iss > coupPCD ? iss : coupPCD );
-    days = days360( firstDate, settl, basis );
+    days = AscCommonExcel.days360( firstDate, settl, basis );
     coupDays = getcoupdays( coupPCD, fInter, frequency, basis ).getValue();
     res = days / coupDays;
     startDate = new Date( coupPCD );
@@ -689,13 +685,13 @@ cACCRINT.prototype.Calculate = function ( arg ) {
         endDate = startDate;
         startDate = addMonth( startDate, numMonthsNeg, endMonth );
         firstDate = iss > startDate ? iss : startDate;
-        if ( basis == DayCountBasis.UsPsa30_360 ) {
-            days = days360( firstDate, endDate, !( iss > startDate ) );
+        if ( basis == AscCommonExcel.DayCountBasis.UsPsa30_360 ) {
+            days = AscCommonExcel.days360( firstDate, endDate, !( iss > startDate ) );
             coupDays = getcoupdays( startDate, endDate, frequency, basis ).getValue();
         }
         else {
-            days = diffDate( firstDate, endDate, basis ).getValue();
-            coupDays = ( basis == DayCountBasis.Actual365 ) ? ( 365 / frequency ) : diffDate( startDate, endDate, basis ).getValue();
+            days = AscCommonExcel.diffDate( firstDate, endDate, basis ).getValue();
+            coupDays = ( basis == AscCommonExcel.DayCountBasis.Actual365 ) ? ( 365 / frequency ) : AscCommonExcel.diffDate( startDate, endDate, basis ).getValue();
         }
 
         res += (iss <= startDate) ? calcMethod : days / coupDays;
@@ -792,7 +788,7 @@ cACCRINTM.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = yearFrac( Date.prototype.getDateFromExcel( issue ), Date.prototype.getDateFromExcel( settlement ), basis );
+    var res = AscCommonExcel.yearFrac( Date.prototype.getDateFromExcel( issue ), Date.prototype.getDateFromExcel( settlement ), basis );
 
     res *= rate * par;
 
@@ -949,7 +945,7 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
 
     function firstDeprLinc( cost, datePurch, firstP, salvage, rate, per, basis){
         function fix29February (d){
-            if ( (basis == DayCountBasis.ActualActual || basis == DayCountBasis.Actual365) && d.isLeapYear() && d.getUTCMonth() == 2 && d.getUTCDate() >= 28){
+            if ( (basis == AscCommonExcel.DayCountBasis.ActualActual || basis == AscCommonExcel.DayCountBasis.Actual365) && d.isLeapYear() && d.getUTCMonth() == 2 && d.getUTCDate() >= 28){
                 return new Date(d.getUTCFullYear(), d.getUTCMonth(), 28);
             }
             else{
@@ -957,8 +953,8 @@ cAMORDEGRC.prototype.Calculate = function ( arg ) {
             }
         }
 
-        var firstLen = diffDate( fix29February (datePurch), fix29February(firstP), basis),
-            firstDeprTemp = firstLen / daysInYear( datePurch, basis ) * rate * cost,
+        var firstLen = AscCommonExcel.diffDate( fix29February (datePurch), fix29February(firstP), basis),
+            firstDeprTemp = firstLen / AscCommonExcel.daysInYear( datePurch, basis ) * rate * cost,
             firstDepr = firstDeprTemp == 0 ? cost * rate : firstDeprTemp,
             period = firstDeprTemp == 0 ? per : per + 1,
             availDepr = cost - salvage;
@@ -1121,7 +1117,7 @@ cAMORLINC.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var fDepTime = yearFrac( val0, val1, basis ).getValue() * rate * cost,
+    var fDepTime = AscCommonExcel.yearFrac( val0, val1, basis ).getValue() * rate * cost,
         fDep, depr = rate * cost, availDepr, availDeprTemp,
         countedPeriod = 1, c = 0, maxIter = 10000;
 
@@ -2220,7 +2216,7 @@ cDISC.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = ( 1 - pr / redemption ) / yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
+    var res = ( 1 - pr / redemption ) / AscCommonExcel.yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
 
     this.value = new cNumber( res );
 //    this.value.numFormat = 9;
@@ -2779,7 +2775,7 @@ cINTRATE.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = ( ( redemption / investment ) - 1 ) / yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
+    var res = ( ( redemption / investment ) - 1 ) / AscCommonExcel.yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis );
 
     this.value = new cNumber( res );
     this.value.numFormat = 10;
@@ -3873,7 +3869,7 @@ cODDFYIELD.prototype.Calculate = function ( arg ) {
         iss = Date.prototype.getDateFromExcel( issue ),
         firstCoup = Date.prototype.getDateFromExcel( first_coupon );
 
-    var years = diffDate( settl, matur, basis ),
+    var years = AscCommonExcel.diffDate( settl, matur, basis ),
         px = pr - 100,
         num = rate * years * 100 - px,
         denum = px * 0.25 * ( 1 + 2 * years ) + years * 100,
@@ -4081,9 +4077,9 @@ cODDLPRICE.prototype.Calculate = function ( arg ) {
         matur = Date.prototype.getDateFromExcel( maturity ),
         lastInt = Date.prototype.getDateFromExcel( last_interest );
 
-    var fDCi = yearFrac( lastInt, matur, basis ) * frequency;
-    var fDSCi = yearFrac( settl, matur, basis ) * frequency;
-    var fAi = yearFrac( lastInt, settl, basis ) * frequency;
+    var fDCi = AscCommonExcel.yearFrac( lastInt, matur, basis ) * frequency;
+    var fDSCi = AscCommonExcel.yearFrac( settl, matur, basis ) * frequency;
+    var fAi = AscCommonExcel.yearFrac( lastInt, settl, basis ) * frequency;
 
     var res = redemption + fDCi * 100 * rate / frequency;
     res /= fDSCi * yld / frequency + 1;
@@ -4224,9 +4220,9 @@ cODDLYIELD.prototype.Calculate = function ( arg ) {
         matur = Date.prototype.getDateFromExcel( maturity ),
         lastInt = Date.prototype.getDateFromExcel( last_interest );
 
-    var fDCi = yearFrac( lastInt, matur, basis ) * frequency;
-    var fDSCi = yearFrac( settl, matur, basis ) * frequency;
-    var fAi = yearFrac( lastInt, settl, basis ) * frequency;
+    var fDCi = AscCommonExcel.yearFrac( lastInt, matur, basis ) * frequency;
+    var fDSCi = AscCommonExcel.yearFrac( settl, matur, basis ) * frequency;
+    var fAi = AscCommonExcel.yearFrac( lastInt, settl, basis ) * frequency;
 
     var res = redemption + fDCi * 100 * rate / frequency;
     res /= pr + fAi * 100 * rate / frequency;
@@ -4656,7 +4652,7 @@ cPRICEDISC.prototype.Calculate = function ( arg ) {
     var settl = Date.prototype.getDateFromExcel( settlement ),
         matur = Date.prototype.getDateFromExcel( maturity );
 
-    var res = redemption * ( 1 - discount * yearFrac( settl, matur, basis ) );
+    var res = redemption * ( 1 - discount * AscCommonExcel.yearFrac( settl, matur, basis ) );
 
     return this.value = new cNumber( res );
 
@@ -4769,9 +4765,9 @@ cPRICEMAT.prototype.Calculate = function ( arg ) {
         matur = Date.prototype.getDateFromExcel( maturity ),
         iss = Date.prototype.getDateFromExcel( issue );
 
-    var fIssMat = yearFrac( new Date( iss ), new Date( matur ), basis );
-    var fIssSet = yearFrac( new Date( iss ), new Date( settl ), basis );
-    var fSetMat = yearFrac( new Date( settl ), new Date( matur ), basis );
+    var fIssMat = AscCommonExcel.yearFrac( new Date( iss ), new Date( matur ), basis );
+    var fIssSet = AscCommonExcel.yearFrac( new Date( iss ), new Date( settl ), basis );
+    var fSetMat = AscCommonExcel.yearFrac( new Date( settl ), new Date( matur ), basis );
 
     var res = 1 + fIssMat * rate;
     res /= 1 + fSetMat * yld;
@@ -5064,7 +5060,7 @@ cRECEIVED.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    var res = investment / ( 1 - ( discount * yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis ) ) );
+    var res = investment / ( 1 - ( discount * AscCommonExcel.yearFrac( Date.prototype.getDateFromExcel( settlement ), Date.prototype.getDateFromExcel( maturity ), basis ) ) );
 
     this.value = res >= 0 ? new cNumber( res ) : new cError( cErrorType.not_numeric );
 //    this.value.numFormat = 9;
@@ -5390,7 +5386,7 @@ cTBILLPRICE.prototype.Calculate = function ( arg ) {
         return this.value = new cError( cErrorType.not_numeric );
     }
 
-    discount *= diffDate( d1, d2, DayCountBasis.ActualActual );
+    discount *= AscCommonExcel.diffDate( d1, d2, AscCommonExcel.DayCountBasis.ActualActual );
 
     this.value = new cNumber( 100 * ( 1 - discount / 360 ) );
     return this.value;
@@ -6316,7 +6312,7 @@ cYIELDDISC.prototype.Calculate = function ( arg ) {
         matur = Date.prototype.getDateFromExcel( maturity );
 
     var fRet = ( redemption / pr ) - 1;
-    fRet /= yearFrac( settl, matur, basis );
+    fRet /= AscCommonExcel.yearFrac( settl, matur, basis );
 
     this.value = new cNumber( fRet );
     this.value.numFormat = 10;
@@ -6444,3 +6440,11 @@ cYIELDMAT.prototype.getInfo = function () {
     };
 };
 
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].getPMT = getPMT;
+window['AscCommonExcel'].getIPMT = getIPMT;
+window['AscCommonExcel'].getcoupdaybs = getcoupdaybs;getcoupdays
+window['AscCommonExcel'].getcoupdays = getcoupdays;getcoupnum
+window['AscCommonExcel'].getcoupnum = getcoupnum;
+})(window);

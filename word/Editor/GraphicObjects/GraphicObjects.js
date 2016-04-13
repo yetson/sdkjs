@@ -317,6 +317,30 @@ CGraphicObjects.prototype =
         return;
     },
 
+    createWatermarkImage: DrawingObjectsController.prototype.createWatermarkImage,
+
+
+
+    getTrialImage: function(sImageUrl)
+    {
+        return ExecuteNoHistory(function(){
+            var oParaDrawing = new ParaDrawing();
+            oParaDrawing.Set_PositionH(c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
+            oParaDrawing.Set_PositionV(c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
+            oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            oParaDrawing.Set_BehindDoc( false );
+            oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
+            oParaDrawing.Set_DrawingType(drawing_Anchor);
+            var oShape = this.createWatermarkImage(sImageUrl);
+            oParaDrawing.Extent.W = oShape.spPr.xfrm.extX;
+            oParaDrawing.Extent.H = oShape.spPr.xfrm.extY;
+            oShape.setParent(oParaDrawing);
+            oParaDrawing.Set_GraphicObject(oShape);
+            return oParaDrawing;
+        }, this, []);
+
+    },
+	
     recalculate_: function(data)
     {
         if(data.All)
@@ -511,7 +535,7 @@ CGraphicObjects.prototype =
         {
             this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        if(isRealNumber(oProps.Width) && isRealNumber(oProps.Height))
+        if(isRealNumber(oProps.Width) || isRealNumber(oProps.Height))
         {
             oApplyProps = oProps;
         }
@@ -520,7 +544,7 @@ CGraphicObjects.prototype =
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
         }
         this.applyDrawingProps(oApplyProps);
-        if(isRealNumber(oApplyProps.Width) && isRealNumber(oApplyProps.Height))
+        if(isRealNumber(oApplyProps.Width) || isRealNumber(oApplyProps.Height))
         {
             /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
             var aSelectedObjects = this.selectedObjects;

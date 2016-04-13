@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var global3DPersperctive = 30;
 var globalBasePercent = 100;
@@ -233,9 +233,16 @@ CChartsDrawer.prototype =
 			
 			if(this.nDimensionCount !== 3)
 			{
-				this.cShapeDrawer.bIsNoSmartAttack = true;
-				this.chart.draw(this);
-				this.cShapeDrawer.bIsNoSmartAttack = false;
+				if(this.calcProp.type === "Line" || this.calcProp.type === "Scatter")
+				{
+					this.cShapeDrawer.bIsNoSmartAttack = true;
+					this.chart.draw(this);
+					this.cShapeDrawer.bIsNoSmartAttack = false;
+				}
+				else
+				{
+					this.chart.draw(this);
+				}
 			}
 		}
 	},
@@ -3714,7 +3721,7 @@ drawLineChart.prototype =
 		//в excel всегда темные боковые стороны, лицевая и задняя стороны светлые
 		
 		//todo возможно стоит проверить fill.type на FILL_TYPE_NOFILL и рисовать отдельно границы, если они заданы!
-		brush = pen.Fill;
+		//brush = pen.Fill;
 		if(brush.fill.color === undefined)
 			return;
 		

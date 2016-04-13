@@ -496,6 +496,8 @@ var historyitem_ClrScheme_AddClr      = 2462;
 var historyitem_ClrScheme_SetName     = 2463;
 var historyitem_ClrMap_SetClr         = 2464;
 
+var historyitem_Common_AddWatermark   = 100390;
+
 var historyitem_ExtraClrScheme_SetClrScheme  = 2465;
 var historyitem_ExtraClrScheme_SetClrMap     = 2466;
 
@@ -1035,7 +1037,8 @@ var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем Eff
 var historyitem_Drawing_SetParent         = 18;// Устанавливаем Parent
 var historyitem_Drawing_SetParaMath       = 19; // Добавляем новую формулу для конвертации старого формата в новый
 var historyitem_Drawing_LayoutInCell      = 20; // Устанавливаем параметр расположения в таблице
-
+var historyitem_Drawing_SetSizeRelH       = 21;//Ширина объекта в процентах
+var historyitem_Drawing_SetSizeRelV       = 22;//Высота объекта в процентах
 
 
 
