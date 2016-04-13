@@ -25,7 +25,7 @@
 $( function () {
 
     function toFixed( n ) {
-        return n//.toFixed( cExcelSignificantDigits ) - 0;
+        return n//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
     }
 
     function difBetween( a, b ) {
@@ -404,6 +404,10 @@ $( function () {
         return duration / p / frequency ;
     }
 
+    var c_msPerDay = AscCommonExcel.c_msPerDay;
+    var parserFormula = AscCommonExcel.parserFormula;
+    var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
+
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
         sData = data + "";
@@ -430,7 +434,7 @@ $( function () {
         var oBinaryFileReader = new Asc.BinaryFileReader();
         oBinaryFileReader.Read( sData, wb );
         ws = wb.getWorksheet( wb.getActive() );
-        getFormulasInfo();
+        AscCommonExcel.getFormulasInfo();
     }
 
     /*QUnit.log( function ( details ) {
@@ -674,14 +678,14 @@ $( function () {
     test( "Test: \"MROUND\"", function () {
         var multiple;//должен равняться значению второго аргумента
         function mroundHelper( num ) {
-            var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - cExcelSignificantDigits + 1 );
+            var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - AscCommonExcel.cExcelSignificantDigits + 1 );
             var nolpiat = 0.5 * (num > 0 ? 1 : num < 0 ? -1 : 0) * multiplier;
             var y = (num + nolpiat) / multiplier;
             y = y / Math.abs( y ) * Math.floor( Math.abs( y ) )
             var x = y * multiplier / multiple
 
             // var x = number / multiple;
-            var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+            var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - AscCommonExcel.cExcelSignificantDigits );
             x = x + nolpiat;
             x = x | x;
 
@@ -2513,9 +2517,9 @@ $( function () {
             if ( sigma <= 0 )
                 return "#NUM!";
             else if ( kum == false )
-                return toFixed( phi( (x - mue) / sigma ) / sigma );
+                return toFixed( AscCommonExcel.phi( (x - mue) / sigma ) / sigma );
             else
-                return toFixed( 0.5 + gauss( (x - mue) / sigma ) );
+                return toFixed( 0.5 + AscCommonExcel.gauss( (x - mue) / sigma ) );
 
         }
 
@@ -2540,7 +2544,7 @@ $( function () {
     test( "Test: \"NORMSDIST\"", function () {
 
         function normsdist( x ) {
-            return toFixed( 0.5 + gauss( x ) );
+            return toFixed( 0.5 + AscCommonExcel.gauss( x ) );
         }
 
         oParser = new parserFormula( "NORMSDIST(1.333333)", "A1", ws );
@@ -2584,7 +2588,7 @@ $( function () {
             if ( x <= 0.0 || x >= 1.0 )
                 return "#N/A";
             else
-                return toFixed( gaussinv( x ) );
+                return toFixed( AscCommonExcel.gaussinv( x ) );
         }
 
         oParser = new parserFormula( "NORMSINV(0.954)", "A1", ws );
@@ -2615,7 +2619,7 @@ $( function () {
             if ( sigma <= 0 || x <= 0 || x >= 1 )
                 return "#NUM!";
             else
-                return toFixed( Math.exp( mue + sigma * ( gaussinv( x ) ) ) );
+                return toFixed( Math.exp( mue + sigma * ( AscCommonExcel.gaussinv( x ) ) ) );
         }
 
         oParser = new parserFormula( "LOGINV(0.039084,3.5,1.2)", "A1", ws );
@@ -2641,7 +2645,7 @@ $( function () {
             if ( sigma <= 0.0 || x <= 0.0 || x >= 1.0 )
                 return "#NUM!";
             else
-                return toFixed( gaussinv( x ) * sigma + mue );
+                return toFixed( AscCommonExcel.gaussinv( x ) * sigma + mue );
         }
 
         oParser = new parserFormula( "NORMINV(0.954,40,1.5)", "A1", ws );
@@ -2708,7 +2712,7 @@ $( function () {
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )
-                return new cError( cErrorType.not_available ).toString();
+                return new AscCommonExcel.cError( AscCommonExcel.cErrorType.not_available ).toString();
             else {
                 if ( nSize == 1 )
                     return toFixed( A[0] );
@@ -4556,7 +4560,7 @@ $( function () {
         function db( cost, salvage, life, period, month ){
 
             if ( salvage >= cost ) {
-                return this.value = new cNumber( 0 );
+                return this.value = new AscCommonExcel.cNumber( 0 );
             }
 
             if ( month < 1 || month > 12 || salvage < 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 ) {

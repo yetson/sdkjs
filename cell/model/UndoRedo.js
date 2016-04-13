@@ -2953,7 +2953,7 @@ UndoRedoWorkbook.prototype = {
 
                             n = n.returnCell();
                             if(n){
-                                n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
+                                n.formulaParsed = new AscCommonExcel.parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
                             }
                         }
                     }
@@ -3497,7 +3497,7 @@ UndoRedoWoorksheet.prototype = {
                     for(var id in arrDefNameRecalc ){
                         dN  = arrDefNameRecalc[id];
                         if( !dN.parsedRef && dN.Ref ){
-                            dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
+                            dN.parsedRef = new AscCommonExcel.parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
                             dN.parsedRef.parse();
                         }
                     }

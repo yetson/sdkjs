@@ -41,6 +41,8 @@
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
+	var cElementType = AscCommonExcel.cElementType;
+
 	var asc = window["Asc"];
 
 	var asc_calcnpt = asc.calcNearestPt;
@@ -841,7 +843,7 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false,
@@ -902,7 +904,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if( nameRef instanceof cError ) continue;
+						if( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :{
@@ -966,7 +968,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
@@ -1021,7 +1023,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if ( nameRef instanceof cError ) continue;
+						if ( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :
