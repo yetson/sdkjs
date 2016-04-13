@@ -23,10 +23,6 @@
  *
 */
 "use strict";
-var maxValCol = 20000;
-var maxValRow = 100000;
-
-var maxIndividualValues = 10000;
 (
 	/**
 	 * @param {jQuery} $
@@ -44,6 +40,10 @@ var maxIndividualValues = 10000;
 		var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 
 		var prot;
+
+		var maxIndividualValues = 10000;
+		var maxValCol = 20000;
+		var maxValRow = 100000;
 
 		var g_oAutoFiltersOptionsElementsProperties = {
 			val		    : 0,
