@@ -35,6 +35,8 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
+
 		var c_oAscError = Asc.c_oAscError;
 		var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 		var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
@@ -2033,7 +2035,7 @@
 			
 			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter, activeRange) {
 				var ws = this.worksheet;
-				var oHistoryObject = new UndoRedoData_AutoFilter();
+				var oHistoryObject = new AscCommonExcel.UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
 
 				if(redoObject)
@@ -2059,7 +2061,7 @@
 				if(!activeHistoryRange)
 					activeHistoryRange = null;
 				
-				History.Add(g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
+				History.Add(AscCommonExcel.g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
 				if(deleteFilterAfterDeleteColRow)
 					History.ChangeActionsEndToStart();
 			},
