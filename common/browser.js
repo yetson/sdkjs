@@ -23,6 +23,12 @@
  *
 */
 "use strict";
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 
 var AscBrowser = {
     userAgent : "",
@@ -109,3 +115,7 @@ AscBrowser.checkZoom = function()
 AscBrowser.checkZoom();
 // detect retina (http://habrahabr.ru/post/159419/)
 AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscBrowser'] = window.AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
+})(window);
