@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 function CDocumentReaderMode()
 {
     this.DefaultFontSize = 12;
@@ -2519,7 +2522,7 @@ function sendImgUrls(api, images, callback, bExcel) {
 
   api.fCurCallback = function (input) {
     api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
-    var nError = Asc.c_oAscError.ID.No;
+    var nError = c_oAscError.ID.No;
     var data;
     if (null != input && "imgurls" == input["type"]) {
       if ("ok" == input["status"]) {
@@ -2536,13 +2539,13 @@ function sendImgUrls(api, images, callback, bExcel) {
         nError = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
       }
     } else {
-      nError = Asc.c_oAscError.ID.Unknown;
+      nError = c_oAscError.ID.Unknown;
     }
-    if ( Asc.c_oAscError.ID.No !== nError ) {
+    if ( c_oAscError.ID.No !== nError ) {
       if(!bExcel)
-        api.asc_fireCallback("asc_onError", nError, Asc.c_oAscError.Level.NoCritical);
+        api.asc_fireCallback("asc_onError", nError, c_oAscError.Level.NoCritical);
       else
-        api.handlers.trigger("asc_onError", nError, Asc.c_oAscError.Level.NoCritical);
+        api.handlers.trigger("asc_onError", nError, c_oAscError.Level.NoCritical);
     }
     if (!data) {
       //todo сделать функцию очистки, чтобы можно было оборвать paste и показать error

@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 var c_oSerFormat = {
     Version		: 1,
     Signature	: "PPTY"
@@ -1807,6 +1810,15 @@ asc_docs_api.prototype.ShapeApply = function(prop)
           fApplyCallback();
         }
         else{
+
+          if (window["AscDesktopEditor"])
+          {
+              image_url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+			  image_url = g_oDocumentUrls.getImageUrl(image_url);
+              fApplyCallback();
+              return;
+          }
+
           this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           this.fCurCallback = function(input) {
             if(null != input && "imgurl" == input["type"]){
@@ -1828,13 +1840,13 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                   image_url = firstUrl;
                   fApplyCallback();
                 } else {
-                  oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+                  oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                 }
               } else {
-                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
             }
             oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           };
@@ -2746,13 +2758,13 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 					if(firstUrl) {
 						t.AddImageUrlAction(firstUrl);
 					} else {
-						t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+						t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 					}
 				} else {
-					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 				}
 			} else {
-				t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 			}
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		};
@@ -2923,13 +2935,13 @@ asc_docs_api.prototype.ImgApply = function(obj){
                 ImagePr.ImageUrl = firstUrl;
                 fApplyCallback();
               } else {
-                oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
           } else {
-            oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+            oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
           }
           oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
         };
@@ -4714,7 +4726,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
 	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
-			t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.Critical);
+			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
 		}
 
@@ -4754,20 +4766,20 @@ function _downloadAs(editor, filetype, actionType, options)
 	else
 		dataContainer.data = editor.WordControl.SaveDocument();
     var fCallback = function(input) {
-      var error = Asc.c_oAscError.ID.Unknown;
+      var error = c_oAscError.ID.Unknown;
       if(null != input && command == input["type"]) {
         if('ok' == input["status"]){
           var url = input["data"];
           if(url) {
-            error = Asc.c_oAscError.ID.No;
+            error = c_oAscError.ID.No;
             editor.processSavedFile(url, options.downloadType);
           }
         } else {
           error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
-      if (Asc.c_oAscError.ID.No != error) {
-        editor.asc_fireCallback("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+      if (c_oAscError.ID.No != error) {
+        editor.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
       }
       if (actionType) {
         editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
