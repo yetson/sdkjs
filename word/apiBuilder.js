@@ -34,57 +34,137 @@
 {
     var Api = window["asc_docs_api"];
 
+    /**
+     * Class representing a document.
+     * @class
+     * @global
+     */
     function ApiDocument(Document)
     {
         this.Document = Document;
     }
 
+    /**
+     * Class representing a paragraph.
+     * @class
+     */
     function ApiParagraph(Paragraph)
     {
         this.Paragraph = Paragraph;
     }
 
+    /**
+     * Class representing a table.
+     * @class
+     */
     function ApiTable(Table)
     {
         this.Table = Table;
     }
 
+    /**
+     * Class representing a small text block calling 'run'.
+     * @class
+     */
     function ApiRun(Run)
     {
         this.Run = Run;
     }
 
+    /**
+     * Class representing a style.
+     * @class
+     */
     function ApiStyle(Style)
     {
         this.Style = Style;
     }
 
+    /**
+     * Class representing a text properties.
+     * @class
+     */
     function ApiTextPr(Parent, TextPr)
     {
         this.Parent = Parent;
         this.TextPr = TextPr;
     }
 
+    /**
+     * Class representing a paragraph properties.
+     * @class
+     */
     function ApiParaPr(Parent, ParaPr)
     {
         this.Parent = Parent;
         this.ParaPr = ParaPr;
     }
 
+    /**
+     * Class representing a document section.
+     * @class
+     */
     function ApiSection(Section)
     {
         this.Section = Section;
     }
 
+    /**
+     * Class representing a table row.
+     * @class
+     */
     function ApiTableRow(Row)
     {
         this.Row = Row;
     }
 
+    /**
+     * Class representing a table cell.
+     * @class
+     */
     function ApiTableCell(Cell)
     {
         this.Cell = Cell;
     }
+
+    /**
+     * Twentieths of a point (equivalent to 1/1440th of an inch).
+     * @typedef {number} twips
+     */
+
+    /**
+     * @typedef {(ApiParagraph | ApiTable)} DocumentElement
+     */
+
+    /**
+     * @typedef {("paragraph" | "table" | "run" | "numbering")} StyleType
+     */
+
+    /**
+     * A 240ths of a line.
+     * @typedef {number} line240
+     */
+
+    /**
+     * Half-points.
+     * @typedef {number} hps
+     */
+
+    /**
+     * A numeric value from 0 to 255.
+     * @typedef {number} byte
+     */
+
+    /**
+     * A border type
+     * @typedef {("none" | "single")} BorderType
+     */
+
+    /**
+     * A shade type
+     * @typedef {("nil" | "clear")} ShdType
+     */
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -110,8 +190,8 @@
     };
     /**
      * Create new table
-     * @param nCols
-     * @param nRows
+     * @param {number} [nCols]
+     * @param {number} [nRows]
      * @returns {ApiTable}
      */
     Api.prototype["CreateTable"] = function(nCols, nRows)
@@ -132,6 +212,7 @@
 
     /**
      * Get the number of elements.
+     * @returns {number}
      */
     ApiDocument.prototype["GetElementsCount"] = function()
     {
@@ -139,7 +220,7 @@
     };
     /**
      * Get element by position
-     * @returns {ApiParagraph | ApiTable | null}
+     * @returns {?DocumentElement}
      */
     ApiDocument.prototype["GetElement"] = function(nPos)
     {
@@ -156,8 +237,8 @@
     };
     /**
      * Add paragraph or table by position
-     * @param nPos
-     * @param oElement (ApiParagraph | ApiTable)
+     * @param {number} nPos
+     * @param {DocumentElement} oElement
      */
     ApiDocument.prototype["AddElement"] = function(nPos, oElement)
     {
@@ -171,7 +252,7 @@
     };
     /**
      * Push paragraph or table
-     * @param oElement (ApiParagraph | ApiTable)
+     * @param {DocumentElement} oElement
      */
     ApiDocument.prototype["Push"] = function(oElement)
     {
@@ -192,8 +273,8 @@
     };
     /**
      * Get style by style name
-     * @param sStyleName
-     * @returns {ApiStyle | null}
+     * @param {string} sStyleName
+     * @returns {?ApiStyle}
      */
     ApiDocument.prototype["GetStyle"] = function(sStyleName)
     {
@@ -204,8 +285,8 @@
     /**
      * Create a new style with the specified type and name. If there is a style with the same name it will be replaced
      * with a new one.
-     * @param sStyleName
-     * @param sType ("paragraph" || "table" || "run" || "numbering") default value is "paragraph"
+     * @param {string} sStyleName
+     * @param {StyleType} [sType="paragraph"]
      * @returns {ApiStyle}
      */
     ApiDocument.prototype["CreateStyle"] = function(sStyleName, sType)
@@ -238,8 +319,8 @@
     };
     /**
      * Get the default style for the specified style type.
-     * @param sStyleType ("paragraph" || "table" || "run" || "numbering")
-     * @returns {ApiStyle || null}
+     * @param {StyleType} sStyleType
+     * @returns {?ApiStyle}
      */
     ApiDocument.prototype["GetDefaultStyle"] = function(sStyleType)
     {
@@ -266,7 +347,7 @@
     };
     /**
      * Create a new section of the document, which ends at the specified paragraph.
-     * @param oParagraph (ApiParagraph)
+     * @param {ApiParagraph} oParagraph
      * @returns {ApiSection}
      * @constructor
      */
@@ -288,7 +369,7 @@
 
     /**
      * Add text
-     * @param sText
+     * @param {string} [sText=""]
      * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddText"] = function(sText)
@@ -296,7 +377,7 @@
         var oRun = new ParaRun(this.Paragraph, false);
 
         if (!sText || !sText.length)
-            return oRun;
+            return new ApiRun(oRun);
 
         for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
         {
@@ -311,7 +392,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add page beak
+     * Add page break
      * @returns {ApiRun}
      */
     ApiParagraph.prototype["AddPageBreak"] = function()
@@ -344,17 +425,16 @@
         return new ApiRun(oRun);
     };
     /**
-     * Get ApiRun with paragraph mark
-     * @returns {ApiRun}
+     * Get text properties of the paragraph mark.
+     * @returns {ApiTextPr}
      */
-    ApiParagraph.prototype["GetParagraphMark"] = function()
+    ApiParagraph.prototype["GetParagraphMarkTextPr"] = function()
     {
-        var oEndRun = this.Paragraph.Content[this.Paragraph.Content.length - 1];
-        return new ApiRun(oEndRun);
+        return new ApiTextPr(this, this.Paragraph.TextPr.Value.Copy());
     };
     /**
      * Set paragraph style
-     * @param oStyle (ApiStyle)
+     * @param {ApiStyle} oStyle
      * @returns {boolean}
      */
     ApiParagraph.prototype["SetStyle"] = function(oStyle)
@@ -374,31 +454,37 @@
         return new ApiParaPr(this, this.Paragraph.Pr.Copy());
     };
     /**
-     * Set paragraph line spacing. If the value of the <sLineRule> parameter is either "atLeast" or "exact", then the
-     * value of <nLine> shall be interpreted as twentieths of a point. If the value of the <sLineRule> parameter is
-     * "auto", then the value of the <nLine> attribute shall be interpreted as 240ths of a line.
-     * @param nLine (twips | 1/240ths of a line)
-     * @param sLineRule ("auto" | "atLeast" | "exact")
+     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
+     * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
+     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
+     * attribute shall be interpreted as 240ths of a line.
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingLine}.
+     * @param {(twips | line240)} nLine
+     * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
     ApiParagraph.prototype["SetSpacingLine"] = function(nLine, sLineRule)
     {
         this.Paragraph.Set_Spacing(private_GetParaSpacing(nLine, sLineRule, undefined, undefined, undefined, undefined), false);
     };
     /**
-     * Set paragraph spacing before. If the value of the <isBeforeAuto> parameter is <true>, then any value of the
-     * <nBefore> is ignored. If <isBeforeAuto> parameter is not specified, then it will be interpreted as <false>.
-     * @param nBefore (twips)
-     * @param isBeforeAuto  (true | false)
+     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then 
+     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it 
+     * will be interpreted as <code>false</code>.
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingBefore}.
+     * @param {twips} nBefore
+     * @param {boolean} [isBeforeAuto=false]
      */
     ApiParagraph.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
     {
         this.Paragraph.Set_Spacing(private_GetParaSpacing(undefined, undefined, nBefore, undefined, isBeforeAuto === undefined ? false : isBeforeAuto, undefined), false);
     };
     /**
-     * Set paragraph spacing after. If the value of the <isAfterAuto> parameter is <true>, then any value of the
-     * <nAfter> is ignored. If <isAfterAuto> parameter is not specified, then it will be interpreted as <false>.
-     * @param nAfter (twips)
-     * @param isAfterAuto  (true | false)
+     * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
+     * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
+     * will be interpreted as <code>false</code>.
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetSpacingAfter}.
+     * @param {twips} nAfter
+     * @param {boolean} [isAfterAuto=false]
      */
     ApiParagraph.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
     {
@@ -406,7 +492,8 @@
     };
     /**
      * Set paragraph justification
-     * @param sJc ("left" | "right" | "both" | "center")
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetJc}.
+     * @param {("left" | "right" | "both" | "center")} sJc
      */
     ApiParagraph.prototype["SetJc"] = function(sJc)
     {
@@ -415,8 +502,9 @@
             this.Paragraph.Set_Align(nAlign);
     };
     /**
-     * Set left indentation
-     * @param nValue (twips)
+     * Set left indentation.
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndLeft}.
+     * @param {twips} nValue
      */
     ApiParagraph.prototype["SetIndLeft"] = function(nValue)
     {
@@ -424,7 +512,8 @@
     };
     /**
      * Set right indentation
-     * @param nValue (twips)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndRight}.
+     * @param {twips} nValue
      */
     ApiParagraph.prototype["SetIndRight"] = function(nValue)
     {
@@ -432,7 +521,8 @@
     };
     /**
      * Set first line indentation
-     * @param nValue (twips)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetIndFirstLine}.
+     * @param {twips} nValue
      */
     ApiParagraph.prototype["SetIndFirstLine"] = function(nValue)
     {
@@ -441,7 +531,8 @@
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are at least partly rendered on the same page as the following paragraph whenever possible.
-     * @param isKeepNext (true | false)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepNext}.
+     * @param {boolean} isKeepNext
      */
     ApiParagraph.prototype["SetKeepNext"] = function(isKeepNext)
     {
@@ -450,7 +541,8 @@
     /**
      * This element specifies that when rendering this document in a page view, all lines of this paragraph are
      * maintained on a single page whenever possible.
-     * @param isKeepLines (true | false)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetKeepLines}.
+     * @param {boolean} isKeepLines
      */
     ApiParagraph.prototype["SetKeepLines"] = function(isKeepLines)
     {
@@ -459,7 +551,8 @@
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are rendered on the start of a new page in the document.
-     * @param isPageBreakBefore (true | false)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetPageBreakBefore}.
+     * @param {boolean} isPageBreakBefore
      */
     ApiParagraph.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
     {
@@ -468,7 +561,8 @@
     /**
      * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
      * a separate page from the remaining content at display time by moving the line onto the following page.
-     * @param isWidowControl (true | false)
+	 * See also {@link ApiParagraph#GetParaPr} and {@link ApiParaPr#SetWidowControl}.
+     * @param {boolean} isWidowControl
      */
     ApiParagraph.prototype["SetWidowControl"] = function(isWidowControl)
     {
@@ -482,56 +576,79 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Set bold
-     * @param isBold (true | false)
+     * Get the text properties of the current run.
+     * @returns {ApiTextPr}
+     */
+    ApiRun.prototype["GetTextPr"] = function()
+    {
+        return this.private_GetTextPr();
+    };
+    /**
+     * Set the bold property.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetBold}.
+     * @param {boolean} isBold
      */
     ApiRun.prototype["SetBold"] = function(isBold)
     {
-        this.Run.Set_Bold(isBold);
+        this.private_GetTextPr().SetBold(isBold);
     };
     /**
-     * Set italic
-     * @param isItalic (true | false)
+     * Set the italic property.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetItalic}.
+     * @param {boolean} isItalic
      */
     ApiRun.prototype["SetItalic"] = function(isItalic)
     {
-        this.Run.Set_Italic(isItalic);
+        this.private_GetTextPr().SetItalic(isItalic);
     };
-
     /**
-     * Set underline
-     * @param isUnderline (true | false)
+     * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
+     * the line.
+      See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetStrikeout}.
+     * @param {boolean} isStrikeout
+     */
+    ApiRun.prototype["SetStrikeout"] = function(isStrikeout)
+    {
+        this.private_GetTextPr().SetStrikeout(isStrikeout);
+    };
+    /**
+     * Set the underline property.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetUnderline}.
+     * @param {boolean} isUnderline
      */
     ApiRun.prototype["SetUnderline"] = function(isUnderline)
     {
-        this.Run.Set_Underline(isUnderline);
+        this.private_GetTextPr().SetUnderline(isUnderline);
     };
     /**
-     * Set font size
-     * @param nSize (half-points)
+     * Set the font size.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetFontSize}.
+     * @param {hps} nSize
      */
     ApiRun.prototype["SetFontSize"] = function(nSize)
     {
-        this.Run.Set_FontSize(private_GetHps(nSize));
+        this.private_GetTextPr().SetFontSize(nSize);
     };
     /**
-     * Set text color in rgb
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
-     * @param isAuto (true | false) false is default
+     * Set text color in the rgb format.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetColor}.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
      */
     ApiRun.prototype["SetColor"] = function(r, g, b, isAuto)
     {
-        this.Run.Set_Color(private_GetColor(r, g, b, isAuto));
+        this.private_GetTextPr().SetColor(r, g, b, isAuto);
     };
     /**
-     * Set text spacing
-     * @param nSpacing (twips)
+     * Set the text spacing.
+     * See also {@link ApiRun#GetTextPr} and {@link ApiTextPr#SetSpacing}.
+     * @param {twips} nSpacing
      */
     ApiRun.prototype["SetSpacing"] = function(nSpacing)
     {
-        this.Run.Set_Spacing(private_Twips2MM(nSpacing));
+        this.private_GetTextPr().SetSpacing(nSpacing);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -553,7 +670,7 @@
      *   inherited from the following section. These breaks, however, can specify other section properties, such
      *   as line numbering and footnote/endnote settings.
      *   <b>Column</b> section breaks, which begin the new section on the next column on the page.
-     * @param sType ("nextPage" | "oddPage" | "evenPage" | "continuous" | "nextColumn")
+     * @param {("nextPage" | "oddPage" | "evenPage" | "continuous" | "nextColumn")} sType - Type of the section break
      */
     ApiSection.prototype["SetType"] = function(sType)
     {
@@ -570,8 +687,8 @@
     };
     /**
      * Specify all text columns in the current section are of equal width.
-     * @param nCount
-     * @param nSpace (twips)
+     * @param {number} nCount - Number of columns
+     * @param {twips} nSpace - Distance between columns
      */
     ApiSection.prototype["SetEqualColumns"] = function(nCount, nSpace)
     {
@@ -580,10 +697,10 @@
         this.Section.Set_Columns_Space(private_Twips2MM(nSpace));
     };
     /**
-     * Set all columns of this section are of different widths. Count of columns are equal length of <aWidth> array.
-     * The length of <aSpaces> array MUST BE (<aWidth>.length - 1).
-     * @param aWidths (array of twips)
-     * @param aSpaces (array of twips)
+     * Set all columns of this section are of different widths. Count of columns are equal length of <code>aWidth</code> array.
+     * The length of <code>aSpaces</code> array <b>MUST BE</b> (<code>aWidth.length - 1</code>).
+     * @param {twips[]} aWidths - An array of column width
+     * @param {twips[]} aSpaces - An array of distances between the columns
      */
     ApiSection.prototype["SetNotEqualColumns"] = function(aWidths, aSpaces)
     {
@@ -605,9 +722,9 @@
     };
     /**
      * Specify the properties (size and orientation) for all pages in the current section.
-     * @param nWidth (twips)
-     * @param nHeight (twips)
-     * @param isPortrait (true | false) Specifies the orientation of all pages in this section. Default value is true.
+     * @param {twips} nWidth - width
+     * @param {twips} nHeight - height
+     * @param {boolean} [isPortrait=false] - Specifies the orientation of all pages in this section.
      */
     ApiSection.prototype["SetPageSize"] = function(nWidth, nHeight, isPortrait)
     {
@@ -616,10 +733,10 @@
     };
     /**
      * Specify the page margins for all pages in this section.
-     * @param nLeft (twips)
-     * @param nTop (twips)
-     * @param nRight (twips)
-     * @param nBottom (twips)
+     * @param {twips} nLeft - Left margin
+     * @param {twips} nTop - Top margin
+     * @param {twips} nRight - Right margin
+     * @param {twips} nBottom - Bottom margin
      */
     ApiSection.prototype["SetPageMargins"] = function(nLeft, nTop, nRight, nBottom)
     {
@@ -627,7 +744,7 @@
     };
     /**
      * Specifies the distance (in twentieths of a point) from the top edge of the page to the top edge of the header.
-     * @param nDistance (twips)
+     * @param {twips} nDistance
      */
     ApiSection.prototype["SetHeaderDistance"] = function(nDistance)
     {
@@ -635,7 +752,7 @@
     };
     /**
      * Specifies the distance (in twentieths of a point) from the bottom edge of the page to the bottom edge of the footer.
-     * @param nDistance (twips)
+     * @param {twips} nDistance
      */
     ApiSection.prototype["SetFooterDistance"] = function(nDistance)
     {
@@ -657,7 +774,7 @@
     };
     /**
      * Get table row by position.
-     * @param nPos
+     * @param {number} nPos
      * @returns {ApiTableRow}
      */
     ApiTable.prototype["GetRow"] = function(nPos)
@@ -668,10 +785,10 @@
         return new ApiTableRow(this.Table.Content[nPos]);
     };
     /**
-     * Merge array of cells. If merge was done successfully it will reuturn merged cell, otherwise "null".
+     * Merge array of cells. If merge was done successfully it will return merged cell, otherwise "null".
      * <b>Warning</b>: The number of cells in any row and the numbers of rows in the current table may be changed.
-     * @param aCells
-     * @returns {ApiTableCell | null}
+     * @param {ApiTableCell[]} aCells
+     * @returns {?ApiTableCell}
      */
     ApiTable.prototype["MergeCells"] = function(aCells)
     {
@@ -722,7 +839,7 @@
     };
     /**
      * Set table style
-     * @param oStyle (ApiStyle)
+     * @param {ApiStyle} oStyle
      * @return {boolean}
      */
     ApiTable.prototype["SetStyle"] = function(oStyle)
@@ -735,8 +852,8 @@
     };
     /**
      * Set the preferred width for this table.
-     * @param sType ("auto" | "twips" | "percent" | "nil")
-     * @param nValue
+     * @param {("auto" | "twips" | "percent" | "nil")} sType - Type of the width value
+     * @param {number} nValue
      */
     ApiTable.prototype["SetWidth"] = function(sType, nValue)
     {
@@ -755,12 +872,12 @@
      *
      * The default setting is to apply the row and column banding formatting, but not the first row, last row, first
      * column, or last column formatting.
-     * @param isFirstColumn (true | false) Specifies that the first column conditional formatting shall be applied to the table.
-     * @param isFirstRow (true | false) Specifies that the first row conditional formatting shall be applied to the table.
-     * @param isLastColumn (true | false) Specifies that the last column conditional formatting shall be applied to the table.
-     * @param isLastRow (true | false) Specifies that the last row conditional formatting shall be applied to the table.
-     * @param isHorBand (true | false) Specifies that the horizontal banding conditional formatting shall not be applied to the table.
-     * @param isVerBand (true | false) Specifies that the vertical banding conditional formatting shall not be applied to the table.
+     * @param {boolean} isFirstColumn - Specifies that the first column conditional formatting shall be applied to the table.
+     * @param {boolean} isFirstRow - Specifies that the first row conditional formatting shall be applied to the table.
+     * @param {boolean} isLastColumn - Specifies that the last column conditional formatting shall be applied to the table.
+     * @param {boolean} isLastRow - Specifies that the last row conditional formatting shall be applied to the table.
+     * @param {boolean} isHorBand - Specifies that the horizontal banding conditional formatting shall not be applied to the table.
+     * @param {boolean} isVerBand - Specifies that the vertical banding conditional formatting shall not be applied to the table.
      */
     ApiTable.prototype["SetTableLook"] = function(isFirstColumn, isFirstRow, isLastColumn, isLastRow, isHorBand, isVerBand)
     {
@@ -776,12 +893,12 @@
     };
     /**
      * Set the border which shall be displayed at the top of the current table.
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderTop"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -789,12 +906,12 @@
     };
     /**
      * Set the border which shall be displayed at the bottom of the current table.
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderBottom"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -802,12 +919,12 @@
     };
     /**
      * Set the border which shall be displayed on the left of the current table.
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderLeft"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -815,12 +932,12 @@
     };
     /**
      * Set the border which shall be displayed on the right of the current table.
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderRight"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -829,12 +946,12 @@
     /**
      * Specify the border which shall be displayed on all horizontal table cell borders which are not on
      * an outmost edge of the parent table (all horizontal borders which are not the topmost or bottommost border).
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderInsideH"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -843,12 +960,12 @@
     /**
      * Specify the border which shall be displayed on all vertical table cell borders which are not on an
      * outmost edge of the parent table (all horizontal borders which are not the leftmost or rightmost border).
-     * @param sType ("single" | "none")
-     * @param nSize (twips)
-     * @param nSpace (twips)
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
+     * @param {BorderType} sType - The style of border.
+     * @param {twips} nSize - The width of the current border.
+     * @param {twips} nSpace - The spacing offset that shall be used to place this border.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
      */
     ApiTable.prototype["SetTableBorderInsideV"] = function(sType, nSize, nSpace, r, g, b)
     {
@@ -871,7 +988,7 @@
     };
     /**
      * Get cell by position.
-     * @param nPos
+     * @param {number} nPos
      * @returns {ApiTableCell}
      */
     ApiTableRow.prototype["GetCell"] = function(nPos)
@@ -883,8 +1000,8 @@
     };
     /**
      * Set the height of the current table row within the current table.
-     * @param sHRule ("auto" | "atLeast") "auto" is default value
-     * @param nValue (twips)
+     * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
+     * @param {twips} nValue
      */
     ApiTableRow.prototype["SetHeight"] = function(sHRule, nValue)
     {
@@ -899,7 +1016,7 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Get cell content
+     * Get cell content.
      * @returns {ApiDocument}
      */
     ApiTableCell.prototype["GetContent"] = function()
@@ -908,8 +1025,8 @@
     };
     /**
      * Set the preferred width for this cell.
-     * @param sType ("auto" | "twips" | "percent" | "nil")
-     * @param nValue
+     * @param {("auto" | "twips" | "percent" | "nil")} sType - Specifies the meaning of the width value.
+     * @param {number} [nValue]
      */
     ApiTableCell.prototype["SetWidth"] = function(sType, nValue)
     {
@@ -926,7 +1043,7 @@
     };
     /**
      * Specify the vertical alignment for text within the current table cell.
-     * @param sType ("top" | "center" | "bottom")
+     * @param {("top" | "center" | "bottom")} sType
      */
     ApiTableCell.prototype["SetVerticalAlign"] = function(sType)
     {
@@ -939,11 +1056,11 @@
     };
     /**
      * Specify the shading which shall be applied to the extents of the current table cell.
-     * @param sType ("nil" | "clear")
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
-     * @param isAuto (true | false)
+     * @param {ShdType} sType
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
      * @constructor
      */
     ApiTableCell.prototype["SetShd"] = function(sType, r, g, b, isAuto)
@@ -952,7 +1069,7 @@
     };
     /**
      * Specify the direction of the text flow for this table cell.
-     * @param sType ("lrtb" || "tbrl" || "btlr") default value is "lrtb" (left-right-top-bottom)
+     * @param {("lrtb" | "tbrl" | "btlr")} sType
      */
     ApiTableCell.prototype["SetTextDirection"] = function(sType)
     {
@@ -980,7 +1097,7 @@
     };
     /**
      * Set the name of the current style.
-     * @param sStyleName
+     * @param {string} sStyleName
      */
     ApiStyle.prototype["SetName"] = function(sStyleName)
     {
@@ -988,7 +1105,7 @@
     };
     /**
      * Get the type of the current style.
-     * @returns {"paragraph" || "table" || "run" || "numbering"}
+     * @returns {StyleType}
      */
     ApiStyle.prototype["GetType"] = function()
     {
@@ -1029,11 +1146,49 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Set text color in rgb
-     * @param r (0-255)
-     * @param g (0-255)
-     * @param b (0-255)
-     * @param isAuto (true | false) false is default
+     * Set the bold property.
+     * @param {boolean} isBold
+     */
+    ApiTextPr.prototype["SetBold"] = function(isBold)
+    {
+        this.TextPr.Bold = isBold;
+        this.private_OnChange();
+    };
+    /**
+     * Set the italic property.
+     * @param {boolean} isItalic
+     */
+    ApiTextPr.prototype["SetItalic"] = function(isItalic)
+    {
+        this.TextPr.Italic = isItalic;
+        this.private_OnChange();
+    };
+    /**
+     * Specify that the contents of this run shall be displayed with a single horizontal line through the center of
+     * the line.
+     * @param {boolean} isStrikeout
+     */
+    ApiTextPr.prototype["SetStrikeout"] = function(isStrikeout)
+    {
+        this.TextPr.Strikeout = isStrikeout;
+        this.private_OnChange();
+    };
+    /**
+     * Specify that the contents of this run should be displayed along with an underline appearing directly below the
+     * character height (less all spacing above and below the characters on the line).
+     * @param {boolean} isUnderline
+     */
+    ApiTextPr.prototype["SetUnderline"] = function(isUnderline)
+    {
+        this.TextPr.Underline = isUnderline;
+        this.private_OnChange();
+    };
+    /**
+     * Set text color in the rgb format.
+     * @param {byte} r
+     * @param {byte} g
+     * @param {byte} b
+     * @param {boolean} [isAuto=false]
      */
     ApiTextPr.prototype["SetColor"] = function(r, g, b, isAuto)
     {
@@ -1041,8 +1196,8 @@
         this.private_OnChange();
     };
     /**
-     * Set font size
-     * @param nSize (half-points)
+     * Set the font size.
+     * @param {hps} nSize
      */
     ApiTextPr.prototype["SetFontSize"] = function(nSize)
     {
@@ -1051,11 +1206,20 @@
     };
     /**
      * Set all 4 font slots with the specified font family.
-     * @param sFontFamily
+     * @param {string} sFontFamily
      */
     ApiTextPr.prototype["SetFontFamily"] = function(sFontFamily)
     {
         this.TextPr.RFonts.Set_All(sFontFamily, -1);
+        this.private_OnChange();
+    };
+    /**
+     * Set text spacing.
+     * @param {twips} nSpacing
+     */
+    ApiTextPr.prototype["SetSpacing"] = function(nSpacing)
+    {
+        this.TextPr.Spacing = private_Twips2MM(nSpacing);
         this.private_OnChange();
     };
 
@@ -1066,11 +1230,12 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
-     * Set paragraph line spacing. If the value of the <sLineRule> parameter is either "atLeast" or "exact", then the
-     * value of <nLine> shall be interpreted as twentieths of a point. If the value of the <sLineRule> parameter is
-     * "auto", then the value of the <nLine> attribute shall be interpreted as 240ths of a line.
-     * @param nLine (twips | 1/240ths of a line)
-     * @param sLineRule ("auto" | "atLeast" | "exact")
+     * Set paragraph line spacing. If the value of the <code>sLineRule</code> parameter is either <code>"atLeast"</code>
+     * or <code>"exact"</code>, then the value of <code>nLine</code> shall be interpreted as twentieths of a point. If
+     * the value of the <code>sLineRule</code> parameter is <code>"auto"</code>, then the value of the <code>nLine</code>
+     * attribute shall be interpreted as 240ths of a line.
+     * @param {(twips | line240)} nLine
+     * @param {("auto" | "atLeast" | "exact")} sLineRule
      */
     ApiParaPr.prototype["SetSpacingLine"] = function(nLine, sLineRule)
     {
@@ -1097,10 +1262,11 @@
         this.private_OnChange();
     };
     /**
-     * Set paragraph spacing before. If the value of the <isBeforeAuto> parameter is <true>, then any value of the
-     * <nBefore> is ignored. If <isBeforeAuto> parameter is not specified, then it will be interpreted as <false>.
-     * @param nBefore (twips)
-     * @param isBeforeAuto  (true | false)
+     * Set paragraph spacing before. If the value of the <code>isBeforeAuto</code> parameter is <code>true</code>, then
+     * any value of the <code>nBefore</code> is ignored. If <code>isBeforeAuto</code> parameter is not specified, then it
+     * will be interpreted as <code>false</code>.
+     * @param {twips} nBefore
+     * @param {boolean} [isBeforeAuto=false]
      */
     ApiParaPr.prototype["SetSpacingBefore"] = function(nBefore, isBeforeAuto)
     {
@@ -1113,10 +1279,11 @@
         this.private_OnChange();
     };
     /**
-     * Set paragraph spacing after. If the value of the <isAfterAuto> parameter is <true>, then any value of the
-     * <nAfter> is ignored. If <isAfterAuto> parameter is not specified, then it will be interpreted as <false>.
-     * @param nAfter (twips)
-     * @param isAfterAuto  (true | false)
+     * Set paragraph spacing after. If the value of the <code>isAfterAuto</code> parameter is <code>true</code>, then
+     * any value of the <code>nAfter</code> is ignored. If <code>isAfterAuto</code> parameter is not specified, then it
+     * will be interpreted as <code>false</code>.
+     * @param {twips} nAfter
+     * @param {boolean} [isAfterAuto=false]
      */
     ApiParaPr.prototype["SetSpacingAfter"] = function(nAfter, isAfterAuto)
     {
@@ -1130,7 +1297,7 @@
     };
     /**
      * Set paragraph justification
-     * @param sJc ("left" | "right" | "both" | "center")
+     * @param {("left" | "right" | "both" | "center")} sJc
      */
     ApiParaPr.prototype["SetJc"] = function(sJc)
     {
@@ -1138,8 +1305,8 @@
         this.private_OnChange();
     };
     /**
-     * Set left indentation
-     * @param nValue (twips)
+     * Set left indentation.
+     * @param {twips} nValue
      */
     ApiParaPr.prototype["SetIndLeft"] = function(nValue)
     {
@@ -1147,8 +1314,8 @@
         this.private_OnChange();
     };
     /**
-     * Set right indentation
-     * @param nValue (twips)
+     * Set right indentation.
+     * @param {twips} nValue
      */
     ApiParaPr.prototype["SetIndRight"] = function(nValue)
     {
@@ -1156,8 +1323,8 @@
         this.private_OnChange();
     };
     /**
-     * Set first line indentation
-     * @param nValue (twips)
+     * Set first line indentation.
+     * @param {twips} nValue
      */
     ApiParaPr.prototype["SetIndFirstLine"] = function(nValue)
     {
@@ -1167,7 +1334,7 @@
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are at least partly rendered on the same page as the following paragraph whenever possible.
-     * @param isKeepNext (true | false)
+     * @param {boolean} isKeepNext
      */
     ApiParaPr.prototype["SetKeepNext"] = function(isKeepNext)
     {
@@ -1177,7 +1344,7 @@
     /**
      * This element specifies that when rendering this document in a page view, all lines of this paragraph are
      * maintained on a single page whenever possible.
-     * @param isKeepLines (true | false)
+     * @param {boolean} isKeepLines
      */
     ApiParaPr.prototype["SetKeepLines"] = function(isKeepLines)
     {
@@ -1187,7 +1354,7 @@
     /**
      * This element specifies that when rendering this document in a paginated view, the contents of this paragraph
      * are rendered on the start of a new page in the document.
-     * @param isPageBreakBefore (true | false)
+     * @param {boolean} isPageBreakBefore
      */
     ApiParaPr.prototype["SetPageBreakBefore"] = function(isPageBreakBefore)
     {
@@ -1197,7 +1364,7 @@
     /**
      * This element specifies whether a consumer shall prevent a single line of this paragraph from being displayed on
      * a separate page from the remaining content at display time by moving the line onto the following page.
-     * @param isWidowControl (true | false)
+     * @param {boolean} isWidowControl
      */
     ApiParaPr.prototype["SetWidowControl"] = function(isWidowControl)
     {
@@ -1345,6 +1512,20 @@
         this.Paragraph.Set_Pr(oApiParaPr.ParaPr);
         oApiParaPr.ParaPr = this.Paragraph.Pr.Copy();
     };
+    ApiParagraph.prototype.OnChangeTextPr = function(oApiTextPr)
+    {
+        this.Paragraph.TextPr.Set_Value(oApiTextPr.TextPr);
+        oApiTextPr.TextPr = this.Paragraph.TextPr.Value.Copy();
+    };
+    ApiRun.prototype.OnChangeTextPr = function(oApiTextPr)
+    {
+        this.Run.Set_Pr(oApiTextPr.TextPr);
+        oApiTextPr.TextPr = this.Run.Pr.Copy();
+    };
+    ApiRun.prototype.private_GetTextPr = function()
+    {
+        return new ApiTextPr(this, this.Run.Pr.Copy());
+    };
     ApiTable.prototype.private_GetImpl = function()
     {
         return this.Table;
@@ -1425,10 +1606,9 @@ function TEST_BUILDER()
     var oParagraph = Api.CreateParagraph();
     oParagraph.SetSpacingLine(276, "auto");
     oParagraph.SetJc("left");
-
-    var oEndRun = oParagraph.GetParagraphMark();
+    var oEndRun = oParagraph.GetParagraphMarkTextPr();
     oEndRun.SetFontSize(52);
-    oEndRun.SetColor(0x14, 0x14, 0x14);
+    oEndRun.SetColor(0x14, 0x14, 0x14, false);
     oEndRun.SetSpacing(5);
     oParagraph.AddPageBreak();
     // TODO: Добавить 2 автофигуры
@@ -1773,3 +1953,53 @@ function TEST_BUILDER()
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart(true);
 }
+
+function TEST_BUILDER2()
+{
+    var oLD = editor.WordControl.m_oLogicDocument;
+    oLD.Create_NewHistoryPoint();
+    //------------------------------------------------------------------------------------------------------------------
+    var Api = editor;
+    var oDocument  = Api.GetDocument();
+    var oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+
+    oParagraph.AddText("Plain");
+    oParagraph.AddText("Bold").SetBold(true);
+    oParagraph.AddText("Italic").SetItalic(true);
+    oParagraph.AddText("Strikeout").SetStrikeout(true);
+    oParagraph.AddText("Underline").SetUnderline(true);
+
+
+    //this.FontFamily = undefined;
+    //this.FontSize   = undefined;
+    //this.Color      = undefined;
+    //this.VertAlign  = undefined;
+    //this.HighLight  = undefined; // highlight_None/Color
+    //this.RStyle     = undefined;
+    //this.Spacing    = undefined; // Дополнительное расстояние между символвами
+    //this.DStrikeout = undefined; // Двойное зачеркивание
+    //this.Caps       = undefined;
+    //this.SmallCaps  = undefined;
+    //this.Position   = undefined; // Смещение по Y
+    //
+    //this.RFonts     = new CRFonts();
+    //this.BoldCS     = undefined;
+    //this.ItalicCS   = undefined;
+    //this.FontSizeCS = undefined;
+    //this.CS         = undefined;
+    //this.RTL        = undefined;
+    //this.Lang       = new CLang();
+    //this.Unifill    = undefined;
+    //this.FontRef    = undefined;
+    //
+    //this.Shd        = undefined;
+    //this.Vanish     = undefined;
+    //
+    //this.TextOutline = undefined;
+    //this.TextFill    = undefined;
+
+    //------------------------------------------------------------------------------------------------------------------
+    oLD.Recalculate_FromStart();
+}
+
