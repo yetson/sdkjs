@@ -23,7 +23,12 @@
  *
 */
 "use strict";
-
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 function FileHandler() {
 
     this.get = function ( file ) {
@@ -64,3 +69,8 @@ function getFile( filePath ) {
     var fh = new FileHandler();
     fh.get( filePath );
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].getFile = getFile;
+})(window);
