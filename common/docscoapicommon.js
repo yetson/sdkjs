@@ -34,13 +34,6 @@
  * @param {undefined} undefined
  */
   function(window, undefined) {
-  /*
-   * Import
-   * -----------------------------------------------------------------------------
-   */
-  var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-  var prot;
-
   /**
    * Класс user для совместного редактирования/просмотра документа
    * -----------------------------------------------------------------------------
@@ -96,26 +89,30 @@
     this.state = val;
   };
 
+  var ConnectionState = {
+    Reconnect: -1,	// reconnect state
+    None: 0,	// not initialized
+    WaitAuth: 1,	// waiting session id
+    Authorized: 2,	// authorized
+    ClosedCoAuth: 3,	// closed coauthoring
+    ClosedAll: 4,	// closed all
+
+    SaveChanges: 10		// save
+  };
+
   /*
    * Export
    * -----------------------------------------------------------------------------
    */
-  window["Asc"].asc_CUser = asc_CUser;
+  var prot;
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].asc_CUser = asc_CUser;
   prot = asc_CUser.prototype;
   prot["asc_getId"] = prot.asc_getId;
   prot["asc_getUserName"] = prot.asc_getUserName;
   prot["asc_getState"] = prot.asc_getState;
   prot["asc_getColor"] = prot.asc_getColor;
   prot["asc_getView"] = prot.asc_getView;
+
+  window["AscCommon"].ConnectionState = ConnectionState;
 })(window);
-
-var ConnectionState = {
-  Reconnect: -1,	// reconnect state
-  None: 0,	// not initialized
-  WaitAuth: 1,	// waiting session id
-  Authorized: 2,	// authorized
-  ClosedCoAuth: 3,	// closed coauthoring
-  ClosedAll: 4,	// closed all
-
-  SaveChanges: 10		// save
-};
