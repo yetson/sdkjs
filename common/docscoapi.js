@@ -1114,7 +1114,7 @@
 
       if (this._isReSaveAfterAuth) {
         var callbackAskSaveChanges = function(e) {
-          if (false == e["saveLock"]) {
+          if (false === e["saveLock"]) {
             t._reSaveChanges();
           } else {
             setTimeout(function() {
