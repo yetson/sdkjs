@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscColor = Asc.c_oAscColor;
+
 var c_oMainTables = {
     Main			: 255,
     App				: 1,
@@ -1644,16 +1647,16 @@ function CBinaryFileWriter()
         {
             switch (pPr.Jc)
             {
-                case align_Left:
+                case AscCommon.align_Left:
                     oThis._WriteUChar1(0, 4);
                     break;
-                case align_Center:
+                case AscCommon.align_Center:
                     oThis._WriteUChar1(0, 0);
                     break;
-                case align_Right:
+                case AscCommon.align_Right:
                     oThis._WriteUChar1(0, 5);
                     break;
-                case align_Justify:
+                case AscCommon.align_Justify:
                     oThis._WriteUChar1(0, 2);
                     break;
                 default:
@@ -1689,14 +1692,14 @@ function CBinaryFileWriter()
             {
                 switch (spacing.LineRule)
                 {
-                    case linerule_Auto:
+                    case Asc.linerule_Auto:
                         oThis.StartRecord(0);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteInt1(0, (spacing.Line * 100000) >> 0);
                         oThis.WriteUChar(g_nodeAttributeEnd);
                         oThis.EndRecord();
                         break;
-                    case linerule_Exact:
+                    case Asc.linerule_Exact:
                         oThis.StartRecord(0);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteInt1(1, (spacing.Line / 0.00352777778) >> 0);
@@ -1906,9 +1909,9 @@ function CBinaryFileWriter()
             oThis._WriteInt1(17, rPr.FontSize * 100);
         }
 
-        if (vertalign_SubScript == rPr.VertAlign)
+        if (AscCommon.vertalign_SubScript == rPr.VertAlign)
             oThis._WriteInt1(2, -25000);
-        else if (vertalign_SuperScript == rPr.VertAlign)
+        else if (AscCommon.vertalign_SuperScript == rPr.VertAlign)
             oThis._WriteInt1(2, 30000);
 
         oThis.WriteUChar(g_nodeAttributeEnd);

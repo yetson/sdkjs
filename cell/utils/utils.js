@@ -40,6 +40,8 @@
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
 
+		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+
 		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
 
@@ -1040,7 +1042,7 @@
 				}
 			},
 			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
-			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, c_oAscMaxTooltipLength) : val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, Asc.c_oAscMaxTooltipLength) : val; },
 			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
 			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
 			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
@@ -1366,7 +1368,7 @@
           oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
           this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
+          this.defaultStyles.push(new CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
         }
       },
       generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
@@ -1386,7 +1388,7 @@
           }
 
           this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
+          this.docStyles.push(new CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
         }
       },
       drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
@@ -1399,7 +1401,7 @@
         }
 
         var drawBorder = function(b, x1, y1, x2, y2) {
-          if (null != b && c_oAscBorderStyles.None !== b.s) {
+          if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
             oGraphics.setStrokeStyle(b.c);
 
             // ToDo поправить

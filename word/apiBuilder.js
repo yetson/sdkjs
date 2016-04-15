@@ -1447,11 +1447,11 @@
     ApiTextPr.prototype.SetVertAlign = function(sType)
     {
         if ("baseline" === sType)
-            this.TextPr.VertAlign = vertalign_Baseline;
+            this.TextPr.VertAlign = AscCommon.vertalign_Baseline;
         else if ("subscript" === sType)
-            this.TextPr.VertAlign = vertalign_SubScript;
+            this.TextPr.VertAlign = AscCommon.vertalign_SubScript;
         else if ("superscript" === sType)
-            this.TextPr.VertAlign = vertalign_SuperScript;
+            this.TextPr.VertAlign = AscCommon.vertalign_SuperScript;
 
         this.private_OnChange();
     };
@@ -1649,18 +1649,18 @@
         {
             if ("auto" === sLineRule)
             {
-                this.ParaPr.Spacing.LineRule = linerule_Auto;
+                this.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
                 this.ParaPr.Spacing.Line = nLine / 240.0;
             }
             else if ("atLeast" === sLineRule)
             {
-                this.ParaPr.Spacing.LineRule = linerule_AtLeast;
+                this.ParaPr.Spacing.LineRule = Asc.linerule_AtLeast;
                 this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
 
             }
             else if ("exact" === sLineRule)
             {
-                this.ParaPr.Spacing.LineRule = linerule_Exact;
+                this.ParaPr.Spacing.LineRule = Asc.linerule_Exact;
                 this.ParaPr.Spacing.Line = private_Twips2MM(nLine);
             }
         }
@@ -2043,18 +2043,18 @@
         {
             if ("auto" === sLineRule)
             {
-                oSp.LineRule = linerule_Auto;
+                oSp.LineRule = Asc.linerule_Auto;
                 oSp.Line = nLine / 240.0;
             }
             else if ("atLeast" === sLineRule)
             {
-                oSp.LineRule = linerule_AtLeast;
+                oSp.LineRule = Asc.linerule_AtLeast;
                 oSp.Line = private_Twips2MM(nLine);
 
             }
             else if ("exact" === sLineRule)
             {
-                oSp.LineRule = linerule_Exact;
+                oSp.LineRule = Asc.linerule_Exact;
                 oSp.Line = private_Twips2MM(nLine);
             }
         }
@@ -2093,13 +2093,13 @@
     function private_GetParaAlign(sJc)
     {
         if ("left" === sJc)
-            return align_Left;
+            return AscCommon.align_Left;
         else if ("right" === sJc)
-            return align_Right;
+            return AscCommon.align_Right;
         else if ("both" === sJc)
-            return align_Justify;
+            return AscCommon.align_Justify;
         else if ("center" === sJc)
-            return align_Center;
+            return AscCommon.align_Center;
 
         return undefined;
     }
@@ -2124,9 +2124,9 @@
         var oShd = new CDocumentShd();
 
         if ("nil" === sType)
-            oShd.Value = shd_Nil;
+            oShd.Value = Asc.c_oAscShdNil;
         else if ("clear" === sType)
-            oShd.Value = shd_Clear;
+            oShd.Value = Asc.c_oAscShdClear;
 
         oShd.Color.Set(r, g, b, isAuto);
         return oShd;

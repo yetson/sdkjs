@@ -24,11 +24,6 @@
 */
 "use strict";
 
-/* docscoapicommon.js
- *
- * Author: Alexander.Trofimov
- * Date: 09.11.12
- */
 (/**
  * @param {Window} window
  * @param {undefined} undefined
