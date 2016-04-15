@@ -441,10 +441,8 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                     break;
                 }
             }
-            chart_space.displayHidden = oSparklineGroup.displayHidden;
         }
-
-
+        chart_space.displayHidden = oSparklineGroup.displayHidden;
         settings.putTitle(c_oAscChartTitleShowSettings.none);
         settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
         settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);

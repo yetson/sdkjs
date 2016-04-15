@@ -2364,7 +2364,7 @@ CChartSpace.prototype =
                         {
                             var range = range1.bbox;
 
-                            var nLastNoEmptyIndex = null, dLastNoEmptyVal = null, aSpanPoints = [];
+                            var nLastNoEmptyIndex = null, dLastNoEmptyVal = null, aSpanPoints = [], nSpliceIndex = null;
                             if(range.r1 === range.r2 || bVertical === true)
                             {
                                 row_hidden = source_worksheet.getRowHidden(range.r1);
@@ -2390,14 +2390,16 @@ CChartSpace.prototype =
                                                 if(isRealNumber(nLastNoEmptyIndex))
                                                 {
                                                     var oStartPoint = num_cache.getPtByIndex(nLastNoEmptyIndex);
-                                                    for(t = 0; t < aSpanPoints.length; ++i)
+                                                    for(t = 0; t < aSpanPoints.length; ++t)
                                                     {
-
+                                                        aSpanPoints[t].val = oStartPoint.val + ((pt.val - oStartPoint.val)/(aSpanPoints.length + 1))*(t+1);
+                                                        num_cache.pts.splice(nSpliceIndex + t, 0, aSpanPoints[t]);
                                                     }
                                                 }
                                                 aSpanPoints.length = 0;
                                             }
                                             nLastNoEmptyIndex = pt_index;
+                                            nSpliceIndex = num_cache.pts.length;
                                             dLastNoEmptyVal = pt.val;
                                         }
                                         else
@@ -2416,7 +2418,6 @@ CChartSpace.prototype =
                                                     pt = new CNumericPoint();
                                                     pt.setIdx(pt_index);
                                                     pt.setVal(0);
-                                                    num_cache.addPt(pt);
                                                     aSpanPoints.push(pt);
                                                 }
                                             }
