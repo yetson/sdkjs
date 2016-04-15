@@ -11232,12 +11232,6 @@ CDocument.prototype =
             bUpdateSelection = false;
             bRetValue = keydownresult_PreventAll;
         }
-        //else if (e.KeyCode === 113)
-        //{
-        //    // Для теста
-        //    TEST_BUILDER();
-        //    bRetValue = keydownresult_PreventAll;
-        //}
         else if ( e.KeyCode == 121 && true === e.ShiftKey ) // Shift + F10 - контекстное меню
         {
             var X_abs, Y_abs, oPosition, ConvertedPos;
@@ -16039,6 +16033,10 @@ CDocument.prototype.Remove_ForeignCursor = function(UserId)
 CDocument.prototype.private_UpdateTargetForCollaboration = function()
 {
     this.NeedUpdateTargetForCollaboration = true;
+};
+CDocument.prototype.Get_HdrFtr = function()
+{
+    return this.HdrFtr;
 };
 CDocument.prototype.Get_DrawingDocument = function()
 {
