@@ -49,6 +49,7 @@ function CThemeLoader()
     this.Api = null;
     this.CurrentLoadThemeIndex = -1;
     this.ThemesUrl = "";
+    this.ThemesUrlAbs = "";
 
     this.IsReloadBinaryThemeEditorNow = false;
 

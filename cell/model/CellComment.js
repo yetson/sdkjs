@@ -1474,6 +1474,7 @@ CCellCommentator.prototype.Redo = function(type, data) {
 	//----------------------------------------------------------export----------------------------------------------------
 	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 	window["AscCommonExcel"].asc_CCommentCoords = asc_CCommentCoords;
+	window["AscCommonExcel"].CompositeCommentData = CompositeCommentData;
 	window["AscCommonExcel"].CCellCommentator = CCellCommentator;
 
 	window['Asc'] = window['Asc'] || {};

@@ -1068,6 +1068,10 @@ CGraphicFrame.prototype =
 
 
     },
+    Get_PageContentStartPos2: function()
+    {
+        return this.Get_PageContentStartPos();
+    },
 
     hitToHandles: function()
     {
