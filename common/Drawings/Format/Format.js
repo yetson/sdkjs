@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscColor = Asc.c_oAscColor;
+
 // COLOR -----------------------
 /*
  var map_color_scheme = {};

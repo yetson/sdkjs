@@ -24,6 +24,9 @@
 */
 ﻿"use strict";
 
+// Import
+var c_oAscDocumentUnits = Asc.c_oAscDocumentUnits;
+
 function CTab(pos,type)
 {
     this.pos   = pos;
@@ -2206,7 +2209,7 @@ function CHorRuler()
                 _arr.Add( new CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
         }
         
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetParagraphTabs);
             this.m_oWordControl.m_oLogicDocument.Set_ParagraphTabs(_arr);
@@ -2215,7 +2218,7 @@ function CHorRuler()
 
     this.SetPrProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetParagraphIndentFromRulers);
             this.m_oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
@@ -2225,7 +2228,7 @@ function CHorRuler()
     }
     this.SetMarginProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetDocumentMargin_Hor);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Left : this.m_dMarginLeft, Right : this.m_dMarginRight });
@@ -2236,7 +2239,7 @@ function CHorRuler()
 
     this.SetTableProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetTableMarkup_Hor);
 
@@ -3615,7 +3618,7 @@ function CVerRuler()
     // выставление параметров логическому документу
     this.SetMarginProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Document_SectPr) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetDocumentMargin_Ver);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Top : this.m_dMarginTop, Bottom : this.m_dMarginBottom });
@@ -3623,7 +3626,7 @@ function CVerRuler()
     }
     this.SetHeaderProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
         {
             // TODO: в данной функции при определенных параметрах может меняться верхнее поле. Поэтому, надо
             //       вставить проверку на залоченность с типом changestype_Document_SectPr
@@ -3634,7 +3637,7 @@ function CVerRuler()
     }
     this.SetTableProperties = function()
     {
-        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+        if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
         {
             this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetTableMarkup_Ver);
 

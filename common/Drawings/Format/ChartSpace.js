@@ -24,6 +24,11 @@
 */
 "use strict";
 
+// Import
+var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
+var c_oAscChartType = Asc.c_oAscChartType;
+var c_oAscChartSubType = Asc.c_oAscChartSubType;
+
 var EFFECT_NONE = 0;
 var EFFECT_SUBTLE = 1;
 var EFFECT_MODERATE = 2;
@@ -513,11 +518,11 @@ CChartSpace.prototype =
             var theme = parent_objects.theme;
 
             var para_pr = new CParaPr();
-            para_pr.Jc = align_Center;
+            para_pr.Jc = AscCommon.align_Center;
             para_pr.Spacing.Before = 0.0;
             para_pr.Spacing.After = 0.0;
             para_pr.Spacing.Line = 1;
-            para_pr.Spacing.LineRule = linerule_Auto;
+            para_pr.Spacing.LineRule = Asc.linerule_Auto;
             style.ParaPr = para_pr;
 
             var minor_font = theme.themeElements.fontScheme.minorFont;
@@ -4011,7 +4016,7 @@ CChartSpace.prototype =
 
                                 var content = dlbl.tx.rich.content;
                                 content.Set_ApplyToAll(true);
-                                content.Set_ParagraphAlign(align_Center);
+                                content.Set_ParagraphAlign(AscCommon.align_Center);
                                 content.Set_ApplyToAll(false);
                                 dlbl.txBody = dlbl.tx.rich;
                                 if(cat_ax.labels.arrLabels.length > 0)
@@ -4542,7 +4547,7 @@ CChartSpace.prototype =
                                     {
                                         var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                        cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Left);
+                                        cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
                                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                         var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                         w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -4587,7 +4592,7 @@ CChartSpace.prototype =
                                     {
                                         var label_text_transform = cat_ax.labels.arrLabels[i].transformText;
                                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(true);
-                                        cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(align_Left);
+                                        cat_ax.labels.arrLabels[i].tx.rich.content.Set_ParagraphAlign(AscCommon.align_Left);
                                         cat_ax.labels.arrLabels[i].tx.rich.content.Set_ApplyToAll(false);
                                         var wh = cat_ax.labels.arrLabels[i].tx.rich.getContentOneStringSizes();//Todo: не расчитывать больше контент
                                         w2 = wh.w*Math.cos(Math.PI/4) + wh.h*Math.sin(Math.PI/4);
@@ -5141,7 +5146,7 @@ CChartSpace.prototype =
                                     dlbl.lastStyleObject = cat_ax.labels.arrLabels[0].lastStyleObject;
                                 }
                                 dlbl.tx.rich.content.Set_ApplyToAll(true);
-                                dlbl.tx.rich.content.Set_ParagraphAlign(align_Center);
+                                dlbl.tx.rich.content.Set_ParagraphAlign(AscCommon.align_Center);
                                 dlbl.tx.rich.content.Set_ApplyToAll(false);
                                 var min_max =  dlbl.tx.rich.content.Recalculate_MinMaxContentWidth();
                                 var max_min_content_width = min_max.Min;
@@ -6000,7 +6005,7 @@ CChartSpace.prototype =
                             union_marker.lineMarker = CreateMarkerGeometryByType(SYMBOL_DASH, null);
                             union_marker.lineMarker.pen = pt.pen;
                         }
-                        if(!b_scatter_no_line && this.chart.view3D)
+                        if(!b_scatter_no_line && !this.chart.view3D)
                             b_line_series = true;
                     }
                     else
@@ -8412,7 +8417,7 @@ CChartSpace.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.SaveGrState();
                 graphics.transform3(this.transform);
@@ -8880,7 +8885,7 @@ CChartSpace.prototype =
                 var pos = readLong(r);
                 if(this.worksheet)
                 {
-                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
                 addToDrawings(this.worksheet, this, pos);
                 break;
@@ -12003,7 +12008,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
         }
     }
 
-	var bIsScatter = (c_oAscChartTypeSettings.scatter <= options.type && options.type <= c_oAscChartTypeSettings.scatterSmoothMarker);
+	var bIsScatter = (Asc.c_oAscChartTypeSettings.scatter <= options.type && options.type <= Asc.c_oAscChartTypeSettings.scatterSmoothMarker);
 	var top_header_bbox, left_header_bbox, ser, startCell, endCell, formulaCell, seriaName, start, end, formula, numCache, sStartCellId, sEndCellId;
 	if (!options.getInColumns()) {
 		if(parsedHeaders.bTop)

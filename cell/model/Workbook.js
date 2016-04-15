@@ -25,6 +25,9 @@
 "use strict";
 
 // Import
+var CellValueType = AscCommon.CellValueType;
+var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
 var UndoRedoData_CellValueData = AscCommonExcel.UndoRedoData_CellValueData;
@@ -3340,7 +3343,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 			if (oFormulaExt.t == Asc.ECellFormulaType.cellformulatypeShared) {
 				if(null != oFormulaExt.si){
 					if(null != oFormulaExt.ref){
-            if (oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
+            if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
               formulaShared[oFormulaExt.si] = {
                 fVal: new parserFormula(oFormulaExt.v, "", this), fRef: function(t) {
                   var r = t.getRange2(oFormulaExt.ref);
@@ -3371,7 +3374,7 @@ Woorksheet.prototype.initPostOpen = function(handlers){
 				}
 			}
 			if(oFormulaExt.v) {
-        if (oFormulaExt.v.length <= c_oAscMaxFormulaLength) {
+        if (oFormulaExt.v.length <= AscCommon.c_oAscMaxFormulaLength) {
           oCell.setFormula(oFormulaExt.v);
           if(oFormulaExt.ca) {
             oCell.sFormulaCA = true;

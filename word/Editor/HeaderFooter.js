@@ -30,8 +30,9 @@
  * Time: 14:51
  */
 
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
+// Import
+var hdrftr_Header = AscCommon.hdrftr_Header;
+var hdrftr_Footer = AscCommon.hdrftr_Footer;
 
 //-----------------------------------------------------------------------------------
 // Класс работающий с одним колонтитулом
@@ -2068,7 +2069,7 @@ CHeaderFooterController.prototype =
         {
             if ( null === this.Pages[PageIndex].Header )
             {
-                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
@@ -2087,7 +2088,7 @@ CHeaderFooterController.prototype =
         {
             if ( null === this.Pages[PageIndex].Footer )
             {
-                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;

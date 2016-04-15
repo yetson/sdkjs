@@ -25,7 +25,20 @@
 "use strict";
 
 // Import
+var DownloadType = AscCommon.DownloadType;
+var locktype_None = AscCommon.locktype_None;
+var locktype_Mine = AscCommon.locktype_Mine;
+var locktype_Other = AscCommon.locktype_Other;
+var locktype_Other2 = AscCommon.locktype_Other2;
+var locktype_Other3 = AscCommon.locktype_Other3;
+var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
+
 var c_oAscError = Asc.c_oAscError;
+var c_oAscFileType = Asc.c_oAscFileType;
+var c_oAscAsyncAction = Asc.c_oAscAsyncAction;
+var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
+var c_oAscTypeSelectElement = Asc.c_oAscTypeSelectElement;
+var c_oAscFill = Asc.c_oAscFill;
 
 var c_oSerFormat = {
     Version		: 1,
@@ -963,8 +976,8 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 
     ParaPr.StyleName = "";
     var TextPr = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
-    ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-    ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+    ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+    ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
     ParaPr.Strikeout   = TextPr.Strikeout;
     ParaPr.DStrikeout  = TextPr.DStrikeout;
     ParaPr.AllCaps     = TextPr.Caps;
@@ -1604,11 +1617,11 @@ asc_docs_api.prototype.paraApply = function(Props)
                 var TextPr = new CTextPr();
 
                 if ( true === Props.Subscript )
-                    TextPr.VertAlign = vertalign_SubScript;
+                    TextPr.VertAlign = AscCommon.vertalign_SubScript;
                 else if ( true === Props.Superscript )
-                    TextPr.VertAlign = vertalign_SuperScript;
+                    TextPr.VertAlign = AscCommon.vertalign_SuperScript;
                 else if ( false === Props.Superscript || false === Props.Subscript )
-                    TextPr.VertAlign = vertalign_Baseline;
+                    TextPr.VertAlign = AscCommon.vertalign_Baseline;
 
                 if ( undefined != Props.Strikeout )
                 {
@@ -2970,7 +2983,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
 
 asc_docs_api.prototype.ChartApply = function(obj)
 {
-    if(obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock && this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+    if(obj.ChartProperties && obj.ChartProperties.type === Asc.c_oAscChartTypeSettings.stock && this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
     {
         if(!CheckStockChart(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].graphicObjects, this))
         {
@@ -3225,7 +3238,7 @@ function asc_CCommentData( obj )
 }
 
 asc_CCommentData.prototype.asc_getText         = function()  { return this.m_sText; };
-asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, c_oAscMaxCellOrCommentLength) : v; };
+asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, Asc.c_oAscMaxCellOrCommentLength) : v; };
 asc_CCommentData.prototype.asc_getTime         = function()  { return this.m_sTime; };
 asc_CCommentData.prototype.asc_putTime         = function(v) { this.m_sTime = v; };
 asc_CCommentData.prototype.asc_getUserId       = function()  { return this.m_sUserId; };
@@ -3278,7 +3291,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id ) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveComment);
         this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
@@ -3693,7 +3706,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
         this.asc_setViewMode(true);
 
 	// Меняем тип состояния (на никакое)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+	this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
 };
 
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
@@ -4080,7 +4093,7 @@ function CHyperlinkProperty( obj )
 CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
 CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
 CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v ? v.slice(0, c_oAscMaxTooltipLength) : v; };
+CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v; };
 CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
 CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
 
@@ -4401,7 +4414,7 @@ asc_docs_api.prototype.ChangeTheme = function(indexTheme)
     if (true === CollaborativeEditing.Get_GlobalLock())
         return;
 
-    if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Theme) === false)
+    if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false)
     {
         CollaborativeEditing.m_bGlobalLock = true;
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_ChangeTheme);
@@ -4587,7 +4600,7 @@ asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 
 asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 {
-    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming) === false)
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_SlideTiming) === false)
     {
         History.Create_NewPoint(historydescription_Presentation_ApplyTiming);
         var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
@@ -4602,7 +4615,7 @@ asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 asc_docs_api.prototype.SlideTimingApplyToAll = function()
 {
 
-    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming, {All: true}) === false)
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_SlideTiming, {All: true}) === false)
     {
         History.Create_NewPoint(historydescription_Presentation_ApplyTimingToAll);
         var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
@@ -4759,7 +4772,7 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["vkey"] = editor.documentVKey;
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
-	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }

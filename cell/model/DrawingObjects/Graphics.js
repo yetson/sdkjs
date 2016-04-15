@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+
 window.g_fontManager2 = null;
 window.g_fontManager2;
 
@@ -1697,15 +1700,15 @@ CGraphics.prototype =
 
         switch (lock_type)
         {
-            case locktype_None:
-            case locktype_Mine:
+            case AscCommon.locktype_None:
+            case AscCommon.locktype_Mine:
             {
                 this.p_color(155, 187, 277, 255);
                 ctx.lineWidth = 2;
                 break;
             }
-            case locktype_Other:
-            case locktype_Other2:
+            case AscCommon.locktype_Other:
+            case AscCommon.locktype_Other2:
             {
                 this.p_color(238, 53, 37, 255);
                 ctx.lineWidth = 1;
@@ -1766,15 +1769,15 @@ CGraphics.prototype =
 
         switch (lock_type)
         {
-            case locktype_None:
-            case locktype_Mine:
+            case AscCommon.locktype_None:
+            case AscCommon.locktype_Mine:
             {
                 this.p_color(155, 187, 277, 255);
                 ctx.lineWidth = 2;
                 break;
             }
-            case locktype_Other:
-            case locktype_Other2:
+            case AscCommon.locktype_Other:
+            case AscCommon.locktype_Other2:
             {
                 this.p_color(238, 53, 37, 255);
                 ctx.lineWidth = 1;
