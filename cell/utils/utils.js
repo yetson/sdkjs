@@ -1325,7 +1325,7 @@
 
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
-      if (AscBrowser.isRetina) {
+      if (AscCommon.AscBrowser.isRetina) {
         this.styleThumbnailWidthWithRetina <<= 1;
         this.styleThumbnailHeightWithRetina <<= 1;
       }

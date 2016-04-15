@@ -47,9 +47,6 @@ var History = {};
 window["Asc"] = {};
 var Asc = window["Asc"];
 
-window["AscBrowser"] = {};
-var AscBrowser = window["AscBrowser"];
-
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 
@@ -5253,7 +5250,7 @@ function OfflineEditor () {
 
             window['native'].SetStylesType(1);
 
-            if (AscBrowser.isRetina) {
+            if (AscCommon.AscBrowser.isRetina) {
                 styleThumbnailWidth <<= 1;
                 styleThumbnailHeight <<= 1;
             }
@@ -5711,7 +5708,7 @@ function OfflineEditor () {
 
                 var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
                 var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                if (AscBrowser.isRetina)
+                if (AscCommon.AscBrowser.isRetina)
                 {
                     _width_px <<= 1;
                     _height_px <<= 1;

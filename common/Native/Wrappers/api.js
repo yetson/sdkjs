@@ -5178,7 +5178,7 @@ CStylesPainter.prototype =
         var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
         var dKoefToMM = g_dKoef_pix_to_mm;
 
-        if (AscBrowser.isRetina)
+        if (AscCommon.AscBrowser.isRetina)
         {
             _w_px *= 2;
             _h_px *= 2;
@@ -5391,7 +5391,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
         }
     }
 
-    AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
+    AscCommon.AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
 
     if (this.WordControl.m_oDrawingDocument.IsRetina && this.WordControl.m_oDrawingDocument.IsMobile)
     {
@@ -5544,7 +5544,7 @@ ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, sty
 
         var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
         var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-        if (AscBrowser.isRetina)
+        if (AscCommon.AscBrowser.isRetina)
         {
             _width_px <<= 1;
             _height_px <<= 1;

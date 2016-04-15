@@ -25,6 +25,7 @@
 "use strict";
 
 // Import
+var AscBrowser = AscCommon.AscBrowser;
 var locktype_None = AscCommon.locktype_None;
 var locktype_Mine = AscCommon.locktype_Mine;
 var locktype_Other = AscCommon.locktype_Other;

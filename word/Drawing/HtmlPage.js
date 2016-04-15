@@ -24,6 +24,9 @@
 */
 ﻿"use strict";
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 

@@ -24,6 +24,9 @@
 */
 ﻿"use strict";
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+
 var g_bIsAppleDevices = AscBrowser.isAppleDevices;
 
 function get_raster_bounds(data, width, height, stride)
