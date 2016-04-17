@@ -243,6 +243,13 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+	/**
+     * Create new history point
+     */
+	ApiDocument.prototype.Create_NewHistoryPoint = function()
+    {
+        this.Document.Create_NewHistoryPoint();
+    };
     /**
      * Get the number of elements.
      * @returns {number}
@@ -2013,6 +2020,9 @@
     Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
     Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
 
+	ApiDocument.prototype["Create_NewHistoryPoint"]  = ApiDocument.prototype.Create_NewHistoryPoint;
+	ApiDocument.prototype["GetDefaultTextPr"]        = ApiDocument.prototype.GetDefaultTextPr;
+	ApiDocument.prototype["GetDefaultParaPr"]        = ApiDocument.prototype.GetDefaultParaPr;
     ApiDocument.prototype["GetElementsCount"]        = ApiDocument.prototype.GetElementsCount;
     ApiDocument.prototype["GetElement"]              = ApiDocument.prototype.GetElement;
     ApiDocument.prototype["AddElement"]              = ApiDocument.prototype.AddElement;
@@ -2085,6 +2095,7 @@
     ApiSection.prototype["RemoveFooter"]             = ApiSection.prototype.RemoveFooter;
     ApiSection.prototype["SetTitlePage"]             = ApiSection.prototype.SetTitlePage;
 
+	ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
     ApiTable.prototype["GetRowsCount"]               = ApiTable.prototype.GetRowsCount;
     ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
     ApiTable.prototype["MergeCells"]                 = ApiTable.prototype.MergeCells;
