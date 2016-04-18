@@ -3259,6 +3259,8 @@ function OfflineEditor () {
 
     this.beforeOpen  = function() {
 
+        var offlineEditor = this;
+
         function __selectDrawingObjectRange(drawing, worksheet) {
             worksheet.cleanSelection();
             worksheet.arrActiveChartsRanges = [];
@@ -3275,15 +3277,7 @@ function OfflineEditor () {
 
         DrawingArea.prototype.drawSelection = function(drawingDocument) {
 
-            g_oTextMeasurer.m_oFont = null;
-            g_oTextMeasurer.m_oTextPr = null;
-            g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
-            g_oTextMeasurer.m_oLastFont = new CFontSetup();
-            g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
-            g_oTextMeasurer.Ascender  = 0;
-            g_oTextMeasurer.Descender = 0;
-            g_oTextMeasurer.Height = 0;
-            g_oTextMeasurer.UnitsPerEm = 0;
+            offlineEditor.flushTextMeasurer();
 
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
             var shapeCtx = canvas.shapeCtx;
@@ -3726,15 +3720,7 @@ function OfflineEditor () {
 
             window.native["SwitchMemoryLayer"]();
 
-            g_oTextMeasurer.m_oFont = null;
-            g_oTextMeasurer.m_oTextPr = null;
-            g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
-            g_oTextMeasurer.m_oLastFont = new CFontSetup();
-            g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
-            g_oTextMeasurer.Ascender  = 0;
-            g_oTextMeasurer.Descender = 0;
-            g_oTextMeasurer.Height = 0;
-            g_oTextMeasurer.UnitsPerEm = 0;
+            offlineEditor.flushTextMeasurer();
 
             this.objectRender.showDrawingObjectsEx(false);
 
@@ -5779,6 +5765,18 @@ function OfflineEditor () {
         }
     };
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
+
+    this.flushTextMeasurer = function () {
+        g_oTextMeasurer.m_oFont = null;
+        g_oTextMeasurer.m_oTextPr = null;
+        g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
+        g_oTextMeasurer.m_oLastFont = new CFontSetup();
+        g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
+        g_oTextMeasurer.Ascender  = 0;
+        g_oTextMeasurer.Descender = 0;
+        g_oTextMeasurer.Height = 0;
+        g_oTextMeasurer.UnitsPerEm = 0;
+    };
 }
 var _s = new OfflineEditor();
 
@@ -6701,12 +6699,16 @@ function offline_apply_event(type,params) {
 
         case 3: // ASC_MENU_EVENT_TYPE_UNDO
         {
+            _s.flushTextMeasurer();
+
             _api.asc_Undo();
             _s.asc_WriteAllWorksheets(true);
             break;
         }
         case 4: // ASC_MENU_EVENT_TYPE_REDO
         {
+            _s.flushTextMeasurer();
+
             _api.asc_Redo();
             _s.asc_WriteAllWorksheets(true);
             break;
