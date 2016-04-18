@@ -32,6 +32,7 @@ var locktype_Other = AscCommon.locktype_Other;
 var locktype_Other2 = AscCommon.locktype_Other2;
 var locktype_Other3 = AscCommon.locktype_Other3;
 var contentchanges_Add = AscCommon.contentchanges_Add;
+var CColor = AscCommon.CColor;
 
 var c_oAscFileType = Asc.c_oAscFileType;
 
@@ -1593,7 +1594,7 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 			}
 
 			if (Asc.c_oAscChartTypeSettings.stock === chartType) {
-                var chartSettings = new asc_ChartSettings();
+                var chartSettings = new AscCommon.asc_ChartSettings();
                 chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
                 chartSettings.putRange(sDataRange);
                 chartSettings.putInColumns(!isRows);
@@ -2510,7 +2511,7 @@ function getUserColorById(userId, userName, isDark, isNumericValue)
     }
     else
     {
-        var nColor = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
+        var nColor = Asc.c_oAscArrUserColors[g_oUserNextColorIndex % Asc.c_oAscArrUserColors.length];
         ++g_oUserNextColorIndex;
 
       res = g_oUserColorById[userId||userName] = new CUserCacheColor(nColor);

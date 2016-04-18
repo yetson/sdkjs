@@ -1380,7 +1380,7 @@ CPresentation.prototype =
                     ResultHeight -= (oMargins.Top + oMargins.Bottom);
                 }
             }
-            content[i].Set_Height(ResultHeight, heightrule_AtLeast );
+            content[i].Set_Height(ResultHeight, Asc.linerule_AtLeast );
         }
     },
 
@@ -1477,7 +1477,7 @@ CPresentation.prototype =
             var Row = table.Content[i];
             if(isRealNumber(RowHeight))
             {
-                Row.Set_Height(RowHeight, heightrule_AtLeast);
+                Row.Set_Height(RowHeight, Asc.linerule_AtLeast);
             }
             //for(var j = 0; j < Row.Content.length; ++j)
             //{
@@ -3282,6 +3282,7 @@ CPresentation.prototype =
             {
                 drawing_props.imageProps.Width = drawing_props.imageProps.w;
                 drawing_props.imageProps.Height = drawing_props.imageProps.h;
+                drawing_props.imageProps.Position = {X: drawing_props.imageProps.x, Y: drawing_props.imageProps.y};
                 editor.sync_ImgPropCallback(drawing_props.imageProps);
             }
 
