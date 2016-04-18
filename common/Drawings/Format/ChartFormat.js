@@ -4344,7 +4344,7 @@ CCatAx.prototype =
 
     getMenuProps: function()
     {
-        var ret = new asc_CatAxisSettings();
+        var ret = new AscCommon.asc_CatAxisSettings();
 
         if(isRealNumber(this.tickMarkSkip))
             ret.putIntervalBetweenTick(this.tickMarkSkip);
@@ -8692,7 +8692,7 @@ CValAx.prototype =
 
     getMenuProps: function()
     {
-        var ret = new asc_ValAxisSettings();
+        var ret = new AscCommon.asc_ValAxisSettings();
         var scaling = this.scaling;
 
         //настройки логарифмической шкалы

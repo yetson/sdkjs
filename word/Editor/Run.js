@@ -8677,7 +8677,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             var unifill = this.Pr.Unifill;
             if(typeof CollaborativeEditing !== "undefined")
             {
-                if(unifill && unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                if(unifill && unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                 {
                     CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
                 }
@@ -8796,7 +8796,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Unifill = unifill;
                 if(typeof CollaborativeEditing !== "undefined")
                 {
-                    if(unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                    if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                     {
                         CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
                     }

@@ -41,6 +41,7 @@ var c_oAscGridLinesSettings = Asc.c_oAscGridLinesSettings;
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
+var c_oAscFill = Asc.c_oAscFill;
 
 
 var HANDLE_EVENT_MODE_HANDLE = 0;
@@ -1753,16 +1754,16 @@ DrawingObjectsController.prototype =
 
     setCellBackgroundColor: function (color)
     {
-        var fill = new asc_CShapeFill();
+        var fill = new Asc.asc_CShapeFill();
         if(color)
         {
-            fill.type = Asc.c_oAscFill.FILL_TYPE_SOLID;
-            fill.fill = new asc_CFillSolid();
+            fill.type = c_oAscFill.FILL_TYPE_SOLID;
+            fill.fill = new Asc.asc_CFillSolid();
             fill.fill.color = color;
         }
         else
         {
-            fill.type = Asc.c_oAscFill.FILL_TYPE_NOFILL;
+            fill.type = c_oAscFill.FILL_TYPE_NOFILL;
         }
 
         this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{fill: fill}], false, historydescription_Spreadsheet_SetCellBackgroundColor);
@@ -3745,7 +3746,7 @@ DrawingObjectsController.prototype =
     getPropsFromChart: function(chart_space)
     {
         var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-        var ret = new asc_ChartSettings();
+        var ret = new AscCommon.asc_ChartSettings();
         var range_obj = chart_space.getRangeObjectStr();
         if(range_obj)
         {
@@ -4021,7 +4022,7 @@ DrawingObjectsController.prototype =
             for(var i = 0; i < chart_type.series.length; ++i)
             {
                 if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                 {
                     b_no_line = false;
                     break;
@@ -4126,7 +4127,7 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < chart_type.series.length; ++i)
                 {
                     if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                     {
                         break;
                     }
@@ -5511,7 +5512,7 @@ DrawingObjectsController.prototype =
         {
             return ExecuteNoHistory(function()
             {
-                var options = new asc_ChartSettings();
+                var options = new AscCommon.asc_ChartSettings();
                 options.type = type;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
                 var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
@@ -5524,10 +5525,10 @@ DrawingObjectsController.prototype =
                 }
                 if(type === c_oAscChartTypeSettings.scatter)
                 {
-                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    var new_hor_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_hor_axis_settings.setDefault();
                     options.putHorAxisProps(new_hor_axis_settings);
-                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    var new_vert_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_vert_axis_settings.setDefault();
                     options.putVertAxisProps(new_vert_axis_settings);
                     options.putHorGridLines(c_oAscGridLinesSettings.major);
@@ -6560,7 +6561,7 @@ DrawingObjectsController.prototype =
                         table_props = new_table_props;
                         if(new_table_props.CellsBackground)
                         {
-                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== FILL_TYPE_NONE)
+                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                             {
                                 new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                 var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
@@ -6579,7 +6580,7 @@ DrawingObjectsController.prototype =
                             {
                                 if(!border)
                                     return;
-                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== FILL_TYPE_NONE)
+                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                                 {
                                     border.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                     var RGBA = border.Unifill.getRGBAColor();
@@ -6757,9 +6758,9 @@ DrawingObjectsController.prototype =
         var ret = [], i, bParaLocked = false;
         if(isRealObject(props.shapeChartProps))
         {
-            shape_props = new asc_CImgProperty();
+            shape_props = new Asc.asc_CImgProperty();
             shape_props.fromGroup = props.shapeChartProps.fromGroup;
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeChartProps.type;
             shape_props.ShapeProperties.fill = props.shapeChartProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
@@ -6768,7 +6769,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeChartProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeChartProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeChartProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeChartProps.verticalTextAlign;
             shape_props.vert = props.shapeChartProps.vert;
@@ -6779,7 +6780,7 @@ DrawingObjectsController.prototype =
             var oTextArtProperties;
             if (!isRealObject(props.shapeProps))
             {
-                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6797,7 +6798,7 @@ DrawingObjectsController.prototype =
                 if(pr.textArtProperties)
                 {
                     oTextArtProperties = pr.textArtProperties;
-                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                     {
                         if(api)
                             this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6820,9 +6821,9 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.shapeProps))
         {
-            shape_props = new asc_CImgProperty();
+            shape_props = new Asc.asc_CImgProperty();
             shape_props.fromGroup = CanStartEditText(this);
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
@@ -6833,7 +6834,7 @@ DrawingObjectsController.prototype =
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;
-                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6848,7 +6849,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeProps.verticalTextAlign;
             shape_props.vert = props.shapeProps.vert;
@@ -6856,7 +6857,7 @@ DrawingObjectsController.prototype =
             shape_props.Width = props.shapeProps.w;
             shape_props.Height = props.shapeProps.h;
             var pr = shape_props.ShapeProperties;
-            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
             {
                 if(api)
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6882,7 +6883,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.imageProps))
         {
-            image_props = new asc_CImgProperty();
+            image_props = new Asc.asc_CImgProperty();
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
@@ -6896,7 +6897,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.chartProps) && isRealObject(props.chartProps.chartProps))
         {
-            chart_props = new asc_CImgProperty();
+            chart_props = new Asc.asc_CImgProperty();
             chart_props.Width = props.chartProps.w;
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
@@ -6909,7 +6910,7 @@ DrawingObjectsController.prototype =
         }
         for (i = 0; i < ret.length; i++)
         {
-            ascSelectedObjects.push(new asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+            ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Image, new Asc.asc_CImgProperty(ret[i]) ));
         }
 
         // Текстовые свойства объекта
@@ -6988,12 +6989,12 @@ DrawingObjectsController.prototype =
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = UnknownValue;
 
-        trigger("asc_onParaSpacingLine", new asc_CParagraphSpacing( ParaPr.Spacing ));
+        trigger("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing( ParaPr.Spacing ));
 
         // ParaPr.Jc
         trigger("asc_onPrAlign", ParaPr.Jc);
 
-        ascSelectedObjects.push(new asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+        ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty( ParaPr ) ));
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
@@ -7227,7 +7228,7 @@ DrawingObjectsController.prototype =
 
     setGraphicObjectProps: function(props)
     {
-        if(typeof asc_CParagraphProperty !== "undefined" && !(props instanceof asc_CParagraphProperty))
+        if(typeof Asc.asc_CParagraphProperty !== "undefined" && !(props instanceof Asc.asc_CParagraphProperty))
         {
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
