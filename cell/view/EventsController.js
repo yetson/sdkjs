@@ -922,7 +922,7 @@
 							86: function () {
 								if (!window.GlobalPasteFlag)
 								{
-									if (!window.USER_AGENT_SAFARI_MACOS)
+									if (!AscBrowser.isSafariMacOs)
 									{
 										window.GlobalPasteFlag = true;
 										t.handlers.trigger("paste");
@@ -939,7 +939,7 @@
 								}
 								else
 								{
-									if (!window.USER_AGENT_SAFARI_MACOS)
+									if (!AscBrowser.isSafariMacOs)
 										stop();
 								}
 							},

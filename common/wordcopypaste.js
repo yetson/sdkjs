@@ -47,7 +47,7 @@ function CDocumentReaderMode()
             return;
 
         this.DefaultFontSize = size;
-    }
+    };
 
     this.CorrectFontSize = function(size)
     {
@@ -57,7 +57,7 @@ function CDocumentReaderMode()
         dRes /= 100;
 
         return "" + dRes + "em";
-    }
+    };
 }
 
 function GetObjectsForImageDownload(aBuilderImages)
@@ -124,11 +124,6 @@ function ResetNewUrls(data, aUrls, aBuilderImagesByUrl, oImageMap)
     }
 }
 
-window.USER_AGENT_MACOS = AscBrowser.isMacOs; window.USER_AGENT_MACOS;
-window.USER_AGENT_SAFARI_MACOS = AscBrowser.isSafariMacOs; window.USER_AGENT_SAFARI_MACOS;
-window.USER_AGENT_IE = AscBrowser.isIE || AscBrowser.isOpera; window.USER_AGENT_IE;
-window.USER_AGENT_WEBKIT = AscBrowser.isWebkit; window.USER_AGENT_WEBKIT;
-
 window.GlobalPasteFlagCounter = 0; window.GlobalPasteFlagCounter;
 window.GlobalPasteFlag = false; window.GlobalPasteFlag;
 window.GlobalCopyFlag = false; window.GlobalCopyFlag;
@@ -141,7 +136,7 @@ var ELEMENT_DISPAY_STYLE = "none";
 var COPYPASTE_ELEMENT_CLASS = "sdk-element";
 var copyPasteUseBinary = true;
 
-if (window.USER_AGENT_SAFARI_MACOS)
+if (AscBrowser.isSafariMacOs)
 {
     PASTE_ELEMENT_ID = COPY_ELEMENT_ID;
     ELEMENT_DISPAY_STYLE = "block";
@@ -280,7 +275,7 @@ function Editor_Copy_Button(api, bCut)
 }
 function Editor_Copy(api, bCut)
 {
-    if(window.USER_AGENT_SAFARI_MACOS)
+    if(AscBrowser.isSafariMacOs)
 		return;
 	
 	//todo ��������� �����
@@ -352,7 +347,7 @@ function Editor_Copy(api, bCut)
         {
             //�������� � webkit: ���� ���������� ����� ���� ��������, �� ���������� ������ ��� ������������
             //������ ��� docs.google ����������� ��� � ��� <b>
-            if(window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
+            if(AscBrowser.isWebkit && (true !== AscBrowser.isSafariMacOs))
             {
                 var aChildNodes = ElemToSelect.childNodes;
                 if(aChildNodes.length == 1)
@@ -420,7 +415,7 @@ function Editor_Copy(api, bCut)
 
     //���� ���������� copy
     var time_interval = 200;
-    if (window.USER_AGENT_SAFARI_MACOS)
+    if (AscBrowser.isSafariMacOs)
         time_interval = 200;
 
     window.GlobalCopyFlag = true;
@@ -504,7 +499,7 @@ function Editor_Copy_Event(e, ElemToSelect)
 
 	if (oWordControl.m_bIsMouseLock === true)
 	{
-		if (!window.USER_AGENT_MACOS)
+		if (!AscBrowser.isMacOs)
 		{
 			e.preventDefault();
 			return;
@@ -1722,7 +1717,7 @@ CopyProcessor.prototype =
 
             var sBase64 = this.oPresentationWriter.GetBase64Memory();
             sBase64 = "" + this.oPresentationWriter.pos + ";" + sBase64;
-			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && AscBrowser.isSafariMacOs)
 			{
 				var oElem = this.oRoot.aChildren[0];
 				var sStyle = oElem.oAttributes["style"];
@@ -1739,7 +1734,7 @@ CopyProcessor.prototype =
 		if(g_bIsDocumentCopyPaste && copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0 && !bFromPresentation)
 		{
 			var sBase64 = this.oBinaryFileWriter.GetResult();
-			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+			if(this.oRoot.aChildren && this.oRoot.aChildren.length == 1 && AscBrowser.isSafariMacOs)
 			{
 				var oElem = this.oRoot.aChildren[0];
 				var sStyle = oElem.oAttributes["style"];
@@ -2105,7 +2100,7 @@ function Editor_Paste_GetElem(api, bClean)
         }
     }
 
-    if (!window.USER_AGENT_SAFARI_MACOS && !AscBrowser.isIE)
+    if (!AscBrowser.isSafariMacOs && !AscBrowser.isIE)
     {
         pastebin.onpaste = function(e){
             if (!window.GlobalPasteFlag)
@@ -2142,7 +2137,7 @@ function Editor_Paste_Button(api)
         //rangeToSelect.execCommand("paste", false);
         document.execCommand("paste");
 
-        if (!window.USER_AGENT_SAFARI_MACOS)
+        if (!AscBrowser.isSafariMacOs)
             pastebin.blur();
 
         pastebin.style.display  = ELEMENT_DISPAY_STYLE;
@@ -2282,7 +2277,7 @@ function Editor_Paste(api, bClean)
             }
         }
 
-        if (window.USER_AGENT_SAFARI_MACOS)
+        if (AscBrowser.isSafariMacOs)
         {
             if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
             {
@@ -2299,7 +2294,7 @@ function Editor_Paste(api, bClean)
 		
 		document.body.style.overflow = overflowBody;
 
-        if (!window.USER_AGENT_SAFARI_MACOS)
+        if (!AscBrowser.isSafariMacOs)
             pastebin.onpaste = null;
 
         if(!oWordControl.bIsEventPaste)
@@ -2312,7 +2307,7 @@ function Editor_Paste(api, bClean)
         window.PasteEndTimerId = -1;
     };
 
-    var _interval_time = window.USER_AGENT_MACOS ? 200 : 0;
+    var _interval_time = AscBrowser.isMacOs ? 200 : 0;
 
     if (-1 != window.PasteEndTimerId)
         clearTimeout(window.PasteEndTimerId);

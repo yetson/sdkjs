@@ -52,7 +52,7 @@
 		var kElementTextId = "clipboard-helper-text";
 		var isNeedEmptyAfterCut = false;
 
-		if (window.USER_AGENT_SAFARI_MACOS)
+		if (AscBrowser.isSafariMacOs)
 		{
 			PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
 		}
@@ -119,7 +119,7 @@
 				t.element.style.top = '-100px';
 				t.element.style.left = '0px';
 				
-				if(window.USER_AGENT_MACOS)
+				if(AscBrowser.isMacOs)
 					t.element.style.width = '100px';
 				else
 					t.element.style.width = '10000px';
@@ -147,7 +147,7 @@
 					t.elementText.style.position = "absolute";
 					// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 					// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
-					if(window.USER_AGENT_MACOS)
+					if(AscBrowser.isMacOs)
 						t.element.style.width = '100px';
 					else
 						t.element.style.width = '10000px';
@@ -340,7 +340,7 @@
 				if(text == false)
 					return;
 				
-				if(window.USER_AGENT_SAFARI_MACOS && !worksheet.isCellEditMode)
+				if(AscBrowser.isSafariMacOs && !worksheet.isCellEditMode)
 				{
 					this.element.appendChild(text);
 					
@@ -352,7 +352,7 @@
 					
 					if(sBase64)
 					{
-						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+						if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -404,7 +404,7 @@
 						else
 						{
 							var sBase64 = this._getBinaryForCopy(worksheet);
-							if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+							if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 							{
 								$(this.element.children[0]).css("font-weight", "normal");
 								$(this.element.children[0]).wrap(document.createElement("b"));
@@ -548,7 +548,7 @@
 					else
 					{
 						var sBase64 = this._getBinaryForCopy(worksheet);
-						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+						if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -624,7 +624,7 @@
 							
 							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 							var sBase64 = oBinaryFileWriter.Write();
-							if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
+							if(this.element.children && this.element.children.length == 1 && AscBrowser.isWebkit && (true !== AscBrowser.isSafariMacOs))
 							{
 								$(this.element.children[0]).css("font-weight", "normal");
 								$(this.element.children[0]).wrap(document.createElement("b"));
@@ -939,7 +939,7 @@
 				var _interval_time = 0;
 				if(AscBrowser.isMozilla)
 					_interval_time = 10;
-				else if(window.USER_AGENT_MACOS && window.USER_AGENT_WEBKIT)
+				else if(AscBrowser.isMacOs && AscBrowser.isWebkit)
 					_interval_time = 200;
 				
 				// ждем выполнения
@@ -1030,7 +1030,7 @@
 			// Private
 
 			_cleanElement: function () {
-				if(!window.USER_AGENT_SAFARI_MACOS)
+				if(!AscBrowser.isSafariMacOs)
 				{
 					this.element.style.left = "0px";
 					this.element.style.top = "-100px";
@@ -1061,7 +1061,7 @@
 			},
 			
             _editorPaste: function (worksheet,callback) {
-                if(window.USER_AGENT_SAFARI_MACOS)
+                if(AscBrowser.isSafariMacOs)
 					return;
 				
 				var t = this;
@@ -1120,7 +1120,7 @@
 						}
 					}
 					
-					if (window.USER_AGENT_SAFARI_MACOS)
+					if (AscBrowser.isSafariMacOs)
 					{
 						if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
 						{
@@ -1148,7 +1148,7 @@
 					if (callback && callback.call) {callback();}
 				};
 
-				var _interval_time = window.USER_AGENT_MACOS ? 200 : 100;
+				var _interval_time = AscBrowser.isMacOs ? 200 : 100;
 
 				PASTE_EMPTY_COUNTER = 0;
 				window.setTimeout( func_timeout, _interval_time );
@@ -1167,7 +1167,7 @@
                     pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
 					
-                    if(window.USER_AGENT_MACOS)
+                    if(AscBrowser.isMacOs)
 						t.element.style.width = '100px';
 					else
 						t.element.style.width = '10000px';
@@ -1401,7 +1401,7 @@
 					ifr.style.top = '-100px';
 					ifr.style.left = '0px';
 					
-					if(window.USER_AGENT_MACOS)
+					if(AscBrowser.isMacOs)
 						ifr.style.width = '100px';
 					else
 						ifr.style.width = '10000px';
@@ -5041,7 +5041,7 @@
 									{
 										this.oBinaryFileWriter.CopyEnd();
 										var sBase64 = this.oBinaryFileWriter.GetResult();
-										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 										{
 											$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 											$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5123,7 +5123,7 @@
 								{
 									this.oBinaryFileWriter.CopyEnd();
 									var sBase64 = this.oBinaryFileWriter.GetResult();
-									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 									{
 										$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 										$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5148,7 +5148,7 @@
 				if(copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
 				{
 					var sBase64 = this.oBinaryFileWriter.GetResult();
-					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 					{
 						$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
 						$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5218,7 +5218,7 @@
 			ElemToSelect.style.left = '0px';
 			ElemToSelect.style.top = '100px';
 
-			if(window.USER_AGENT_MACOS)
+			if(AscBrowser.isMacOs)
 				ElemToSelect.style.width = '1000px';
 			else
 				ElemToSelect.style.width = '10000px';
@@ -5303,7 +5303,7 @@
 			elementText.id = kElementTextId;
 			elementText.style.position = "absolute";
 
-			if(window.USER_AGENT_MACOS)
+			if(AscBrowser.isMacOs)
 				ElemToSelect.style.width = '100px';
 			else
 				ElemToSelect.style.width = '10000px';

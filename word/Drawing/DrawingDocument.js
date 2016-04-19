@@ -2272,7 +2272,7 @@ CDrawingCollaborativeTarget.prototype =
 
             this.HtmlElementX = Math.min(pos1.X, pos2.X) >> 0;
             this.HtmlElementY = Math.min(pos1.Y, pos2.Y) >> 0;
-            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
             {
                 this.HtmlElement.style.left = this.HtmlElementX + "px";
                 this.HtmlElement.style.top = this.HtmlElementY + "px";
@@ -2316,7 +2316,7 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElementX = pos.X >> 0;
             this.HtmlElementY = pos.Y >> 0;
 
-            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            if ((!_drawing_doc.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
             {
                 this.HtmlElement.style.left = this.HtmlElementX + "px";
                 this.HtmlElement.style.top = this.HtmlElementY + "px";
@@ -3445,7 +3445,7 @@ function CDrawingDocument()
 
             oThis.TargetHtmlElementLeft = Math.min(pos1.X, pos2.X) >> 0;
             oThis.TargetHtmlElementTop  = Math.min(pos1.Y, pos2.Y) >> 0;
-            if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            if ((!oThis.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
             {
                 oThis.TargetHtmlElement.style.left = oThis.TargetHtmlElementLeft + "px";
                 oThis.TargetHtmlElement.style.top = oThis.TargetHtmlElementTop + "px";
@@ -3489,7 +3489,7 @@ function CDrawingDocument()
             this.TargetHtmlElementLeft = pos.X >> 0;
             this.TargetHtmlElementTop = pos.Y >> 0;
 
-            if ((!oThis.m_oWordControl.MobileTouchManager && !window.USER_AGENT_SAFARI_MACOS) || !window.USER_AGENT_WEBKIT)
+            if ((!oThis.m_oWordControl.MobileTouchManager && !AscCommon.AscBrowser.isSafariMacOs) || !AscCommon.AscBrowser.isWebkit)
             {
                 this.TargetHtmlElement.style.left = this.TargetHtmlElementLeft + "px";
                 this.TargetHtmlElement.style.top = this.TargetHtmlElementTop + "px";

@@ -1995,7 +1995,7 @@
 
   WorkbookView.prototype.cutToClipboard = function() {
     var t = this, ws, v;
-    if (!t.getCellEditMode() && !window.USER_AGENT_SAFARI_MACOS) {
+    if (!t.getCellEditMode() && !AscBrowser.isSafariMacOs) {
       ws = t.getWorksheet();
 
       // Запрещаем копирование диаграмм в iframe
@@ -2004,7 +2004,7 @@
 
       t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
       ws.emptySelection(c_oAscCleanOptions.All);
-    } else if (!window.USER_AGENT_SAFARI_MACOS) {
+    } else if (!AscBrowser.isSafariMacOs) {
       v = t.cellEditor.cutSelection();
       if (v) {
         t.clipboard.copyCellValue(v);
