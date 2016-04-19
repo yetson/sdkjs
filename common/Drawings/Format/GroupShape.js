@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
@@ -69,10 +69,10 @@ function CGroupShape()
     this.snapArrayY = [];
 
     this.setRecalculateInfo();
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
 }
 
 CGroupShape.prototype =

@@ -55,7 +55,7 @@
       this.idOriginal = val['idOriginal'];
       this.userName = val['username'];
       this.indexUser = val['indexUser'];
-      this.color = getUserColorById(this.idOriginal, this.userName, false, true);
+      this.color = AscCommon.getUserColorById(this.idOriginal, this.userName, false, true);
       this.view = val['view'];
     }
   };
@@ -95,6 +95,12 @@
     SaveChanges: 10		// save
   };
 
+  var c_oEditorId = {
+    Word:0,
+    Spreadsheet:1,
+    Presentation:2
+  };
+
   /*
    * Export
    * -----------------------------------------------------------------------------
@@ -110,4 +116,5 @@
   prot["asc_getView"] = prot.asc_getView;
 
   window["AscCommon"].ConnectionState = ConnectionState;
+  window["AscCommon"].c_oEditorId = c_oEditorId;
 })(window);

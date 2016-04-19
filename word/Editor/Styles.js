@@ -32,6 +32,7 @@
 
 // Import
 var align_Left = AscCommon.align_Left;
+var g_oTableId = AscCommon.g_oTableId;
 
 var linerule_Auto = Asc.linerule_Auto;
 var c_oAscShdClear = Asc.c_oAscShdClear;
@@ -202,7 +203,7 @@ CTableStylePr.prototype =
 
 function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Name    = Name;
     this.BasedOn = BasedOnId;
@@ -3902,8 +3903,8 @@ function CStyles(bCreateDefault)
 {
     if (bCreateDefault !== false)
     {
-        this.Id = g_oIdCounter.Get_NewId();
-        this.Lock = new CLock();
+        this.Id = AscCommon.g_oIdCounter.Get_NewId();
+        this.Lock = new AscCommon.CLock();
 
         this.Default =
         {

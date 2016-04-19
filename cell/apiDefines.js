@@ -33,6 +33,7 @@ function (window, undefined) {
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
 
+
   // Import
   var CColor = AscCommon.CColor;
 
@@ -67,14 +68,19 @@ var c_oAscInsertOptions = {
   InsertCellsAndShiftRight: 1,
   InsertCellsAndShiftDown: 2,
   InsertColumns: 3,
-  InsertRows: 4
+  InsertRows: 4,
+  InsertTableRowAbove: 5,
+  InsertTableRowBelow: 6,
+  InsertTableColLeft: 7,
+  InsertTableColRight: 8
 };
 
 var c_oAscDeleteOptions = {
   DeleteCellsAndShiftLeft: 1,
   DeleteCellsAndShiftTop: 2,
   DeleteColumns: 3,
-  DeleteRows: 4
+  DeleteRows: 4,
+  DeleteTable: 5
 };
 
 var c_oAscBorderOptions = {
@@ -121,7 +127,8 @@ var c_oAscSelectionDialogType = {
   None: 0,
   FormatTable: 1,
   Chart: 2,
-  DefinedName: 3
+  DefinedName: 3,
+  FormatTableChangeRange: 4
 };
 
 var c_oAscGraphicOption = {
@@ -198,6 +205,23 @@ var c_oAscCustomAutoFilter = {
 var c_oAscChangeFilterOptions = {
   filter: 1,
   style: 2
+};
+
+var c_oAscChangeSelectionFormatTable = {
+	all: 1,
+	data: 2,
+	row: 3,
+	column: 4
+};
+
+var c_oAscChangeTableStyleInfo = {
+	columnFirst: 1,
+	columnLast: 2,
+	columnBanded: 3,
+	rowHeader: 4,
+	rowTotal: 5,
+	rowBanded: 6,
+	filterButton: 7
 };
 
 // Состояние редактора ячейки
@@ -300,6 +324,7 @@ var c_oAscPopUpSelectorType = {
   Range: 2,
   Table: 3
 };
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -338,6 +363,8 @@ var c_oAscPopUpSelectorType = {
   window['Asc']['c_oAscCustomAutoFilter'] = window['Asc'].c_oAscCustomAutoFilter = c_oAscCustomAutoFilter;
   window['Asc']['c_oAscChangeFilterOptions'] = window['Asc'].c_oAscChangeFilterOptions = c_oAscChangeFilterOptions;
   window['Asc']['c_oAscCellEditorState'] = window['Asc'].c_oAscCellEditorState = c_oAscCellEditorState;
+  window['Asc']['c_oAscChangeSelectionFormatTable'] = window['Asc'].c_oAscChangeSelectionFormatTable = c_oAscChangeSelectionFormatTable;
+  window['Asc']['c_oAscChangeTableStyleInfo'] = window['Asc'].c_oAscChangeTableStyleInfo = c_oAscChangeTableStyleInfo;
   window['Asc']['c_oAscAutoFilterTypes'] = window['Asc'].c_oAscAutoFilterTypes = c_oAscAutoFilterTypes;
   window['Asc']['c_oAscFindLookIn'] = window['Asc'].c_oAscFindLookIn = c_oAscFindLookIn;
   window['Asc']['c_oAscGetDefinedNamesList'] = window['Asc'].c_oAscGetDefinedNamesList = c_oAscGetDefinedNamesList;

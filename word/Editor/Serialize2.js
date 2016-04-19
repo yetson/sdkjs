@@ -2221,7 +2221,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
 				}		
 			case para_Math_Text:
 			case para_Math_BreakOperator:
-				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(convertUnicodeToUTF16([item.value]));}); //m:t
+				this.bs.WriteItem(c_oSer_OMathContentType.MText, function(){ oThis.memory.WriteString2(AscCommon.convertUnicodeToUTF16([item.value]));}); //m:t
 				break;
 			case para_Math_Run:
 				this.bs.WriteItem(c_oSer_OMathContentType.MRun, function(){oThis.WriteMRun(item);});
@@ -2276,7 +2276,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
             {	
 				case para_Math_Ampersand :		oText += "&"; break;
 				case para_Math_BreakOperator:
-				case para_Math_Text :			oText += convertUnicodeToUTF16([Item.value]); break;
+				case para_Math_Text :			oText += AscCommon.convertUnicodeToUTF16([Item.value]); break;
             	case para_Space:
             	case para_Tab : 				oText += " "; break;
             }
@@ -2456,7 +2456,7 @@ function Binary_oMathWriter(memory, oMathPara, saveParams)
         if (OPERATOR_EMPTY === Chr)
             this.memory.WriteString2("");
         else
-		    this.memory.WriteString2(convertUnicodeToUTF16([Chr]));
+		    this.memory.WriteString2(AscCommon.convertUnicodeToUTF16([Chr]));
 	}
 	this.WriteCount = function(Count)
 	{
@@ -4206,7 +4206,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                         oThis.memory.WriteByte(c_oSerRunType.nonBreakHyphen);
                         oThis.memory.WriteLong(c_oSerPropLenType.Null);
                     } else {
-                        sCurText += encodeSurrogateChar(item.Value);
+                        sCurText += AscCommon.encodeSurrogateChar(item.Value);
                     }
                     break;
                 case para_Space:
@@ -7486,17 +7486,27 @@ Binary_tblPrReader.prototype =
         {
             if(null == Pr.Shd)
                 Pr.Shd = new CDocumentShd();
+            var oNewShd = {Value: undefined, Color: undefined, Unifill: undefined};
 			var themeColor = {Auto: null, Color: null, Tint: null, Shade: null};
             res = this.bcr.Read2(length, function(t, l){
-                return oThis.bcr.ReadShd(t, l, Pr.Shd, themeColor);
+                return oThis.bcr.ReadShd(t, l, oNewShd, themeColor);
             });
-			if(true == themeColor.Auto && null != Pr.Shd.Color)
-				Pr.Shd.Color.Auto = true;//todo менять полностью цвет
-			var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+            var unifill = CreateThemeUnifill(themeColor.Color, themeColor.Tint, themeColor.Shade);
+            if (true == themeColor.Auto) {
+                if (!oNewShd.Color) {
+                    oNewShd.Color = new CDocumentColor(255, 255, 255);
+                }
+                oNewShd.Color.Auto = true;
+            }
 			if(null != unifill)
-				Pr.Shd.Unifill = unifill;
-			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
-			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
+				oNewShd.Unifill = unifill;
+			else if (null != oNewShd.Color && !oNewShd.Color.Auto)
+			    oNewShd.Unifill = CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
+            //если есть themeColor или Color, то Value по умолчанию ShdClear(Тарифы_на_комплексное_обслуживание_клиен.docx)
+            if (undefined == oNewShd.Value && oNewShd.Unifill) {
+                oNewShd.Value = Asc.c_oAscShdClear;
+            }
+            Pr.Shd.Set_FromObject(oNewShd);
         }
         else if( c_oSerProp_cellPrType.TableCellBorders === type )
         {
@@ -7982,24 +7992,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
-            oNewTable.ReIndexing(0);
-            oNewTable.Correct_BadTable();
-			if(2 == g_nCurFileVersion && false == oNewTable.Inline)
-			{
-				//делаем смещение левой границы
-				if(false == oNewTable.PositionH.Align)
-				{
-					var dx = Get_TableOffsetCorrection(oNewTable);
-					oNewTable.PositionH.Value += dx;
-				}
-			}
-			if(null != this.lastPar)
-            {
-                oNewTable.Set_DocumentPrev(this.lastPar);
-                this.lastPar.Set_DocumentNext(oNewTable);
+            if (oNewTable.Content.length > 0) {
+              oNewTable.ReIndexing(0);
+              oNewTable.Correct_BadTable();
+              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              {
+                  //делаем смещение левой границы
+                  if(false == oNewTable.PositionH.Align)
+                  {
+                      var dx = Get_TableOffsetCorrection(oNewTable);
+                      oNewTable.PositionH.Value += dx;
+                  }
+              }
+              if(null != this.lastPar)
+              {
+                  oNewTable.Set_DocumentPrev(this.lastPar);
+                  this.lastPar.Set_DocumentNext(oNewTable);
+              }
+              this.lastPar = oNewTable;
+              Content.push(oNewTable);
             }
-            this.lastPar = oNewTable;
-            Content.push(oNewTable);
         }
         else if ( c_oSerParType.sectPr === type )
 		{
@@ -8331,13 +8343,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			{
 			    var nUnicode = null;
 			    var nCharCode = text.charCodeAt(i);
-			    if (isLeadingSurrogateChar(nCharCode))
+			    if (AscCommon.isLeadingSurrogateChar(nCharCode))
 			    {
 			        if(i + 1 < text.length)
 			        {
 			            i++;
 			            var nTrailingChar = text.charCodeAt(i);
-			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			            nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 			        }
 			    }
 			    else
@@ -8421,24 +8433,26 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             res = this.bcr.Read1(length, function(t, l){
                 return oThis.ReadDocTable(t, l, oNewTable);
             });
-            oNewTable.ReIndexing(0);
-            oNewTable.Correct_BadTable();
-            if(2 == g_nCurFileVersion && false == oNewTable.Inline)
-            {
-                //делаем смещение левой границы
-                if(false == oNewTable.PositionH.Align)
-                {
-                    var dx = Get_TableOffsetCorrection(oNewTable);
-                    oNewTable.PositionH.Value += dx;
-                }
+            if (oNewTable.Content.length > 0) {
+              oNewTable.ReIndexing(0);
+              oNewTable.Correct_BadTable();
+              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              {
+                  //делаем смещение левой границы
+                  if(false == oNewTable.PositionH.Align)
+                  {
+                      var dx = Get_TableOffsetCorrection(oNewTable);
+                      oNewTable.PositionH.Value += dx;
+                  }
+              }
+              if(null != this.lastPar)
+              {
+                  oNewTable.Set_DocumentPrev(this.lastPar);
+                  this.lastPar.Set_DocumentNext(oNewTable);
+              }
+              this.lastPar = oNewTable;
+              oParStruct.DocContent.push(oNewTable);
             }
-            if(null != this.lastPar)
-            {
-                oNewTable.Set_DocumentPrev(this.lastPar);
-                this.lastPar.Set_DocumentNext(oNewTable);
-            }
-            this.lastPar = oNewTable;
-            oParStruct.DocContent.push(oNewTable);
         }
         else if(c_oSerRunType.fldstart === type)
         {
@@ -9241,13 +9255,13 @@ function Binary_oMathReader(stream, oReadResult)
 			{
 			    var nUnicode = null;
 			    var nCharCode = text.charCodeAt(i);
-			    if (isLeadingSurrogateChar(nCharCode))
+			    if (AscCommon.isLeadingSurrogateChar(nCharCode))
 			    {
 			        if(i + 1 < text.length)
 			        {
 			            i++;
 			            var nTrailingChar = text.charCodeAt(i);
-			            nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+			            nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 			        }
 			    }
 			    else
@@ -9904,7 +9918,7 @@ function Binary_oMathReader(stream, oReadResult)
 		if (c_oSer_OMathBottomNodesValType.Val === type)
         {
 			var text = this.stream.GetString2LE(length);
-            var aUnicode = convertUTF16toUnicode(text);
+            var aUnicode = AscCommon.convertUTF16toUnicode(text);
 
             var chr = (aUnicode.length <= 0 ? OPERATOR_EMPTY : aUnicode[0]);
 
@@ -10718,7 +10732,7 @@ function Binary_oMathReader(stream, oReadResult)
         {
 			var aUnicodes = [];
             if (length > 0)
-                aUnicodes = convertUTF16toUnicode(this.stream.GetString2LE(length));
+                aUnicodes = AscCommon.convertUTF16toUnicode(this.stream.GetString2LE(length));
 
 			for (var nPos = 0, nCount = aUnicodes.length; nPos < nCount; ++nPos)
             {
@@ -11765,7 +11779,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
 			if(true == api.isUseEmbeddedCutFonts)
 			{
 				var font_cuts = api.FontLoader.embedded_cut_manager;
-				font_cuts.Url = g_oDocumentUrls.getUrl('fonts/fonts.js');
+				font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
 				font_cuts.init_cut_fonts(_embedded_fonts);
 				font_cuts.bIsCutFontsUse = true;
 			}

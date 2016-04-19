@@ -52,7 +52,7 @@ var c_oAscError = Asc.c_oAscError;
 	
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data)
 	{
-		g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
+		AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
@@ -73,7 +73,7 @@ var c_oAscError = Asc.c_oAscError;
 	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
 	{
 		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
-		cp['encodings'] = getEncodingParams();
+		cp['encodings'] = AscCommon.getEncodingParams();
 		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
@@ -85,7 +85,7 @@ var c_oAscError = Asc.c_oAscError;
 		if (ws) 
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
 		}
 	};
 	asc['spreadsheet_api'].prototype.asc_showImageFileDialog = function()
@@ -111,12 +111,12 @@ window["asc_initAdvancedOptions"] = function()
 
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
-    g_oDocumentUrls.documentUrl = _url;
-	if (g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
+	AscCommon.g_oDocumentUrls.documentUrl = _url;
+	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
 	{
-		if (g_oDocumentUrls.documentUrl.indexOf("/") != 0)
-			g_oDocumentUrls.documentUrl = "/" + g_oDocumentUrls.documentUrl;
-		g_oDocumentUrls.documentUrl = "file://" + g_oDocumentUrls.documentUrl;
+		if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("/") != 0)
+			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
+		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data);
@@ -264,7 +264,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
     if (ws) 
 	{
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-        ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+        ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
     }
 };
 

@@ -25,6 +25,8 @@
 "use strict";
 
 // Import
+var getFullImageSrc2 = AscCommon.getFullImageSrc2;
+
 var c_oAscFill = Asc.c_oAscFill;
 
 window.IsShapeToImageConverter = false;

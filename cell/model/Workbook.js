@@ -27,6 +27,9 @@
 // Import
 var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+var fSortAscending = AscCommon.fSortAscending;
+var fSortDescending = AscCommon.fSortDescending;
+var parserHelp = AscCommon.parserHelp;
 
 var UndoRedoItemSerializable = AscCommonExcel.UndoRedoItemSerializable;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -880,7 +883,7 @@ DependencyGraph.prototype = {
             nodeId,
             oRes = false;
 
-        if ( !rx_defName.test( name ) ) {
+        if ( !AscCommon.rx_defName.test( name ) ) {
             return oRes ;
         }
 
@@ -1176,6 +1179,34 @@ DependencyGraph.prototype = {
         table.Ref = table.Ref.split("!")[0]+"!"+newRefClone.getAbsName();
 		table.rebuild();
 //        table.Ref = parserHelp.getEscapeSheetName(ws.getName())+"!"+newRef.getAbsName();
+    },
+	changeTableRef:function(tableName, ws, newName){
+        var table = this.getDefNameNodeByName( tableName, ws );
+        
+		var newTable = table.clone();
+		
+		if(table)
+		{
+			//изменяем имя именнованного диапазона
+			newTable.Name = newName;
+			newTable.cellId = newName.toLowerCase();
+			newTable.nodeId = table.sheetId + table.cellId;
+			
+			this.changeDefName(table, newTable);
+			
+			//изменяем все ссылки на данную таблицу
+			var nameRef = tableName + "[]";
+			for(var i in this.defNameList)
+			{
+				if(this.defNameList[i] && this.defNameList[i].Ref && this.defNameList[i].Ref === nameRef)
+				{
+					this.defNameList[i].Ref = newName + "[]";
+				}
+			}
+		}
+		
+		
+		table.rebuild();
     },
     delTableName:function(name,ws){
         var table = this.getDefNameNodeByName( name, ws );
@@ -1781,10 +1812,10 @@ DefNameVertex.prototype = {
 };
 
 function getVertexId(sheetId, cellId){
-	return sheetId + g_cCharDelimiter + cellId;
+	return sheetId + AscCommon.g_cCharDelimiter + cellId;
 }
 function getDefNameVertexId(scope, name){
-	return ( scope === null || scope === undefined ? "WB" : scope ) + g_cCharDelimiter + name.toLowerCase();
+	return ( scope === null || scope === undefined ? "WB" : scope ) + AscCommon.g_cCharDelimiter + name.toLowerCase();
 }
 function lockDraw(wb){
     lc++;
@@ -2534,7 +2565,7 @@ Workbook.prototype.recalcWB = function(isRecalcWB){
 };
 Workbook.prototype.checkDefName = function ( checkName, scope ) {
 
-    var rxTest = rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
+    var rxTest = AscCommon.rx_defName.test( checkName ), res = new Asc.asc_CCheckDefName();
     if ( !rxTest ) {
         res.status = false;
         res.reason = c_oAscDefinedNameReason.WrongName;
@@ -2670,7 +2701,7 @@ Workbook.prototype.editDefinesNames = function ( oldName, newName, bUndo ) {
 
     var newN = newName.Name.toLowerCase(), retRes = null, rename = false, nSE, se;
 
-    if ( !rx_defName.test( newN ) || !newName.Ref || newName.Ref.length == 0  ) {
+    if ( !AscCommon.rx_defName.test( newN ) || !newName.Ref || newName.Ref.length == 0  ) {
         return retRes;
     }
 
@@ -3115,7 +3146,7 @@ function Woorksheet(wb, _index, sId){
 	this.bHidden = false;
 	this.oSheetFormatPr = new SheetFormatPr();
 	this.index = _index;
-	this.Id = null != sId ? sId : g_oIdCounter.Get_NewId();
+	this.Id = null != sId ? sId : AscCommon.g_oIdCounter.Get_NewId();
 	this.nRowsCount = 0;
 	this.nColsCount = 0;
 	this.aGCells = {};// 0 based
@@ -3184,10 +3215,8 @@ function Woorksheet(wb, _index, sId){
 	this.autoFilters = asc.AutoFilters !== undefined ? new asc.AutoFilters(this) : null;
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
-    this.contentChanges = new CContentChanges();
-
-    this.sparklineGroups = new sparklineGroups();
-
+    this.contentChanges = new AscCommon.CContentChanges();
+	
 	/*handlers*/
 	this.handlers = null;
 }
@@ -4846,7 +4875,7 @@ Woorksheet.prototype._shiftCellsUp=function(oBBox){
     this.autoFilters.insertRows( "delCell", oBBox, c_oAscDeleteOptions.DeleteCellsAndShiftTop );
 	//todo проверить не уменьшились ли границы таблицы
 };
-Woorksheet.prototype._shiftCellsRight=function(oBBox){
+Woorksheet.prototype._shiftCellsRight=function(oBBox, displayNameFormatTable){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
 	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
 	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
@@ -4881,9 +4910,9 @@ Woorksheet.prototype._shiftCellsRight=function(oBBox){
 	}
 
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsRight, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, gc_nMaxCol0, oBBox.r2), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight );
+    this.autoFilters.insertColumn( "insCells",  oBBox, c_oAscInsertOptions.InsertCellsAndShiftRight, displayNameFormatTable );
 };
-Woorksheet.prototype._shiftCellsBottom=function(oBBox){
+Woorksheet.prototype._shiftCellsBottom=function(oBBox, displayNameFormatTable){
 	//до перемещения ячеек, перед функцией, в которой используются nodesSheetArea/nodesSheetCell move/shift нужно обязательно вызвать force buildRecalc
 	//чтобы формулы, которые копим попали в струкруры nodesSheet, иначе формулы не сдвинутся
 	//например принимаем изменения: добавление формул, сдвиг с помощью _removeRows. результат формулы указывают на теже ячейки, что и до _removeRows
@@ -4916,7 +4945,7 @@ Woorksheet.prototype._shiftCellsBottom=function(oBBox){
 	}
 
 	History.Add(AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ShiftCellsBottom, this.getId(), new Asc.Range(oBBox.c1, oBBox.r1, oBBox.c2, gc_nMaxRow0), new UndoRedoData_BBox(oBBox));
-    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown );
+    this.autoFilters.insertRows( "insCell", oBBox, c_oAscInsertOptions.InsertCellsAndShiftDown, displayNameFormatTable );
 };
 Woorksheet.prototype._setIndex=function(ind){
 	this.index = ind;
@@ -7959,11 +7988,11 @@ Range.prototype.removeHyperlink = function (val, removeStyle) {
 Range.prototype.deleteCellsShiftUp=function(preDeleteAction){
 	return this._shiftUpDown(true, preDeleteAction);
 };
-Range.prototype.addCellsShiftBottom=function(){
-	return this._shiftUpDown(false);
+Range.prototype.addCellsShiftBottom=function(displayNameFormatTable){
+	return this._shiftUpDown(false, null, displayNameFormatTable);
 };
-Range.prototype.addCellsShiftRight=function(){
-	return this._shiftLeftRight(false);
+Range.prototype.addCellsShiftRight=function(displayNameFormatTable){
+	return this._shiftLeftRight(false, null,displayNameFormatTable);
 };
 Range.prototype.deleteCellsShiftLeft=function(preDeleteAction){
 	return this._shiftLeftRight(true, preDeleteAction);
@@ -8005,7 +8034,7 @@ Range.prototype._canShiftLeftRight=function(bLeft){
 	}
 	return {aColsToDelete: aColsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction){
+Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction, displayNameFormatTable){
 	var canShiftRes = this._canShiftLeftRight(bLeft);
 	if(null === canShiftRes)
 		return false;
@@ -8064,7 +8093,7 @@ Range.prototype._shiftLeftRight=function(bLeft, preDeleteAction){
 	else
 	{
 		if(c_oRangeType.Range == nRangeType)
-			this.worksheet._shiftCellsRight(oBBox);
+			this.worksheet._shiftCellsRight(oBBox, displayNameFormatTable);
 		else
 			this.worksheet._insertColsBefore(oBBox.c1, nWidth);
 	}
@@ -8117,7 +8146,7 @@ Range.prototype._canShiftUpDown=function(bUp){
 	}
 	return {aRowsToDelete: aRowsToDelete, aCellsToDelete: aCellsToDelete};
 };
-Range.prototype._shiftUpDown = function (bUp, preDeleteAction) {
+Range.prototype._shiftUpDown = function (bUp, preDeleteAction, displayNameFormatTable) {
 	var canShiftRes = this._canShiftUpDown(bUp);
 	if(null === canShiftRes)
 		return false;
@@ -8176,7 +8205,7 @@ Range.prototype._shiftUpDown = function (bUp, preDeleteAction) {
 	else
 	{
 		if(c_oRangeType.Range == nRangeType)
-			this.worksheet._shiftCellsBottom(oBBox);
+			this.worksheet._shiftCellsBottom(oBBox, displayNameFormatTable);
 		else
 			this.worksheet._insertRowsBefore(oBBox.r1, nHeight);
 	}
@@ -8304,7 +8333,7 @@ Range.prototype.cleanHyperlinks=function(){
 		this.removeHyperlink(aHyperlinks.inner[i].data);
 	History.EndTransaction();
 };
-Range.prototype.sort=function(nOption, nStartCol){
+Range.prototype.sort=function(nOption, nStartCol, colorText, colorFill){
 	//todo горизонтальная сортировка
 	var aMerged = this.worksheet.mergeManager.get(this.bbox);
 	if(aMerged.outer.length > 0 || (aMerged.inner.length > 0 && null == _isSameSizeMerged(this.bbox, aMerged.inner)))
@@ -8318,6 +8347,7 @@ Range.prototype.sort=function(nOption, nStartCol){
 		nStartCol = merged.bbox.c1;
 	}
 	lockDraw(this.worksheet.workbook);
+	var isSortColor = !!(colorText || colorFill);
 	var oRes = null;
 	var oThis = this;
 	var bAscent = false;
@@ -8360,6 +8390,23 @@ Range.prototype.sort=function(nOption, nStartCol){
 				if(nLastRow0 < nRow0)
 					nLastRow0 = nRow0;
 				var val = oCell.getValueWithoutFormat();
+				
+				//for sort color
+				var colorFillCell, colorsTextCell = null;
+				if(colorFill)
+				{
+					var styleCell = oCell.getStyle();
+					colorFillCell = styleCell !== null ? styleCell.fill : null;
+				}
+				else if(colorText)
+				{
+					var value2 = oCell.getValue2();
+					for(var n = 0; n < value2.length; n++)
+					{
+						colorsTextCell.push(value2[n].c);
+					}
+				}
+				
 				var nNumber = null;
 				var sText = null;
 				if("" != val)
@@ -8369,7 +8416,11 @@ Range.prototype.sort=function(nOption, nStartCol){
 						nNumber = nVal;
 					else
 						sText = val;
-					aSortElems.push({row: nRow0, num: nNumber, text: sText});
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
+				}
+				else if(isSortColor)
+				{
+					aSortElems.push({row: nRow0, num: nNumber, text: sText, colorFill: colorFillCell, colorsText: colorsTextCell});
 				}
 			}
 		}
@@ -8399,28 +8450,78 @@ Range.prototype.sort=function(nOption, nStartCol){
 	function strcmp ( str1, str2 ) {
 			return ( ( str1 == str2 ) ? 0 : ( ( str1 > str2 ) ? 1 : -1 ) );
 		}
-	aSortElems.sort(function(a, b){
-		var res = 0;
-		if(null != a.text)
+	
+	
+	//color sort
+	var colorFillCmp = function(color1, color2)
+	{
+		var res = false;
+		if(colorFill)
 		{
-			if(null != b.text)
-				res = strcmp(a.text.toUpperCase(), b.text.toUpperCase());
-			else
-				res = 1;
+			res = color1 !== null && color2 !== null && color1.isEqual(color2) === true ? true : false;
 		}
-		else if(null != a.num)
+		else if(colorText && color1 && color1.length)
 		{
-			if(null != b.num)
-				res = a.num - b.num;
-			else
-				res = -1;
+			for(var n = 0; n < color1.length; n++)
+			{
+				if(color1[n] && color1[n].isEqual(color2))
+				{
+					res = true;
+					break;
+				}
+			}
 		}
-		if(0 == res)
-			res = a.row - b.row;
-		else if(!bAscent)
-			res = -res;
+		
 		return res;
-	});
+	};
+	
+	if(isSortColor)
+	{
+		var newArrayNeedColor = [];
+		var newArrayAnotherColor = [];
+		var sortColor = colorText ? colorText : colorFill;
+		
+		for(var i = 0; i < aSortElems.length; i++)
+		{
+			var color = colorFill ? aSortElems[i].colorFill : aSortElems[i].colorText;
+			if(colorFillCmp(color, sortColor))
+			{
+				newArrayNeedColor.push(aSortElems[i]);
+			}
+			else
+			{
+				newArrayAnotherColor.push(aSortElems[i]);
+			}
+		}
+		
+		aSortElems = newArrayAnotherColor.concat(newArrayNeedColor);
+	}
+	else
+	{
+		aSortElems.sort(function(a, b){
+			var res = 0;
+			if(null != a.text)
+			{
+				if(null != b.text)
+					res = strcmp(a.text.toUpperCase(), b.text.toUpperCase());
+				else
+					res = 1;
+			}
+			else if(null != a.num)
+			{
+				if(null != b.num)
+					res = a.num - b.num;
+				else
+					res = -1;
+			}
+			if(0 == res)
+				res = a.row - b.row;
+			else if(!bAscent)
+				res = -res;
+			return res;
+		});
+	}
+	
 	//проверяем что это не пустая операция
 	var aSortData = [];
 	var nHiddenCount = 0;

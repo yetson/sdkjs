@@ -69,7 +69,7 @@
 			return this;
 		}
 
-		asc.extendClass(CellTextRender, asc.StringRender);
+		AscCommon.extendClass(CellTextRender, asc.StringRender);
 
 		CellTextRender.prototype.getLinesCount = function () {
 			return this.lines.length;

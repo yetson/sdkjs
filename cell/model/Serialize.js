@@ -2478,7 +2478,7 @@
             var aIndexes = [];
             for(var i in aCols)
                 aIndexes.push(i - 0);
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             var fInitCol = function(col, nMin, nMax){
                 var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
                 if(null == oRes.width)
@@ -2995,7 +2995,7 @@
                 for(var i in ws.aGCells)
                     aIndexes.push(i - 0);
             }
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             for(var i = 0, length = aIndexes.length; i < length; ++i)
             {
                 var row = ws.aGCells[aIndexes[i]];
@@ -3064,7 +3064,7 @@
                 for(var i in row.c)
                     aIndexes.push(i - 0);
             }
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             for(var i = 0, length = aIndexes.length; i < length; ++i)
             {
                 var cell = row.c[aIndexes[i]];
@@ -6819,7 +6819,7 @@
                 if(true == api.isUseEmbeddedCutFonts)
                 {
                     var font_cuts = api.FontLoader.embedded_cut_manager;
-                    font_cuts.Url = g_oDocumentUrls.getUrl('fonts/fonts.js');
+                    font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
                     font_cuts.init_cut_fonts(_embedded_fonts);
                     font_cuts.bIsCutFontsUse = true;
                 }
@@ -6857,7 +6857,7 @@
             {
                 var src = this.stream.GetString2LE(length);
                 if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-                    oNewMedia.src = g_oDocumentUrls.getImageUrl(src);
+                    oNewMedia.src = AscCommon.g_oDocumentUrls.getImageUrl(src);
                 else
                     oNewMedia.src = src;
             }
@@ -7308,23 +7308,6 @@
                     if(0 == (rowIndex - headerRowCount) % 2)
                     {
                         if(0 == colIndex % 2)
-                            res = styles.rightRowBand1ColBand1LC;
-                        else
-                            res = styles.rightRowBand1ColBand2LC;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand2ColBand1LC;
-                        else
-                            res = styles.rightRowBand2ColBand2LC;
-                    }
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
                             res = styles.rightBottomRowBand1ColBand1LC;
                         else
                             res = styles.rightBottomRowBand1ColBand2LC;
@@ -7335,6 +7318,23 @@
                             res = styles.rightBottomRowBand2ColBand1LC;
                         else
                             res = styles.rightBottomRowBand2ColBand2LC;
+                    }
+                }
+                else
+                {
+                    if(0 == (rowIndex - headerRowCount) % 2)
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand1ColBand1LC;
+                        else
+                            res = styles.rightRowBand1ColBand2LC;
+                    }
+                    else
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand2ColBand1LC;
+                        else
+                            res = styles.rightRowBand2ColBand2LC;
                     }
                 }
             }

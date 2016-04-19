@@ -127,6 +127,9 @@ var historyitem_AutoFilter_Delete   = 8;
 var historyitem_AutoFilter_ChangeTableStyle = 9;
 var historyitem_AutoFilter_Change = 10;
 var historyitem_AutoFilter_CleanFormat  = 11;
+var historyitem_AutoFilter_ChangeTableInfo = 12;
+var historyitem_AutoFilter_ChangeTableRef = 13;
+var historyitem_AutoFilter_ChangeTableName = 14;
 
 
 function CHistory(workbook)
@@ -261,7 +264,7 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 			Data.oBinaryReader.Seek2(Data.nPos);
 			if(!Class)
 			{
-				Class = g_oTableId.Get_ById(Data.sChangedObjectId);
+				Class = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
 				if(Class)
 					this.Add(Class, Type, sheetid, range, Data, LocalChange);
 			}
@@ -466,6 +469,9 @@ CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
 		oRedoObjectParam.bAddRemoveRowCol = true;
+	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && historyitem_AutoFilter_ChangeTableInfo === Point.Type)
+		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
+		
 };
 CHistory.prototype.Get_RecalcData = function(Point2)
 {

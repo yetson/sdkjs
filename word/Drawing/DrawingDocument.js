@@ -27,6 +27,7 @@
 // Import
 var CColor = AscCommon.CColor;
 var CAscMathCategory = AscCommon.CAscMathCategory;
+var g_oTableId = AscCommon.g_oTableId;
 
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
@@ -2185,7 +2186,7 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            this.Color = getUserColorById(this.ShortId, null, true);
+            this.Color = AscCommon.getUserColorById(this.ShortId, null, true);
             this.Style ="rgb(" + this.Color.r + "," + this.Color.g + "," + this.Color.b + ")";
         }
 
@@ -2503,7 +2504,7 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if ( AscCommon.c_oAscFormatPainterState.kOff !== this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
             else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
             else
@@ -2937,7 +2938,7 @@ function CDrawingDocument()
             var _len = _imgs.length;
             for (var j = 0; j < _len; j++)
             {
-                if (getFullImageSrc2(_imgs[j]) == src)
+                if (AscCommon.getFullImageSrc2(_imgs[j]) == src)
                 {
                     this.StopRenderingPage(i);
                     bIsRaster = true;
@@ -6000,7 +6001,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;

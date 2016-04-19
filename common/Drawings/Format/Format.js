@@ -26,6 +26,8 @@
 
 // Import
 var CreateAscColor = AscCommon.CreateAscColor;
+var g_oIdCounter = AscCommon.g_oIdCounter;
+var g_oTableId = AscCommon.g_oTableId;
 
 var c_oAscColor = Asc.c_oAscColor;
 var c_oAscFill = Asc.c_oAscFill;
@@ -106,7 +108,7 @@ function scRGB_to_sRGB(value)
 }
 
 function checkRasterImageId(rasterImageId) {
-  var imageLocal = g_oDocumentUrls.getImageLocal(rasterImageId);
+  var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(rasterImageId);
   return imageLocal ? imageLocal : rasterImageId;
 }
 
@@ -1973,7 +1975,7 @@ CBlipFill.prototype =
     {
         w.WriteLong(this.type);
         writeString(w, this.RasterImageId);
-        var srcUrl = g_oDocumentUrls.getImageUrl(this.RasterImageId) || "";
+        var srcUrl = AscCommon.g_oDocumentUrls.getImageUrl(this.RasterImageId) || "";
         writeString(w, srcUrl);
         writeString(w, this.VectorImageBin);
         if(this.srcRect)
@@ -2005,13 +2007,13 @@ CBlipFill.prototype =
     {
         this.RasterImageId = readString(r);
 
-        var _correct_id = g_fGetImageFromChanges(this.RasterImageId);
+        var _correct_id = AscCommon.getImageFromChanges(this.RasterImageId);
         if (null != _correct_id)
             this.RasterImageId = _correct_id;
 
         var srcUrl = readString(r);
         if(srcUrl) {
-            g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);
+            AscCommon.g_oDocumentUrls.addImageUrl(this.RasterImageId, srcUrl);
         }
         this.VectorImageBin = readString(r);
 
@@ -3464,7 +3466,7 @@ function CompareUnifillBool(u1, u2)
                 return false;
 
             if(typeof u1.fill.RasterImageId === "string" && typeof u2.fill.RasterImageId === "string"
-                && getFullImageSrc2(u1.fill.RasterImageId) !== getFullImageSrc2(u2.fill.RasterImageId))
+                && AscCommon.getFullImageSrc2(u1.fill.RasterImageId) !== AscCommon.getFullImageSrc2(u2.fill.RasterImageId))
                 return false;
 
             if(u1.fill.VectorImageBin !== u2.fill.VectorImageBin)
@@ -7030,7 +7032,7 @@ CSpPr.prototype =
                     {
                         if(this.Fill.fill && this.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.Fill.fill.RasterImageId));
+							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.Fill.fill.RasterImageId));
                         }
                     }
                 }
@@ -7289,7 +7291,7 @@ function ClrMap()
         this.color_map[i] = null;
 
 
-    if(typeof g_oIdCounter != "undefined" && typeof g_oTableId != "undefined" && g_oTableId && g_oIdCounter)
+    if (g_oTableId.checkInit())
     {
         this.Id = g_oIdCounter.Get_NewId();
         g_oTableId.Add(this, this.Id);
@@ -9240,7 +9242,7 @@ _arr_lt_types_weight[16] =  _ph_summ__two_obj_and_two_tx;
 _arr_lt_types_weight[17] =  _ph_summ__tx;
 _arr_lt_types_weight[18] =  _ph_summ__tx_and_clip_art;
 
-_arr_lt_types_weight.sort(fSortAscending);
+_arr_lt_types_weight.sort(AscCommon.fSortAscending);
 
 
 var _global_layout_summs_array = {};

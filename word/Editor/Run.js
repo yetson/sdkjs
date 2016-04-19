@@ -30,6 +30,8 @@
  */
   
 // Import
+var g_oTableId = AscCommon.g_oTableId;
+
 var c_oAscShdNil = Asc.c_oAscShdNil;
 
 var reviewtype_Common = 0x00;
@@ -47,7 +49,7 @@ function ParaRun(Paragraph, bMathRun)
 {
     ParaRun.superclass.constructor.call(this);
     
-    this.Id         = g_oIdCounter.Get_NewId();  // Id данного элемента
+    this.Id         = AscCommon.g_oIdCounter.Get_NewId();  // Id данного элемента
     this.Type       = para_Run;                  // тип данного элемента
     this.Paragraph  = Paragraph;                 // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
@@ -70,7 +72,7 @@ function ParaRun(Paragraph, bMathRun)
     this.CollPrChangeMine   = false;
     this.CollPrChangeOther  = false;
     this.CollaborativeMarks = new CRunCollaborativeMarks();
-    this.m_oContentChanges  = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges  = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.NearPosArray  = [];
     this.SearchMarks   = [];
@@ -107,7 +109,7 @@ function ParaRun(Paragraph, bMathRun)
     }
 }
 
-Asc.extendClass(ParaRun, CParagraphContentWithContentBase);
+AscCommon.extendClass(ParaRun, CParagraphContentWithContentBase);
 
 ParaRun.prototype.Get_Type = function()
 {
@@ -8679,7 +8681,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             {
                 if(unifill && unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                 {
-                    CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                    CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
                 }
             }
 
@@ -8798,7 +8800,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 {
                     if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                     {
-                        CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
+                        CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(unifill.fill.RasterImageId));
                     }
                 }
             }
@@ -11013,7 +11015,7 @@ CReviewInfo.prototype.Get_Color = function()
     if (!this.UserId && !this.UserName)
         return REVIEW_COLOR;
 
-    return getUserColorById(this.UserId, this.UserName, true, false);
+    return AscCommon.getUserColorById(this.UserId, this.UserName, true, false);
 };
 CReviewInfo.prototype.Is_CurrentUser = function()
 {
