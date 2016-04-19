@@ -30,6 +30,12 @@
  * Time: 11:51
  */
 
+// Import
+var c_oAscHAnchor = Asc.c_oAscHAnchor;
+var c_oAscXAlign = Asc.c_oAscXAlign;
+var c_oAscYAlign = Asc.c_oAscYAlign;
+var c_oAscVAnchor = Asc.c_oAscVAnchor;
+
 
 // Класс CDocumentContent. Данный класс используется для работы с контентом ячеек таблицы,
 // колонтитулов, сносок, надписей.
@@ -828,7 +834,7 @@ CDocumentContent.prototype =
 
                         // Если прилегание в данном случае не к левой стороне, тогда пересчитываем параграф,
                         // с учетом того, что ширина буквицы должна быть FrameW
-                        if ( align_Left != ParaPr.Jc )
+                        if ( AscCommon.align_Left != ParaPr.Jc )
                         {
                             TempElement.Reset( 0, 0, FrameW, Frame_YLimit, PageIndex );
                             TempElement.Recalculate_Page( PageIndex );
@@ -838,11 +844,11 @@ CDocumentContent.prototype =
                     else if ( -1 === FrameW )
                         FrameW = Frame_XLimit;
 
-                    var FrameHRule = ( undefined === FramePr.HRule ? heightrule_Auto : FramePr.HRule );
+                    var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
                     switch ( FrameHRule )
                     {
-                        case heightrule_Auto : break;
-                        case heightrule_AtLeast :
+                        case Asc.linerule_Auto : break;
+                        case Asc.linerule_AtLeast :
                         {
                             if ( FrameH < FramePr.H )
                                 FrameH = FramePr.H;
@@ -850,7 +856,7 @@ CDocumentContent.prototype =
                             break;
                         }
 
-                        case heightrule_Exact:
+                        case Asc.linerule_Exact:
                         {
                             FrameH = FramePr.H;
                             break;
@@ -2074,7 +2080,7 @@ CDocumentContent.prototype =
     Update_CursorType : function(X, Y, CurPage)
     {
         if (CurPage < 0 || CurPage >= this.Pages.length)
-            return this.DrawingDocument.SetCursorType("default", new CMouseMoveData());
+            return this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
 
         var bInText      = (null === this.Is_InText(X, Y, CurPage)      ? false : true);
         var bTableBorder = (null === this.Is_TableBorder(X, Y, CurPage) ? false : true);
@@ -2282,7 +2288,7 @@ CDocumentContent.prototype =
 
         LastPara = this.Content[this.Content.length - 1];
 
-        if ( LastPara != LastPara2 || false === this.LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_Element_and_Type, Element : LastPara, CheckType : changestype_Paragraph_Content } ) )
+        if ( LastPara != LastPara2 || false === this.LogicDocument.Document_Is_SelectionLocked( AscCommon.changestype_None, { Type : AscCommon.changestype_2_Element_and_Type, Element : LastPara, CheckType : AscCommon.changestype_Paragraph_Content } ) )
         {
             // Теперь нам нужно вставить таб по X
             LastPara.Extend_ToPos(X);
@@ -2330,8 +2336,8 @@ CDocumentContent.prototype =
                     Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
                     Drawing.Set_BehindDoc( false );
                     Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                    Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
-                    Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
+                    Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+                    Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
                 }
                 this.Paragraph_Add( Drawing );
                 this.Select_DrawingObject( Drawing.Get_Id() );
@@ -2360,8 +2366,8 @@ CDocumentContent.prototype =
                 Drawing.Set_WrappingType( WRAPPING_TYPE_NONE );
                 Drawing.Set_BehindDoc( false );
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
-                Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
+                Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+                Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
                 if ( true == this.Selection.Use )
                     this.Remove( 1, true );
                 this.Paragraph_Add( Drawing );
@@ -8993,7 +8999,7 @@ CDocumentContent.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
                     var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
                     if ( null != Element )
@@ -9031,7 +9037,7 @@ CDocumentContent.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                    var Pos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Reader.GetLong() );
 
                     // действие совпало, не делаем его
                     if ( false === Pos )

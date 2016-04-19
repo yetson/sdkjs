@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var CColor = AscCommon.CColor;
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 
@@ -1300,7 +1303,7 @@ function CDrawingDocument()
         else
             this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
 
         editor.sync_MouseMoveCallback( Data );
     }
@@ -1542,7 +1545,7 @@ function CDrawingDocument()
         {
             bIsChange = true;
 
-            this.GuiLastTextProps = new asc_CParagraphProperty();
+            this.GuiLastTextProps = new Asc.asc_CParagraphProperty();
 
             this.GuiLastTextProps.Subscript     = props.Subscript;
             this.GuiLastTextProps.Superscript   = props.Superscript;
@@ -1622,11 +1625,11 @@ function CDrawingDocument()
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
 
         if (true === this.GuiLastTextProps.Subscript)
-            _textPr.VertAlign  = vertalign_SubScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SubScript;
         else if (true === this.GuiLastTextProps.Superscript)
-            _textPr.VertAlign  = vertalign_SuperScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SuperScript;
         else
-            _textPr.VertAlign = vertalign_Baseline;
+            _textPr.VertAlign = AscCommon.vertalign_Baseline;
 
         _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
         _textPr.Caps       = this.GuiLastTextProps.AllCaps;
@@ -2934,7 +2937,7 @@ function CDrawingDocument()
         for (var i = 0; i < _count_defaults; ++i)
         {
             var _obj = g_oUserColorScheme[i];
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _obj["name"];
 
             _c = _obj["dk1"];
@@ -2985,7 +2988,7 @@ function CDrawingDocument()
         {
             var _scheme = _extra[i].clrScheme;
 
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _scheme.name;
 
             _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
@@ -4035,9 +4038,9 @@ function CThumbnailsManager()
             if (!oThis.IsMouseDownTrackSimple)
             {
                 var cursor_dragged = "default";
-                if (AscBrowser.isWebkit)
+                if (AscCommon.AscBrowser.isWebkit)
                     cursor_dragged = "-webkit-grabbing";
-                else if (AscBrowser.isMozilla)
+                else if (AscCommon.AscBrowser.isMozilla)
                     cursor_dragged = "-moz-grabbing";
 
                 oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;
@@ -5190,7 +5193,7 @@ function CThumbnailsManager()
                 if(global_keyboardEvent.CtrlKey)
                 {
                     var doc = editor.WordControl.m_oLogicDocument;
-                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(changestype_RemoveSlide) === false)
+                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(AscCommon.changestype_RemoveSlide) === false)
                     {
                         Editor_Copy(editor, this.m_oWordControl.m_oLogicDocument.viewMode === false);
                         return undefined;

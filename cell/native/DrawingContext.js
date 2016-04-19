@@ -72,17 +72,17 @@
             }
             if(bTheme)
             {
-                oRes = new asc_CColor();
+                oRes = new Asc.asc_CColor();
                 oRes.r = r;
                 oRes.g = g;
                 oRes.b = b;
                 oRes.a = 255;
-                oRes.type = c_oAscColor.COLOR_TYPE_SCHEME;
+                oRes.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
                 oRes.value = themePresentation;
             }
         }
         if(false == bTheme)
-            oRes = CreateAscColorCustom(r, g, b);
+            oRes = AscCommon.CreateAscColorCustom(r, g, b);
         return oRes;
     }
 
@@ -453,8 +453,8 @@
             throw "Can not set font in DrawingContext";
         }
 
-        // CColor
-        this.fillColor = new CColor(255, 255, 255);
+        // AscCommon.CColor
+        this.fillColor = new AscCommon.CColor(255, 255, 255);
 
         return this;
     }
@@ -743,7 +743,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || CColor} val
+     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setFillStyle = function (val) {
@@ -751,7 +751,7 @@
         var _g = val.getG();
         var _b = val.getB();
         var _a = val.getA();
-        //this.fillColor = new CColor(_r, _g, _b, _a);
+        //this.fillColor = new AscCommon.CColor(_r, _g, _b, _a);
         //this.ctx.fillStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
         this.nctx["PD_b_color1"](_r,_g,_b,_a * 255);
         return this;
@@ -763,7 +763,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || CColor} val
+     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setStrokeStyle = function (val) {
@@ -1012,7 +1012,7 @@
         var _g = this.fillColor.g;
         var _b = this.fillColor.b;
 
-        if (AscBrowser.isMobileVersion) {
+        if (AscCommon.AscBrowser.isMobileVersion) {
             // Special for iPad (5.1)
 
             if (!_r && !_g && !_b) {

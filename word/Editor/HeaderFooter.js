@@ -30,8 +30,9 @@
  * Time: 14:51
  */
 
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
+// Import
+var hdrftr_Header = AscCommon.hdrftr_Header;
+var hdrftr_Footer = AscCommon.hdrftr_Footer;
 
 //-----------------------------------------------------------------------------------
 // Класс работающий с одним колонтитулом
@@ -526,7 +527,7 @@ CHeaderFooter.prototype =
     Update_CursorType : function(X, Y, PageAbs)
     {
         if (PageAbs != this.Content.Get_StartPage_Absolute())
-            this.DrawingDocument.SetCursorType("default", new CMouseMoveData());
+            this.DrawingDocument.SetCursorType("default", new AscCommon.CMouseMoveData());
         else
             return this.Content.Update_CursorType(X, Y, 0);
     },
@@ -1596,21 +1597,21 @@ CHeaderFooterController.prototype =
         {
             var PageLimits = this.LogicDocument.Get_PageContentStartPos( PageNum_Abs );
 
-            var MMData_header = new CMouseMoveData();
+            var MMData_header = new AscCommon.CMouseMoveData();
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( PageLimits.X, PageLimits.Y, PageNum_Abs );
             MMData_header.X_abs            = Coords.X;
             MMData_header.Y_abs            = Coords.Y + 2;
-            MMData_header.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData_header.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData_header.UserId           = this.Lock.Get_UserId();
             MMData_header.HaveChanges      = this.Lock.Have_Changes();
             MMData_header.LockedObjectType = c_oAscMouseMoveLockedObjectType.Header;
             editor.sync_MouseMoveCallback( MMData_header );
 
-            var MMData_footer = new CMouseMoveData();
+            var MMData_footer = new AscCommon.CMouseMoveData();
             Coords = this.DrawingDocument.ConvertCoordsToCursorWR( PageLimits.X, PageLimits.YLimit, PageNum_Abs );
             MMData_footer.X_abs            = Coords.X;
             MMData_footer.Y_abs            = Coords.Y - 2;
-            MMData_footer.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData_footer.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData_footer.UserId           = this.Lock.Get_UserId();
             MMData_footer.HaveChanges      = this.Lock.Have_Changes();
             MMData_footer.LockedObjectType = c_oAscMouseMoveLockedObjectType.Footer;
@@ -2068,7 +2069,7 @@ CHeaderFooterController.prototype =
         {
             if ( null === this.Pages[PageIndex].Header )
             {
-                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
@@ -2087,7 +2088,7 @@ CHeaderFooterController.prototype =
         {
             if ( null === this.Pages[PageIndex].Footer )
             {
-                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_HdrFtr) )
+                if ( false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_HdrFtr) )
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;

@@ -28,6 +28,9 @@
  * Date: 03.12.13
  * Time: 18:28
  */
+  
+// Import
+var c_oAscShdNil = Asc.c_oAscShdNil;
 
 var reviewtype_Common = 0x00;
 var reviewtype_Remove = 0x01;
@@ -1221,7 +1224,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                         // Выясним какая заливка у нашего текста
                         var Pr = Para.Get_CompiledPr();
                         var BgColor = undefined;
-                        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value )
+                        if ( undefined !== Pr.ParaPr.Shd && c_oAscShdNil !== Pr.ParaPr.Shd.Value )
                         {
                             if(Pr.ParaPr.Shd.Unifill)
                             {
@@ -1239,7 +1242,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                             // Нам надо выяснить заливку у родительского класса (возможно мы находимся в ячейке таблицы с забивкой)
                             BgColor = Para.Parent.Get_TextBackGroundColor();
 
-                            if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+                            if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
                                 BgColor = CurTextPr.Shd.Get_Color( this.Paragraph );
                         }
 
@@ -1254,12 +1257,12 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                 var TargetY = Y - Ascender - CurTextPr.Position;
                 switch( CurTextPr.VertAlign )
                 {
-                    case vertalign_SubScript:
+                    case AscCommon.vertalign_SubScript:
                     {
                         TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
                         break;
                     }
-                    case vertalign_SuperScript:
+                    case AscCommon.vertalign_SuperScript:
                     {
                         TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
                         break;
@@ -1325,12 +1328,12 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
 
             switch( CurTextPr.VertAlign )
             {
-                case vertalign_SubScript:
+                case AscCommon.vertalign_SubScript:
                 {
                     TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Sub;
                     break;
                 }
-                case vertalign_SuperScript:
+                case AscCommon.vertalign_SuperScript:
                 {
                     TargetY -= CurTextPr.FontSize * g_dKoef_pt_to_mm * vertalign_Koef_Super;
                     break;
@@ -3146,7 +3149,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
                 if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
                 {
                     // Обновим метрики строки
-                    if (linerule_Exact === LineRule)
+                    if (Asc.linerule_Exact === LineRule)
                     {
                         if (PRS.LineAscent < Item.Height)
                             PRS.LineAscent = Item.Height;
@@ -3184,7 +3187,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
         if ( PRS.LineTextDescent < this.TextDescent )
             PRS.LineTextDescent = this.TextDescent;
 
-        if ( linerule_Exact === LineRule )
+        if ( Asc.linerule_Exact === LineRule )
         {
             // Смещение не учитывается в метриках строки, когда расстояние между строк точное
             if ( PRS.LineAscent < this.TextAscent )
@@ -4212,7 +4215,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
 
     var oCompiledPr = this.Get_CompiledPr(false);
     var oShd = oCompiledPr.Shd;
-    var bDrawShd  = ( oShd === undefined || shd_Nil === oShd.Value ? false : true );
+    var bDrawShd  = ( oShd === undefined || c_oAscShdNil === oShd.Value ? false : true );
     var ShdColor  = ( true === bDrawShd ? oShd.Get_Color( PDSH.Paragraph ) : null );
 
     if(this.Type == para_Math_Run && this.IsPlaceholder())
@@ -4375,7 +4378,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         InfoMathText = new CMathInfoTextPr(InfoTextPr);
     }
 
-    if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
@@ -4430,13 +4433,13 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
         var TempY = Y;
         switch( CurTextPr.VertAlign )
         {
-            case vertalign_SubScript:
+            case AscCommon.vertalign_SubScript:
             {
                 Y -= vertalign_Koef_Sub * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
                 break;
             }
-            case vertalign_SuperScript:
+            case AscCommon.vertalign_SuperScript:
             {
                 Y -= vertalign_Koef_Super * CurTextPr.FontSize * g_dKoef_pt_to_mm;
 
@@ -4615,9 +4618,9 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
     switch(CurTextPr.VertAlign)
     {
-        case vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27; break;
-        case vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
-        case vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
+        case AscCommon.vertalign_Baseline   : StrikeoutY += -CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm * 0.27; break;
+        case AscCommon.vertalign_SubScript  : StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Sub * CurTextPr.FontSize  * fontCoeff * g_dKoef_pt_to_mm; break;
+        case AscCommon.vertalign_SuperScript: StrikeoutY += -CurTextPr.FontSize * fontCoeff * vertalign_Koef_Size * g_dKoef_pt_to_mm * 0.27 - vertalign_Koef_Super * CurTextPr.FontSize * fontCoeff * g_dKoef_pt_to_mm; break;
     }
 
     var UnderlineY = Y + UndOff -  this.YOffset;
@@ -4625,7 +4628,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
 
 
     var BgColor = PDSL.BgColor;
-    if ( undefined !== CurTextPr.Shd && shd_Nil !== CurTextPr.Shd.Value )
+    if ( undefined !== CurTextPr.Shd && c_oAscShdNil !== CurTextPr.Shd.Value )
         BgColor = CurTextPr.Shd.Get_Color( Para );
 
     var AutoColor = ( undefined != BgColor && false === BgColor.Check_BlackAutoColor() ? new CDocumentColor( 255, 255, 255, false ) : new CDocumentColor( 0, 0, 0, false ) );
@@ -8614,7 +8617,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
 
             for ( var Index = 0; Index < Count; Index++ )
             {
-                var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
                 var Element = ParagraphContent_Read_FromBinary(Reader);
 
                 if ( null != Element )
@@ -8646,7 +8649,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             var Count = Reader.GetLong();
             for ( var Index = 0; Index < Count; Index++ )
             {
-                var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                var ChangesPos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
                 // действие совпало, не делаем его
                 if (false === ChangesPos)
@@ -8674,7 +8677,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             var unifill = this.Pr.Unifill;
             if(typeof CollaborativeEditing !== "undefined")
             {
-                if(unifill && unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                if(unifill && unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                 {
                     CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
                 }
@@ -8793,7 +8796,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
                 this.Pr.Unifill = unifill;
                 if(typeof CollaborativeEditing !== "undefined")
                 {
-                    if(unifill.fill && unifill.fill.type === FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
+                    if(unifill.fill && unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof unifill.fill.RasterImageId === "string" && unifill.fill.RasterImageId.length > 0)
                     {
                         CollaborativeEditing.Add_NewImage(getFullImageSrc2(unifill.fill.RasterImageId));
                     }
@@ -10427,7 +10430,7 @@ ParaRun.prototype.Get_TextForAutoCorrect = function(AutoCorrectEngine, RunPos)
 ParaRun.prototype.IsShade = function()
 {
     var oShd = this.Get_CompiledPr(false).Shd;
-    return !(oShd === undefined || shd_Nil === oShd.Value);
+    return !(oShd === undefined || c_oAscShdNil === oShd.Value);
 };
 ParaRun.prototype.Get_RangesByPos = function(Pos)
 {
@@ -10926,7 +10929,7 @@ ParaRun.prototype.Math_UpdateLineMetrics = function(PRS, ParaPr)
     if ( PRS.LineTextDescent < this.TextDescent )
         PRS.LineTextDescent = this.TextDescent;
 
-    if ( linerule_Exact === LineRule )
+    if ( Asc.linerule_Exact === LineRule )
     {
         // Смещение не учитывается в метриках строки, когда расстояние между строк точное
         if ( PRS.LineAscent < this.TextAscent )

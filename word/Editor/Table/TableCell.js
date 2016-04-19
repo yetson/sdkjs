@@ -452,7 +452,7 @@ CTableCell.prototype =
         // Сначала проверим заливку данной ячейки, если ее нет, тогда спрашиваем у таблицы
         var Shd = this.Get_Shd();
 
-        if ( shd_Nil !== Shd.Value )
+        if ( Asc.c_oAscShdNil !== Shd.Value )
             return Shd.Get_Color2(this.Get_Theme(), this.Get_ColorMap());
 
         return this.Row.Table.Get_TextBackGroundColor();
@@ -1477,8 +1477,8 @@ CTableCell.prototype =
                 var Row  = this.Row;
                 var RowH = this.Row.Get_Height();
 
-                if (heightrule_Auto === RowH.HRule)
-                    Row.Set_Height(20, heightrule_AtLeast);
+                if (Asc.linerule_Auto === RowH.HRule)
+                    Row.Set_Height(20, Asc.linerule_AtLeast);
                 else if (RowH.Value < 20)
                     Row.Set_Height(20, RowH.HRule);
             }

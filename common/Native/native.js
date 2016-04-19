@@ -32,12 +32,22 @@ window.location = {};
 window.location.protocol = "";
 window.location.host = "";
 window.location.href = "";
+window.location.pathname = "";
 
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
 
 var document = {};
 window.document = document;
+
+window["Asc"] = {};
+var Asc = window["Asc"];
+
+window["AscCommon"] = {};
+var AscCommon = window["AscCommon"];
+
+window["AscCommonExcel"] = {};
+var AscCommonExcel = window["AscCommonExcel"];
 
 function ConvertJSC_Array(_array)
 {
@@ -185,9 +195,6 @@ native_canvas.prototype =
     } 
 };
 
-window["Asc"] = {};
-window["AscCommonExcel"] = {};
-
 var _null_object = {};
 _null_object.length = 0;
 _null_object.nodeType = 1;
@@ -279,8 +286,6 @@ function GetNativeEngine()
 
 var native_renderer = null;
 var _api = null;
-var Asc = window["Asc"];
-var AscCommonExcel = window["AscCommonExcel"];
 
 function NativeOpenFileData(data, version)
 {

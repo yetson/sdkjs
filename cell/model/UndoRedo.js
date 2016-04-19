@@ -23,6 +23,17 @@
  *
 */
 "use strict";
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
+// Import
+var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 
 var c_oUndoRedoSerializeType =
 {
@@ -449,8 +460,8 @@ var UndoRedoDataTypes = new function() {
 			case this.StyleBorderProp: return new BorderProp();break;
 			case this.StyleXfs: return new CellXfs();break;
 			case this.StyleAlign: return new Align();break;
-			case this.CommentData: return new asc_CCommentData();break;
-			case this.CompositeCommentData: return new CompositeCommentData();break;
+			case this.CommentData: return new Asc.asc_CCommentData();break;
+			case this.CompositeCommentData: return new AscCommonExcel.CompositeCommentData();break;
 			case this.ChartSeriesData: return new asc_CChartSeria();break;
 			case this.SheetAdd: return new UndoRedoData_SheetAdd();break;
 			case this.SheetRemove: return new UndoRedoData_SheetRemove();break;
@@ -2714,11 +2725,10 @@ UndoRedoDataSetAdjustmentValue.prototype =
     }
 };
 
-var g_oUndoRedoWorkbook = null;
 function UndoRedoWorkbook(wb)
 {
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoWorkbook;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoWorkbook;});
 }
 
 UndoRedoWorkbook.prototype = {
@@ -2953,7 +2963,7 @@ UndoRedoWorkbook.prototype = {
 
                             n = n.returnCell();
                             if(n){
-                                n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
+                                n.formulaParsed = new AscCommonExcel.parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
                             }
                         }
                     }
@@ -2967,11 +2977,10 @@ UndoRedoWorkbook.prototype = {
 	}
 };
 
-var g_oUndoRedoCell = null;
 function UndoRedoCell(wb)
 {
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoCell;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoCell;});
 }
 UndoRedoCell.prototype = {
 	getClassType : function()
@@ -3000,7 +3009,7 @@ UndoRedoCell.prototype = {
 			nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 			var oLockInfo = new Asc.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
-			oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
 			this.wb.aCollaborativeChangeElements.push(oLockInfo);
 		}
@@ -3082,10 +3091,9 @@ UndoRedoCell.prototype = {
 	}
 };
 
-var g_oUndoRedoWorksheet = null;
 function UndoRedoWoorksheet(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoWorksheet;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoWorksheet;});
 }
 UndoRedoWoorksheet.prototype = {
 	getClassType : function()
@@ -3118,7 +3126,7 @@ UndoRedoWoorksheet.prototype = {
 				nCol = collaborativeEditing.getLockOtherColumn2(nSheetId, nCol);
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(nCol, nRow, nCol, nRow);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3161,7 +3169,7 @@ UndoRedoWoorksheet.prototype = {
 			    }
 			    oLockInfo = new Asc.asc_CLockInfo();
 			    oLockInfo["sheetId"] = nSheetId;
-			    oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			    oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			    oLockInfo["rangeOrObjectId"] = range;
 			    this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3179,7 +3187,7 @@ UndoRedoWoorksheet.prototype = {
 				index = collaborativeEditing.getLockOtherRow2(nSheetId, index);
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, index, gc_nMaxCol0, index);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3206,7 +3214,7 @@ UndoRedoWoorksheet.prototype = {
 				
 				oLockInfo = new Asc.asc_CLockInfo();
 				oLockInfo["sheetId"] = nSheetId;
-				oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+				oLockInfo["type"] = c_oAscLockTypeElem.Range;
 				oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
 				this.wb.aCollaborativeChangeElements.push(oLockInfo);
 			}
@@ -3234,7 +3242,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(0, from, gc_nMaxCol0, to);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3243,11 +3251,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_AddRows == Type) || (false == bUndo && historyitem_Worksheet_RemoveRows == Type)) {
 				ws.removeRows(from, to);
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteRows;
+				operType = c_oAscDeleteOptions.DeleteRows;
 			} else {
 				ws.insertRowsBefore(from, to - from + 1);
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertRows;
+				operType = c_oAscInsertOptions.InsertRows;
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
@@ -3270,7 +3278,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(from, 0, to, gc_nMaxRow0);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3280,11 +3288,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_AddCols == Type) || (false == bUndo && historyitem_Worksheet_RemoveCols == Type)) {
 				ws.removeCols(from, to);
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteColumns;
+				operType = c_oAscDeleteOptions.DeleteColumns;
 			} else {
 				ws.insertColsBefore(from, to - from + 1);
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertColumns;
+				operType = c_oAscInsertOptions.InsertColumns;
 			}
 
 			// Нужно поменять пересчетные индексы для совместного редактирования (lock-элементы), но только если это не изменения от другого пользователя
@@ -3311,7 +3319,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3321,11 +3329,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_ShiftCellsLeft == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsRight == Type)) {
 				range.addCellsShiftRight();
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertCellsAndShiftRight;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftRight;
 			}  else {
 				range.deleteCellsShiftLeft();
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
 			}
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
@@ -3348,7 +3356,7 @@ UndoRedoWoorksheet.prototype = {
 				{
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(c1, r1, c2, r2);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3358,11 +3366,11 @@ UndoRedoWoorksheet.prototype = {
 			if((true == bUndo && historyitem_Worksheet_ShiftCellsTop == Type) || (false == bUndo && historyitem_Worksheet_ShiftCellsBottom == Type)) {
 				range.addCellsShiftBottom();
 				bInsert = true;
-				operType = Asc.c_oAscInsertOptions.InsertCellsAndShiftDown;
+				operType = c_oAscInsertOptions.InsertCellsAndShiftDown;
 			} else {
 				range.deleteCellsShiftUp();
 				bInsert = false;
-				operType = Asc.c_oAscDeleteOptions.DeleteCellsAndShiftTop;
+				operType = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
 			}
 
 			// ToDo Так делать неправильно, нужно поправить (перенести логику в model, а отрисовку отделить)
@@ -3386,7 +3394,7 @@ UndoRedoWoorksheet.prototype = {
 					place.to = collaborativeEditing.getLockOtherRow2(nSheetId, place.to);
 					oLockInfo = new Asc.asc_CLockInfo();
 					oLockInfo["sheetId"] = nSheetId;
-					oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+					oLockInfo["type"] = c_oAscLockTypeElem.Range;
 					oLockInfo["rangeOrObjectId"] = new Asc.Range(bbox.c1, place.from, bbox.c2, place.from);
 					this.wb.aCollaborativeChangeElements.push(oLockInfo);
 				}
@@ -3497,7 +3505,7 @@ UndoRedoWoorksheet.prototype = {
                     for(var id in arrDefNameRecalc ){
                         dN  = arrDefNameRecalc[id];
                         if( !dN.parsedRef && dN.Ref ){
-                            dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
+                            dN.parsedRef = new AscCommonExcel.parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
                             dN.parsedRef.parse();
                         }
                     }
@@ -3614,13 +3622,11 @@ UndoRedoWoorksheet.prototype = {
 	}
 };
 
-var g_oUndoRedoRow = null;
-var g_oUndoRedoCol = null;
 function UndoRedoRowCol(wb, bRow){
 	this.wb = wb;
 	this.bRow = bRow;
-	this.nTypeRow = UndoRedoClassTypes.Add(function(){return g_oUndoRedoRow;});
-	this.nTypeCol = UndoRedoClassTypes.Add(function(){return g_oUndoRedoCol;});
+	this.nTypeRow = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoRow;});
+	this.nTypeCol = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoCol;});
 }
 UndoRedoRowCol.prototype = {
 	getClassType : function()
@@ -3649,7 +3655,7 @@ UndoRedoRowCol.prototype = {
 			var collaborativeEditing = this.wb.oApi.collaborativeEditing;
 			var oLockInfo = new Asc.asc_CLockInfo();
 			oLockInfo["sheetId"] = nSheetId;
-			oLockInfo["type"] = AscCommonExcel.c_oAscLockTypeElem.Range;
+			oLockInfo["type"] = c_oAscLockTypeElem.Range;
 			if(this.bRow)
 			{
 				nIndex = collaborativeEditing.getLockOtherRow2(nSheetId, nIndex);
@@ -3723,10 +3729,9 @@ UndoRedoRowCol.prototype = {
 	}
 };
 
-var g_oUndoRedoComment = null;
 function UndoRedoComment(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoComment;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoComment;});
 }
 UndoRedoComment.prototype = {
 	getClassType : function()
@@ -3783,10 +3788,9 @@ UndoRedoComment.prototype = {
 	}
 };
 
-var g_oUndoRedoAutoFilters = null;
 function UndoRedoAutoFilters(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoAutoFilters;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoAutoFilters;});
 }
 UndoRedoAutoFilters.prototype = {
 	getClassType : function() {
@@ -3814,3 +3818,42 @@ UndoRedoAutoFilters.prototype = {
 			autoFilters.Redo(Type, Data);
 	}
 };
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
+	window['AscCommonExcel'].UndoRedoDataTypes = UndoRedoDataTypes;
+	window['AscCommonExcel'].UndoRedoData_CellSimpleData = UndoRedoData_CellSimpleData;
+	window['AscCommonExcel'].UndoRedoData_CellData = UndoRedoData_CellData;
+	window['AscCommonExcel'].UndoRedoData_CellValueData = UndoRedoData_CellValueData;
+	window['AscCommonExcel'].UndoRedoData_FromToRowCol = UndoRedoData_FromToRowCol;
+	window['AscCommonExcel'].UndoRedoData_FromTo = UndoRedoData_FromTo;
+	window['AscCommonExcel'].UndoRedoData_FromToHyperlink = UndoRedoData_FromToHyperlink;
+	window['AscCommonExcel'].UndoRedoData_IndexSimpleProp = UndoRedoData_IndexSimpleProp;
+	window['AscCommonExcel'].UndoRedoData_ColProp = UndoRedoData_ColProp;
+	window['AscCommonExcel'].UndoRedoData_RowProp = UndoRedoData_RowProp;
+	window['AscCommonExcel'].UndoRedoData_BBox = UndoRedoData_BBox;
+	window['AscCommonExcel'].UndoRedoData_SortData = UndoRedoData_SortData;
+	window['AscCommonExcel'].UndoRedoData_SheetAdd = UndoRedoData_SheetAdd;
+	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
+	window['AscCommonExcel'].UndoRedoData_SheetPositions = UndoRedoData_SheetPositions;
+	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
+	window['AscCommonExcel'].UndoRedoData_DefinedNamesChange = UndoRedoData_DefinedNamesChange;
+	window['AscCommonExcel'].UndoRedoData_ClrScheme = UndoRedoData_ClrScheme;
+	window['AscCommonExcel'].UndoRedoData_AutoFilter = UndoRedoData_AutoFilter;
+	window['AscCommonExcel'].UndoRedoData_SingleProperty = UndoRedoData_SingleProperty;
+	window['AscCommonExcel'].UndoRedoWorkbook = UndoRedoWorkbook;
+	window['AscCommonExcel'].UndoRedoCell = UndoRedoCell;
+	window['AscCommonExcel'].UndoRedoWoorksheet = UndoRedoWoorksheet;
+	window['AscCommonExcel'].UndoRedoRowCol = UndoRedoRowCol;
+	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
+	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
+
+	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
+	window['AscCommonExcel'].g_oUndoRedoCell = null;
+	window['AscCommonExcel'].g_oUndoRedoWorksheet = null;
+	window['AscCommonExcel'].g_oUndoRedoRow = null;
+	window['AscCommonExcel'].g_oUndoRedoCol = null;
+	window['AscCommonExcel'].g_oUndoRedoComment = null;
+	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
+})(window);

@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 /////////////////////////////////////////////////////////
 //////////////        OPEN       ////////////////////////
 /////////////////////////////////////////////////////////
@@ -52,7 +55,7 @@
 		g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{
-			this.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
+			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 			return;
 		}
 	
@@ -71,7 +74,7 @@
 	{
 		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
 		cp['encodings'] = getEncodingParams();
-		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), c_oAscAdvancedOptionsAction.Open);
+		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
@@ -183,7 +186,7 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
   
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
-	if (this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+	if (this.isChartEditor || AscCommon.c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 		return;
     	
 	var t = this;
@@ -220,19 +223,19 @@ window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
 	if (isSaveAs === true)
 		_param += "saveas=true;";
-	if (AscBrowser.isRetina)
+	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
-	window["Asc"]["editor"].sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (0 == error)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
@@ -242,7 +245,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	window["Asc"]["editor"].LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		window["Asc"]["editor"].sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.NoCritical);
+		window["Asc"]["editor"].sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
 };
 
 window["Asc"]['spreadsheet_api'].prototype["asc_addImageDrawingObject"] = window["Asc"]['spreadsheet_api'].prototype.asc_addImageDrawingObject;

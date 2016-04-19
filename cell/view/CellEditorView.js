@@ -42,6 +42,12 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var asc = window["Asc"];
+	
+	var AscBrowser = AscCommon.AscBrowser;
+	
+	var cElementType = AscCommonExcel.cElementType;
+	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;
+	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
 
 	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
@@ -132,7 +138,7 @@
 		this.noUpdateMode = false;
 		this.selectionBegin = -1;
 		this.selectionEnd = -1;
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		this.hasCursor = false;
 		this.hasFocus = false;
 		this.newTextFormat = undefined;
@@ -143,7 +149,7 @@
 		this.isOpened = false;
 		this.callTopLineMouseup = false;
 		this.lastKeyCode = undefined;
-		this.m_nEditorState = Asc.c_oAscCellEditorState.editEnd; // Состояние редактора
+		this.m_nEditorState = c_oAscCellEditorState.editEnd; // Состояние редактора
 		this.isUpdateValue = true;							// Обновлять ли состояние строки при вводе в TextArea
 
 		// Функции, которые будем отключать
@@ -167,7 +173,7 @@
 		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 		this.defaults = {
-			padding: -1, selectColor: new CColor( 190, 190, 255, 0.5 ),
+			padding: -1, selectColor: new AscCommon.CColor( 190, 190, 255, 0.5 ),
 
 			canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
 		};
@@ -386,7 +392,7 @@
 		this.objAutoComplete = {};
 
 		// Сброс состояния редактора
-		this.m_nEditorState = Asc.c_oAscCellEditorState.editEnd;
+		this.m_nEditorState = c_oAscCellEditorState.editEnd;
 		this.handlers.trigger( "closed" );
 		return true;
 	};
@@ -798,7 +804,7 @@
 		this.topLineIndex = 0;
 		this.selectionBegin = -1;
 		this.selectionEnd = -1;
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		this.hasCursor = false;
 
 		this.undoList = [];
@@ -817,7 +823,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == c_oAscNumFormatType.Text ) {
+		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text ) {
 			return ret;
 		}
 
@@ -841,7 +847,7 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false,
@@ -902,7 +908,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if( nameRef instanceof cError ) continue;
+						if( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :{
@@ -966,7 +972,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
@@ -1021,7 +1027,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if ( nameRef instanceof cError ) continue;
+						if ( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :
@@ -1090,7 +1096,7 @@
 		if ( undefined === isFormula ) {
 			isFormula = this.isFormula();
 		}
-		var editorState = isFormula ? Asc.c_oAscCellEditorState.editFormula : "" === this._getFragmentsText( this.options.fragments ) ? Asc.c_oAscCellEditorState.editEmptyCell : Asc.c_oAscCellEditorState.editText;
+		var editorState = isFormula ? c_oAscCellEditorState.editFormula : "" === this._getFragmentsText( this.options.fragments ) ? c_oAscCellEditorState.editEmptyCell : c_oAscCellEditorState.editText;
 
 		if ( this.m_nEditorState !== editorState ) {
 			this.m_nEditorState = editorState;
@@ -1855,7 +1861,7 @@
 
 		function doChangeSelection( coordTmp ) {
 			// ToDo реализовать для слова.
-			if ( AscCommonExcel.c_oAscCellEditorSelectState.word === t.isSelectMode ) {
+			if ( c_oAscCellEditorSelectState.word === t.isSelectMode ) {
 				return;
 			}
 			var pos = t._findCursorPosition( coordTmp );
@@ -2173,7 +2179,7 @@
 		result.strikeout = tmp.s;
 		result.subscript = tmp.va === "subscript";
 		result.superscript = tmp.va === "superscript";
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new asc_CColor( this.options.textColor ));
+		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};
@@ -2181,14 +2187,14 @@
 	CellEditor.prototype._checkMaxCellLength = function ( length ) {
 		var newLength = this._getFragmentsLength( this.options.fragments ) + length;
 		// Ограничение на ввод
-		if ( newLength > c_oAscMaxCellOrCommentLength ) {
+		if ( newLength > Asc.c_oAscMaxCellOrCommentLength ) {
 			if ( this.selectionBegin === this.selectionEnd ) {
 				return false;
 			}
 
 			var b = Math.min( this.selectionBegin, this.selectionEnd );
 			var e = Math.max( this.selectionBegin, this.selectionEnd );
-			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > c_oAscMaxCellOrCommentLength ) {
+			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > Asc.c_oAscMaxCellOrCommentLength ) {
 				return false;
 			}
 		}
@@ -2611,7 +2617,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseUp = function ( event ) {
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		if ( this.callTopLineMouseup ) {
 			this._topLineMouseUp();
 		}
@@ -2620,7 +2626,7 @@
 
 	/** @param event {MouseEvent} */
 	CellEditor.prototype._onWindowMouseMove = function ( event ) {
-		if ( AscCommonExcel.c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
+		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode && !this.hasCursor ) {
 			this._changeSelection( this._getCoordinates( event ) );
 		}
 		return true;
@@ -2641,7 +2647,7 @@
 
 		if ( 0 === event.button ) {
 			if ( 1 === this.clickCounter.getClickCount() % 2 ) {
-				this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.char;
+				this.isSelectMode = c_oAscCellEditorSelectState.char;
 				if ( !event.shiftKey ) {
 					this._showCursor();
 					pos = this._findCursorPosition( coord );
@@ -2655,7 +2661,7 @@
 			}
 			else {
 				// Dbl click
-				this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.word;
+				this.isSelectMode = c_oAscCellEditorSelectState.word;
 				// Окончание слова
 				var endWord = this.textRender.getNextWord( this.cursorPos );
 				// Начало слова (ищем по окончанию, т.к. могли попасть в пробел)
@@ -2674,7 +2680,7 @@
 			this.handlers.trigger( 'onContextMenu', event );
 			return true;
 		}
-		this.isSelectMode = AscCommonExcel.c_oAscCellEditorSelectState.no;
+		this.isSelectMode = c_oAscCellEditorSelectState.no;
 		return true;
 	};
 
@@ -2683,7 +2689,7 @@
 		var coord = this._getCoordinates( event );
 		this.clickCounter.mouseMoveEvent( coord.x, coord.y );
 		this.hasCursor = true;
-		if ( AscCommonExcel.c_oAscCellEditorSelectState.no !== this.isSelectMode ) {
+		if ( c_oAscCellEditorSelectState.no !== this.isSelectMode ) {
 			this._changeSelection( coord );
 		}
 		return true;

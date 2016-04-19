@@ -26,8 +26,22 @@
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
-var contentchanges_Add    = 1;
-var contentchanges_Remove = 2;
+// Import
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+
+var c_oAscError = Asc.c_oAscError;
+var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
+var c_oAscChartHorAxisLabelShowSettings = Asc.c_oAscChartHorAxisLabelShowSettings;
+var c_oAscChartVertAxisLabelShowSettings = Asc.c_oAscChartVertAxisLabelShowSettings;
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscGridLinesSettings = Asc.c_oAscGridLinesSettings;
+var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
+var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
+var c_oAscFill = Asc.c_oAscFill;
 
 
 var HANDLE_EVENT_MODE_HANDLE = 0;
@@ -287,7 +301,7 @@ function CheckStockChart(oDrawingObjects, oApi)
         {
             if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
             {
-                oApi.asc_fireCallback("asc_onError", Asc.c_oAscError.ID.StockChartError, Asc.c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", c_oAscError.ID.StockChartError, c_oAscError.Level.NoCritical);
                 oApi.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
                 return false;
             }
@@ -1642,7 +1656,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSubscript);
     },
@@ -1651,7 +1665,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSuperscript);
     },
@@ -1662,22 +1676,22 @@ DrawingObjectsController.prototype =
         {
             case "left":
             {
-                align_ = align_Left;
+                align_ = AscCommon.align_Left;
                 break;
             }
             case "right":
             {
-                align_ = align_Right;
+                align_ = AscCommon.align_Right;
                 break;
             }
             case "center":
             {
-                align_ = align_Center;
+                align_ = AscCommon.align_Center;
                 break;
             }
             case "justify":
             {
-                align_ = align_Justify;
+                align_ = AscCommon.align_Justify;
             }
         }
         this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_], false, historydescription_Spreadsheet_SetCellAlign);
@@ -1740,11 +1754,11 @@ DrawingObjectsController.prototype =
 
     setCellBackgroundColor: function (color)
     {
-        var fill = new asc_CShapeFill();
+        var fill = new Asc.asc_CShapeFill();
         if(color)
         {
             fill.type = c_oAscFill.FILL_TYPE_SOLID;
-            fill.fill = new asc_CFillSolid();
+            fill.fill = new Asc.asc_CFillSolid();
             fill.fill.color = color;
         }
         else
@@ -3732,7 +3746,7 @@ DrawingObjectsController.prototype =
     getPropsFromChart: function(chart_space)
     {
         var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-        var ret = new asc_ChartSettings();
+        var ret = new AscCommon.asc_ChartSettings();
         var range_obj = chart_space.getRangeObjectStr();
         if(range_obj)
         {
@@ -3776,7 +3790,7 @@ DrawingObjectsController.prototype =
             {
                 if(ret.horAxisProps)
                 {
-                    ret.horAxisProps.putLabelsPosition(c_oAscLabelsPosition.byDivisions);
+                    ret.horAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.byDivisions);
                 }
             }
         }
@@ -4008,7 +4022,7 @@ DrawingObjectsController.prototype =
             for(var i = 0; i < chart_type.series.length; ++i)
             {
                 if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                 {
                     b_no_line = false;
                     break;
@@ -4113,7 +4127,7 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < chart_type.series.length; ++i)
                 {
                     if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                     {
                         break;
                     }
@@ -5252,7 +5266,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                this.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
+                this.setCellAlign(ParaPr.Jc === AscCommon.align_Center ? "left" : "center" );
                 bRetValue = true;
             }
         }
@@ -5270,7 +5284,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Justify ? "left" : "justify" );
                 bRetValue = true;
             }
         }
@@ -5285,7 +5299,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Left ? "justify" : "left");
                 bRetValue = true;
             }
 
@@ -5305,7 +5319,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Right ? "left" : "right");
                 bRetValue = true;
             }
         }
@@ -5355,9 +5369,9 @@ DrawingObjectsController.prototype =
             if ( isRealObject(TextPr))
             {
                 if ( true === e.shiftKey )
-                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 else
-                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5366,7 +5380,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5403,7 +5417,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5498,7 +5512,7 @@ DrawingObjectsController.prototype =
         {
             return ExecuteNoHistory(function()
             {
-                var options = new asc_ChartSettings();
+                var options = new AscCommon.asc_ChartSettings();
                 options.type = type;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
                 var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
@@ -5511,10 +5525,10 @@ DrawingObjectsController.prototype =
                 }
                 if(type === c_oAscChartTypeSettings.scatter)
                 {
-                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    var new_hor_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_hor_axis_settings.setDefault();
                     options.putHorAxisProps(new_hor_axis_settings);
-                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    var new_vert_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_vert_axis_settings.setDefault();
                     options.putVertAxisProps(new_vert_axis_settings);
                     options.putHorGridLines(c_oAscGridLinesSettings.major);
@@ -6547,17 +6561,17 @@ DrawingObjectsController.prototype =
                         table_props = new_table_props;
                         if(new_table_props.CellsBackground)
                         {
-                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== FILL_TYPE_NONE)
+                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                             {
                                 new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                 var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
                                 new_table_props.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
-                                new_table_props.CellsBackground.Value = shd_Clear;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdClear;
                             }
                             else
                             {
                                 new_table_props.CellsBackground.Color = new CDocumentColor(0, 0, 0, false);
-                                new_table_props.CellsBackground.Value = shd_Nil;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdNil;
                             }
                         }
                         if(new_table_props.CellBorders)
@@ -6566,7 +6580,7 @@ DrawingObjectsController.prototype =
                             {
                                 if(!border)
                                     return;
-                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== FILL_TYPE_NONE)
+                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                                 {
                                     border.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                     var RGBA = border.Unifill.getRGBAColor();
@@ -6744,9 +6758,9 @@ DrawingObjectsController.prototype =
         var ret = [], i, bParaLocked = false;
         if(isRealObject(props.shapeChartProps))
         {
-            shape_props = new asc_CImgProperty();
+            shape_props = new Asc.asc_CImgProperty();
             shape_props.fromGroup = props.shapeChartProps.fromGroup;
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeChartProps.type;
             shape_props.ShapeProperties.fill = props.shapeChartProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
@@ -6755,7 +6769,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeChartProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeChartProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeChartProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeChartProps.verticalTextAlign;
             shape_props.vert = props.shapeChartProps.vert;
@@ -6766,7 +6780,7 @@ DrawingObjectsController.prototype =
             var oTextArtProperties;
             if (!isRealObject(props.shapeProps))
             {
-                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6784,7 +6798,7 @@ DrawingObjectsController.prototype =
                 if(pr.textArtProperties)
                 {
                     oTextArtProperties = pr.textArtProperties;
-                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                     {
                         if(api)
                             this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6807,9 +6821,9 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.shapeProps))
         {
-            shape_props = new asc_CImgProperty();
+            shape_props = new Asc.asc_CImgProperty();
             shape_props.fromGroup = CanStartEditText(this);
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
@@ -6820,7 +6834,7 @@ DrawingObjectsController.prototype =
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;
-                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6835,7 +6849,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeProps.verticalTextAlign;
             shape_props.vert = props.shapeProps.vert;
@@ -6843,7 +6857,7 @@ DrawingObjectsController.prototype =
             shape_props.Width = props.shapeProps.w;
             shape_props.Height = props.shapeProps.h;
             var pr = shape_props.ShapeProperties;
-            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
             {
                 if(api)
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6869,7 +6883,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.imageProps))
         {
-            image_props = new asc_CImgProperty();
+            image_props = new Asc.asc_CImgProperty();
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
@@ -6883,7 +6897,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.chartProps) && isRealObject(props.chartProps.chartProps))
         {
-            chart_props = new asc_CImgProperty();
+            chart_props = new Asc.asc_CImgProperty();
             chart_props.Width = props.chartProps.w;
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
@@ -6896,7 +6910,7 @@ DrawingObjectsController.prototype =
         }
         for (i = 0; i < ret.length; i++)
         {
-            ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+            ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Image, new Asc.asc_CImgProperty(ret[i]) ));
         }
 
         // Текстовые свойства объекта
@@ -6938,8 +6952,8 @@ DrawingObjectsController.prototype =
         var _this = this;
         var trigger = this.drawingObjects.callTrigger;
 
-        ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-        ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+        ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+        ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
         ParaPr.Strikeout   = TextPr.Strikeout;
         ParaPr.DStrikeout  = TextPr.DStrikeout;
         ParaPr.AllCaps     = TextPr.Caps;
@@ -6975,12 +6989,12 @@ DrawingObjectsController.prototype =
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = UnknownValue;
 
-        trigger("asc_onParaSpacingLine", new asc_CParagraphSpacing( ParaPr.Spacing ));
+        trigger("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing( ParaPr.Spacing ));
 
         // ParaPr.Jc
         trigger("asc_onPrAlign", ParaPr.Jc);
 
-        ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+        ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty( ParaPr ) ));
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
@@ -7122,7 +7136,7 @@ DrawingObjectsController.prototype =
         }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
-        oContent.Set_ParagraphAlign(align_Center);
+        oContent.Set_ParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;
@@ -7214,16 +7228,16 @@ DrawingObjectsController.prototype =
 
     setGraphicObjectProps: function(props)
     {
-        if(typeof asc_CParagraphProperty !== "undefined" && !(props instanceof asc_CParagraphProperty))
+        if(typeof Asc.asc_CParagraphProperty !== "undefined" && !(props instanceof Asc.asc_CParagraphProperty))
         {
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
                 var editor = window["Asc"]["editor"];
                 var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, Asc.c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
-                if(check === Asc.c_oAscError.ID.StockChartError || check === Asc.c_oAscError.ID.DataRangeError
-                    || check === Asc.c_oAscError.ID.MaxDataSeriesError)
+                if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
+                    || check === c_oAscError.ID.MaxDataSeriesError)
                 {
-                    editor.wbModel.handlers.trigger("asc_onError", check, Asc.c_oAscError.Level.NoCritical);
+                    editor.wbModel.handlers.trigger("asc_onError", check, c_oAscError.Level.NoCritical);
                     this.drawingObjects.sendGraphicObjectProps();
                     return;
                 }
@@ -7415,11 +7429,11 @@ DrawingObjectsController.prototype =
             var TextPr = new CTextPr();
 
             if ( true === Props.Subscript )
-                TextPr.VertAlign = vertalign_SubScript;
+                TextPr.VertAlign = AscCommon.vertalign_SubScript;
             else if ( true === Props.Superscript )
-                TextPr.VertAlign = vertalign_SuperScript;
+                TextPr.VertAlign = AscCommon.vertalign_SuperScript;
             else if ( false === Props.Superscript || false === Props.Subscript )
-                TextPr.VertAlign = vertalign_Baseline;
+                TextPr.VertAlign = AscCommon.vertalign_Baseline;
 
             if ( undefined != Props.Strikeout )
             {
@@ -8559,7 +8573,7 @@ function CreateImageDrawingObject(imageUrl, options, drawingObjects) {
         var addImageObject = function (_image) {
 
             if ( !_image.Image ) {
-                worksheet.model.workbook.handlers.trigger("asc_onError", Asc.c_oAscError.ID.UplImageUrl, Asc.c_oAscError.Level.NoCritical);
+                worksheet.model.workbook.handlers.trigger("asc_onError", c_oAscError.ID.UplImageUrl, c_oAscError.Level.NoCritical);
             }
             else {
 

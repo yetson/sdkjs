@@ -24,6 +24,25 @@
 */
 "use strict";
 
+// Import
+var DownloadType = AscCommon.DownloadType;
+var locktype_None = AscCommon.locktype_None;
+var locktype_Mine = AscCommon.locktype_Mine;
+var locktype_Other = AscCommon.locktype_Other;
+var locktype_Other2 = AscCommon.locktype_Other2;
+var locktype_Other3 = AscCommon.locktype_Other3;
+var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
+var asc_CSelectedObject = AscCommon.asc_CSelectedObject;
+
+var c_oAscError = Asc.c_oAscError;
+var c_oAscFileType = Asc.c_oAscFileType;
+var c_oAscAsyncAction = Asc.c_oAscAsyncAction;
+var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
+var c_oAscTypeSelectElement = Asc.c_oAscTypeSelectElement;
+var c_oAscFill = Asc.c_oAscFill;
+var asc_CShapeFill = Asc.asc_CShapeFill;
+var asc_CFillBlip = Asc.asc_CFillBlip;
+
 var c_oSerFormat = {
     Version		: 1,
     Signature	: "PPTY"
@@ -510,9 +529,9 @@ asc_docs_api.prototype.sync_ChangeLastSelectedElement = function(type, obj)
 			
 	switch( type )
 	{
-		case c_oAscTypeSelectElement.Paragraph: oUnkTypeObj = new asc_CParagraphProperty( obj );
+		case c_oAscTypeSelectElement.Paragraph: oUnkTypeObj = new Asc.asc_CParagraphProperty( obj );
 			break;
-		case c_oAscTypeSelectElement.Image: oUnkTypeObj = new asc_CImgProperty( obj );
+		case c_oAscTypeSelectElement.Image: oUnkTypeObj = new Asc.asc_CImgProperty( obj );
 			break;
 		case c_oAscTypeSelectElement.Table: oUnkTypeObj = new CTableProp( obj );
 			break;
@@ -549,6 +568,11 @@ asc_docs_api.prototype.asc_setLocale = function(val) {
 asc_docs_api.prototype.SetThemesPath = function(path)
 {
     this.ThemeLoader.ThemesUrl = path;
+    if (this.documentOrigin) {
+        this.ThemeLoader.ThemesUrlAbs = joinUrls(this.documentOrigin + this.documentPathname, path);
+    } else {
+        this.ThemeLoader.ThemesUrlAbs = path;
+    }
 };
 
 asc_docs_api.prototype.CreateCSS = function()
@@ -739,7 +763,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
 	OnUnderline, 
 	OnTextPrBaseline(возвращается расположение строки - supstring, superstring, baseline), 
 	OnPrAlign(выравнивание по ширине, правому краю, левому краю, по центру), 
-	OnListType( возвращается asc_CListType )
+	OnListType( возвращается AscCommon.asc_CListType )
 
 	фейк-функции ожидающие TODO:
 	Print,Undo,Redo,Copy,Cut,Paste,Share,Save,Download & callbacks
@@ -748,10 +772,10 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function() {
 	OnFocusObject( возвращается массив asc_CSelectedObject )
 	OnInitEditorStyles( возвращается CStylesPainter )
 	OnSearchFound( возвращается CSearchResult );
-	OnParaSpacingLine( возвращается asc_CParagraphSpacing )
+	OnParaSpacingLine( возвращается AscCommon.asc_CParagraphSpacing )
 	OnLineSpacing( не используется? )
-	OnTextColor( возвращается CColor )
-	OnTextHightLight( возвращается CColor )
+	OnTextColor( возвращается AscCommon.CColor )
+	OnTextHightLight( возвращается AscCommon.CColor )
 	OnInitEditorFonts( возвращается массив объектов СFont )
 	OnFontFamily( возвращается asc_CTextFontFamily )
 */
@@ -821,7 +845,7 @@ asc_docs_api.prototype.get_PropertyStandartTextures = function()
     var arr = new Array(_count);
     for (var i = 0; i < _count; ++i)
     {
-        arr[i] = new asc_CTexture();
+        arr[i] = new AscCommon.asc_CTexture();
         arr[i].Id = i;
         arr[i].Image = g_oUserTexturePresets[i];
     }
@@ -955,8 +979,8 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr, bParaPr){
 
     ParaPr.StyleName = "";
     var TextPr = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
-    ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-    ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+    ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+    ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
     ParaPr.Strikeout   = TextPr.Strikeout;
     ParaPr.DStrikeout  = TextPr.DStrikeout;
     ParaPr.AllCaps     = TextPr.Caps;
@@ -1192,7 +1216,7 @@ function OnSave_Callback(e) {
     CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo});
   } else {
     var nState = editor.CoAuthoringApi.get_state();
-    if (ConnectionState.Close === nState) {
+    if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
       // Отключаемся от сохранения, соединение потеряно
       editor.canSave = true;
       editor.IsUserSave = false;
@@ -1521,13 +1545,13 @@ asc_docs_api.prototype.sync_StrikeoutCallBack = function(isStrikeout){
 	this.asc_fireCallback("asc_onStrikeout",isStrikeout);
 };
 asc_docs_api.prototype.sync_TextPrFontFamilyCallBack = function(FontFamily){
-	this.asc_fireCallback("asc_onFontFamily", new asc_CTextFontFamily( FontFamily ));
+	this.asc_fireCallback("asc_onFontFamily", new AscCommon.asc_CTextFontFamily( FontFamily ));
 };
 asc_docs_api.prototype.sync_TextPrFontSizeCallBack = function(FontSize){
 	this.asc_fireCallback("asc_onFontSize", FontSize);
 };
 asc_docs_api.prototype.sync_PrLineSpacingCallBack = function(LineSpacing){
-	this.asc_fireCallback("asc_onLineSpacing", new asc_CParagraphSpacing ( LineSpacing ) );
+	this.asc_fireCallback("asc_onLineSpacing", new AscCommon.asc_CParagraphSpacing ( LineSpacing ) );
 };
 
 asc_docs_api.prototype.sync_InitEditorThemes = function(gui_editor_themes, gui_document_themes){
@@ -1596,11 +1620,11 @@ asc_docs_api.prototype.paraApply = function(Props)
                 var TextPr = new CTextPr();
 
                 if ( true === Props.Subscript )
-                    TextPr.VertAlign = vertalign_SubScript;
+                    TextPr.VertAlign = AscCommon.vertalign_SubScript;
                 else if ( true === Props.Superscript )
-                    TextPr.VertAlign = vertalign_SuperScript;
+                    TextPr.VertAlign = AscCommon.vertalign_SuperScript;
                 else if ( false === Props.Superscript || false === Props.Subscript )
-                    TextPr.VertAlign = vertalign_Baseline;
+                    TextPr.VertAlign = AscCommon.vertalign_Baseline;
 
                 if ( undefined != Props.Strikeout )
                 {
@@ -1807,6 +1831,15 @@ asc_docs_api.prototype.ShapeApply = function(prop)
           fApplyCallback();
         }
         else{
+
+          if (window["AscDesktopEditor"])
+          {
+              image_url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](sImageUrl);
+			  image_url = g_oDocumentUrls.getImageUrl(image_url);
+              fApplyCallback();
+              return;
+          }
+
           this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           this.fCurCallback = function(input) {
             if(null != input && "imgurl" == input["type"]){
@@ -1828,13 +1861,13 @@ asc_docs_api.prototype.ShapeApply = function(prop)
                   image_url = firstUrl;
                   fApplyCallback();
                 } else {
-                  oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+                  oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                 }
               } else {
-                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
             }
             oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
           };
@@ -2131,29 +2164,29 @@ asc_docs_api.prototype.sync_PrAlignCallBack = function(value){
 	this.asc_fireCallback("asc_onPrAlign",value);
 };
 asc_docs_api.prototype.sync_ListType = function(NumPr){
-	this.asc_fireCallback("asc_onListType", new asc_CListType( NumPr ) );
+	this.asc_fireCallback("asc_onListType", new AscCommon.asc_CListType( NumPr ) );
 };
 asc_docs_api.prototype.sync_TextColor = function(Color){
-	this.asc_fireCallback("asc_onTextColor", new CColor( Color.r, Color.g, Color.b ));
+	this.asc_fireCallback("asc_onTextColor", new AscCommon.CColor( Color.r, Color.g, Color.b ));
 }
 asc_docs_api.prototype.sync_TextColor2 = function(unifill)
 {
     var _color;
     if (unifill.fill == null)
         return;
-    else if (unifill.fill.type == FILL_TYPE_SOLID)
+    else if (unifill.fill.type == c_oAscFill.FILL_TYPE_SOLID)
     {
         _color = unifill.getRGBAColor();
-        var color = CreateAscColor(unifill.fill.color);
+        var color = AscCommon.CreateAscColor(unifill.fill.color);
         color.asc_putR(_color.R);
         color.asc_putG(_color.G);
         color.asc_putB(_color.B);
         this.asc_fireCallback("asc_onTextColor", color);
     }
-    else if (unifill.fill.type == FILL_TYPE_GRAD)
+    else if (unifill.fill.type == c_oAscFill.FILL_TYPE_GRAD)
     {
         _color = unifill.getRGBAColor();
-        var color = CreateAscColor(unifill.fill.colors[0].color);
+        var color = AscCommon.CreateAscColor(unifill.fill.colors[0].color);
         color.asc_putR(_color.R);
         color.asc_putG(_color.G);
         color.asc_putB(_color.B);
@@ -2162,7 +2195,7 @@ asc_docs_api.prototype.sync_TextColor2 = function(unifill)
     else
     {
         _color = unifill.getRGBAColor();
-        var color = new asc_CColor();
+        var color = new Asc.asc_CColor();
         color.asc_putR(_color.R);
         color.asc_putG(_color.G);
         color.asc_putB(_color.B);
@@ -2170,13 +2203,13 @@ asc_docs_api.prototype.sync_TextColor2 = function(unifill)
     }
 }
 asc_docs_api.prototype.sync_TextHighLight = function(HighLight){
-	this.asc_fireCallback("asc_onTextHighLight", new CColor( HighLight.r, HighLight.g, HighLight.b ) );
+	this.asc_fireCallback("asc_onTextHighLight", new AscCommon.CColor( HighLight.r, HighLight.g, HighLight.b ) );
 }
 asc_docs_api.prototype.sync_ParaStyleName = function(Name){
 	this.asc_fireCallback("asc_onParaStyleName",Name);
 }
 asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine){
-	this.asc_fireCallback("asc_onParaSpacingLine", new asc_CParagraphSpacing ( SpacingLine ));
+	this.asc_fireCallback("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing ( SpacingLine ));
 }
 asc_docs_api.prototype.sync_PageBreakCallback = function(isBreak){
 	this.asc_fireCallback("asc_onPageBreak",isBreak);
@@ -2196,12 +2229,12 @@ asc_docs_api.prototype.sync_PrPropCallback = function(prProp){
     {
         if (this.SelectedObjectsStack[_len - 1].Type == c_oAscTypeSelectElement.Paragraph)
         {
-            this.SelectedObjectsStack[_len - 1].Value = new asc_CParagraphProperty( prProp );
+            this.SelectedObjectsStack[_len - 1].Value = new Asc.asc_CParagraphProperty( prProp );
             return;
         }
     }
 
-    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( prProp ) );
+    this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty( prProp ) );
 }
 
 asc_docs_api.prototype.SetDrawImagePlaceParagraph = function(element_id, props)
@@ -2746,13 +2779,13 @@ asc_docs_api.prototype.AddImageUrl = function(url){
 					if(firstUrl) {
 						t.AddImageUrlAction(firstUrl);
 					} else {
-						t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+						t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 					}
 				} else {
-					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+					t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
 				}
 			} else {
-				t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+				t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
 			}
 			t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
 		};
@@ -2775,7 +2808,7 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     var src = _image.src;
     if (this.isShapeImageChangeUrl)
     {
-        var AscShapeProp = new asc_CShapeProperty();
+        var AscShapeProp = new Asc.asc_CShapeProperty();
         AscShapeProp.fill = new asc_CShapeFill();
         AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
         AscShapeProp.fill.fill = new asc_CFillBlip();
@@ -2795,19 +2828,19 @@ asc_docs_api.prototype.AddImageUrlActionCallback = function(_image)
     }
     else if (this.isImageChangeUrl)
     {
-        var AscImageProp = new asc_CImgProperty();
+        var AscImageProp = new Asc.asc_CImgProperty();
         AscImageProp.ImageUrl = src;
         this.ImgApply(AscImageProp);
         this.isImageChangeUrl = false;
     }
     else if (this.isTextArtChangeUrl)
     {
-        var AscShapeProp = new asc_CShapeProperty();
+        var AscShapeProp = new Asc.asc_CShapeProperty();
         var oFill = new asc_CShapeFill();
         oFill.type = c_oAscFill.FILL_TYPE_BLIP;
         oFill.fill = new asc_CFillBlip();
         oFill.fill.asc_putUrl(src);
-        AscShapeProp.textArtProperties = new asc_TextArtProperties();
+        AscShapeProp.textArtProperties = new Asc.asc_TextArtProperties();
         AscShapeProp.textArtProperties.asc_putFill(oFill);
         this.ShapeApply(AscShapeProp);
         this.isTextArtChangeUrl = false;
@@ -2841,8 +2874,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url){
 		}
 	}
 };
-/* В качестве параметра  передается объект класса asc_CImgProperty, он же приходит на OnImgProp
- asc_CImgProperty заменяет пережнюю структуру:
+/* В качестве параметра  передается объект класса Asc.asc_CImgProperty, он же приходит на OnImgProp
+ Asc.asc_CImgProperty заменяет пережнюю структуру:
 если параметр не имеет значения то передвать следует null, напримере inline-картинок: в качестве left,top,bottom,right,X,Y,ImageUrl необходимо передавать null.
 	{
 		Width: 0,
@@ -2923,13 +2956,13 @@ asc_docs_api.prototype.ImgApply = function(obj){
                 ImagePr.ImageUrl = firstUrl;
                 fApplyCallback();
               } else {
-                oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+                oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
               }
             } else {
-              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.NoCritical);
+              oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
           } else {
-            oApi.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.NoCritical);
+            oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
           }
           oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
         };
@@ -2953,7 +2986,7 @@ asc_docs_api.prototype.ImgApply = function(obj){
 
 asc_docs_api.prototype.ChartApply = function(obj)
 {
-    if(obj.ChartProperties && obj.ChartProperties.type === c_oAscChartTypeSettings.stock && this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
+    if(obj.ChartProperties && obj.ChartProperties.type === Asc.c_oAscChartTypeSettings.stock && this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage])
     {
         if(!CheckStockChart(this.WordControl.m_oLogicDocument.Slides[this.WordControl.m_oLogicDocument.CurPage].graphicObjects, this))
         {
@@ -3007,7 +3040,7 @@ asc_docs_api.prototype.sync_ImgPropCallback = function(imgProp){
     }
     else
     {
-        objects = new asc_CImgProperty(imgProp);
+        objects = new Asc.asc_CImgProperty(imgProp);
     }
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( type,  objects);
 };
@@ -3208,7 +3241,7 @@ function asc_CCommentData( obj )
 }
 
 asc_CCommentData.prototype.asc_getText         = function()  { return this.m_sText; };
-asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, c_oAscMaxCellOrCommentLength) : v; };
+asc_CCommentData.prototype.asc_putText         = function(v) { this.m_sText = v ? v.slice(0, Asc.c_oAscMaxCellOrCommentLength) : v; };
 asc_CCommentData.prototype.asc_getTime         = function()  { return this.m_sTime; };
 asc_CCommentData.prototype.asc_putTime         = function(v) { this.m_sTime = v; };
 asc_CCommentData.prototype.asc_getUserId       = function()  { return this.m_sUserId; };
@@ -3253,7 +3286,7 @@ asc_docs_api.prototype.asc_getMasterCommentId = function()
 asc_docs_api.prototype.asc_getAnchorPosition = function()
 {
     var AnchorPos = this.WordControl.m_oLogicDocument.Get_SelectionAnchorPos();
-    return new asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
+    return new AscCommon.asc_CRect(AnchorPos.X0, AnchorPos.Y, AnchorPos.X1 - AnchorPos.X0, 0);
 };
 
 asc_docs_api.prototype.asc_removeComment = function(Id)
@@ -3261,7 +3294,7 @@ asc_docs_api.prototype.asc_removeComment = function(Id)
     if (null == this.WordControl.m_oLogicDocument)
         return;
 
-    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_MoveComment, Id ) )
+    if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, Id ) )
     {
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_RemoveComment);
         this.WordControl.m_oLogicDocument.Remove_Comment( Id, true );
@@ -3676,7 +3709,7 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
         this.asc_setViewMode(true);
 
 	// Меняем тип состояния (на никакое)
-	this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+	this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
 };
 
 asc_docs_api.prototype.asyncFontEndLoaded = function(fontinfo)
@@ -3972,7 +4005,7 @@ asc_docs_api.prototype.sync_MouseMoveCallback = function(Data)
 asc_docs_api.prototype.sync_ShowForeignCursorLabel = function(UserId, X, Y, Color)
 {
 
-    this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new CColor(Color.r, Color.g, Color.b, 255));
+    this.asc_fireCallback("asc_onShowForeignCursorLabel", UserId, X, Y, new AscCommon.CColor(Color.r, Color.g, Color.b, 255));
 };
 asc_docs_api.prototype.sync_HideForeignCursorLabel = function(UserId)
 {
@@ -4063,7 +4096,7 @@ function CHyperlinkProperty( obj )
 CHyperlinkProperty.prototype.get_Value   = function()  { return this.Value; };
 CHyperlinkProperty.prototype.put_Value   = function(v) { this.Value = v; };
 CHyperlinkProperty.prototype.get_ToolTip = function()  { return this.ToolTip; };
-CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v ? v.slice(0, c_oAscMaxTooltipLength) : v; };
+CHyperlinkProperty.prototype.put_ToolTip = function(v) { this.ToolTip = v ? v.slice(0, Asc.c_oAscMaxTooltipLength) : v; };
 CHyperlinkProperty.prototype.get_Text    = function()  { return this.Text; };
 CHyperlinkProperty.prototype.put_Text    = function(v) { this.Text = v; };
 
@@ -4108,7 +4141,7 @@ asc_docs_api.prototype.GoToFooter = function(pageNumber)
 asc_docs_api.prototype.sync_shapePropCallback = function(pr)
 {
     var obj = CreateAscShapePropFromProp(pr);
-    if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+    if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
     }
@@ -4118,7 +4151,7 @@ asc_docs_api.prototype.sync_shapePropCallback = function(pr)
     }
 
     var oTextArtProperties = pr.textArtProperties;
-    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
     {
         this.WordControl.m_oDrawingDocument.DrawImageTextureFillTextArt(oTextArtProperties.Fill.fill.RasterImageId);
     }
@@ -4164,7 +4197,7 @@ asc_docs_api.prototype.sync_slidePropCallback = function(slide)
     {
         obj.Background = CreateAscFill(bgFill);
 
-        if (bgFill != null && bgFill.fill != null && bgFill.fill.type == FILL_TYPE_BLIP)
+        if (bgFill != null && bgFill.fill != null && bgFill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
         {
             this.WordControl.m_oDrawingDocument.DrawImageTextureFillSlide(bgFill.fill.RasterImageId);
         }
@@ -4384,7 +4417,7 @@ asc_docs_api.prototype.ChangeTheme = function(indexTheme)
     if (true === CollaborativeEditing.Get_GlobalLock())
         return;
 
-    if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Theme) === false)
+    if (!this.isViewMode && this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Theme) === false)
     {
         CollaborativeEditing.m_bGlobalLock = true;
         this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_ChangeTheme);
@@ -4570,7 +4603,7 @@ asc_docs_api.prototype.DemonstrationGoToSlide = function(slideNum)
 
 asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 {
-    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming) === false)
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_SlideTiming) === false)
     {
         History.Create_NewPoint(historydescription_Presentation_ApplyTiming);
         var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
@@ -4585,7 +4618,7 @@ asc_docs_api.prototype.ApplySlideTiming = function(oTiming)
 asc_docs_api.prototype.SlideTimingApplyToAll = function()
 {
 
-    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_SlideTiming, {All: true}) === false)
+    if(this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_SlideTiming, {All: true}) === false)
     {
         History.Create_NewPoint(historydescription_Presentation_ApplyTimingToAll);
         var _count = this.WordControl.m_oDrawingDocument.SlidesCount;
@@ -4714,7 +4747,7 @@ asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
 	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error || !result.bSerFormat) {
-			t.asc_fireCallback("asc_onError",Asc.c_oAscError.ID.Unknown,Asc.c_oAscError.Level.Critical);
+			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
 		}
 
@@ -4742,7 +4775,7 @@ function _downloadAs(editor, filetype, actionType, options)
 	oAdditionalData["vkey"] = editor.documentVKey;
 	oAdditionalData["outputformat"] = filetype;
 	oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
-	oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
     }
@@ -4754,20 +4787,20 @@ function _downloadAs(editor, filetype, actionType, options)
 	else
 		dataContainer.data = editor.WordControl.SaveDocument();
     var fCallback = function(input) {
-      var error = Asc.c_oAscError.ID.Unknown;
+      var error = c_oAscError.ID.Unknown;
       if(null != input && command == input["type"]) {
         if('ok' == input["status"]){
           var url = input["data"];
           if(url) {
-            error = Asc.c_oAscError.ID.No;
+            error = c_oAscError.ID.No;
             editor.processSavedFile(url, options.downloadType);
           }
         } else {
           error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
         }
       }
-      if (Asc.c_oAscError.ID.No != error) {
-        editor.asc_fireCallback("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+      if (c_oAscError.ID.No != error) {
+        editor.asc_fireCallback("asc_onError", error, c_oAscError.Level.NoCritical);
       }
       if (actionType) {
         editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
@@ -4783,7 +4816,7 @@ window["asc_docs_api"].prototype["asc_nativeOpenFile"] = function(base64File, ve
 {
 	this.SpellCheckUrl = '';
 
-	this.User = new Asc.asc_CUser();
+	this.User = new AscCommon.asc_CUser();
 	this.User.setId("TM");
 	this.User.setUserName("native");
 	

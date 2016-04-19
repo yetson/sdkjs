@@ -1281,7 +1281,7 @@ CTableRow.prototype =
                     this.Pr.Height = undefined;
                 else
                 {
-                    this.Pr.Height = new CTableRowHeight(0, heightrule_Auto);
+                    this.Pr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
                     this.Pr.Height.Read_FromBinary( Reader );
                 }
 
@@ -1302,7 +1302,7 @@ CTableRow.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
+                    var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
                     var Element = g_oTableId.Get_ById(Reader.GetString2());
 
                     if (null != Element)
@@ -1326,7 +1326,7 @@ CTableRow.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                    var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
                     if (false === Pos)

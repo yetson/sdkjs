@@ -27,8 +27,8 @@
 (function(window, undefined) {
   'use strict';
 
-  var asc = window["Asc"];
   var asc_coAuthV = '3.0.9';
+  var ConnectionState = AscCommon.ConnectionState;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -616,7 +616,7 @@
     }
 
     // Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
-    if (ConnectionState.Reconnect === this._state) {
+    if (ConnectionState.Authorized !== this._state) {
       this.saveLockCallbackErrorTimeOutId = window.setTimeout(function() {
         if (callback && _.isFunction(callback)) {
           // Фиктивные вызовы
@@ -1019,7 +1019,7 @@
     if (participants) {
       var tmpUser;
       for (var i = 0; i < participants.length; ++i) {
-        tmpUser = new asc.asc_CUser(participants[i]);
+        tmpUser = new AscCommon.asc_CUser(participants[i]);
         this._participants[tmpUser.asc_getId()] = tmpUser;
         // Считаем только число редакторов
         if (!tmpUser.asc_getView()) {
@@ -1044,7 +1044,7 @@
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
     if (this.onConnectionStateChanged) {
-      userStateChanged = new asc.asc_CUser(data['user']);
+      userStateChanged = new AscCommon.asc_CUser(data['user']);
       userStateChanged.setState(data["state"]);
 
       userId = userStateChanged.asc_getId();
@@ -1114,7 +1114,7 @@
 
       if (this._isReSaveAfterAuth) {
         var callbackAskSaveChanges = function(e) {
-          if (false == e["saveLock"]) {
+          if (false === e["saveLock"]) {
             t._reSaveChanges();
           } else {
             setTimeout(function() {
@@ -1336,5 +1336,7 @@
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
-  asc.CDocsCoApi = CDocsCoApi;
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].CDocsCoApi = CDocsCoApi;
 })(window);

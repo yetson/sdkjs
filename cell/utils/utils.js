@@ -36,8 +36,13 @@
 	 */
 	function (window, undefined) {
 
+		// Import
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
+
+		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+
+		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
 
 		/** @const */
@@ -460,11 +465,11 @@
 
 			getAllRange: function () {
 				var result;
-				if (Asc.c_oAscSelectionType.RangeMax === this.type)
+				if (c_oAscSelectionType.RangeMax === this.type)
 					result = new Range(0, 0, gc_nMaxCol0, gc_nMaxRow0);
-				else if (Asc.c_oAscSelectionType.RangeCol === this.type)
+				else if (c_oAscSelectionType.RangeCol === this.type)
 					result = new Range(this.c1, 0, this.c2, gc_nMaxRow0);
-				else if (Asc.c_oAscSelectionType.RangeRow === this.type)
+				else if (c_oAscSelectionType.RangeRow === this.type)
 					result = new Range(0, this.r1, gc_nMaxCol0, this.r2);
 				else
 					result = this.clone();
@@ -493,7 +498,7 @@
 				ActiveRange.superclass.constructor.apply(this, arguments);
 			else
 				ActiveRange.superclass.constructor.call(this, 0, 0, 0, 0);
-			this.type = Asc.c_oAscSelectionType.RangeCells;
+			this.type = c_oAscSelectionType.RangeCells;
 			this.startCol = 0; // Активная ячейка в выделении
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
@@ -591,17 +596,17 @@
 				this.startRow = this.r1;
 			}
 			//не меняем тип выделения, если это не выделение ячееек
-			// if(this.type == Asc.c_oAscSelectionType.RangeCells || this.type == Asc.c_oAscSelectionType.RangeCol ||
-				// this.type == Asc.c_oAscSelectionType.RangeRow || this.type == Asc.c_oAscSelectionType.RangeMax)
+			// if(this.type == c_oAscSelectionType.RangeCells || this.type == c_oAscSelectionType.RangeCol ||
+				// this.type == c_oAscSelectionType.RangeRow || this.type == c_oAscSelectionType.RangeMax)
 			// {
 				// if(0 == this.r1 && 0 == this.c1 && gc_nMaxRow0 == this.r2 && gc_nMaxCol0 == this.c2)
-					// this.type = Asc.c_oAscSelectionType.RangeMax;
+					// this.type = c_oAscSelectionType.RangeMax;
 				// else if(0 == this.r1 && gc_nMaxRow0 == this.r2)
-					// this.type = Asc.c_oAscSelectionType.RangeCol;
+					// this.type = c_oAscSelectionType.RangeCol;
 				// else if(0 == this.c1 && gc_nMaxCol0 == this.c2)
-					// this.type = Asc.c_oAscSelectionType.RangeRow;
+					// this.type = c_oAscSelectionType.RangeRow;
 				// else
-					// this.type = Asc.c_oAscSelectionType.RangeCells;
+					// this.type = c_oAscSelectionType.RangeCells;
 			// }
 		};
 
@@ -788,13 +793,13 @@
 				            var bCol = 0 == r1 && gc_nMaxRow0 == r2;
 				            var bRow = 0 == c1 && gc_nMaxCol0 == c2;
 				            if (bCol && bRow)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeMax;
+				                oActiveRange.type = c_oAscSelectionType.RangeMax;
 				            else if (bCol)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCol;
+				                oActiveRange.type = c_oAscSelectionType.RangeCol;
 				            else if (bRow)
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeRow;
+				                oActiveRange.type = c_oAscSelectionType.RangeRow;
 				            else
-				                oActiveRange.type = Asc.c_oAscSelectionType.RangeCells;
+				                oActiveRange.type = c_oAscSelectionType.RangeCells;
 				            oActiveRange.startCol = oActiveRange.c1;
 				            oActiveRange.startRow = oActiveRange.r1;
 				            oCacheVal.activeRange = oActiveRange;
@@ -1037,7 +1042,7 @@
 				}
 			},
 			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
-			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, c_oAscMaxTooltipLength) : val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, Asc.c_oAscMaxTooltipLength) : val; },
 			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
 			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
 			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
@@ -1320,7 +1325,7 @@
 
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
-      if (AscBrowser.isRetina) {
+      if (AscCommon.AscBrowser.isRetina) {
         this.styleThumbnailWidthWithRetina <<= 1;
         this.styleThumbnailHeightWithRetina <<= 1;
       }
@@ -1363,7 +1368,7 @@
           oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
           this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
+          this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
         }
       },
       generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
@@ -1383,7 +1388,7 @@
           }
 
           this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
+          this.docStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
         }
       },
       drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
@@ -1396,7 +1401,7 @@
         }
 
         var drawBorder = function(b, x1, y1, x2, y2) {
-          if (null != b && c_oAscBorderStyles.None !== b.s) {
+          if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
             oGraphics.setStrokeStyle(b.c);
 
             // ToDo поправить
@@ -1413,7 +1418,7 @@
 
         // Draw text
         var fc = oStyle.getFontColor();
-        var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+        var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
         var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);

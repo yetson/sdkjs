@@ -24,6 +24,12 @@
 */
 "use strict";
 
+// Import
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+
+var c_oAscFill = Asc.c_oAscFill;
+
 var BOUNDS_DELTA = 3;
 function CheckObjectLine(obj)
 {
@@ -34,7 +40,7 @@ function CheckObjectLine(obj)
 function CheckWordArtTextPr(oRun)
 {
     var oTextPr = oRun.Get_CompiledPr()
-    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
+    if(oTextPr.TextFill || oTextPr.TextOutline || (oTextPr.Unifill && oTextPr.Unifill.fill && (oTextPr.Unifill.fill.type !== c_oAscFill.FILL_TYPE_SOLID || oTextPr.Unifill.transparent != null && oTextPr.Unifill.transparent < 254.5)))
         return true;
     return false;
 }
@@ -379,13 +385,13 @@ function CheckWordRunPr(Pr)
     {
         switch(Pr.Unifill.fill.type)
         {
-            case FILL_TYPE_SOLID:
+            case c_oAscFill.FILL_TYPE_SOLID:
             {
                 if(Pr.Unifill.fill.color && Pr.Unifill.fill.color.color)
                 {
                     switch(Pr.Unifill.fill.color.color.type)
                     {
-                        case c_oAscColor.COLOR_TYPE_SCHEME:
+                        case Asc.c_oAscColor.COLOR_TYPE_SCHEME:
                         {
                             if(Pr.Unifill.fill.color.Mods && Pr.Unifill.fill.color.Mods.Mods.length !== 0)
                             {
@@ -403,7 +409,7 @@ function CheckWordRunPr(Pr)
                             }
                             break;
                         }
-                        case c_oAscColor.COLOR_TYPE_SRGB:
+                        case Asc.c_oAscColor.COLOR_TYPE_SRGB:
                         {
 
                             NewRPr = Pr.Copy();
@@ -422,8 +428,8 @@ function CheckWordRunPr(Pr)
                 }
                 break;
             }
-            case FILL_TYPE_PATT:
-            case FILL_TYPE_BLIP:
+            case c_oAscFill.FILL_TYPE_PATT:
+            case c_oAscFill.FILL_TYPE_BLIP:
             {
                 NewRPr = Pr.Copy();
                 NewRPr.TextFill = CreateUnfilFromRGB(0, 0, 0);
@@ -839,7 +845,7 @@ CShape.prototype =
         body_pr.setAnchor(1);
         this.setBodyPr(body_pr);
         this.setTextBoxContent(new CDocumentContent(this, this.getDrawingDocument(), 0, 0, 0, 20000, false, false));
-        this.textBoxContent.Set_ParagraphAlign(align_Center);
+        this.textBoxContent.Set_ParagraphAlign(AscCommon.align_Center);
         this.textBoxContent.Content[0].Set_DocumentIndex(0);
     },
 
@@ -1129,7 +1135,7 @@ CShape.prototype =
             body_pr = shape.bodyPr;
         }
         if (body_pr) {
-            paddings = new asc_CPaddings();
+            paddings = new Asc.asc_CPaddings();
             if (typeof body_pr.lIns === "number")
                 paddings.Left = body_pr.lIns;
             else
@@ -2160,11 +2166,11 @@ CShape.prototype =
         return ExecuteNoHistory(function () {
             var parent_objects = this.getParentObjects();
             var default_style = new CStyle("defaultStyle", null, null, null, true);
-            default_style.ParaPr.Spacing.LineRule = linerule_Auto;
+            default_style.ParaPr.Spacing.LineRule = Asc.linerule_Auto;
             default_style.ParaPr.Spacing.Line = 1;
             default_style.ParaPr.Spacing.Before = 0;
             default_style.ParaPr.Spacing.After = 0;
-            default_style.ParaPr.Align = align_Center;
+            default_style.ParaPr.Align = AscCommon.align_Center;
             if(parent_objects.theme)
             {
                 default_style.TextPr.RFonts.Ascii = {Name: "+mn-lt", Index: -1};
@@ -2966,18 +2972,18 @@ CShape.prototype =
                 var nJc = this.getDocContent().Content[0].CompiledPr.Pr.ParaPr.Jc;
                 switch(nJc)
                 {
-                    case align_Right:
+                    case AscCommon.align_Right:
                     {
                         dDeltaX = dOldExtX - this.extX;
                         break;
                     }
-                    case align_Left:
+                    case AscCommon.align_Left:
                     {
                         dDeltaX = 0;
                         break;
                     }
-                    case align_Center:
-                    case align_Justify:
+                    case AscCommon.align_Center:
+                    case AscCommon.align_Justify:
                     {
                         dDeltaX = (dOldExtX - this.extX)/2;
                         break;
@@ -4269,7 +4275,7 @@ CShape.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.transform3(_transform);
                 graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
@@ -4554,7 +4560,7 @@ CShape.prototype =
             }
             var fCallback = function(oTextPr)
             {
-                if( (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type == FILL_TYPE_BLIP))
+                if( (oTextPr.Unifill && oTextPr.Unifill.fill && oTextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_BLIP))
                 {
                     images.push(oTextPr.Unifill.fill.RasterImageId);
                 }
@@ -4860,7 +4866,7 @@ CShape.prototype =
 
     hitInInnerArea: function (x, y) {
         if ((this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
-            && this.brush.fill.type != FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
+            && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
@@ -5353,7 +5359,7 @@ CShape.prototype =
                     var pos = readLong(r);
                     if(this.worksheet)
                     {
-                        pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                        pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                     }
                     addToDrawings(this.worksheet, this, pos);
                     break;

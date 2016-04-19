@@ -24,6 +24,13 @@
 */
 "use strict";
 
+// Import
+var offlineMode = AscCommon.offlineMode;
+
+var c_oAscError = Asc.c_oAscError;
+var c_oAscAsyncAction = Asc.c_oAscAsyncAction;
+var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
+
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 /** @constructor */
@@ -54,16 +61,18 @@ function baseEditorsApi(name) {
   this.documentCallbackUrl = undefined;		// Ссылка для отправления информации о документе
   this.documentFormat = "null";
   this.documentTitle = "null";
-  this.documentFormatSave = c_oAscFileType.UNKNOWN;
+  this.documentFormatSave = Asc.c_oAscFileType.UNKNOWN;
 
   this.documentOpenOptions = undefined;		// Опции при открытии (пока только опции для CSV)
 
   // Тип состояния на данный момент (сохранение, открытие или никакое)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.None;
+  this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.None;
   // Тип скачивания файлы(download или event).нужен для txt, csv. запоминаем на asc_DownloadAs используем asc_setAdvancedOptions
-  this.downloadType = DownloadType.None;
-  this.OpenDocumentProgress = new COpenProgress();
-  this.documentOrigin = ''; // ToDo скорее всего лишняя переменная и можно обойтись и без нее
+  this.downloadType = AscCommon.DownloadType.None;
+  this.OpenDocumentProgress = new AscCommon.COpenProgress();
+  var sProtocol = window.location.protocol;
+  this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host; // for presentation theme url
+  this.documentPathname = window.location.pathname; // for presentation theme url
 
   // Переменная отвечает, получили ли мы ответ с сервера совместного редактирования
   this.ServerIdWaitComplete = false;
@@ -80,7 +89,7 @@ function baseEditorsApi(name) {
 
   // Chart
   this.chartTranslate = new asc_CChartTranslate();
-  this.textArtTranslate = new asc_TextArtTranslate();
+  this.textArtTranslate = new Asc.asc_TextArtTranslate();
   this.chartPreviewManager = new ChartPreviewManager();
   this.textArtPreviewManager = new TextArtPreviewManager();
   // Режим вставки диаграмм в редакторе документов
@@ -89,7 +98,7 @@ function baseEditorsApi(name) {
 
   // CoAuthoring and Chat
   this.User = undefined;
-  this.CoAuthoringApi = new Asc.CDocsCoApi();
+  this.CoAuthoringApi = new AscCommon.CDocsCoApi();
   this.isCoAuthoringEnable = true;
   // Массив lock-ов, которые были на открытии документа
   this.arrPreOpenLocksObjects = [];
@@ -133,8 +142,8 @@ baseEditorsApi.prototype._baseInit = function() {
 
   // init OnMessage
   InitOnMessage(function(error, url) {
-    if (Asc.c_oAscError.ID.No !== error) {
-      t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+    if (c_oAscError.ID.No !== error) {
+      t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
     } else {
       t._addImageUrl(url);
     }
@@ -182,12 +191,10 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.documentFormat = this.DocInfo.get_Format();
     this.documentCallbackUrl = this.DocInfo.get_CallbackUrl();
     this.documentVKey = this.DocInfo.get_VKey();
-    var sProtocol = window.location.protocol;
-    this.documentOrigin = ((sProtocol && '' !== sProtocol) ? sProtocol + '//' : '') + window.location.host;
 
     this.documentOpenOptions = this.DocInfo.asc_getOptions();
 
-    this.User = new Asc.asc_CUser();
+    this.User = new AscCommon.asc_CUser();
     this.User.setId(this.DocInfo.get_UserId());
     this.User.setUserName(this.DocInfo.get_UserName());
   }
@@ -293,7 +300,7 @@ baseEditorsApi.prototype.onPrint = function() {
 // Open
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)
-  this.advancedOptionsAction = c_oAscAdvancedOptionsAction.Open;
+  this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
   this.CoAuthoringApi.auth(this.getViewMode());
 
   this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
@@ -353,11 +360,11 @@ baseEditorsApi.prototype.asyncImagesDocumentStartLoaded = function() {
 };
 // Save
 baseEditorsApi.prototype.processSavedFile = function(url, downloadType) {
-  if (DownloadType.None !== downloadType) {
+  if (AscCommon.DownloadType.None !== downloadType) {
     this.sendEvent(downloadType, url, function(hasError) {
     });
   } else {
-    getFile(url);
+    AscCommon.getFile(url);
   }
 };
 // Выставление интервала автосохранения (0 - означает, что автосохранения нет)
@@ -384,7 +391,7 @@ baseEditorsApi.prototype.asc_getEditorPermissions = function() {
 };
 baseEditorsApi.prototype._onEndPermissions = function() {
   if (this.isOnFirstConnectEnd && this.isOnLoadLicense) {
-    this.sendEvent('asc_onGetEditorPermissions', new window['Asc'].asc_CAscEditorPermissions());
+    this.sendEvent('asc_onGetEditorPermissions', new AscCommon.asc_CAscEditorPermissions());
   }
 };
 // CoAuthoring
@@ -392,7 +399,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
   var t = this;
   //Если User не задан, отключаем коавторинг.
   if (null == this.User || null == this.User.asc_getId()) {
-    this.User = new Asc.asc_CUser();
+    this.User = new AscCommon.asc_CUser();
     this.User.setId("Unknown");
     this.User.setUserName("Unknown");
   }
@@ -431,7 +438,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
     t._onEndPermissions();
   };
   this.CoAuthoringApi.onWarning = function(e) {
-    t.sendEvent('asc_onError', Asc.c_oAscError.ID.Warning, Asc.c_oAscError.Level.NoCritical);
+    t.sendEvent('asc_onError', c_oAscError.ID.Warning, c_oAscError.Level.NoCritical);
   };
   /**
    * Event об отсоединении от сервера
@@ -440,7 +447,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
    * @param {Bool} isCloseCoAuthoring
    */
   this.CoAuthoringApi.onDisconnect = function(e, isDisconnectAtAll, isCloseCoAuthoring) {
-    if (ConnectionState.None === t.CoAuthoringApi.get_state()) {
+    if (AscCommon.ConnectionState.None === t.CoAuthoringApi.get_state()) {
       t.asyncServerIdEndLoaded();
     }
     if (isDisconnectAtAll) {
@@ -448,7 +455,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
       t.sendEvent('asc_onCoAuthoringDisconnect');
       // И переходим в режим просмотра т.к. мы не можем сохранить файл
       t.asc_setViewMode(true);
-      t.sendEvent('asc_onError', isCloseCoAuthoring ? Asc.c_oAscError.ID.UserDrop : Asc.c_oAscError.ID.CoAuthoringDisconnect, Asc.c_oAscError.Level.NoCritical);
+      t.sendEvent('asc_onError', isCloseCoAuthoring ? c_oAscError.ID.UserDrop : c_oAscError.ID.CoAuthoringDisconnect, c_oAscError.Level.NoCritical);
     }
   };
   this.CoAuthoringApi.onDocumentOpen = function(inputWrap) {
@@ -474,14 +481,14 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
                   })
                 }
               } else {
-                t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
+                t.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
               }
               break;
             case "needparams":
               t._onNeedParams(input["data"]);
               break;
             case "err":
-              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), Asc.c_oAscError.Level.Critical);
+              t.sendEvent("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
               break;
           }
           break;
@@ -490,7 +497,7 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
             t.fCurCallback(input);
             t.fCurCallback = null;
           } else {
-            t.sendEvent("asc_onError", Asc.c_oAscError.ID.Unknown, Asc.c_oAscError.Level.NoCritical);
+            t.sendEvent("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
           }
           break;
       }
@@ -546,21 +553,21 @@ baseEditorsApi.prototype.asc_addImage = function() {
   ShowImageFileDialog(this.documentId, this.documentUserId, function(error, files) {
     t._uploadCallback(error, files);
   }, function(error) {
-    if (Asc.c_oAscError.ID.No !== error) {
-      t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+    if (c_oAscError.ID.No !== error) {
+      t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
     }
     t.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
   });
 };
 baseEditorsApi.prototype._uploadCallback = function(error, files) {
   var t = this;
-  if (Asc.c_oAscError.ID.No !== error) {
-    this.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+  if (c_oAscError.ID.No !== error) {
+    this.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
   } else {
     this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
     UploadImageFiles(files, this.documentId, this.documentUserId, function(error, url) {
-      if (Asc.c_oAscError.ID.No !== error) {
-        t.sendEvent("asc_onError", error, Asc.c_oAscError.Level.NoCritical);
+      if (c_oAscError.ID.No !== error) {
+        t.sendEvent("asc_onError", error, c_oAscError.Level.NoCritical);
       } else {
         t._addImageUrl(url);
       }

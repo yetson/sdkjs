@@ -37,6 +37,9 @@
 
 // Для инициализации вызвать g_clipboardBase.Init(api); в любой момент времени
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+
 var c_oAscClipboardDataFormat = {
     Text	    : 1,
     Html	    : 2,

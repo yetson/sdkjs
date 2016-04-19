@@ -174,7 +174,7 @@ CPdfPrinter.prototype =
         return "miter";
     },
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setFillStyle : function(val)
@@ -193,7 +193,7 @@ CPdfPrinter.prototype =
         return this;
     },
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setStrokeStyle : function(val)

@@ -33,7 +33,7 @@ baseEditorsApi.prototype._onEndPermissions = function()
 {
 	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) 
 	{
-		var oResult = new window['Asc'].asc_CAscEditorPermissions();
+		var oResult = new AscCommon.asc_CAscEditorPermissions();
 		oResult.asc_setCanLicense(true);
 		oResult.asc_setCanBranding(true);
  		this.sendEvent('asc_onGetEditorPermissions', oResult);
@@ -191,11 +191,11 @@ function DesktopOfflineUpdateLocalName(_api)
 	window["AscDesktopEditor"]["SetDocumentName"](_name);
 }
 
-Asc.CDocsCoApi.prototype.askSaveChanges = function(callback)
+AscCommon.CDocsCoApi.prototype.askSaveChanges = function(callback)
 {
     callback({"saveLock": false});
 };
-Asc.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+AscCommon.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
 {
 	window["AscDesktopEditor"]["LocalFileSaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
 	//this.onUnSaveLock();

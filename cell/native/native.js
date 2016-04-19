@@ -33,6 +33,7 @@ window.location = {};
 window.location.protocol = "";
 window.location.host = "";
 window.location.href = "";
+window.location.pathname = "";
 
 window.NATIVE_EDITOR_ENJINE = true;
 window.NATIVE_EDITOR_ENJINE_SYNC_RECALC = true;
@@ -45,6 +46,9 @@ var History = {};
 
 window["Asc"] = {};
 var Asc = window["Asc"];
+
+window["AscCommon"] = {};
+var AscCommon = window["AscCommon"];
 
 window["AscCommonExcel"] = {};
 var AscCommonExcel = window["AscCommonExcel"];
@@ -512,7 +516,9 @@ window.clearInterval = clearInterval;
 window.setInterval = setInterval;
 
 var console = {
-    log : function(param) { window.native.consoleLog(param); }
+    log : function(param) { window.native.consoleLog(param); },
+    time : function (param) {},
+    timeEnd : function (param) {}
 };
 
 window["NativeCorrectImageUrlOnPaste"] = function(url) {
@@ -665,22 +671,6 @@ function CPoint2() {
     this.fRight = 0;
     this.fBottom = 0;
 }
-function CPosition( obj ) {
-    if (obj)
-    {
-        this.X = (undefined == obj.X) ? null : obj.X;
-        this.Y = (undefined == obj.Y) ? null : obj.Y;
-    }
-    else
-    {
-        this.X = null;
-        this.Y = null;
-    }
-}
-CPosition.prototype.get_X = function() { return this.X; };
-CPosition.prototype.put_X = function(v) { this.X = v; };
-CPosition.prototype.get_Y = function() { return this.Y; };
-CPosition.prototype.put_Y = function(v) { this.Y = v; };
 function CFontManager() {
     this.m_oLibrary = {};
     this.Initialize = function(){};
@@ -799,7 +789,7 @@ var FT_Common = new _FT_Common();
 var global_memory_stream_menu = CreateNativeMemoryStream();
 
 function asc_menu_ReadColor(_params, _cursor) {
-    var _color = new asc_CColor();
+    var _color = new Asc.asc_CColor();
     var _continue = true;
     while (_continue)
     {
@@ -978,7 +968,7 @@ function asc_menu_WriteFontFamily(_type, _family, _stream) {
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_solid(_params, _cursor){
-    var _fill = new asc_CFillSolid();
+    var _fill = new Asc.asc_CFillSolid();
 
     var _continue = true;
     while (_continue)
@@ -1013,7 +1003,7 @@ function asc_menu_WriteAscFill_solid(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_patt(_params, _cursor){
-    var _fill = new asc_CFillHatch();
+    var _fill = new Asc.asc_CFillHatch();
 
     var _continue = true;
     while (_continue)
@@ -1065,7 +1055,7 @@ function asc_menu_WriteAscFill_patt(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_grad(_params, _cursor){
-    var _fill = new asc_CFillGrad();
+    var _fill = new Asc.asc_CFillGrad();
 
     var _continue = true;
     while (_continue)
@@ -1201,7 +1191,7 @@ function asc_menu_WriteAscFill_grad(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill_blip(_params, _cursor){
-    var _fill = new asc_CFillBlip();
+    var _fill = new Asc.asc_CFillBlip();
 
     var _continue = true;
     while (_continue)
@@ -1262,7 +1252,7 @@ function asc_menu_WriteAscFill_blip(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscFill(_params, _cursor){
-    var _fill = new asc_CShapeFill();
+    var _fill = new Asc.asc_CShapeFill();
 
     //_fill.type = c_oAscFill.FILL_TYPE_NOFILL;
     var _continue = true;
@@ -1280,22 +1270,22 @@ function asc_menu_ReadAscFill(_params, _cursor){
             {
                 switch (_fill.type)
                 {
-                    case c_oAscFill.FILL_TYPE_SOLID:
+                    case Asc.c_oAscFill.FILL_TYPE_SOLID:
                     {
                         _fill.fill = asc_menu_ReadAscFill_solid(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_PATT:
+                    case Asc.c_oAscFill.FILL_TYPE_PATT:
                     {
                         _fill.fill = asc_menu_ReadAscFill_patt(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_GRAD:
+                    case Asc.c_oAscFill.FILL_TYPE_GRAD:
                     {
                         _fill.fill = asc_menu_ReadAscFill_grad(_params, _cursor);
                         break;
                     }
-                    case c_oAscFill.FILL_TYPE_BLIP:
+                    case Asc.c_oAscFill.FILL_TYPE_BLIP:
                     {
                         _fill.fill = asc_menu_ReadAscFill_blip(_params, _cursor);
                         break;
@@ -1338,22 +1328,22 @@ function asc_menu_WriteAscFill(_type, _fill, _stream){
     {
         switch (_fill.type)
         {
-            case c_oAscFill.FILL_TYPE_SOLID:
+            case Asc.c_oAscFill.FILL_TYPE_SOLID:
             {
                 _fill.fill = asc_menu_WriteAscFill_solid(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_PATT:
+            case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
                 _fill.fill = asc_menu_ReadAscFill_patt(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_GRAD:
+            case Asc.c_oAscFill.FILL_TYPE_GRAD:
             {
                 _fill.fill = asc_menu_ReadAscFill_grad(1, _fill.fill, _stream);
                 break;
             }
-            case c_oAscFill.FILL_TYPE_BLIP:
+            case Asc.c_oAscFill.FILL_TYPE_BLIP:
             {
                 _fill.fill = asc_menu_ReadAscFill_blip(1, _fill.fill, _stream);
                 break;
@@ -1372,7 +1362,7 @@ function asc_menu_WriteAscFill(_type, _fill, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscStroke(_params, _cursor){
-    var _stroke = new asc_CStroke();
+    var _stroke = new Asc.asc_CStroke();
 
     var _continue = true;
     while (_continue)
@@ -1501,7 +1491,7 @@ function asc_menu_WriteAscStroke(_type, _stroke, _stream){
 
 }
 function asc_menu_ReadPaddings(_params, _cursor){
-    var _paddings = new asc_CPaddings();
+    var _paddings = new Asc.asc_CPaddings();
     var _continue = true;
     while (_continue)
     {
@@ -1682,7 +1672,7 @@ function asc_menu_WriteImagePosition(_type, _position, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadAscValAxisSettings(_params, _cursor){
-    var _settings = new asc_ValAxisSettings();
+    var _settings = new AscCommon.asc_ValAxisSettings();
 
     var _continue = true;
     while (_continue)
@@ -1871,7 +1861,7 @@ function asc_menu_WriteAscValAxisSettings(_type, _settings, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadChartPr(_params, _cursor){
-    var _settings = new asc_ChartSettings();
+    var _settings = new AscCommon.asc_ChartSettings();
 
     var _continue = true;
     while (_continue)
@@ -2127,7 +2117,7 @@ function asc_menu_WriteChartPr(_type, _chartPr, _stream){
     _stream["WriteByte"](255);
 }
 function asc_menu_ReadShapePr(_params, _cursor){
-    var _settings = new asc_CShapeProperty();
+    var _settings = new Asc.asc_CShapeProperty();
 
     var _continue = true;
     while (_continue)
@@ -3253,6 +3243,8 @@ function OfflineEditor () {
 
     this.beforeOpen  = function() {
 
+        var offlineEditor = this;
+
         function __selectDrawingObjectRange(drawing, worksheet) {
             worksheet.cleanSelection();
             worksheet.arrActiveChartsRanges = [];
@@ -3268,6 +3260,9 @@ function OfflineEditor () {
         }
 
         DrawingArea.prototype.drawSelection = function(drawingDocument) {
+
+            offlineEditor.flushTextMeasurer();
+
             var canvas = this.worksheet.objectRender.getDrawingCanvas();
             var shapeCtx = canvas.shapeCtx;
             var shapeOverlayCtx = canvas.shapeOverlayCtx;
@@ -3709,15 +3704,7 @@ function OfflineEditor () {
 
             window.native["SwitchMemoryLayer"]();
 
-            g_oTextMeasurer.m_oFont = null;
-            g_oTextMeasurer.m_oTextPr = null;
-            g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
-            g_oTextMeasurer.m_oLastFont = new CFontSetup();
-            g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
-            g_oTextMeasurer.Ascender  = 0;
-            g_oTextMeasurer.Descender = 0;
-            g_oTextMeasurer.Height = 0;
-            g_oTextMeasurer.UnitsPerEm = 0;
+            offlineEditor.flushTextMeasurer();
 
             this.objectRender.showDrawingObjectsEx(false);
 
@@ -4064,7 +4051,7 @@ function OfflineEditor () {
             //	this._drawFormatPainterRange();
             //}
             //if (null !== this.activeMoveRange) {
-            //	ctx.setStrokeStyle(new CColor(0, 0, 0))
+            //	ctx.setStrokeStyle(new AscCommon.CColor(0, 0, 0))
             //		.setLineWidth(1)
             //		.beginPath();
             //	var aActiveMoveRangeIntersection = this.activeMoveRange.intersection(tmpRange !== undefined ? tmpRange : this.visibleRange);
@@ -4847,23 +4834,23 @@ function OfflineEditor () {
             {
                 switch (SelectedObjects[i].asc_getObjectType())
                 {
-                    case c_oAscTypeSelectElement.Paragraph:
+                    case Asc.c_oAscTypeSelectElement.Paragraph:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Paragraph);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Paragraph);
                         asc_menu_WriteParagraphPr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Paragraph');
                         break;
                     }
-                    case c_oAscTypeSelectElement.Image:
+                    case Asc.c_oAscTypeSelectElement.Image:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Image);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Image);
                         asc_menu_WriteImagePr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Image');
                         break;
                     }
-                    case c_oAscTypeSelectElement.Hyperlink:
+                    case Asc.c_oAscTypeSelectElement.Hyperlink:
                     {
-                        stream["WriteLong"](c_oAscTypeSelectElement.Hyperlink);
+                        stream["WriteLong"](Asc.c_oAscTypeSelectElement.Hyperlink);
                         asc_menu_WriteHyperPr(SelectedObjects[i].Value, stream);
                         //console.log('c_oAscTypeSelectElement.Hyperlink');
                         break;
@@ -5073,11 +5060,11 @@ function OfflineEditor () {
         var series = getChartSeries(ws.model, settings);
         if(series && series.series.length > 1)
         {
-            settings.putLegendPos(c_oAscChartLegendShowSettings.right);
+            settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
         }
         else
         {
-            settings.putLegendPos(c_oAscChartLegendShowSettings.none);
+            settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
         }
         // settings.putHorAxisLabel(c_oAscChartHorAxisLabelShowSettings.none);
         // settings.putVertAxisLabel(c_oAscChartVertAxisLabelShowSettings.none);
@@ -5085,11 +5072,11 @@ function OfflineEditor () {
         // settings.putHorGridLines(c_oAscGridLinesSettings.major);
         // settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
-        var vert_axis_settings = new asc_ValAxisSettings();
+        var vert_axis_settings = new AscCommon.asc_ValAxisSettings();
         settings.putVertAxisProps(vert_axis_settings);
         vert_axis_settings.setDefault();
 
-        var hor_axis_settings = new asc_CatAxisSettings();
+        var hor_axis_settings = new AscCommon.asc_CatAxisSettings();
         settings.putHorAxisProps(hor_axis_settings);
         hor_axis_settings.setDefault();
 
@@ -5185,7 +5172,7 @@ function OfflineEditor () {
             }
 
             var drawBorder = function (b, x1, y1, x2, y2) {
-                if (null != b && c_oAscBorderStyles.None !== b.s) {
+                if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
                     oGraphics.setStrokeStyle(b.c);
                     oGraphics.setLineWidth(b.w).beginPath();
 
@@ -5204,7 +5191,7 @@ function OfflineEditor () {
 
             // Draw text
             var fc = oStyle.getFontColor();
-            var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+            var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
             var format = oStyle.getFont();
             // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
             var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
@@ -5233,7 +5220,7 @@ function OfflineEditor () {
 
             window['native'].SetStylesType(1);
 
-            if (AscBrowser.isRetina) {
+            if (AscCommon.AscBrowser.isRetina) {
                 styleThumbnailWidth <<= 1;
                 styleThumbnailHeight <<= 1;
             }
@@ -5320,8 +5307,8 @@ function OfflineEditor () {
 
             var stepY = (ySize)/5;
             var stepX = (styleThumbnailWidth * pxToMM)/5;   //(60 * pxToMM)/5;
-            var whiteColor = new CColor(255, 255, 255);
-            var blackColor = new CColor(0, 0, 0);
+            var whiteColor = new AscCommon.CColor(255, 255, 255);
+            var blackColor = new AscCommon.CColor(0, 0, 0);
 
             //**draw background**
             var defaultColorBackground;
@@ -5527,12 +5514,12 @@ function OfflineEditor () {
                 if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.border)
                 {
                     var borders = styleOptions.wholeTable.dxf.border;
-                    if(borders.t.s !== c_oAscBorderStyles.None)
+                    if(borders.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.t.c);
                         ctx.lineHor(0, 0, xSize);
                     }
-                    if(borders.b.s !== c_oAscBorderStyles.None)
+                    if(borders.b.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.b.c);
                         // ctx.lineHor(0, ySize-0.5, xSize);
@@ -5540,12 +5527,12 @@ function OfflineEditor () {
                         nativeRender["PD_PathMoveTo"](0, ySize-0.5);
                         nativeRender["PD_PathLineTo"](xSize, ySize-0.5);
                     }
-                    if(borders.l.s !== c_oAscBorderStyles.None)
+                    if(borders.l.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.l.c);
                         ctx.lineVer(0, 0, ySize);
                     }
-                    if(borders.r.s !== c_oAscBorderStyles.None)
+                    if(borders.r.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.r.c);
                         //ctx.lineVer(xSize-0.5, 0, ySize);
@@ -5553,7 +5540,7 @@ function OfflineEditor () {
                         nativeRender["PD_PathMoveTo"](xSize-0.5, 0);
                         nativeRender["PD_PathLineTo"](xSize-0.5, ySize);
                     }
-                    if(borders.ih.s !== c_oAscBorderStyles.None)
+                    if(borders.ih.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.ih.c);
                         for(var n = 1; n < 5; n++)
@@ -5562,7 +5549,7 @@ function OfflineEditor () {
                         }
                         ctx.stroke();
                     }
-                    if(borders.iv.s !== c_oAscBorderStyles.None)
+                    if(borders.iv.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(borders.iv.c);
                         for(var n = 1; n < 5; n++)
@@ -5594,7 +5581,7 @@ function OfflineEditor () {
                 if(styleOptions.totalRow && styleInfo.TotalsRowCount && styleOptions.totalRow.dxf.border)
                 {
                     border = styleOptions.totalRow.dxf.border;
-                    if(border.t.s !== c_oAscBorderStyles.None)
+                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineVer(0, xSize, ySize);
@@ -5603,12 +5590,12 @@ function OfflineEditor () {
                 if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
                 {
                     border = styleOptions.headerRow.dxf.border;
-                    if(border.t.s !== c_oAscBorderStyles.None)
+                    if(border.t.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.t.c);
                         ctx.lineHor(0, 0, xSize);
                     }
-                    if(border.b.s !== c_oAscBorderStyles.None)
+                    if(border.b.s !== AscCommon.c_oAscBorderStyles.None)
                     {
                         ctx.setStrokeStyle(border.b.c);
                         ctx.lineHor(0, stepY, xSize);
@@ -5691,7 +5678,7 @@ function OfflineEditor () {
 
                 var _width_px = this.CHART_PREVIEW_WIDTH_PIX;
                 var _height_px = this.CHART_PREVIEW_WIDTH_PIX;
-                if (AscBrowser.isRetina)
+                if (AscCommon.AscBrowser.isRetina)
                 {
                     _width_px <<= 1;
                     _height_px <<= 1;
@@ -5762,6 +5749,18 @@ function OfflineEditor () {
         }
     };
     this.offline_afteInit = function () {window.AscAlwaysSaveAspectOnResizeTrack = true;};
+
+    this.flushTextMeasurer = function () {
+        g_oTextMeasurer.m_oFont = null;
+        g_oTextMeasurer.m_oTextPr = null;
+        g_oTextMeasurer.m_oGrFonts = new CGrRFonts();
+        g_oTextMeasurer.m_oLastFont = new CFontSetup();
+        g_oTextMeasurer.LastFontOriginInfo = { Name : "", Replace : null };
+        g_oTextMeasurer.Ascender  = 0;
+        g_oTextMeasurer.Descender = 0;
+        g_oTextMeasurer.Height = 0;
+        g_oTextMeasurer.UnitsPerEm = 0;
+    };
 }
 var _s = new OfflineEditor();
 
@@ -5791,17 +5790,13 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
 
         var e = {isLocked:true, Button:0, ClickCount:1, shiftKey:false, metaKey:false, ctrlKey:false};
 
-        var content = null;
-
         if (1 === select.pin) {
-            content = ws.objectRender.controller.getTargetDocContent();
             wb._onGraphicObjectMouseDown(e, select.beginX, select.beginY);
             wb._onGraphicObjectMouseUp(e, select.endX, select.endY);
             e.shiftKey = true;
         }
 
         if (-1 === select.pin) {
-            content = ws.objectRender.controller.getTargetDocContent();
             wb._onGraphicObjectMouseDown(e, select.endX, select.endY);
             wb._onGraphicObjectMouseUp(e, select.beginX, select.beginY);
             e.shiftKey = true;
@@ -5930,8 +5925,15 @@ function offline_mouse_move(x, y, isViewerMode, isRangeResize, isChartRange, ind
 
         if (_s.isShapeAction) {
             if (!isViewerMode) {
+
                 var e = {isLocked: true, Button: 0, ClickCount: 1, shiftKey: false, metaKey: false, ctrlKey: false};
-                ws.objectRender.graphicObjectMouseMove(e, x, y);
+
+                if (textPin && 0 == textPin.pin) {
+                    wb._onGraphicObjectMouseDown(e, x, y);
+                    wb._onGraphicObjectMouseUp(e, x, y);
+                } else {
+                    ws.objectRender.graphicObjectMouseMove(e, x, y);
+                }
             }
         } else {
             if (_s.isFormulaEditMode) {
@@ -6668,6 +6670,7 @@ function offline_calculate_complete_range(x, y, w, h) {
 function offline_set_translate(translate) {_s.translate = translate;}
 
 function offline_apply_event(type,params) {
+    var _borderOptions = Asc.c_oAscBorderOptions;
     var _stream = null;
     var _return = undefined;
     var _current = {pos: 0};
@@ -6680,12 +6683,16 @@ function offline_apply_event(type,params) {
 
         case 3: // ASC_MENU_EVENT_TYPE_UNDO
         {
+            _s.flushTextMeasurer();
+
             _api.asc_Undo();
             _s.asc_WriteAllWorksheets(true);
             break;
         }
         case 4: // ASC_MENU_EVENT_TYPE_REDO
         {
+            _s.flushTextMeasurer();
+
             _api.asc_Redo();
             _s.asc_WriteAllWorksheets(true);
             break;
@@ -6697,7 +6704,7 @@ function offline_apply_event(type,params) {
             if (ws && ws.objectRender && ws.objectRender.controller) {
                 var selectedImageProp =  ws.objectRender.controller.getGraphicObjectProps();
 
-                var _imagePr =  new asc_CImgProperty();
+                var _imagePr =  new Asc.asc_CImgProperty();
                 while (_continue)
                 {
                     _attr = params[_current.pos++];
@@ -7110,7 +7117,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border) {
-                            borders[c_oAscBorderOptions.Left] = border;
+                            borders[_borderOptions.Left] = border;
                         }
                         break;
                     }
@@ -7120,7 +7127,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Top] = border;
+                            borders[_borderOptions.Top] = border;
                         }
                         break;
                     }
@@ -7130,7 +7137,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Right] = border;
+                            borders[_borderOptions.Right] = border;
                         }
                         break;
                     }
@@ -7140,7 +7147,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.Bottom] = border;
+                            borders[_borderOptions.Bottom] = border;
                         }
                         break;
                     }
@@ -7150,7 +7157,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.DiagD] = border;
+                            borders[_borderOptions.DiagD] = border;
                         }
                         break;
                     }
@@ -7160,7 +7167,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.DiagU] = border;
+                            borders[_borderOptions.DiagU] = border;
                         }
                         break;
                     }
@@ -7170,7 +7177,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.InnerV] = border;
+                            borders[_borderOptions.InnerV] = border;
                         }
                         break;
                     }
@@ -7180,7 +7187,7 @@ function offline_apply_event(type,params) {
                         if (!borders) borders = [];
                         border = asc_ReadCBorder(params, _current);
                         if (border && borders) {
-                            borders[c_oAscBorderOptions.InnerH] = border;
+                            borders[_borderOptions.InnerH] = border;
                         }
                         break;
                     }

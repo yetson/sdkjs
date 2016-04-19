@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+
 // ��������� ��� ����
 var g_mouse_event_type_down  = 0;
 var g_mouse_event_type_move  = 1;

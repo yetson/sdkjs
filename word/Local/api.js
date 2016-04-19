@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 /////////////////////////////////////////////////////////
 //////////////        OPEN       ////////////////////////
 /////////////////////////////////////////////////////////
@@ -41,7 +44,7 @@ asc_docs_api.prototype._OfflineAppDocumentEndLoad = function(_url, _data)
 	g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 	if (_data == "")
 	{
-		this.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.Critical);
+		this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
 		return;
 	}
     if (c_oSerFormat.Signature !== _data.substring(0, c_oSerFormat.Signature.length))
@@ -186,19 +189,19 @@ asc_docs_api.prototype.asc_Save = function (isNoUserSave, isSaveAs)
 };
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-    editor.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+    editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
 	if (isSaveAs === true)
 		_param += "saveas=true;";
-	if (AscBrowser.isRetina)
+	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
-	editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (error == 0)
 		DesktopOfflineUpdateLocalName(editor);
 	else
@@ -208,7 +211,7 @@ window["DesktopOfflineAppDocumentEndSave"] = function(error)
 	editor.LastUserSavedIndex = undefined;
 	
 	if (2 == error)
-		editor.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationError, Asc.c_oAscError.Level.NoCritical);
+		editor.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.NoCritical);
 };
 asc_docs_api.prototype.asc_DownloadAs = function(typeFile, bIsDownloadEvent) 
 {
