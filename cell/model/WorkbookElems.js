@@ -4439,6 +4439,78 @@ CellArea.prototype = {
 	}
 };
 
+/** @constructor */
+function sparklineGroups() {
+	this.arrSparklineGroup = [];
+}
+/** @constructor */
+function sparklineGroup() {
+	// attributes
+	this.manualMax = undefined;
+	this.manualMin = undefined;
+	this.lineWeight = 0.75;
+	this.type = Asc.ESparklineType.Line;
+	this.dateAxis = false;
+	this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
+	this.markers = false;
+	this.high = false;
+	this.low = false;
+	this.first = false;
+	this.last = false;
+	this.negative = false;
+	this.displayXAxis = false;
+	this.displayHidden = false;
+	this.minAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.rightToLeft = false;
+
+	// elements
+	this.colorSeries = null;
+	this.colorNegative = null;
+	this.colorAxis = null;
+	this.colorMarkers = null;
+	this.colorFirst = null;
+	this.colorLast = null;
+	this.colorHigh = null;
+	this.colorLow = null;
+	this.f = null;
+	this.arrSparklines = [];
+	this.arrCachedSparklines = [];
+}
+sparklineGroup.prototype.clearCached = function() {
+	this.arrCachedSparklines.length = 0;
+};
+sparklineGroup.prototype.addView = function(oSparklineView, index) {
+	this.arrCachedSparklines[index] = oSparklineView;
+};
+sparklineGroup.prototype.draw = function(oDrawingContext) {
+	var graphics = new CGraphics();
+	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+	graphics.m_oFontManager = g_fontManager;
+	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
+		this.arrCachedSparklines[i].draw(graphics);
+	}
+};
+sparklineGroup.prototype.updateCache = function(range) {
+	for (var i = 0; i < this.arrSparklines.length; ++i) {
+		if (range.intersectionSimple(this.arrSparklines[i].f)) {
+			this.arrCachedSparklines[i] = null;
+		}
+	}
+};
+/** @constructor */
+function sparkline() {
+	this.sqref = null;
+	this.f = null;
+}
+sparkline.prototype.setSqref = function(sqref) {
+	this.sqref = Asc.g_oRangeCache.getAscRange(sqref);
+};
+sparkline.prototype.checkInRange = function(range) {
+	return this.sqref ? range.isIntersect(this.sqref) : false;
+};
+
 // For Auto Filters
 /** @constructor */
 function TablePart(handlers) {

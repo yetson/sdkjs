@@ -695,11 +695,6 @@
         this.updateZoom = false;
     };
 
-    WorksheetView.prototype.getCellTextMetrics = function ( col, row ) {
-        var ct = this._getCellTextCache( col, row );
-        return ct ? $.extend( {}, ct.metrics ) : undefined;
-    };
-
     WorksheetView.prototype.getSheetViewSettings = function () {
         return this.model.getSheetViewSettings();
     };
@@ -2493,20 +2488,31 @@
         }
     };
 
+    /** Рисует спарклайны */
+    WorksheetView.prototype._drawSparklines = function(drawingCtx, range, offsetX, offsetY) {
+        var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
+        this.objectRender.drawSparkLineGroups(ctx, this.model.sparklineGroups, range, offsetX, offsetY);
+    };
+
     /** Рисует ячейки таблицы */
     WorksheetView.prototype._drawCells = function ( drawingCtx, range, offsetX, offsetY ) {
         this._prepareCellTextMetricsCache( range );
 
-        var mergedCells = {}, mc, i;
+        var mergedCells = [], mc, i;
         for ( var row = range.r1; row <= range.r2; ++row ) {
-            $.extend( mergedCells, this._drawRowBG( drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null ), this._drawRowText( drawingCtx, row, range.c1, range.c2, offsetX, offsetY ) );
+            mergedCells =
+              mergedCells.concat(this._drawRowBG(drawingCtx, row, range.c1, range.c2, offsetX, offsetY, null),
+                this._drawRowText(drawingCtx, row, range.c1, range.c2, offsetX, offsetY));
         }
         // draw merged cells at last stage to fix cells background issue
-        for ( i in mergedCells ) {
-            mc = mergedCells[i];
-            this._drawRowBG( drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc );
-            this._drawCellText( drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true );
+        for (i = 0; i < mergedCells.length; ++i) {
+            if (i === mergedCells.indexOf(mergedCells[i])) {
+                mc = mergedCells[i];
+                this._drawRowBG(drawingCtx, mc.r1, mc.c1, mc.c1, offsetX, offsetY, mc);
+                this._drawCellText(drawingCtx, mc.c1, mc.r1, range.c1, range.c2, offsetX, offsetY, true);
+            }
         }
+        this._drawSparklines(drawingCtx, range, offsetX, offsetY);
         return mergedCells;
     };
 
@@ -2516,7 +2522,7 @@
             return {};
         }
 
-        var mergedCells = {};
+        var mergedCells = [];
         var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
         for ( var col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px && null === oMergedCell ) {
@@ -2536,7 +2542,7 @@
             if ( null === oMergedCell ) {
                 mc = this.model.getMergedByCell( row, col );
                 if ( null !== mc ) {
-                    mergedCells[mc.r1 + "_" + mc.c1] = {c1: mc.c1, r1: mc.r1, c2: mc.c2, r2: mc.r2};
+                    mergedCells.push(mc);
                     col = mc.c2;
                     continue;
                 }
@@ -2596,7 +2602,7 @@
             return {};
         }
 
-        var dependentCells = {}, mergedCells = {}, i, mc, col;
+        var dependentCells = {}, mergedCells = [], i, mc, col;
         // draw cells' text
         for ( col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px ) {
@@ -2604,7 +2610,7 @@
             }
             mc = this._drawCellText( drawingCtx, col, row, colStart, colEnd, offsetX, offsetY, false );
             if ( mc !== null ) {
-                mergedCells[mc.index] = {c1: mc.c1, r1: mc.r1, c2: mc.c2, r2: mc.r2};
+                mergedCells.push(mc);
             }
             // check if long text overlaps this cell
             i = this._findSourceOfCellText( col, row );
@@ -2640,7 +2646,7 @@
         if ( isMerged ) {
             range = ct.flags.merged;
             if ( !drawMergedCells ) {
-                return {c1: range.c1, r1: range.r1, c2: range.c2, r2: range.r2, index: range.r1 + "_" + range.c1};
+                return range;
             }
             if ( col !== range.c1 || row !== range.r1 ) {
                 return null;
