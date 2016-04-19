@@ -24,11 +24,6 @@
 */
 "use strict";
 
-/* spellCheckLanguages.js
- *
- * Author: Alexander.Trofimov
- * Date: 24.06.13
- */
 (	/**
  * @param {Window} window
  * @param {undefined} undefined
@@ -38,7 +33,6 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
 
 		/**
@@ -51,10 +45,6 @@
 		 * @return {*}
 		 */
 		function asc_CLanguage (name, id) {
-			if ( !(this instanceof asc_CLanguage) ) {
-				return new asc_CLanguage(name, id);
-			}
-
 			this.name	= name;			// имя языка
 			this.id		= id;			// уникальный id языка
 
@@ -69,11 +59,9 @@
 			asc_setName: function (val) { this.name = val; }
 		};
 
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"]["asc_CLanguage"] = window["Asc"].asc_CLanguage = asc_CLanguage;
+		//---------------------------------------------------------export---------------------------------------------------
+		window['AscCommon'] = window['AscCommon'] || {};
+		window["AscCommon"].asc_CLanguage = asc_CLanguage;
 		prot = asc_CLanguage.prototype;
 		prot["asc_getId"]			= prot.asc_getId;
 		prot["asc_getName"]			= prot.asc_getName;

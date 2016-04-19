@@ -27,8 +27,6 @@
 (function(window) {
   'use strict';
 
-  var asc = window["Asc"];
-
   // Класс надстройка, для online и offline работы
   var CSpellCheckApi = function(options) {
     this._SpellCheckApi = new SpellCheckApi();
@@ -238,6 +236,8 @@
     this.sockjs = initSocksJs(this.sockjs_url, this);
   };
 
-  asc.CSpellCheckApi = CSpellCheckApi;
+  //-----------------------------------------------------------export---------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].CSpellCheckApi = CSpellCheckApi;
 })(window);
 
