@@ -146,9 +146,8 @@
      */
     function ApiNumberingLevel(Num, Lvl)
     {
-        this.Num    = Num;
-        this.Lvl    = Math.max(0, Math.min(8, Lvl));
-        this.NumLvl = this.Num.Lvl[this.Lvl];
+        this.Num = Num;
+        this.Lvl = Math.max(0, Math.min(8, Lvl));
     }
 
     /**
@@ -2111,7 +2110,7 @@
      */
     ApiNumberingLevel.prototype.GetTextPr = function()
     {
-        return new ApiTextPr(this.NumLvl.TextPr.Copy());
+        return new ApiTextPr(this, this.Num.Lvl[this.Lvl].TextPr.Copy());
     };
     /**
      * This paragraph properties are applied to any numbered paragraph that references the given numbering definition
@@ -2120,7 +2119,7 @@
      */
     ApiNumberingLevel.prototype.GetParaPr = function()
     {
-        return new ApiParaPr(this.NumPr.ParaPr.Copy());
+        return new ApiParaPr(this, this.Num.Lvl[this.Lvl].ParaPr.Copy());
     };
     /**
      * Set one of the predefined numbering templates.
@@ -3286,6 +3285,8 @@ function TEST_BUILDER2()
         var sSymbolCharCode = 'a'.charCodeAt(0) + nLvl;
         oNumLvl.SetTemplateType("bullet", String.fromCharCode(sSymbolCharCode));
         oNumLvl.SetSuff("none");
+        oNumLvl.GetTextPr().SetBold(true);
+        oNumLvl.GetParaPr().SetJc("center");
 
         oParagraph = Api.CreateParagraph();
         oParagraph.AddText("Template bullet lvl " + (nLvl + 1));
@@ -3297,6 +3298,7 @@ function TEST_BUILDER2()
         oParagraph.AddText("Template bullet  lvl " + (nLvl + 1));
         oParagraph.SetNumbering(oNumLvl);
         oParagraph.SetContextualSpacing(true);
+
         oDocument.Push(oParagraph);
     }
 
