@@ -32,6 +32,8 @@
 function (window, undefined) {
     // Import
     var CellValueType = AscCommon.CellValueType;
+    var g_oFormatParser = AscCommon.g_oFormatParser;
+    var oNumFormatCache = AscCommon.oNumFormatCache;
 
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
@@ -145,13 +147,13 @@ cCHAR.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cString( String.fromCharCode( arg0.getValue() ) );
-}
+};
 cCHAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number )"
     };
-}
+};
 
 function cCLEAN() {
 //    cBaseFunction.call( this, "CLEAN" );
@@ -173,7 +175,7 @@ function cCLEAN() {
 
 }
 
-cCLEAN.prototype = Object.create( cBaseFunction.prototype )
+cCLEAN.prototype = Object.create( cBaseFunction.prototype );
 cCLEAN.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -194,13 +196,13 @@ cCLEAN.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cString( res );
-}
+};
 cCLEAN.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};
 
 function cCODE() {
 //    cBaseFunction.call( this, "CODE" );
@@ -221,7 +223,7 @@ function cCODE() {
 
 }
 
-cCODE.prototype = Object.create( cBaseFunction.prototype )
+cCODE.prototype = Object.create( cBaseFunction.prototype );
 cCODE.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0];
 
@@ -250,13 +252,13 @@ cCODE.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cNumber( arg0.toString().charCodeAt() );
-}
+};
 cCODE.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};
 
 function cCONCATENATE() {
 //    cBaseFunction.call( this, "CONCATENATE" );
@@ -277,7 +279,7 @@ function cCONCATENATE() {
 
 }
 
-cCONCATENATE.prototype = Object.create( cBaseFunction.prototype )
+cCONCATENATE.prototype = Object.create( cBaseFunction.prototype );
 cCONCATENATE.prototype.Calculate = function ( arg ) {
     var arg0 = new cString( "" ), argI;
     for ( var i = 0; i < this.argumentsCurrent; i++ ) {
@@ -313,7 +315,7 @@ cCONCATENATE.prototype.getInfo = function () {
         name:this.name,
         args:"(text1, text2, ...)"
     };
-}
+};
 
 function cDOLLAR() {
 //    cBaseFunction.call( this, "DOLLAR" );
@@ -335,7 +337,7 @@ function cDOLLAR() {
 
 }
 
-cDOLLAR.prototype = Object.create( cBaseFunction.prototype )
+cDOLLAR.prototype = Object.create( cBaseFunction.prototype );
 cDOLLAR.prototype.Calculate = function ( arg ) {
 
     function SignZeroPositive( number ) {
@@ -495,7 +497,7 @@ cDOLLAR.prototype.Calculate = function ( arg ) {
 
     this.value = roundHelper( number, num_digits ).getValue();
 
-    var cNull = ""
+    var cNull = "";
 
     if ( num_digits > 0 ) {
         cNull = ".";
@@ -503,15 +505,15 @@ cDOLLAR.prototype.Calculate = function ( arg ) {
         }
     }
 
-    this.value = new cString( oNumFormatCache.get( "$#,##0" + cNull + ";($#,##0" + cNull + ")" ).format( roundHelper( number, num_digits ).getValue(), CellValueType.Number, gc_nMaxDigCount )[0].text )
+    this.value = new cString( oNumFormatCache.get( "$#,##0" + cNull + ";($#,##0" + cNull + ")" ).format( roundHelper( number, num_digits ).getValue(), CellValueType.Number, AscCommon.gc_nMaxDigCount )[0].text )
     return this.value;
-}
+};
 cDOLLAR.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( number [ , num-decimal ] )"
     };
-}
+};
 
 function cEXACT() {
 //    cBaseFunction.call( this, "EXACT" );
@@ -532,7 +534,7 @@ function cEXACT() {
 
 }
 
-cEXACT.prototype = Object.create( cBaseFunction.prototype )
+cEXACT.prototype = Object.create( cBaseFunction.prototype );
 cEXACT.prototype.Calculate = function ( arg ) {
     var arg0 = arg[0], arg1 = arg[1];
     if ( arg0 instanceof cArea || arg0 instanceof cArea3D ) {
@@ -561,13 +563,13 @@ cEXACT.prototype.Calculate = function ( arg ) {
 
     var arg0val = arg0.getValue(), arg1val = arg1.getValue();
     return this.value = new cBool( arg0val === arg1val );
-}
+};
 cEXACT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(text1, text2)"
     };
-}
+};
 
 function cFIND() {
 //    cBaseFunction.call( this, "FIND" );
@@ -849,7 +851,7 @@ cFIXED.prototype.Calculate = function ( arg ) {
         for ( var i = 0; i < num_digits; i++, cNull += "0" ) {
         }
     }
-    return this.value = new cString( oNumFormatCache.get( "#" + (arg2.toBool() ? "" : ",") + "##0" + cNull ).format( roundHelper( number, num_digits ).getValue(), CellValueType.Number, gc_nMaxDigCount )[0].text )
+    return this.value = new cString( oNumFormatCache.get( "#" + (arg2.toBool() ? "" : ",") + "##0" + cNull ).format( roundHelper( number, num_digits ).getValue(), CellValueType.Number, AscCommon.gc_nMaxDigCount )[0].text )
 };
 cFIXED.prototype.getInfo = function () {
     return {
@@ -1120,7 +1122,7 @@ function cPROPER() {
 
 }
 
-cPROPER.prototype = Object.create( cBaseFunction.prototype )
+cPROPER.prototype = Object.create( cBaseFunction.prototype );
 cPROPER.prototype.Calculate = function ( arg ) {
     var reg_PROPER = new RegExp( "[-#$+*/^&%<\\[\\]='?_\\@!~`\">: ;.\\)\\(,]|\\d|\\s" ), arg0 = arg[0];
 
@@ -1171,13 +1173,13 @@ cPROPER.prototype.Calculate = function ( arg ) {
     }
 
     return this.value = new cString( proper( arg0.toString() ) );
-}
+};
 cPROPER.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( string )"
     };
-}
+};
 
 function cREPLACE() {
 //    cBaseFunction.call( this, "REPLACE" );
@@ -1336,13 +1338,13 @@ cREPT.prototype.Calculate = function ( arg ) {
     if ( arg1.getValue() < 0 ) return this.value = new cError( cErrorType.wrong_value_type );
 
     return this.value = new cString( arg0.getValue().repeat(arg1.getValue()) );
-}
+};
 cREPT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"(text, number_of_times)"
     };
-}
+};
 
 function cRIGHT() {
 //    cBaseFunction.call( this, "RIGHT" );
@@ -1707,7 +1709,7 @@ cTEXT.prototype.Calculate = function ( arg ) {
 
     var oFormat = oNumFormatCache.get( arg1.toString() );
     var a = g_oFormatParser.parse(arg0.getValue()+""), aText;
-    aText = oFormat.format( a ? a.value : arg0.getValue(), (arg0 instanceof cNumber || a) ? CellValueType.Number : CellValueType.String, gc_nMaxDigCountView, null );
+    aText = oFormat.format( a ? a.value : arg0.getValue(), (arg0 instanceof cNumber || a) ? CellValueType.Number : CellValueType.String, AscCommon.gc_nMaxDigCountView, null );
     var text = "";
 
     for ( var i = 0, length = aText.length; i < length; ++i ) {
@@ -1725,13 +1727,13 @@ cTEXT.prototype.Calculate = function ( arg ) {
     this.value = new cString( text );
     this.value.numFormat = this.formatType.noneFormat;
     return this.value;
-}
+};
 cTEXT.prototype.getInfo = function () {
     return {
         name:this.name,
         args:"( value , format )"
     };
-}
+};
 
 function cTRIM() {
 //    cBaseFunction.call( this, "TRIM" );

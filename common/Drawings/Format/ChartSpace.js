@@ -30,6 +30,7 @@ var c_oAscChartSubType = AscCommon.c_oAscChartSubType;
 var parserHelp = AscCommon.parserHelp;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
+var oNumFormatCache = AscCommon.oNumFormatCache;
 
 var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
 
