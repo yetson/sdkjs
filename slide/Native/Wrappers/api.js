@@ -226,7 +226,7 @@ CStylesPainter.prototype =
         var _h_px = this.STYLE_THUMBNAIL_HEIGHT;
         var dKoefToMM = g_dKoef_pix_to_mm;
 
-        if (AscBrowser.isRetina)
+        if (AscCommon.AscBrowser.isRetina)
         {
             _w_px *= 2;
             _h_px *= 2;
@@ -235,13 +235,13 @@ CStylesPainter.prototype =
 
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         History.TurnOff();
 
         var oldDefTabStop = Default_Tab_Stop;
         Default_Tab_Stop = 1;
 
-        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, hdrftr_Header);
+        var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
 
         var par = new Paragraph(_api.WordControl.m_oDrawingDocument, _dc, 0, 0, 0, 0, false);
@@ -255,7 +255,7 @@ CStylesPainter.prototype =
         _dc.Internal_Content_Add(0, par, false);
         par.Add_ToContent(0, run);
         par.Style_Add(style.Id, false);
-        par.Set_Align(align_Left);
+        par.Set_Align(AscCommon.align_Left);
         par.Set_Tabs(new CParaTabs());
 
         var _brdL = style.ParaPr.Brd.Left;
@@ -302,7 +302,7 @@ CStylesPainter.prototype =
 
         var _sp = new CParaSpacing();
         _sp.Line              = 1;
-        _sp.LineRule          = linerule_Auto;
+        _sp.LineRule          = Asc.linerule_Auto;
         _sp.Before            = 0;
         _sp.BeforeAutoSpacing = false;
         _sp.After             = 0;
@@ -340,7 +340,7 @@ CStylesPainter.prototype =
 
         Default_Tab_Stop = oldDefTabStop;
 
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         var _stream = global_memory_stream_menu;
@@ -439,7 +439,7 @@ asc_docs_api.prototype["Native_Editor_Initialize_Settings"] = function(_params)
         }
     }
 
-    AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
+    AscCommon.AscBrowser.isRetina = this.WordControl.m_oDrawingDocument.IsRetina;
 
     if (this.WordControl.m_oDrawingDocument.IsRetina && this.WordControl.m_oDrawingDocument.IsMobile)
     {

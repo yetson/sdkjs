@@ -24,6 +24,10 @@
 */
 "use strict";
 
+// Import
+var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
+
 var c_oMainTables = {
     Main			: 255,
     App				: 1,
@@ -113,7 +117,7 @@ function CBinaryFileWriter()
 
     this.Start_UseDocumentOrigin = function(origin)
     {
-        this.PresentationThemesOrigin = origin + "/presentationthemes/";
+        this.PresentationThemesOrigin = origin;
     };
 
     this.End_UseFullUrl = function()
@@ -611,7 +615,7 @@ function CBinaryFileWriter()
         {
             if(this.tableStylesGuides.hasOwnProperty(key))
             {
-                this.WriteTableStyle(key, g_oTableId.m_aPairs[key]);
+                this.WriteTableStyle(key, AscCommon.g_oTableId.m_aPairs[key]);
             }
         }
         this.EndRecord();
@@ -1644,16 +1648,16 @@ function CBinaryFileWriter()
         {
             switch (pPr.Jc)
             {
-                case align_Left:
+                case AscCommon.align_Left:
                     oThis._WriteUChar1(0, 4);
                     break;
-                case align_Center:
+                case AscCommon.align_Center:
                     oThis._WriteUChar1(0, 0);
                     break;
-                case align_Right:
+                case AscCommon.align_Right:
                     oThis._WriteUChar1(0, 5);
                     break;
-                case align_Justify:
+                case AscCommon.align_Justify:
                     oThis._WriteUChar1(0, 2);
                     break;
                 default:
@@ -1689,14 +1693,14 @@ function CBinaryFileWriter()
             {
                 switch (spacing.LineRule)
                 {
-                    case linerule_Auto:
+                    case Asc.linerule_Auto:
                         oThis.StartRecord(0);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteInt1(0, (spacing.Line * 100000) >> 0);
                         oThis.WriteUChar(g_nodeAttributeEnd);
                         oThis.EndRecord();
                         break;
-                    case linerule_Exact:
+                    case Asc.linerule_Exact:
                         oThis.StartRecord(0);
                         oThis.WriteUChar(g_nodeAttributeStart);
                         oThis._WriteInt1(1, (spacing.Line / 0.00352777778) >> 0);
@@ -1906,9 +1910,9 @@ function CBinaryFileWriter()
             oThis._WriteInt1(17, rPr.FontSize * 100);
         }
 
-        if (vertalign_SubScript == rPr.VertAlign)
+        if (AscCommon.vertalign_SubScript == rPr.VertAlign)
             oThis._WriteInt1(2, -25000);
-        else if (vertalign_SuperScript == rPr.VertAlign)
+        else if (AscCommon.vertalign_SuperScript == rPr.VertAlign)
             oThis._WriteInt1(2, 30000);
 
         oThis.WriteUChar(g_nodeAttributeEnd);
@@ -2205,15 +2209,15 @@ function CBinaryFileWriter()
 
         switch (fill.type)
         {
-            case FILL_TYPE_NOFILL:
+            case c_oAscFill.FILL_TYPE_NOFILL:
             {
-                oThis.StartRecord(FILL_TYPE_NOFILL);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_NOFILL);
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_GRAD:
+            case c_oAscFill.FILL_TYPE_GRAD:
             {
-                oThis.StartRecord(FILL_TYPE_GRAD);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_GRAD);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
@@ -2261,9 +2265,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_PATT:
+            case c_oAscFill.FILL_TYPE_PATT:
             {
-                oThis.StartRecord(FILL_TYPE_PATT);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_PATT);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis._WriteLimit2(0, fill.ftype);
@@ -2278,15 +2282,15 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_BLIP:
+            case c_oAscFill.FILL_TYPE_BLIP:
             {
-                oThis.StartRecord(FILL_TYPE_BLIP);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_BLIP);
 
                 oThis.WriteUChar(g_nodeAttributeStart);
                 oThis.WriteUChar(g_nodeAttributeEnd);
 				
                 var _src = fill.RasterImageId;
-				var imageLocal = g_oDocumentUrls.getImageLocal(_src);
+				var imageLocal = AscCommon.g_oDocumentUrls.getImageLocal(_src);
                 if(imageLocal)
                     _src = imageLocal;
                 else
@@ -2301,7 +2305,7 @@ function CBinaryFileWriter()
                         _src = oThis.PresentationThemesOrigin + _src;
                     }
                     else if (0 != _src.indexOf("http:") && 0 != _src.indexOf("data:") && 0 != _src.indexOf("https:") && 0 != _src.indexOf("ftp:") && 0 != _src.indexOf("file:")){
-                        var imageUrl = g_oDocumentUrls.getImageUrl(_src);
+                        var imageUrl = AscCommon.g_oDocumentUrls.getImageUrl(_src);
 						if(imageUrl){
 							_src = imageUrl;
 						}
@@ -2388,18 +2392,18 @@ function CBinaryFileWriter()
                   if (0 != displayN) {
                     var additionalSrc = [];
                     if (0 != (displayN & 1)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "wmf"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "wmf"));
                     }
                     if (0 != (displayN & 2)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "emf"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "emf"));
                     }
                     if (0 != (displayN & 4)) {
-                      additionalSrc.push(changeFileExtention(imageLocal, "bin"));
-                      additionalSrc.push(changeFileExtention(imageLocal, "txt"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "bin"));
+                      additionalSrc.push(AscCommon.changeFileExtention(imageLocal, "txt"));
                     }
                     var additionalUrl = [];
                     for (var i = 0; i < additionalSrc.length; ++i) {
-                      var imageUrl = g_oDocumentUrls.getImageUrl(additionalSrc[i]);
+                      var imageUrl = AscCommon.g_oDocumentUrls.getImageUrl(additionalSrc[i]);
                       if (imageUrl) {
                         additionalUrl.push(imageUrl);
                       }
@@ -2416,9 +2420,9 @@ function CBinaryFileWriter()
                 oThis.EndRecord();
                 break;
             }
-            case FILL_TYPE_SOLID:
+            case c_oAscFill.FILL_TYPE_SOLID:
             {
-                oThis.StartRecord(FILL_TYPE_SOLID);
+                oThis.StartRecord(c_oAscFill.FILL_TYPE_SOLID);
 
                 oThis.CorrectUniColorAlpha(fill.color, trans);
                 oThis.WriteRecord1(0, fill.color, oThis.WriteUniColor);
@@ -3853,7 +3857,7 @@ function CBinaryFileWriter()
 
             oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_SOLID)
                 oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();
@@ -3917,7 +3921,7 @@ function CBinaryFileWriter()
 
             oThis.WriteRecord2(0, _part.TextPr.FontRef, oThis.WriteFontRef);
 
-            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == FILL_TYPE_SOLID)
+            if (bIsFill && _part.TextPr.Unifill.fill !== undefined && _part.TextPr.Unifill.fill != null && _part.TextPr.Unifill.fill.type == c_oAscFill.FILL_TYPE_SOLID)
                 oThis.WriteRecord2(1, _part.TextPr.Unifill.fill.color, oThis.WriteUniColor);
 
             oThis.EndRecord();

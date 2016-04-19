@@ -24,6 +24,11 @@
 */
 "use strict";
 
+// Import
+var getFullImageSrc2 = AscCommon.getFullImageSrc2;
+
+var c_oAscFill = Asc.c_oAscFill;
+
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
@@ -584,17 +589,17 @@ CShapeDrawer.prototype =
             var _fill = this.UniFill.fill;
             switch (_fill.type)
             {
-                case FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_BLIP:
                 {
                     this.bIsTexture = true;
                     break;
                 }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     this.FillUniColor = _fill.color.RGBA;
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     var _c = _fill.colors;
                     if (_c.length == 0)
@@ -606,12 +611,12 @@ CShapeDrawer.prototype =
 
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     bIsCheckBounds = true;
                     break;
                 }
-                case FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     this.bIsNoFillAttack = true;
                     break;
@@ -631,17 +636,17 @@ CShapeDrawer.prototype =
             var _fill = this.Ln.Fill.fill;
             switch (_fill.type)
             {
-                case FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_BLIP:
                 {
                     this.StrokeUniColor = new CUniColor().RGBA;
                     break;
                 }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     this.StrokeUniColor = _fill.color.RGBA;
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     var _c = _fill.colors;
                     if (_c == 0)
@@ -651,12 +656,12 @@ CShapeDrawer.prototype =
 
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     this.StrokeUniColor = _fill.fgClr.RGBA;
                     break;
                 }
-                case FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     this.bIsNoStrokeAttack = true;
                     break;
@@ -704,7 +709,7 @@ CShapeDrawer.prototype =
 
         var bIsPatt = false;
         if (this.UniFill != null && this.UniFill.fill != null &&
-            ((this.UniFill.fill.type == FILL_TYPE_PATT) || (this.UniFill.fill.type == FILL_TYPE_GRAD)))
+            ((this.UniFill.fill.type == c_oAscFill.FILL_TYPE_PATT) || (this.UniFill.fill.type == c_oAscFill.FILL_TYPE_GRAD)))
         {
             bIsPatt = true;
         }
@@ -867,7 +872,7 @@ CShapeDrawer.prototype =
             }
 
 			var bIsUnusePattern = false;
-			if (AscBrowser.isIE)
+			if (AscCommon.AscBrowser.isIE)
 			{
 				// ie падает иначе !!!
 				if (this.UniFill.fill.RasterImageId)
@@ -1000,7 +1005,7 @@ CShapeDrawer.prototype =
         if (this.UniFill != null && this.UniFill.fill != null)
         {
             var _fill = this.UniFill.fill;
-            if (_fill.type == FILL_TYPE_PATT)
+            if (_fill.type == c_oAscFill.FILL_TYPE_PATT)
             {
                 if (this.Graphics.m_bIntegerGrid === true)
                 {
@@ -1076,7 +1081,7 @@ CShapeDrawer.prototype =
                 }
                 return;
             }
-            else if (_fill.type == FILL_TYPE_GRAD)
+            else if (_fill.type == c_oAscFill.FILL_TYPE_GRAD)
             {
                 if (this.Graphics.m_bIntegerGrid === true)
                 {
@@ -1402,7 +1407,7 @@ CShapeDrawer.prototype =
                 else
                 {
                     var _fill = this.UniFill.fill;
-                    if (_fill.type == FILL_TYPE_PATT)
+                    if (_fill.type == c_oAscFill.FILL_TYPE_PATT)
                     {
                         var _patt_name = global_hatch_names[_fill.ftype];
                         if (undefined == _patt_name)
@@ -1435,7 +1440,7 @@ CShapeDrawer.prototype =
 
                         bIsPattern = true;
                     }
-                    else if (_fill.type == FILL_TYPE_GRAD)
+                    else if (_fill.type == c_oAscFill.FILL_TYPE_GRAD)
                     {
                         var points = null;
                         if (_fill.lin)

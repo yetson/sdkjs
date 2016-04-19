@@ -23,6 +23,23 @@
  *
  */
 "use strict";
+
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+  // Import
+  var CellValueType = AscCommon.CellValueType;
+  var cBoolLocal = AscCommon.cBoolLocal;
+  var cErrorOrigin = AscCommon.cErrorOrigin;
+  var cErrorLocal = AscCommon.cErrorLocal;
+  var FormulaSeparators = AscCommon.FormulaSeparators;
+  var parserHelp = AscCommon.parserHelp;
+
+  var c_oAscError = Asc.c_oAscError;
+  
 /** @enum */
 var cElementType = {
     number: 0,
@@ -41,8 +58,9 @@ var cElementType = {
     cellsRange3D: 13,
     table: 14,
     name3D: 15
-  }, /** @enum */
-  cErrorType = {
+  };
+/** @enum */
+var cErrorType = {
     unsupported_function: 0,
     null_value: 1,
     division_by_zero: 2,
@@ -52,35 +70,22 @@ var cElementType = {
     not_numeric: 6,
     not_available: 7,
     getting_data: 8
-  }, cExcelSignificantDigits = 15, //количество цифр в числе после запятой
-  cExcelMaxExponent = 308, cExcelMinExponent = -308, cExcelDateTimeDigits = 8, //количество цифр после запятой в числах отвечающих за время специализация $18.17.4.2
-  c_Date1904Const = 24107, //разница в днях между 01.01.1970 и 01.01.1904 годами
-  c_Date1900Const = 25568, //разница в днях между 01.01.1970 и 01.01.1900 годами
-  c_DateCorrectConst = c_Date1900Const, c_sPerDay = 86400, c_msPerDay = c_sPerDay * 1000, cStrucTableReservedWords = {
-    all: "#All", data: "#Data", headers: "#Headers", totals: "#Totals", thisrow: "#This Row", at: "@"
-  }, cSubTotalFunctionType = {
-    includes: {
-      AVERAGE: 1, COUNT: 2, COUNTA: 3, MAX: 4, MIN: 5, PRODUCT: 6, STDEV: 7, STDEVP: 8, SUM: 9, VAR: 10, VARP: 11
-    }, excludes: {
-      AVERAGE: 101,
-      COUNT: 102,
-      COUNTA: 103,
-      MAX: 104,
-      MIN: 105,
-      PRODUCT: 106,
-      STDEV: 107,
-      STDEVP: 108,
-      SUM: 109,
-      VAR: 110,
-      VARP: 111
-    }
   };
+var cExcelSignificantDigits = 15; //количество цифр в числе после запятой
+var cExcelMaxExponent = 308;
+var cExcelMinExponent = -308;
+var c_Date1904Const = 24107; //разница в днях между 01.01.1970 и 01.01.1904 годами
+var c_Date1900Const = 25568; //разница в днях между 01.01.1970 и 01.01.1900 годами
+var c_DateCorrectConst = c_Date1900Const;
+var c_sPerDay = 86400;
+var c_msPerDay = c_sPerDay * 1000;
+  var rx_sFuncPref = /_xlfn\./i;
 
 Date.prototype.excelNullDate1900 = Date.UTC(1899, 11, 30, 0, 0, 0);
 Date.prototype.excelNullDate1904 = Date.UTC(1904, 0, 1, 0, 0, 0);
 
 Date.prototype.getExcelNullDate = function() {
-  return g_bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
+  return AscCommon.bDate1904 ? Date.prototype.excelNullDate1904 : Date.prototype.excelNullDate1900;
 };
 
 Date.prototype.isLeapYear = function() {
@@ -108,7 +113,7 @@ Date.prototype.getExcelDate = function() {
 };
 
 Date.prototype.getExcelDateWithTime = function() {
-//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (g_bDate1904 ? 0 : 1) ) );
+//    return Math.floor( ( this.getTime() / 1000 - this.getTimezoneOffset() * 60 ) / c_sPerDay + ( c_DateCorrectConst + (bDate1904 ? 0 : 1) ) );
   var year = this.getUTCFullYear(), month = this.getUTCMonth(), date = this.getUTCDate(), res;
 
   if (1900 < year || (1900 == year && 1 < month)) {
@@ -128,7 +133,7 @@ Date.prototype.getDateFromExcel = function(val) {
 
   val = Math.floor(val);
 
-  if (g_bDate1904) {
+  if (AscCommon.bDate1904) {
     return new Date(val * c_msPerDay + this.getExcelNullDate());
   } else {
     if (val < 60) {
@@ -257,7 +262,7 @@ Math.sign = function(x) {
 
 RegExp.escape = function(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
-}
+};
 
 parserHelp.setDigitSeparator(g_oDefaultCultureInfo.NumberDecimalSeparator);
 
@@ -270,25 +275,29 @@ function cBaseType(val, type) {
   this.type = type;
   this.value = val;
 }
-cBaseType.prototype = {
-  constructor: cBaseType, cloneTo: function(oRes) {
-    oRes.needRecalc = this.needRecalc;
-    oRes.numFormat = this.numFormat;
-    oRes.type = this.type;
-    oRes.value = this.value;
-    oRes.ca = this.ca;
-    oRes.node = this.node;
-  }, tryConvert: function() {
-    return this;
-  }, getValue: function() {
-    return this.value;
-  }, toString: function() {
-    return this.value.toString();
-  }, toLocaleString: function() {
-    return this.toString();
-  }, setNode: function(node) {
-    this.node = node;
-  }
+
+cBaseType.prototype.cloneTo = function(oRes) {
+  oRes.needRecalc = this.needRecalc;
+  oRes.numFormat = this.numFormat;
+  oRes.type = this.type;
+  oRes.value = this.value;
+  oRes.ca = this.ca;
+  oRes.node = this.node;
+};
+cBaseType.prototype.tryConvert = function() {
+  return this;
+};
+cBaseType.prototype.getValue = function() {
+  return this.value;
+};
+cBaseType.prototype.toString = function() {
+  return this.value.toString();
+};
+cBaseType.prototype.toLocaleString = function() {
+  return this.toString();
+};
+cBaseType.prototype.setNode = function(node) {
+  this.node = node;
 };
 
 /*Basic types of an elements used into formulas*/
@@ -309,7 +318,7 @@ function cNumber(val) {
 
 cNumber.prototype = Object.create(cBaseType.prototype);
 cNumber.prototype.tocString = function() {
-  return new cString(("" + this.value).replace(digitSeparatorDef, digitSeparator));
+  return new cString(("" + this.value).replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator));
 };
 cNumber.prototype.tocNumber = function() {
   return this;
@@ -320,7 +329,7 @@ cNumber.prototype.tocBool = function() {
 cNumber.prototype.toLocaleString = function(digitDelim) {
   var res = this.value.toString();
   if (digitDelim) {
-    return res.replace(digitSeparatorDef, digitSeparator);
+    return res.replace(FormulaSeparators.digitSeparatorDef, FormulaSeparators.digitSeparator);
   } else {
     return res;
   }
@@ -1168,7 +1177,7 @@ function cRef(val, ws) {/*Ref means A1 for example*/
   this.isAbsolute = false;
   this.isAbsoluteCol1 = false;
   this.isAbsoluteRow1 = false;
-  var ca = g_oCellAddressUtils.getCellAddress(val.replace(rx_space_g, ""));
+  var ca = g_oCellAddressUtils.getCellAddress(val.replace(AscCommon.rx_space_g, ""));
   this.range = null;
   this._valid = ca.isValid();
   if (this._valid) {
@@ -1510,7 +1519,7 @@ cStrucTable.prototype.toString = function() {
     var re = /\[(.*?)\]/ig, m, data = "", i = 0;
     while (null !== (m = re.exec(this.hdt))) {
 
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], false) + "]" + functionArgumentSeparatorDef;
+      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], false) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
     }
     data = data.substr(0, data.length - 1);
     if (this.hdtcstart) {
@@ -1520,7 +1529,7 @@ cStrucTable.prototype.toString = function() {
         this.hdtcstart = columns_1.columnName;
       }
 
-      data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
+      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
     }
     if (this.hdtcend) {
 
@@ -1570,7 +1579,7 @@ cStrucTable.prototype.toLocaleString = function() {
     var re = /\[(.*?)\]/ig, m, data = "", i = 0;
     while (null !== (m = re.exec(this.hdt))) {
 
-      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], true) + "]" + functionArgumentSeparatorDef;
+      data += "[" + this.buildLocalTableString(this.hdtIndexes[i], true) + "]" + FormulaSeparators.functionArgumentSeparatorDef;
     }
     data = data.substr(0, data.length - 1);
     if (this.hdtcstart) {
@@ -1580,7 +1589,7 @@ cStrucTable.prototype.toLocaleString = function() {
         this.hdtcstart = columns_1.columnName;
       }
 
-      data += functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
+      data += FormulaSeparators.functionArgumentSeparatorDef + "[" + this.hdtcstart.replace(/#/g, "'#") + "]"
     }
     if (this.hdtcend) {
 
@@ -1603,43 +1612,12 @@ cStrucTable.prototype.createArea = function(val, cell) {
 
   var paramObj = {param: null, startCol: null, endCol: null, cell: cell.bbox, includeColumnHeader: false};
 
-  function getColumnType(value) {
-    var res;
-    switch (value.toLowerCase()) {
-      case "#" + cStrucTableLocalColumns['a'].toLocaleLowerCase():
-      case cStrucTableReservedWords.all.toLocaleLowerCase():
-        res = g_nFormulaTablePartInfo.all;
-        break;
-      case "#" + cStrucTableLocalColumns['d'].toLocaleLowerCase():
-      case cStrucTableReservedWords.data.toLocaleLowerCase():
-        res = g_nFormulaTablePartInfo.data;
-        break;
-      case "#" + cStrucTableLocalColumns['h'].toLocaleLowerCase():
-      case cStrucTableReservedWords.headers.toLocaleLowerCase():
-        res = g_nFormulaTablePartInfo.headers;
-        break;
-      case "#" + cStrucTableLocalColumns['t'].toLocaleLowerCase():
-      case cStrucTableReservedWords.totals.toLocaleLowerCase():
-        res = g_nFormulaTablePartInfo.totals;
-        break;
-      case "#" + cStrucTableLocalColumns['tr'].toLocaleLowerCase():
-      case cStrucTableReservedWords.at.toLocaleLowerCase():
-      case cStrucTableReservedWords.thisrow.toLocaleLowerCase():
-        res = g_nFormulaTablePartInfo.thisRow;
-        break;
-      default:
-        res = g_nFormulaTablePartInfo.data;
-        break;
-    }
-    return res;
-  }
-
   if (val['oneColumn'] || val['columnRange']) {
 
     this.oneColumn = val['oneColumn'];
     this.columnRange = val['columnRange'];
 
-    paramObj.param = g_nFormulaTablePartInfo.columns;
+    paramObj.param = AscCommon.FormulaTablePartInfo.columns;
     if (val['columnRange']) {
       this.columnRange = val['columnRange'];
       paramObj.startCol = this.colStart = val['colStart'].replace(/'#/g, "#");
@@ -1675,7 +1653,7 @@ cStrucTable.prototype.createArea = function(val, cell) {
     }
   } else if (val['reservedColumn'] || !val['columnName']) {
     this.reservedColumn = val['reservedColumn'] || "";
-    this.reservedColumnIndex = paramObj.param = getColumnType(this.reservedColumn);
+    this.reservedColumnIndex = paramObj.param = parserHelp.getColumnTypeByName(this.reservedColumn);
 
     this.tableData = this.wb.getTableRangeForFormula(this.tableName, paramObj);
     if (!this.tableData) {
@@ -1695,7 +1673,7 @@ cStrucTable.prototype.createArea = function(val, cell) {
     this.hdtcend = val['hdtcend'];
     var re = /\[(.*?)\]/ig, m, data, range;
     while (null !== (m = re.exec(this.hdt))) {
-      paramObj.param = getColumnType(m[1]);
+      paramObj.param = parserHelp.getColumnTypeByName(m[1]);
       this.hdtIndexes.push(paramObj.param);
       data = this.wb.getTableRangeForFormula(this.tableName, paramObj);
 
@@ -1712,7 +1690,7 @@ cStrucTable.prototype.createArea = function(val, cell) {
 
     if (this.hdtcstart) {
       this.hdtcstart = this.hdtcstart.replace(/'#/g, "#");
-      paramObj.param = g_nFormulaTablePartInfo.columns;
+      paramObj.param = AscCommon.FormulaTablePartInfo.columns;
       paramObj.startCol = this.hdtcstart;
       paramObj.endCol = null;
       this.hdtcstartIndex = this.wb.getTableIndexColumnByName(this.tableName, this.hdtcstart);
@@ -1760,50 +1738,8 @@ cStrucTable.prototype.createArea = function(val, cell) {
   return this.area;
 };
 cStrucTable.prototype.buildLocalTableString = function(reservedColumn, local) {
-
-  switch (reservedColumn) {
-    case g_nFormulaTablePartInfo.all:
-    {
-      if (local) {
-        return "#" + cStrucTableLocalColumns['a'];
-      }
-      return cStrucTableReservedWords.all;
-      break;
-    }
-    case g_nFormulaTablePartInfo.data:
-    {
-      if (local) {
-        return "#" + cStrucTableLocalColumns['d'];
-      }
-      return cStrucTableReservedWords.data;
-      break;
-    }
-    case g_nFormulaTablePartInfo.headers:
-    {
-      if (local) {
-        return "#" + cStrucTableLocalColumns['h'];
-      }
-      return cStrucTableReservedWords.headers;
-      break;
-    }
-    case g_nFormulaTablePartInfo.totals:
-    {
-      if (local) {
-        return "#" + cStrucTableLocalColumns['t'];
-      }
-      return cStrucTableReservedWords.totals;
-      break;
-    }
-    case g_nFormulaTablePartInfo.thisRow:
-    {
-      if (local) {
-        return "#" + cStrucTableLocalColumns['tr'];
-      }
-      return cStrucTableReservedWords.thisrow;
-      break;
-    }
-  }
-}
+  return parserHelp.getColumnNameByType();
+};
 
 /** @constructor */
 function cName3D(val, wsFrom, wb, ws) {
@@ -1932,39 +1868,39 @@ cArray.prototype.tocBool = function() {
 };
 cArray.prototype.toString = function() {
   var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += arrayRowSeparatorDef) {
-    for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += arrayColSeparatorDef) {
+  for (var ir = 0; ir < this.rowCount; ir++, ret += FormulaSeparators.arrayRowSeparatorDef) {
+    for (var ic = 0; ic < this.countElementInRow[ir]; ic++, ret += FormulaSeparators.arrayColSeparatorDef) {
       if (this.array[ir][ic] instanceof cString) {
         ret += '"' + this.array[ir][ic].toString() + '"';
       } else {
         ret += this.array[ir][ic].toString() + "";
       }
     }
-    if (ret[ret.length - 1] === arrayColSeparatorDef) {
+    if (ret[ret.length - 1] === FormulaSeparators.arrayColSeparatorDef) {
       ret = ret.substring(0, ret.length - 1);
     }
   }
-  if (ret[ret.length - 1] === arrayRowSeparatorDef) {
+  if (ret[ret.length - 1] === FormulaSeparators.arrayRowSeparatorDef) {
     ret = ret.substring(0, ret.length - 1);
   }
   return "{" + ret + "}";
 };
 cArray.prototype.toLocaleString = function(digitDelim) {
   var ret = "";
-  for (var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) {
+  for (var ir = 0; ir < this.rowCount; ir++, ret += digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
     for (var ic = 0; ic < this.countElementInRow[ir];
-         ic++, ret += digitDelim ? arrayColSeparator : arrayColSeparatorDef) {
+         ic++, ret += digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
       if (this.array[ir][ic] instanceof cString) {
         ret += '"' + this.array[ir][ic].toLocaleString(digitDelim) + '"';
       } else {
         ret += this.array[ir][ic].toLocaleString(digitDelim) + "";
       }
     }
-    if (ret[ret.length - 1] === digitDelim ? arrayColSeparator : arrayColSeparatorDef) {
+    if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayColSeparator : FormulaSeparators.arrayColSeparatorDef) {
       ret = ret.substring(0, ret.length - 1);
     }
   }
-  if (ret[ret.length - 1] === digitDelim ? arrayRowSeparator : arrayRowSeparatorDef) {
+  if (ret[ret.length - 1] === digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef) {
     ret = ret.substring(0, ret.length - 1);
   }
   return "{" + ret + "}";
@@ -2166,7 +2102,7 @@ cBaseFunction.prototype = {
     for (var i = start; i <= c; i++) {
       str += arg[i].toLocaleString(digitDelim);
       if (i !== c) {
-        str += functionArgumentSeparator;
+        str += FormulaSeparators.functionArgumentSeparator;
       }
     }
     return new cString(localeName + "(" + str + ")");
@@ -2845,8 +2781,6 @@ var cFormulaOperators = {
 var cFormulaFunctionGroup = {};
 var cFormulaFunction = {};
 var cAllFormulaFunction = {};
-var cFormulaFunctionLocalized = null;
-var cFormulaFunctionToLocale = null;
 
 function getFormulasInfo() {
 
@@ -3839,7 +3773,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
    */
   this.operand_expected = true;
   var wasLeftParentheses = false, wasRigthParentheses = false, found_operand = null, _3DRefTmp = null, _tableTMP = null;
-  var cFormulaList = (local && cFormulaFunctionLocalized) ? cFormulaFunctionLocalized : cFormulaFunction;
+  var cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
   while (this.pCurrPos < this.Formula.length) {
     this.operand_str = this.Formula[this.pCurrPos];
     /*if ( parserHelp.isControlSymbols.call( this, this.Formula, this.pCurrPos )){
@@ -4034,7 +3968,7 @@ parserFormula.prototype.parse = function(local, digitDelim) {
       var arr = new cArray(), operator = {isOperator: false, operatorName: ""};
       while (this.pCurrPos < this.Formula.length && !parserHelp.isRightBrace.call(this, this.Formula, this.pCurrPos)) {
         if (parserHelp.isArraySeparator.call(this, this.Formula, this.pCurrPos, digitDelim)) {
-          if (this.operand_str == (digitDelim ? arrayRowSeparator : arrayRowSeparatorDef)) {
+          if (this.operand_str == (digitDelim ? FormulaSeparators.arrayRowSeparator : FormulaSeparators.arrayRowSeparatorDef)) {
             arr.addRow();
           }
         } else if (parserHelp.isBoolean.call(this, this.Formula, this.pCurrPos, local)) {
@@ -4883,6 +4817,17 @@ parserFormula.prototype.parseDiagramRef = function() {
   return res;
 };
 
+parserFormula.prototype.getElementByPos = function(pos) {
+  var curPos = 0;
+  for (var i = 0; i < this.f.length; ++i) {
+    curPos += this.f[i].toString().length;
+    if (curPos >= pos) {
+      return this.f[i];
+    }
+  }
+  return null;
+};
+
 function parseNum(str) {
   if (str.indexOf("x") > -1 || str == "" || str.match(/\s+/))//исключаем запись числа в 16-ричной форме из числа.
   {
@@ -4973,29 +4918,6 @@ function GetDiffDate360(nDay1, nMonth1, nYear1, nDay2, nMonth2, nYear2, bUSAMeth
   return nDayDiff;
 }
 
-function searchRegExp(str, flags) {
-  var vFS = str
-    .replace(/(\\)/g, "\\")
-    .replace(/(\^)/g, "\\^")
-    .replace(/(\()/g, "\\(")
-    .replace(/(\))/g, "\\)")
-    .replace(/(\+)/g, "\\+")
-    .replace(/(\[)/g, "\\[")
-    .replace(/(\])/g, "\\]")
-    .replace(/(\{)/g, "\\{")
-    .replace(/(\})/g, "\\}")
-    .replace(/(\$)/g, "\\$")
-    .replace(/(~)?\*/g, function($0, $1) {
-      return $1 ? $0 : '(.*)';
-    })
-    .replace(/(~)?\?/g, function($0, $1) {
-      return $1 ? $0 : '.{1}';
-    })
-    .replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?");
-
-  return new RegExp(vFS + "$", flags ? flags : "i");
-}
-
 function searchRegExp2(s, mask) {
   //todo протестировать
   var bRes = true;
@@ -5055,8 +4977,6 @@ function searchRegExp2(s, mask) {
 /*
  * Code below has been taken from OpenOffice Source.
  */
-
-var maxGammaArgument = 171.624376956302;
 
 function lcl_Erf0065(x) {
   var pn = [1.12837916709551256, 1.35894887627277916E-1, 4.03259488531795274E-2, 1.20339380863079457E-3,
@@ -5169,234 +5089,50 @@ function rtl_math_erfc(x) {
   return fErfc;
 }
 
-function integralPhi(x) { // Using gauss(x)+0.5 has severe cancellation errors for x<-4
-  return 0.5 * rtl_math_erfc(-x * 0.7071067811865475); // * 1/sqrt(2)
-}
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+  window['AscCommonExcel'].cElementType = cElementType;
+  window['AscCommonExcel'].cErrorType = cErrorType;
+  window['AscCommonExcel'].cExcelSignificantDigits = cExcelSignificantDigits;
+  window['AscCommonExcel'].cExcelMaxExponent = cExcelMaxExponent;
+  window['AscCommonExcel'].cExcelMinExponent = cExcelMinExponent;
+  window['AscCommonExcel'].c_Date1904Const = c_Date1904Const;
+  window['AscCommonExcel'].c_Date1900Const = c_Date1900Const;
+  window['AscCommonExcel'].c_DateCorrectConst = c_DateCorrectConst;
+  window['AscCommonExcel'].c_sPerDay = c_sPerDay;
+  window['AscCommonExcel'].c_msPerDay = c_msPerDay;
 
-function phi(x) {
-  return 0.39894228040143268 * Math.exp(-(x * x) / 2);
-}
+  window['AscCommonExcel'].cNumber = cNumber;
+  window['AscCommonExcel'].cString = cString;
+  window['AscCommonExcel'].cBool = cBool;
+  window['AscCommonExcel'].cError = cError;
+  window['AscCommonExcel'].cArea = cArea;
+  window['AscCommonExcel'].cArea3D = cArea3D;
+  window['AscCommonExcel'].cRef = cRef;
+  window['AscCommonExcel'].cRef3D = cRef3D;
+  window['AscCommonExcel'].cEmpty = cEmpty;
+  window['AscCommonExcel'].cName = cName;
+  window['AscCommonExcel'].cArray = cArray;
+  window['AscCommonExcel'].cUndefined = cUndefined;
+  window['AscCommonExcel'].cBaseFunction = cBaseFunction;
 
-function taylor(pPolynom, nMax, x) {
-  var nVal = pPolynom[nMax];
-  for (var i = nMax - 1; i >= 0; i--) {
-    nVal = pPolynom[i] + (nVal * x);
-  }
-  return nVal;
-}
+  window['AscCommonExcel'].checkTypeCell = checkTypeCell;
+  window['AscCommonExcel'].cFormulaFunctionGroup = cFormulaFunctionGroup;
+  window['AscCommonExcel'].cFormulaFunction = cFormulaFunction;
 
-function gauss(x) {
-  var t0 = [0.39894228040143268, -0.06649038006690545, 0.00997355701003582, -0.00118732821548045, 0.00011543468761616,
-    -0.00000944465625950, 0.00000066596935163, -0.00000004122667415, 0.00000000227352982, 0.00000000011301172,
-    0.00000000000511243, -0.00000000000021218], t2 = [0.47724986805182079, 0.05399096651318805, -0.05399096651318805,
-    0.02699548325659403, -0.00449924720943234, -0.00224962360471617, 0.00134977416282970, -0.00011783742691370,
-    -0.00011515930357476, 0.00003704737285544, 0.00000282690796889, -0.00000354513195524, 0.00000037669563126,
-    0.00000019202407921, -0.00000005226908590, -0.00000000491799345, 0.00000000366377919, -0.00000000015981997,
-    -0.00000000017381238, 0.00000000002624031, 0.00000000000560919, -0.00000000000172127, -0.00000000000008634,
-    0.00000000000007894], t4 = [0.49996832875816688, 0.00013383022576489, -0.00026766045152977, 0.00033457556441221,
-    -0.00028996548915725, 0.00018178605666397, -0.00008252863922168, 0.00002551802519049, -0.00000391665839292,
-    -0.00000074018205222, 0.00000064422023359, -0.00000017370155340, 0.00000000909595465, 0.00000000944943118,
-    -0.00000000329957075, 0.00000000029492075, 0.00000000011874477, -0.00000000004420396, 0.00000000000361422,
-    0.00000000000143638, -0.00000000000045848];
-  var asympt = [-1, 1, -3, 15, -105], xabs = Math.abs(x), xshort = Math.floor(xabs), nval = 0;
-  if (xshort == 0) {
-    nval = taylor(t0, 11, (xabs * xabs)) * xabs;
-  } else if ((xshort >= 1) && (xshort <= 2)) {
-    nval = taylor(t2, 23, (xabs - 2));
-  } else if ((xshort >= 3) && (xshort <= 4)) {
-    nval = taylor(t4, 20, (xabs - 4));
-  } else {
-    nval = 0.5 + phi(xabs) * taylor(asympt, 4, 1 / (xabs * xabs)) / xabs;
-  }
-  if (x < 0) {
-    return -nval;
-  } else {
-    return nval;
-  }
-}
+  window['AscCommonExcel'].cFormulaFunctionLocalized = null;
+  window['AscCommonExcel'].cFormulaFunctionToLocale = null;
 
-function gaussinv(x) {
-  var q, t, z;
+  window['AscCommonExcel'].getFormulasInfo = getFormulasInfo;
 
-  q = x - 0.5;
+  window['AscCommonExcel']._func = _func;
 
-  if (Math.abs(q) <= .425) {
-    t = 0.180625 - q * q;
-    z = q * (
-        (
-          (
-            (
-              (
-                (
-                  (
-                    t * 2509.0809287301226727 + 33430.575583588128105
-                  ) * t + 67265.770927008700853
-                ) * t + 45921.953931549871457
-              ) * t + 13731.693765509461125
-            ) * t + 1971.5909503065514427
-          ) * t + 133.14166789178437745
-        ) * t + 3.387132872796366608
-      ) / (
-        (
-          (
-            (
-              (
-                (
-                  (
-                    t * 5226.495278852854561 + 28729.085735721942674
-                  ) * t + 39307.89580009271061
-                ) * t + 21213.794301586595867
-              ) * t + 5394.1960214247511077
-            ) * t + 687.1870074920579083
-          ) * t + 42.313330701600911252
-        ) * t + 1
-      );
-  } else {
-    if (q > 0) {
-      t = 1 - x;
-    } else {
-      t = x;
-    }
+  window['AscCommonExcel'].parserFormula = parserFormula;
 
-    t = Math.sqrt(-Math.log(t));
-
-    if (t <= 5) {
-      t += -1.6;
-      z = (
-          (
-            (
-              (
-                (
-                  (
-                    (
-                      t * 7.7454501427834140764e-4 + 0.0227238449892691845833
-                    ) * t + 0.24178072517745061177
-                  ) * t + 1.27045825245236838258
-                ) * t + 3.64784832476320460504
-              ) * t + 5.7694972214606914055
-            ) * t + 4.6303378461565452959
-          ) * t + 1.42343711074968357734
-        ) / (
-          (
-            (
-              (
-                (
-                  (
-                    (
-                      t * 1.05075007164441684324e-9 + 5.475938084995344946e-4
-                    ) * t + 0.0151986665636164571966
-                  ) * t + 0.14810397642748007459
-                ) * t + 0.68976733498510000455
-              ) * t + 1.6763848301838038494
-            ) * t + 2.05319162663775882187
-          ) * t + 1
-        );
-    } else {
-      t += -5;
-      z = (
-          (
-            (
-              (
-                (
-                  (
-                    (
-                      t * 2.01033439929228813265e-7 + 2.71155556874348757815e-5
-                    ) * t + 0.0012426609473880784386
-                  ) * t + 0.026532189526576123093
-                ) * t + 0.29656057182850489123
-              ) * t + 1.7848265399172913358
-            ) * t + 5.4637849111641143699
-          ) * t + 6.6579046435011037772
-        ) / (
-          (
-            (
-              (
-                (
-                  (
-                    (
-                      t * 2.04426310338993978564e-15 + 1.4215117583164458887e-7
-                    ) * t + 1.8463183175100546818e-5
-                  ) * t + 7.868691311456132591e-4
-                ) * t + 0.0148753612908506148525
-              ) * t + 0.13692988092273580531
-            ) * t + 0.59983220655588793769
-          ) * t + 1
-        );
-    }
-
-    if (q < 0) {
-      z = -z;
-    }
-  }
-
-  return z;
-}
-
-function getLanczosSum(fZ) {
-  var num = [23531376880.41075968857200767445163675473, 42919803642.64909876895789904700198885093,
-    35711959237.35566804944018545154716670596, 17921034426.03720969991975575445893111267,
-    6039542586.35202800506429164430729792107, 1439720407.311721673663223072794912393972,
-    248874557.8620541565114603864132294232163, 31426415.58540019438061423162831820536287,
-    2876370.628935372441225409051620849613599, 186056.2653952234950402949897160456992822,
-    8071.672002365816210638002902272250613822, 210.8242777515793458725097339207133627117,
-    2.506628274631000270164908177133837338626], denom = [0, 39916800, 120543840, 150917976, 105258076, 45995730,
-    13339535, 2637558, 357423, 32670, 1925, 66, 1];
-  // Horner scheme
-  var sumNum, sumDenom, i, zInv;
-  if (fZ <= 1) {
-    sumNum = num[12];
-    sumDenom = denom[12];
-    for (i = 11; i >= 0; --i) {
-      sumNum *= fZ;
-      sumNum += num[i];
-      sumDenom *= fZ;
-      sumDenom += denom[i];
-    }
-  } else
-  // Cancel down with fZ^12; Horner scheme with reverse coefficients
-  {
-    zInv = 1 / fZ;
-    sumNum = num[0];
-    sumDenom = denom[0];
-    for (i = 1; i <= 12; ++i) {
-      sumNum *= zInv;
-      sumNum += num[i];
-      sumDenom *= zInv;
-      sumDenom += denom[i];
-    }
-  }
-  return sumNum / sumDenom;
-}
-
-/** You must ensure fZ>0; fZ>171.624376956302 will overflow. */
-function getGammaHelper(fZ) {
-  var gamma = getLanczosSum(fZ), fg = 6.024680040776729583740234375, zgHelp = fZ + fg - 0.5;
-  // avoid intermediate overflow
-  var halfpower = Math.pow(zgHelp, fZ / 2 - 0.25);
-  gamma *= halfpower;
-  gamma /= Math.exp(zgHelp);
-  gamma *= halfpower;
-  if (fZ <= 20 && fZ == Math.floor(fZ)) {
-    gamma = Math.round(gamma);
-  }
-  return gamma;
-}
-
-/** You must ensure fZ>0 */
-function getLogGammaHelper(fZ) {
-  var _fg = 6.024680040776729583740234375, zgHelp = fZ + _fg - 0.5;
-  return Math.log(getLanczosSum(fZ)) + (fZ - 0.5) * Math.log(zgHelp) - zgHelp;
-}
-
-function getLogGamma(fZ) {
-  if (fZ >= maxGammaArgument) {
-    return getLogGammaHelper(fZ);
-  }
-  if (fZ >= 0) {
-    return Math.log(getGammaHelper(fZ));
-  }
-  if (fZ >= 0.5) {
-    return Math.log(getGammaHelper(fZ + 1) / fZ);
-  }
-  return getLogGammaHelper(fZ + 2) - Math.log(fZ + 1) - Math.log(fZ);
-}
+  window['AscCommonExcel'].parseNum = parseNum;
+  window['AscCommonExcel'].matching = matching;
+  window['AscCommonExcel'].GetDiffDate360 = GetDiffDate360;
+  window['AscCommonExcel'].searchRegExp2 = searchRegExp2;
+  window['AscCommonExcel'].rtl_math_erf = rtl_math_erf;
+  window['AscCommonExcel'].rtl_math_erfc = rtl_math_erfc;
+})(window);

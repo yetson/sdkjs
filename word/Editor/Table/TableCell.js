@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 function CTableCell(Row, ColW)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Row = Row;
 
@@ -103,14 +103,14 @@ function CTableCell(Row, ColW)
     this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CTableCell.prototype =
 {
     Set_Id : function(newId)
     {
-        g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
     },
 
@@ -253,7 +253,7 @@ CTableCell.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
+            if (true === AscCommon.g_oIdCounter.m_bLoad || true === AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr     = g_oDocumentDefaultTableCellPr;
                 this.CompiledPr.ParaPr = g_oDocumentDefaultParaPr;
@@ -452,7 +452,7 @@ CTableCell.prototype =
         // Сначала проверим заливку данной ячейки, если ее нет, тогда спрашиваем у таблицы
         var Shd = this.Get_Shd();
 
-        if ( shd_Nil !== Shd.Value )
+        if ( Asc.c_oAscShdNil !== Shd.Value )
             return Shd.Get_Color2(this.Get_Theme(), this.Get_ColorMap());
 
         return this.Row.Table.Get_TextBackGroundColor();
@@ -685,18 +685,25 @@ CTableCell.prototype =
     {
         var TextDirection = this.Get_TextDirection();
         var bNeedRestore = false;
+        var _transform = undefined;
         if (textdirection_BTLR === TextDirection || textdirection_TBRL === TextDirection)
         {
             bNeedRestore = true;
             pGraphics.SaveGrState();
             pGraphics.AddClipRect(this.Temp.X_cell_start, this.Temp.Y_cell_start, this.Temp.X_cell_end - this.Temp.X_cell_start, this.Temp.Y_cell_end - this.Temp.Y_cell_start);
-            pGraphics.transform3(this.Get_ParentTextTransform());
+
+            _transform = this.Get_ParentTextTransform();
+            if (pGraphics.CheckUseFonts2 !== undefined)
+                pGraphics.CheckUseFonts2(_transform);
+            pGraphics.transform3(_transform);
         }
 
         this.Content.Draw(PageIndex, pGraphics);
         if (bNeedRestore)
         {
             pGraphics.RestoreGrState();
+            if (pGraphics.UncheckUseFonts2 !== undefined && _transform)
+                pGraphics.UncheckUseFonts2(_transform);
         }
     },
 
@@ -1470,8 +1477,8 @@ CTableCell.prototype =
                 var Row  = this.Row;
                 var RowH = this.Row.Get_Height();
 
-                if (heightrule_Auto === RowH.HRule)
-                    Row.Set_Height(20, heightrule_AtLeast);
+                if (Asc.linerule_Auto === RowH.HRule)
+                    Row.Set_Height(20, Asc.linerule_AtLeast);
                 else if (RowH.Value < 20)
                     Row.Set_Height(20, RowH.HRule);
             }
@@ -2568,7 +2575,7 @@ CTableCell.prototype =
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
 
-        this.Content = g_oTableId.Get_ById( Reader.GetString2() );
+        this.Content = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
 
         CollaborativeEditing.Add_NewObject( this );
     },

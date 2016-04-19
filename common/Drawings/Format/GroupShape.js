@@ -22,7 +22,11 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
+
+// Import
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
 function CGroupShape()
 {
@@ -65,10 +69,10 @@ function CGroupShape()
     this.snapArrayY = [];
 
     this.setRecalculateInfo();
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add(this, this.Id);
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add(this, this.Id);
 }
 
 CGroupShape.prototype =
@@ -414,7 +418,7 @@ CGroupShape.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.transform3(this.transform);
                 graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
@@ -482,13 +486,98 @@ CGroupShape.prototype =
             var cx, cy;
             if(this.spPr.xfrm.isNotNullForGroup())
             {
+
+                var dExtX = this.spPr.xfrm.extX, dExtY = this.spPr.xfrm.extY;
+                var oParaDrawing = getParaDrawing(this);
+                if(oParaDrawing)
+                {
+                    if(oParaDrawing.SizeRelH || oParaDrawing.SizeRelV)
+                    {
+                        this.m_oSectPr = null;
+                        var oParentParagraph = oParaDrawing.Get_ParentParagraph();
+                        if(oParentParagraph)
+                        {
+
+                            var oSectPr = oParentParagraph.Get_SectPr();
+                            if(oSectPr)
+                            {
+                                if(oParaDrawing.SizeRelH && oParaDrawing.SizeRelH.Percent > 0)
+                                {
+                                    switch(oParaDrawing.SizeRelH.RelativeFrom)
+                                    {
+                                        case c_oAscSizeRelFromH.sizerelfromhMargin:
+                                        {
+                                            dExtX = oSectPr.Get_PageWidth() - oSectPr.Get_PageMargin_Left() - oSectPr.Get_PageMargin_Right();
+                                            break;
+                                        }
+                                        case c_oAscSizeRelFromH.sizerelfromhPage:
+                                        {
+                                            dExtX = oSectPr.Get_PageWidth();
+                                            break;
+                                        }
+                                        case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
+                                        {
+                                            dExtX = oSectPr.Get_PageMargin_Left();
+                                            break;
+                                        }
+
+                                        case c_oAscSizeRelFromH.sizerelfromhRightMargin:
+                                        {
+                                            dExtX = oSectPr.Get_PageMargin_Right();
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            dExtX = oSectPr.Get_PageMargin_Left();
+                                            break;
+                                        }
+                                    }
+                                    dExtX *= oParaDrawing.SizeRelH.Percent;
+                                }
+                                if(oParaDrawing.SizeRelV && oParaDrawing.SizeRelV.Percent > 0)
+                                {
+                                    switch(oParaDrawing.SizeRelV.RelativeFrom)
+                                    {
+                                        case c_oAscSizeRelFromV.sizerelfromvMargin:
+                                        {
+                                            dExtY = oSectPr.Get_PageHeight() - oSectPr.Get_PageMargin_Top() - oSectPr.Get_PageMargin_Bottom();
+                                            break;
+                                        }
+                                        case c_oAscSizeRelFromV.sizerelfromvPage:
+                                        {
+                                            dExtY = oSectPr.Get_PageHeight();
+                                            break;
+                                        }
+                                        case c_oAscSizeRelFromV.sizerelfromvTopMargin:
+                                        {
+                                            dExtY = oSectPr.Get_PageMargin_Top();
+                                            break;
+                                        }
+                                        case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
+                                        {
+                                            dExtY = oSectPr.Get_PageMargin_Bottom();
+                                            break;
+                                        }
+                                        default:
+                                        {
+                                            dExtY = oSectPr.Get_PageMargin_Top();
+                                            break;
+                                        }
+                                    }
+                                    dExtY *= oParaDrawing.SizeRelV.Percent;
+                                }
+                            }
+                        }
+                    }
+                }
+
                 if(this.spPr.xfrm.chExtX > 0)
-                    cx = this.spPr.xfrm.extX/this.spPr.xfrm.chExtX;
+                    cx = dExtX/this.spPr.xfrm.chExtX;
                 else
                     cx = 1;
 
                 if(this.spPr.xfrm.chExtY > 0)
-                    cy = this.spPr.xfrm.extY/this.spPr.xfrm.chExtY;
+                    cy = dExtY/this.spPr.xfrm.chExtY;
                 else
                     cy = 1;
             }
@@ -2017,7 +2106,7 @@ CGroupShape.prototype =
                 var pos = readLong(r);
                 if(this.worksheet)
                 {
-                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
                 addToDrawings(this.worksheet, this, pos);
                 break;

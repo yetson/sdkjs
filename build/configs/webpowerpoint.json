@@ -1,30 +1,24 @@
 {
-    "info": {
-        "version": "3.8.0",
-        "build": 158
-    },
-    "update_src": {
-        "revision": "HEAD",
-        "src": "../common ../word ../slide"
-    },
     "compile": {
         "sdk": {
             "common": [
                 "../common/Build/License.js",
                 "../common/browser.js",
+				"../common/commonDefines.js",
+				"../common/downloaderfiles.js",
+				"../common/docscoapicommon.js",
+                "../common/docscoapi.js",
+				"../common/apiCommon.js",
+				"../common/editorscommon.js",
+				
+				"../slide/apiDefines.js",
+				"../common/wordcopypaste.js",
                 "../common/FontsFreeType/font_engine.js",
                 "../common/FontsFreeType/FontFile.js",
                 "../common/FontsFreeType/FontManager.js",
                 "../common/FontsFreeType/font_map.js",
                 "../word/Drawing/Externals.js",
                 "../common/GlobalLoaders.js",
-                "../common/commonDefines.js",
-                "../common/apiCommon.js",
-                "../common/downloaderfiles.js",
-                "../common/docscoapicommon.js",
-                "../common/docscoapi.js",
-                "../common/wordcopypaste.js",
-                "../common/editorscommon.js",
                 "../slide/Drawing/ThemeLoader.js",
                 "../common/Charts/DrawingObjects.js",
                 "../common/SerializeCommonWordExcel.js",
@@ -70,7 +64,6 @@
                 "../slide/Drawing/Transitions.js",
                 "../slide/Drawing/DrawingDocument.js",
                 "../slide/Drawing/HtmlPage.js",
-                "../slide/apiDefines.js",
                 "../common/Drawings/Format/Constants.js",
                 "../common/Shapes/Serialize.js",
                 "../common/Shapes/SerializeWriter.js",
@@ -204,7 +197,6 @@
     },
     "tasks": {
         "build": [
-            "add_build_number",
             "compile_sdk"
         ]
     }

@@ -30,6 +30,10 @@
  * Time: 14:49
  */
 
+// Import
+var align_Right = AscCommon.align_Right;
+var align_Left = AscCommon.align_Left;
+
 var numbering_numfmt_None        = 0x0000;
 var numbering_numfmt_Bullet      = 0x1001;
 var numbering_numfmt_Decimal     = 0x2002;
@@ -211,15 +215,15 @@ CLvlText_Num.prototype =
 
 function CAbstractNum(Type)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if ( "undefined" == typeof(Type) )
         Type = numbering_numfmt_Bullet;
 
-    this.Lock = new CLock();
-    if ( false === g_oIdCounter.m_bLoad )
+    this.Lock = new AscCommon.CLock();
+    if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
-        this.Lock.Set_Type(locktype_Mine, false);
+        this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (typeof CollaborativeEditing !== "undefined")
             CollaborativeEditing.Add_Unlock2( this );
     }
@@ -271,14 +275,14 @@ function CAbstractNum(Type)
     }
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CAbstractNum.prototype =
 {
     Set_Id : function(newId)
     {
-        g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
     },
 

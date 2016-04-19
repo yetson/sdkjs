@@ -44,6 +44,19 @@
     
 // TODO: Поскольку, расстояния до/после параграфа для первого и последнего параграфов 
 //       в ячейке зависит от следующей и предыдущей ячеек, надо включать их в пересчет
+
+// Import
+var align_Left = AscCommon.align_Left;
+var CMouseMoveData = AscCommon.CMouseMoveData;
+var g_oTableId = AscCommon.g_oTableId;
+
+var linerule_AtLeast = Asc.linerule_AtLeast;
+var c_oAscError = Asc.c_oAscError;
+var c_oAscHAnchor = Asc.c_oAscHAnchor;
+var c_oAscXAlign = Asc.c_oAscXAlign;
+var c_oAscYAlign = Asc.c_oAscYAlign;
+var c_oAscVAnchor = Asc.c_oAscVAnchor;
+var c_oAscCellTextDirection = Asc.c_oAscCellTextDirection;
     
 
 var table_Selection_Cell = 0x00; // Селектим целыми ячейками
@@ -61,7 +74,7 @@ var type_Table = 0x0002;
 //----------------------------------------------------------------------------------------------------------------------
 function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, Rows, Cols, TableGrid, bPresentation)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Markup = new CTableMarkup(this);
 
@@ -71,11 +84,11 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.Index  = -1; // перед тем как пользоваться этим параметром нужно у родительского класса вызывать this.Parent.Update_ContentIndexing();
     this.Inline = Inline;
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
-        this.Lock.Set_Type(locktype_Mine, false);
+        this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (CollaborativeEditing)
             CollaborativeEditing.Add_Unlock2(this);
     }
@@ -226,7 +239,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
                              // True, если ячейка попадает в выделение по ячейкам.
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );
 }
@@ -701,9 +714,9 @@ CTable.prototype =
 
         if ( true === this.Is_Inline() )
         {
-            Pr.TableAlignment     = ( align_Left === TablePr.Jc ? 0 : ( align_Center === TablePr.Jc ? 1 : 2 ) );
+            Pr.TableAlignment     = ( align_Left === TablePr.Jc ? 0 : ( AscCommon.align_Center === TablePr.Jc ? 1 : 2 ) );
             Pr.TableIndent        = TablePr.TableInd;
-            Pr.TableWrappingStyle = c_oAscWrapStyle.Inline;
+            Pr.TableWrappingStyle = AscCommon.c_oAscWrapStyle.Inline;
 
             Pr.Position =
             {
@@ -725,7 +738,7 @@ CTable.prototype =
             
             Pr.TableAlignment     = 0; // align_Left
             Pr.TableIndent        = this.X_origin - LD_PageFields.X;
-            Pr.TableWrappingStyle = c_oAscWrapStyle.Flow;
+            Pr.TableWrappingStyle = AscCommon.c_oAscWrapStyle.Flow;
 
             Pr.PositionH = {};
             Pr.PositionH.RelativeFrom = this.PositionH.RelativeFrom;
@@ -1143,10 +1156,13 @@ CTable.prototype =
         // TableWidth (ширина таблицы)
         if (undefined !== Props.TableWidth)
         {
-            if (null === Props.TableWidth && tblwidth_Auto != TablePr.TableW.Type)
+            if (null === Props.TableWidth)
             {
+                if (tblwidth_Auto != TablePr.TableW.Type)
+                {
                 this.Set_TableW(tblwidth_Auto, 0);
                 bRecalc_All = true;
+            }
             }
             else if (Props.TableWidth > -0.001)
             {
@@ -1197,7 +1213,7 @@ CTable.prototype =
         // TableAlignment (прилегание таблицы)
         if ( "undefined" != typeof(Props.TableAlignment) && true === this.Is_Inline() )
         {
-            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? align_Center : align_Right ) );
+            var NewJc = ( 0 === Props.TableAlignment ? align_Left : ( 1 === Props.TableAlignment ? AscCommon.align_Center : AscCommon.align_Right ) );
             if ( TablePr.Jc != NewJc )
             {
                 _Jc = NewJc;
@@ -1799,7 +1815,7 @@ CTable.prototype =
                     for ( var  CurCell = 0; CurCell < Row.Get_CellsCount(); CurCell++ )
                     {
                         var Cell = Row.Get_Cell( CurCell );
-                        Cell.Set_Shd( { Value : shd_Nil, Color : { r : 0, g : 0, b : 0 } } );
+                        Cell.Set_Shd( { Value : Asc.c_oAscShdNil, Color : { r : 0, g : 0, b : 0 } } );
                     }
                 }
             }
@@ -2004,7 +2020,7 @@ CTable.prototype =
         // Сначала проверим заливку данной таблицы, если ее нет, тогда спрашиваем у родительского класса
         var Shd = this.Get_Shd();
 
-        if ( shd_Nil !== Shd.Value )
+        if ( Asc.c_oAscShdNil !== Shd.Value )
             return Shd.Get_Color2(this.Get_Theme(), this.Get_ColorMap());
 
         return this.Parent.Get_TextBackGroundColor();
@@ -2560,7 +2576,7 @@ CTable.prototype =
 
         if ( true != this.Is_Inline() )
         {
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
             {
                 oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveInlineTable);
 
@@ -2665,7 +2681,7 @@ CTable.prototype =
         else
         {
             // Проверяем, можно ли двигать данную таблицу
-            if ( false === oLogicDocument.Document_Is_SelectionLocked(changestype_Table_Properties, { Type : changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
+            if ( false === oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties, { Type : AscCommon.changestype_2_InlineObjectMove, PageNum : PageNum, X : X, Y : Y }) )
             {
                 oLogicDocument.Create_NewHistoryPoint(historydescription_Document_MoveFlowTable);
 
@@ -2829,10 +2845,10 @@ CTable.prototype =
                 }
 
                 var RowH = Row.Get_Height();
-                if (heightrule_Exact === RowH.HRule || (heightrule_AtLeast === RowH.HRule && MinContent[CurRow] < RowH.Value))
+                if (Asc.linerule_Exact === RowH.HRule || (linerule_AtLeast === RowH.HRule && MinContent[CurRow] < RowH.Value))
                     MinContent[CurRow] = RowH.Value;
 
-                if (heightrule_Exact === RowH.HRule || (heightrule_AtLeast === RowH.HRule && MaxContent[CurRow] < RowH.Value))
+                if (Asc.linerule_Exact === RowH.HRule || (linerule_AtLeast === RowH.HRule && MaxContent[CurRow] < RowH.Value))
                     MaxContent[CurRow] = RowH.Value;
             }
 
@@ -3209,7 +3225,7 @@ CTable.prototype =
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR(_X, _Y, this.Get_AbsolutePage(CurPage));
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y - 5;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData.UserId           = this.Lock.Get_UserId();
             MMData.HaveChanges      = this.Lock.Have_Changes();
             MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
@@ -5128,7 +5144,7 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check(contentchanges_Add, Reader.GetLong());
+                    var Pos     = this.m_oContentChanges.Check(AscCommon.contentchanges_Add, Reader.GetLong());
                     var Element = g_oTableId.Get_ById(Reader.GetString2());
 
                     if (null != Element)
@@ -5153,7 +5169,7 @@ CTable.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                    var Pos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
                     if (false === Pos)
@@ -6056,10 +6072,10 @@ CTable.prototype =
                 }
 
                 var LogicDocument = (editor && true !== editor.isViewMode ? editor.WordControl.m_oLogicDocument : null);
-                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, {
-                        Type      : changestype_2_Element_and_Type,
+                if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {
+                        Type      : AscCommon.changestype_2_Element_and_Type,
                         Element   : this,
-                        CheckType : changestype_Table_Properties
+                        CheckType : AscCommon.changestype_Table_Properties
                     }))
                 {
                     History.Create_NewPoint(historydescription_Document_MoveTableBorder);
@@ -6406,7 +6422,7 @@ CTable.prototype =
                                 this.Internal_UpdateFlowPosition(Page.X, Page.Y);
 
                                 //var NewH = this.Markup.Rows[0].H + Dy;
-                                //this.Content[0].Set_Height( NewH, heightrule_AtLeast );
+                                //this.Content[0].Set_Height( NewH, Asc.linerule_AtLeast );
                             }
                         }
                         else
@@ -6420,7 +6436,7 @@ CTable.prototype =
                                 var _Y_old = this.Markup.Rows[this.Selection.Data2.Index - 1].Y + this.Markup.Rows[this.Selection.Data2.Index - 1].H;
                                 var Dy     = _Y - _Y_old;
                                 var NewH   = this.Markup.Rows[this.Selection.Data2.Index - 1].H + Dy;
-                                this.Content[RowIndex - 1].Set_Height(NewH, heightrule_AtLeast);
+                                this.Content[RowIndex - 1].Set_Height(NewH, linerule_AtLeast);
                             }
                         }
                     }
@@ -7839,7 +7855,7 @@ CTable.prototype =
                     CurCell = TempCell;
                 else
                 {
-                    if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Table_Properties }) )
+                    if ( false == editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : AscCommon.changestype_2_Element_and_Type, Element : this, CheckType : AscCommon.changestype_Table_Properties }) )
                     {
                         History.Create_NewPoint(historydescription_Document_TableAddNewRowByTab);
                         this.Row_Add(false);
@@ -8954,7 +8970,7 @@ CTable.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true === g_oIdCounter.m_bLoad && true === g_oIdCounter.m_bRead)
+            if (true === AscCommon.g_oIdCounter.m_bLoad && true === AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = {
                     TextPr          : g_oDocumentDefaultTextPr,
@@ -9770,18 +9786,21 @@ CTable.prototype =
         return { Grid_start : Grid_start, Grid_end : Grid_end, RowsInfo : RowsInfo, bCanMerge : bCanMerge };
     },
 
-    // Объединяем заселекченные ячейки
-    Cell_Merge : function()
+    /**
+     * Объединяем выделенные ячейки таблицы.
+     * @param isClearMerge - используем или нет рассчетные данные (true - не используем, false - default value)
+     */
+    Cell_Merge : function(isClearMerge)
     {
         var bApplyToInnerTable = false;
         if ( false === this.Selection.Use || ( true === this.Selection.Use && table_Selection_Text === this.Selection.Type ) )
             bApplyToInnerTable = this.CurCell.Content.Table_MergeCells();
 
         if ( true === bApplyToInnerTable )
-            return;
+            return false;
 
         if ( true != this.Selection.Use || table_Selection_Cell != this.Selection.Type || this.Selection.Data.length <= 1 )
-            return;
+            return false;
 
         // В массиве this.Selection.Data идет список ячеек по строкам (без разрывов)
         // Перед объединением мы должны проверить совпадают ли начальная и конечная колонки
@@ -9793,7 +9812,7 @@ CTable.prototype =
         var RowsInfo   = Temp.RowsInfo;
 
         if ( false === bCanMerge )
-            return;
+            return false;
 
         // Объединяем содержимое всех ячеек в левую верхнюю ячейку. (Все выделенные
         // ячейки идут у нас последовательно, начиная с левой верхней), и объединяем
@@ -9816,13 +9835,16 @@ CTable.prototype =
             }
         }
 
-        // Выставим ширину результируещей ячейки
-        var SumW = 0;
-        for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+        if (true !== isClearMerge)
         {
-            SumW += this.TableGridCalc[CurGridCol];
+            // Выставим ширину результируещей ячейки
+            var SumW = 0;
+            for (var CurGridCol = Grid_start; CurGridCol <= Grid_end; CurGridCol++)
+            {
+                SumW += this.TableGridCalc[CurGridCol];
+            }
+            Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
         }
-        Cell_tl.Set_W(new CTableMeasurement(tblwidth_Mm, SumW));
 
         // Теперь нам надо удалить лишние ячейки и добавить ячейки с
         // вертикальным объединением.
@@ -9856,16 +9878,9 @@ CTable.prototype =
             }
         }
 
-        // У ряда, который содержит полученную ячейку мы выставляем минимальную высоту
-        // сумму высот объединенных строк.
-        //var Summary_VMerge = this.Internal_GetVertMergeCount( Pos_tl.Row, Grid_start, Grid_end - Grid_start + 1 );
-        //var Summary_Height = this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].H + this.RowsInfo[Pos_tl.Row + Summary_VMerge - 1].Y - this.RowsInfo[Pos_tl.Row].Y;
-
         // Удаляем лишние строки
-        this.Internal_Check_TableRows(true);
-
-        var PageNum = 0;
-        for ( PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
+        this.Internal_Check_TableRows(true !== isClearMerge ? true : false);
+        for (var PageNum = 0; PageNum < this.Pages.length - 1; PageNum++ )
         {
             if ( Pos_tl.Row <= this.Pages[PageNum + 1].FirstRow )
                 break;
@@ -9879,9 +9894,14 @@ CTable.prototype =
         this.Selection.Data = [ Pos_tl ];
 
         this.CurCell = Cell_tl;
-        
-        // Запускаем пересчет
-        this.Internal_Recalculate_1();
+
+        if (true !== isClearMerge)
+        {
+            // Запускаем пересчет
+            this.Internal_Recalculate_1();
+        }
+
+        return true;
     },
 
     // Разделяем текущую ячейку
@@ -9934,7 +9954,7 @@ CTable.prototype =
             if ( Rows > VMerge_count )
             {
                 // Сообщение об ошибке : "Value Rows must be between 1 and " + VMerge_count
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxRows,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -9942,7 +9962,7 @@ CTable.prototype =
             else if ( 0 != VMerge_count % Rows )
             {
                 // Сообщение об ошибке : "Value must be a divisor of the number " + VMerge_count
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( VMerge_count );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellRowsDivider,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -9968,7 +9988,7 @@ CTable.prototype =
                 var MaxCols = Math.floor( Span_width / MinW );
 
                 // Сообщение об ошибке : "Value Cols must be a between 1 and " + MaxCols
-                var ErrData = new CErrorData();
+                var ErrData = new AscCommon.CErrorData();
                 ErrData.put_Value( MaxCols );
                 editor.asc_fireCallback("asc_onError",c_oAscError.ID.SplitCellMaxCols,c_oAscError.Level.NoCritical, ErrData );
                 return false;
@@ -11190,7 +11210,7 @@ CTable.prototype =
                     Page.Y -= Dy;
                     this.Internal_UpdateFlowPosition(Page.X, Page.Y);
                     var NewH = NewMarkup.Rows[0].H;
-                    this.Content[0].Set_Height( NewH, heightrule_AtLeast );
+                    this.Content[0].Set_Height( NewH, linerule_AtLeast );
                 }
             }
             else
@@ -11202,7 +11222,7 @@ CTable.prototype =
                 else
                 {
                     var NewH = NewMarkup.Rows[Index - 1].H;
-                    this.Content[RowIndex - 1].Set_Height( NewH, heightrule_AtLeast );
+                    this.Content[RowIndex - 1].Set_Height( NewH, linerule_AtLeast );
                 }
             }
         }
@@ -11522,8 +11542,8 @@ CTable.prototype =
 
             var OldHeight = this.Content[RowIndex].Get_Height();
 
-            if ( undefined === OldHeight || heightrule_Auto == OldHeight.HRule || ( MinHeight > OldHeight.Value ) )
-                this.Content[RowIndex].Set_Height( MinHeight, heightrule_AtLeast );
+            if ( undefined === OldHeight || Asc.linerule_Auto == OldHeight.HRule || ( MinHeight > OldHeight.Value ) )
+                this.Content[RowIndex].Set_Height( MinHeight, linerule_AtLeast );
         }
 
         if ( Rows_to_Delete.length <= 0 )
@@ -11535,7 +11555,7 @@ CTable.prototype =
             for ( var Index = 0; Index < Rows_to_CalcH.length; Index++ )
             {
                 var RowIndex = Rows_to_CalcH[Index];
-                this.Content[RowIndex].Set_Height( this.RowsInfo[RowIndex].H, heightrule_AtLeast );
+                this.Content[RowIndex].Set_Height( this.RowsInfo[RowIndex].H, linerule_AtLeast );
             }
 
             // Рассчитаем высоты строк, так чтобы после удаления, общий вид таблицы не менялся
@@ -11551,7 +11571,7 @@ CTable.prototype =
                 {
                     var StartPage = this.RowsInfo[StartRow - 1 + CurRowSpan].StartPage;
                     var Summary_Height = this.RowsInfo[StartRow - 1 + CurRowSpan].H[StartPage] + this.RowsInfo[StartRow - 1 + CurRowSpan].Y[StartPage] - this.RowsInfo[StartRow - 1].Y[StartPage];
-                    this.Content[StartRow - 1].Set_Height( Summary_Height, heightrule_AtLeast );
+                    this.Content[StartRow - 1].Set_Height( Summary_Height, linerule_AtLeast );
                 }
 
                 Counter += CurRowSpan;
@@ -13315,6 +13335,24 @@ CTable.prototype.Is_TableFirstRowOnNewPage = function(CurRow)
     }
 
     return false;
+};
+CTable.prototype.private_UpdateCellsGrid = function()
+{
+    for (var nCurRow = 0, nRowsCount = this.Content.length; nCurRow < nRowsCount; ++nCurRow)
+    {
+        var Row        = this.Content[nCurRow];
+        var BeforeInfo = Row.Get_Before();
+        var CurGridCol = BeforeInfo.GridBefore;
+
+        for (var nCurCell = 0, nCellsCount = Row.Get_CellsCount(); nCurCell < nCellsCount; ++nCurCell)
+        {
+            var Cell = Row.Get_Cell(nCurCell);
+            var GridSpan = Cell.Get_GridSpan();
+            Cell.Set_Metrics(CurGridCol, 0, 0, 0, 0, 0, 0);
+            Row.Update_CellInfo(nCurCell);
+            CurGridCol += GridSpan;
+        }
+    }
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Класс  CTableLook

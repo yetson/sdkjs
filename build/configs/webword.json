@@ -1,27 +1,21 @@
 {
-    "info": {
-        "version": "3.8.0",
-        "build": 167
-    },
-    "update_src": {
-        "revision": "HEAD",
-        "src": "../common ../word"
-    },
     "compile": {
         "sdk": {
             "common": [
                 "../common/Build/License.js",
                 "../common/browser.js",
+				"../common/commonDefines.js",
+				"../common/downloaderfiles.js",
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
                 "../common/apiCommon.js",
+				"../common/editorscommon.js",
+				
+				"../word/apiDefines.js",
                 "../common/spellcheckapi.js",
                 "../common/wordcopypaste.js",
                 "../common/spellCheckLanguage.js",
                 "../common/spellCheckLanguagesAll.js",
-                "../common/downloaderfiles.js",
-                "../common/commonDefines.js",
-                "../common/editorscommon.js",
                 "../common/Shapes/Serialize.js",
                 "../common/Shapes/SerializeWriter.js",
                 "../common/SerializeCommonWordExcel.js",
@@ -118,7 +112,6 @@
                 "../word/Drawing/documentrenderer.js",
                 "../common/scroll.js",
                 "../word/Editor/SerializeCommon.js",
-                "../word/apiDefines.js",
                 "../common/apiBase.js",
                 "../word/api.js",
                 "../word/apiCommon.js",
@@ -187,7 +180,6 @@
     },
     "tasks": {
         "build": [
-            "add_build_number",
             "compile_sdk"
         ]
     }

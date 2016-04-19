@@ -51,54 +51,6 @@ var c_oAscWrapStyle2 = {
   InFront: 6
 };
 
-/*Error level & ID*/
-var c_oAscError = {
-  Level: {
-    Critical: -1,
-    NoCritical: 0
-  },
-  ID: {
-    ServerSaveComplete: 3,
-    ConvertationProgress: 2,
-    DownloadProgress: 1,
-    No: 0,
-    Unknown: -1,
-    ConvertationTimeout: -2,
-    ConvertationError: -3,
-    DownloadError: -4,
-    UnexpectedGuid: -5,
-    Database: -6,
-    FileRequest: -7,
-    FileVKey: -8,
-    UplImageSize: -9,
-    UplImageExt: -10,
-    UplImageFileCount: -11,
-    NoSupportClipdoard: -12,
-    SplitCellMaxRows: -13,
-    SplitCellMaxCols: -14,
-    SplitCellRowsDivider: -15,
-    StockChartError: -16,
-
-    CoAuthoringDisconnect: -18,
-    ConvertationPassword: -19,
-
-    VKeyEncrypt: -20,
-    KeyExpire: -21,
-    UserCountExceed: -22,
-    MobileUnexpectedCharCount: -23,
-
-    MailMergeLoadFile: -24,
-    MailMergeSaveFile: -25,
-
-    UserDrop: -100,
-    Warning: -101
-  }
-};
-
-
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
-
 var c_oAscTableSelectionType = {
   Cell: 0,
   Row: 1,
@@ -110,12 +62,6 @@ var c_oAscTableSelectionType = {
 var c_oAscContextMenuTypes = {
   Common: 0, // Обычное контекстное меню
   ChangeHdrFtr: 1  // Специальное контестное меню для попадания в колонтитул
-};
-
-var c_oAscMouseMoveDataTypes = {
-  Common: 0,
-  Hyperlink: 1,
-  LockedObject: 2
 };
 
 var c_oAscMouseMoveLockedObjectType = {
@@ -175,12 +121,6 @@ var c_oAscAlignShapeType = {
 
 var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
-
-var c_oAscDropCap = {
-  None: 0,
-  Drop: 1,
-  Margin: 2
-};
 
 var c_oAscSectionBreakType = {
   NextPage: 0x00,
@@ -709,18 +649,11 @@ var c_oAscRevisionsObjectType =
   MathEquation : 3
 };
 
-var c_oAscPageOrientation = {
-  Portrait  : 0x00,
-  Landscape : 0x01
-};
 window["flat_desine"] = false;
 
 //------------------------------------------------------------export---------------------------------------------------
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
+window['Asc'] = window['Asc'] || {};
 window['Asc']['c_oAscWrapStyle2'] = c_oAscWrapStyle2;
-window['Asc']['c_oAscError'] = c_oAscError;
 window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
 window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
 window['Asc']['c_oAscAlignH'] = c_oAscAlignH;
@@ -729,7 +662,6 @@ window['Asc']['c_oAscChangeLevel'] = c_oAscChangeLevel;
 window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
 window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
 window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
-window['Asc']['c_oAscDropCap'] = c_oAscDropCap;
 window['Asc']['c_oAscSectionBreakType'] = c_oAscSectionBreakType;
 window['Asc']['c_oAscMathInterfaceType'] = c_oAscMathInterfaceType;
 window['Asc']['c_oAscMathInterfaceBarPos'] = c_oAscMathInterfaceBarPos;

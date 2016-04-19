@@ -23,6 +23,12 @@
  *
 */
 "use strict";
+(
+/**
+ * @param {Window} window
+ * @param {undefined} undefined
+ */
+function (window, undefined) {
 
 if(window.editor === "undefined" && window["Asc"]["editor"])
 {
@@ -31,7 +37,7 @@ if(window.editor === "undefined" && window["Asc"]["editor"])
 }
 
 // ToDo убрать это отсюда!!!
-CContentChangesElement.prototype.Refresh_BinaryData = function()
+AscCommon.CContentChangesElement.prototype.Refresh_BinaryData = function()
 {
 	this.m_pData.Pos = this.m_aPositions[0];
 
@@ -307,8 +313,8 @@ DrawingObjectsController.prototype.addChartDrawingObject = function(options)
         }
         else
         {
-            w = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartWidth, 0, 3);
-            h = this.drawingObjects.convertMetric(c_oAscChartDefines.defaultChartHeight, 0, 3);
+            w = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartWidth, 0, 3);
+            h = this.drawingObjects.convertMetric(AscCommon.c_oAscChartDefines.defaultChartHeight, 0, 3);
         }
 
         var chartLeft, chartTop;
@@ -498,3 +504,7 @@ DrawingObjectsController.prototype.onKeyPress = function(e)
     //    this.updateSelectionState();
     return bRetValue;
 };
+//------------------------------------------------------------export---------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].CheckIdSatetShapeAdd = CheckIdSatetShapeAdd;
+})(window);

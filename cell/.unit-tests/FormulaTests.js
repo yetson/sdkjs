@@ -25,7 +25,7 @@
 $( function () {
 
     function toFixed( n ) {
-        return n//.toFixed( cExcelSignificantDigits ) - 0;
+        return n//.toFixed( AscCommonExcel.cExcelSignificantDigits ) - 0;
     }
 
     function difBetween( a, b ) {
@@ -265,9 +265,9 @@ $( function () {
 
     function _getprice( nSettle, nMat, fRate, fYield, fRedemp, nFreq, nBase ){
 
-        var fdays = getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fdaybs = getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
-            fnum = getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
+        var fdays = AscCommonExcel.getcoupdays( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fdaybs = AscCommonExcel.getcoupdaybs( new Date(nSettle), new Date(nMat), nFreq, nBase ),
+            fnum = AscCommonExcel.getcoupnum( new Date(nSettle), (nMat), nFreq, nBase ),
             fdaysnc = ( fdays - fdaybs ) / fdays,
             fT1 = 100 * fRate / nFreq,
             fT2 = 1 + fYield / nFreq,
@@ -371,9 +371,9 @@ $( function () {
     }
 
     function _duration( settlement, maturity, coupon, yld, frequency, basis ){
-        var dbc = getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
-            coupD = getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
-            numCoup = getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
+        var dbc = AscCommonExcel.getcoupdaybs(new Date( settlement ),new Date( maturity ),frequency,basis),
+            coupD = AscCommonExcel.getcoupdays(new Date( settlement ),new Date( maturity ),frequency,basis),
+            numCoup = AscCommonExcel.getcoupnum(new Date( settlement ),new Date( maturity ),frequency);
 
         if ( settlement >= maturity || basis < 0 || basis > 4 || ( frequency != 1 && frequency != 2 && frequency != 4 ) || yld < 0 || coupon < 0 ){
             return "#NUM!";
@@ -404,6 +404,13 @@ $( function () {
         return duration / p / frequency ;
     }
 
+    var c_msPerDay = AscCommonExcel.c_msPerDay;
+    var parserFormula = AscCommonExcel.parserFormula;
+    var GetDiffDate360 = AscCommonExcel.GetDiffDate360;
+    var bDate1904 = AscCommon.bDate1904;
+    var fSortAscending = AscCommon.fSortAscending;
+    var g_oIdCounter = AscCommon.g_oIdCounter;
+
     var oParser, wb, ws, dif = 1e-9,
         data = getTestWorkbook(),
         sData = data + "";
@@ -413,24 +420,24 @@ $( function () {
 
         History = new CHistory(wb);
 
-        g_oTableId = new CTableId();
+        AscCommon.g_oTableId.init();
         if ( this.User )
             g_oIdCounter.Set_UserId(this.User.asc_getId());
 
-        g_oUndoRedoCell = new UndoRedoCell(wb);
-        g_oUndoRedoWorksheet = new UndoRedoWoorksheet(wb);
-        g_oUndoRedoWorkbook = new UndoRedoWorkbook(wb);
-        g_oUndoRedoCol = new UndoRedoRowCol(wb, false);
-        g_oUndoRedoRow = new UndoRedoRowCol(wb, true);
-        g_oUndoRedoComment = new UndoRedoComment(wb);
-        g_oUndoRedoAutoFilters = new UndoRedoAutoFilters(wb);
+        AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wb);
+        AscCommonExcel.g_oUndoRedoWorksheet = new AscCommonExcel.UndoRedoWoorksheet(wb);
+        AscCommonExcel.g_oUndoRedoWorkbook = new AscCommonExcel.UndoRedoWorkbook(wb);
+        AscCommonExcel.g_oUndoRedoCol = new AscCommonExcel.UndoRedoRowCol(wb, false);
+        AscCommonExcel.g_oUndoRedoRow = new AscCommonExcel.UndoRedoRowCol(wb, true);
+        AscCommonExcel.g_oUndoRedoComment = new AscCommonExcel.UndoRedoComment(wb);
+        AscCommonExcel.g_oUndoRedoAutoFilters = new AscCommonExcel.UndoRedoAutoFilters(wb);
 //        g_oUndoRedoGraphicObjects = new UndoRedoGraphicObjects(wb);
         g_oIdCounter.Set_Load(false);
 
         var oBinaryFileReader = new Asc.BinaryFileReader();
         oBinaryFileReader.Read( sData, wb );
         ws = wb.getWorksheet( wb.getActive() );
-        getFormulasInfo();
+        AscCommonExcel.getFormulasInfo();
     }
 
     /*QUnit.log( function ( details ) {
@@ -674,14 +681,14 @@ $( function () {
     test( "Test: \"MROUND\"", function () {
         var multiple;//должен равняться значению второго аргумента
         function mroundHelper( num ) {
-            var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - cExcelSignificantDigits + 1 );
+            var multiplier = Math.pow( 10, Math.floor( Math.log( Math.abs( num ) ) / Math.log( 10 ) ) - AscCommonExcel.cExcelSignificantDigits + 1 );
             var nolpiat = 0.5 * (num > 0 ? 1 : num < 0 ? -1 : 0) * multiplier;
             var y = (num + nolpiat) / multiplier;
             y = y / Math.abs( y ) * Math.floor( Math.abs( y ) )
             var x = y * multiplier / multiple
 
             // var x = number / multiple;
-            var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - cExcelSignificantDigits );
+            var nolpiat = 5 * (x / Math.abs( x )) * Math.pow( 10, Math.floor( Math.log( Math.abs( x ) ) / Math.log( 10 ) ) - AscCommonExcel.cExcelSignificantDigits );
             x = x + nolpiat;
             x = x | x;
 
@@ -720,7 +727,7 @@ $( function () {
     test( "Test: YEAR", function () {
         oParser = new parserFormula( "YEAR(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 1909 );
         else
             strictEqual( oParser.calculate().getValue(), 1905 );
@@ -729,7 +736,7 @@ $( function () {
     test( "Test: DAY", function () {
         oParser = new parserFormula( "DAY(2013)", "A1", ws );
         ok( oParser.parse() );
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 6 );
         else
             strictEqual( oParser.calculate().getValue(), 5 );
@@ -1040,7 +1047,7 @@ $( function () {
         oParser = new parserFormula( "VALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1080,7 +1087,7 @@ $( function () {
         oParser = new parserFormula( "DATEVALUE(\"03-26-2006\")", "A2", ws );
         ok( oParser.parse() );
 
-        if ( g_bDate1904 )
+        if ( bDate1904 )
             strictEqual( oParser.calculate().getValue(), 37340 );
         else
             strictEqual( oParser.calculate().getValue(), 38802 );
@@ -1088,7 +1095,7 @@ $( function () {
 
     test( "Test: \"EDATE\"", function () {
 
-        if ( !g_bDate1904 ) {
+        if ( !bDate1904 ) {
             oParser = new parserFormula( "EDATE(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );
@@ -1128,7 +1135,7 @@ $( function () {
 
     test( "Test: \"EOMONTH\"", function () {
 
-        if ( !g_bDate1904 ) {
+        if ( !bDate1904 ) {
             oParser = new parserFormula( "EOMONTH(DATE(2006,1,31),5)", "A2", ws );
             ok( oParser.parse() );
             strictEqual( oParser.calculate().getValue(), 38898 );
@@ -2461,7 +2468,7 @@ $( function () {
 
         function mode( x ) {
 
-            x.sort(fSortDescending);
+            x.sort(AscCommon.fSortDescending);
 
             if ( x.length < 1 )
                 return "#VALUE!";
@@ -2513,9 +2520,9 @@ $( function () {
             if ( sigma <= 0 )
                 return "#NUM!";
             else if ( kum == false )
-                return toFixed( phi( (x - mue) / sigma ) / sigma );
+                return toFixed( AscCommonExcel.phi( (x - mue) / sigma ) / sigma );
             else
-                return toFixed( 0.5 + gauss( (x - mue) / sigma ) );
+                return toFixed( 0.5 + AscCommonExcel.gauss( (x - mue) / sigma ) );
 
         }
 
@@ -2540,7 +2547,7 @@ $( function () {
     test( "Test: \"NORMSDIST\"", function () {
 
         function normsdist( x ) {
-            return toFixed( 0.5 + gauss( x ) );
+            return toFixed( 0.5 + AscCommonExcel.gauss( x ) );
         }
 
         oParser = new parserFormula( "NORMSDIST(1.333333)", "A1", ws );
@@ -2584,7 +2591,7 @@ $( function () {
             if ( x <= 0.0 || x >= 1.0 )
                 return "#N/A";
             else
-                return toFixed( gaussinv( x ) );
+                return toFixed( AscCommonExcel.gaussinv( x ) );
         }
 
         oParser = new parserFormula( "NORMSINV(0.954)", "A1", ws );
@@ -2615,7 +2622,7 @@ $( function () {
             if ( sigma <= 0 || x <= 0 || x >= 1 )
                 return "#NUM!";
             else
-                return toFixed( Math.exp( mue + sigma * ( gaussinv( x ) ) ) );
+                return toFixed( Math.exp( mue + sigma * ( AscCommonExcel.gaussinv( x ) ) ) );
         }
 
         oParser = new parserFormula( "LOGINV(0.039084,3.5,1.2)", "A1", ws );
@@ -2641,7 +2648,7 @@ $( function () {
             if ( sigma <= 0.0 || x <= 0.0 || x >= 1.0 )
                 return "#NUM!";
             else
-                return toFixed( gaussinv( x ) * sigma + mue );
+                return toFixed( AscCommonExcel.gaussinv( x ) * sigma + mue );
         }
 
         oParser = new parserFormula( "NORMINV(0.954,40,1.5)", "A1", ws );
@@ -2708,7 +2715,7 @@ $( function () {
 
             var nSize = A.length;
             if ( A.length < 1 || nSize == 0 )
-                return new cError( cErrorType.not_available ).toString();
+                return new AscCommonExcel.cError( AscCommonExcel.cErrorType.not_available ).toString();
             else {
                 if ( nSize == 1 )
                     return toFixed( A[0] );
@@ -3888,7 +3895,7 @@ $( function () {
             if( settlement >= maturity || pr <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return ( 1.0 - pr / redemption ) / yearFrac( settlement, maturity, basis );
+            return ( 1.0 - pr / redemption ) / AscCommonExcel.yearFrac( settlement, maturity, basis );
 
         }
 
@@ -3967,7 +3974,7 @@ $( function () {
             if( settlement >= maturity || investment <= 0 || discount <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return investment / ( 1 - ( discount * yearFrac( settlement, maturity, basis) ) )
+            return investment / ( 1 - ( discount * AscCommonExcel.yearFrac( settlement, maturity, basis) ) )
 
         }
 
@@ -4084,7 +4091,7 @@ $( function () {
             if( settlement >= maturity || investment <= 0 || redemption <= 0 || basis < 0 || basis > 4 )
                 return "#NUM!"
 
-            return ( ( redemption / investment ) - 1 ) / yearFrac( settlement, maturity, basis )
+            return ( ( redemption / investment ) - 1 ) / AscCommonExcel.yearFrac( settlement, maturity, basis )
 
         }
 
@@ -4128,7 +4135,7 @@ $( function () {
             var d1 = settlement
             var d2 = maturity
 
-            var fFraction = yearFrac(d1, d2, 0);
+            var fFraction = AscCommonExcel.yearFrac(d1, d2, 0);
 
             if( fFraction - Math.floor( fFraction ) == 0 )
                 return "#NUM!"
@@ -4533,8 +4540,8 @@ $( function () {
             if( fv == undefined ) fv = 0;
             if( type == undefined ) type = 0;
 
-            var res = getPMT(rate, nper, pv, fv, type);
-            res = getIPMT(rate, per, pv, type, res);
+            var res = AscCommonExcel.getPMT(rate, nper, pv, fv, type);
+            res = AscCommonExcel.getIPMT(rate, per, pv, type, res);
 
             return res;
 
@@ -4556,7 +4563,7 @@ $( function () {
         function db( cost, salvage, life, period, month ){
 
             if ( salvage >= cost ) {
-                return this.value = new cNumber( 0 );
+                return this.value = new AscCommonExcel.cNumber( 0 );
             }
 
             if ( month < 1 || month > 12 || salvage < 0 || life <= 0 || period < 0 || life + 1 < period || cost < 0 ) {

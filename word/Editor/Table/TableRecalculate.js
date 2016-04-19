@@ -710,7 +710,15 @@ CTable.prototype.private_RecalculateGrid = function()
             // максимальным значениям.
             if (tblwidth_Mm === TablePr.TableW.Type || tblwidth_Pct === TablePr.TableW.Type)
             {
-                if (SumMin >= TableW)
+                if (SumMin < 0.001 && SumMax < 0.001)
+                {
+                    // Распределяем ширину по количеству колонок
+                    for (var CurCol = 0; CurCol < GridCount; ++CurCol)
+                    {
+                        this.TableGridCalc[CurCol] = TableW / GridCount;
+                    }
+                }
+                else if (SumMin >= TableW)
                 {
                     // Выставляем минимальные значения
                     for (var CurCol = 0; CurCol < GridCount; ++CurCol)
@@ -1597,12 +1605,12 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
 
         switch (TablePr.Jc)
         {
-            case align_Left :
+            case AscCommon.align_Left :
             {
                 Page.X = Page.X_origin + this.Get_TableOffsetCorrection() + TablePr.TableInd;
                 break;
             }
-            case align_Right :
+            case AscCommon.align_Right :
             {
                 var TableWidth = this.TableSumGrid[this.TableSumGrid.length - 1];
 
@@ -1612,7 +1620,7 @@ CTable.prototype.private_RecalculatePositionX = function(CurPage)
                     Page.X = Page.XLimit - TableWidth;
                 break;
             }
-            case align_Center :
+            case AscCommon.align_Center :
             {
                 var TableWidth = this.TableSumGrid[this.TableSumGrid.length - 1];
                 var RangeWidth = Page.XLimit - Page.X_origin;
@@ -1740,7 +1748,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         HeaderPage.Rows = [];
 
         // Временно отключаем регистрацию новых классов
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         History.TurnOff();
 
         var aContentDrawings = [];
@@ -1765,7 +1773,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             }
         }
 
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         var bHeaderNextPage = false;
@@ -1976,7 +1984,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             var CellHeight = HeaderPage.RowsInfo[CurRow].TableRowsBottom - Y;
 
             // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-            if (false === bHeaderNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow])
+            if (false === bHeaderNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowH.Value - MaxTopBorder[CurRow])
             {
                 CellHeight = RowH.Value - MaxTopBorder[CurRow];
                 HeaderPage.RowsInfo[CurRow].TableRowsBottom = Y + CellHeight;
@@ -2382,7 +2390,10 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         // В данном значении не учитываются маргины
         RowHValue = RowH.Value + this.MaxBotMargin[CurRow] + MaxTopMargin;
 
-        if ((heightrule_AtLeast === RowH.HRule || heightrule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
+        if (null === CellSpacing)
+            RowHValue -= this.MaxTopBorder[CurRow];
+
+        if ((Asc.linerule_AtLeast === RowH.HRule || Asc.linerule_Exact == RowH.HRule) && Y + RowHValue > Y_content_end && ((0 === CurRow && 0 === CurPage && (null !== this.Get_DocumentPrev() || true === this.Parent.Is_TableCellContent())) || CurRow != FirstRow))
         {
             bNextPage = true;
 
@@ -2612,7 +2623,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         var CellHeight = this.TableRowsBottom[CurRow][CurPage] - Y;
 
         // TODO: улучшить проверку на высоту строки (для строк разбитых на страницы)
-        if ( false === bNextPage && heightrule_AtLeast === RowH.HRule && CellHeight < RowHValue )
+        if ( false === bNextPage && Asc.linerule_AtLeast === RowH.HRule && CellHeight < RowHValue )
         {
             CellHeight = RowHValue;
             this.TableRowsBottom[CurRow][CurPage] = Y + CellHeight;
@@ -2631,7 +2642,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             Cell = this.Internal_Get_StartMergedCell(CurRow, CurGridCol, GridSpan);
 
             var CellMar     = Cell.Get_Margins();
-            var CellMetrics = Row.Get_CellInfo(CurCell);
+            var CellMetrics = Cell.Row.Get_CellInfo(Cell.Index);
 
             var X_content_start = Page.X + CellMetrics.X_content_start;
             var X_content_end   = Page.X + CellMetrics.X_content_end;

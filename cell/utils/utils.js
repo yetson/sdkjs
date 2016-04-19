@@ -36,8 +36,13 @@
 	 */
 	function (window, undefined) {
 
+		// Import
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
+
+		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+
+		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
 
 		/** @const */
@@ -498,7 +503,7 @@
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		asc.extendClass(ActiveRange, Range);
+		AscCommon.extendClass(ActiveRange, Range);
 		
 		ActiveRange.prototype.assign = function () {
 			ActiveRange.superclass.assign.apply(this, arguments);
@@ -625,7 +630,7 @@
 			this.r2Abs = false;
 			this.c2Abs = false;
 		}
-		asc.extendClass(FormulaRange, Range);
+		AscCommon.extendClass(FormulaRange, Range);
 		FormulaRange.prototype.clone = function(){
 			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
 			oRes.r1Abs = this.r1Abs;
@@ -1028,16 +1033,16 @@
 			asc_setType: function (val) {
 				// В принципе эта функция избыточна
 				switch (val) {
-					case c_oAscHyperlinkType.WebLink:
+					case Asc.c_oAscHyperlinkType.WebLink:
 						this.hyperlinkModel.setLocation(null);
 						break;
-					case c_oAscHyperlinkType.RangeLink:
+					case Asc.c_oAscHyperlinkType.RangeLink:
 						this.hyperlinkModel.Hyperlink = null;
 						break;
 				}
 			},
 			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
-			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, c_oAscMaxTooltipLength) : val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, Asc.c_oAscMaxTooltipLength) : val; },
 			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
 			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
 			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
@@ -1046,10 +1051,6 @@
 
 		/** @constructor */
 		function asc_CPageMargins (obj) {
-			if ( !(this instanceof asc_CPageMargins) ) {
-				return new asc_CPageMargins(obj);
-			}
-
 			if (obj) {
 				this.left = obj.left;
 				this.right = obj.right;
@@ -1113,10 +1114,6 @@
 
 		/** @constructor */
 		function asc_CPageOptions (obj) {
-			if ( !(this instanceof asc_CPageOptions) ) {
-				return new asc_CPageOptions(obj);
-			}
-
 			if (obj) {
 				this.pageMargins = obj.pageMargins;
 				this.pageSetup = obj.pageSetup;
@@ -1149,10 +1146,6 @@
 		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
 
 		function CPagePrint () {
-			if ( !(this instanceof CPagePrint) ) {
-				return new CPagePrint();
-			}
-
 			this.pageWidth = 0;
 			this.pageHeight = 0;
 
@@ -1179,9 +1172,6 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			if ( !(this instanceof CPrintPagesData) ) {
-				return new CPrintPagesData();
-			}
 			this.arrPages = null;
 			this.currentIndex = 0;
 
@@ -1190,7 +1180,7 @@
 		/** @constructor */
 		function asc_CAdjustPrint () {
 			// Вид печати
-			this.printType = c_oAscPrintType.ActiveSheets;
+			this.printType = Asc.c_oAscPrintType.ActiveSheets;
 			// ToDo сюда же start и end page index
 
 			return this;
@@ -1221,10 +1211,6 @@
 			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			if (!(this instanceof asc_CSheetViewSettings)) {
-				return new asc_CSheetViewSettings();
-			}
-
 			this.Properties = g_oCSheetViewSettingsProperties;
 
 			// Показывать ли сетку
@@ -1283,10 +1269,6 @@
 
 		/** @constructor */
 		function asc_CPane () {
-			if (!(this instanceof asc_CPane)) {
-				return new asc_CPane();
-			}
-
 			this.state = null;
 			this.topLeftCell = null;
 			this.xSplit = 0;
@@ -1311,7 +1293,7 @@
 		};
 		asc_CPane.prototype.init = function() {
 			// ToDo Обрабатываем пока только frozen и frozenSplit
-			if ((c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) &&
+			if ((AscCommonExcel.c_oAscPaneState.Frozen === this.state || AscCommonExcel.c_oAscPaneState.FrozenSplit === this.state) &&
 				(0 < this.xSplit || 0 < this.ySplit)) {
 				this.topLeftFrozenCell = new CellAddress(this.ySplit, this.xSplit, 0);
 				if (!this.topLeftFrozenCell.isValid())
@@ -1320,10 +1302,6 @@
 		};
 
 		function RedoObjectParam () {
-			if (!(this instanceof RedoObjectParam)) {
-				return new RedoObjectParam();
-			}
-
 			this.bIsOn = false;
 			this.bIsReInit = false;
 			this.oChangeWorksheetUpdate = {};
@@ -1347,7 +1325,7 @@
 
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
-      if (AscBrowser.isRetina) {
+      if (AscCommon.AscBrowser.isRetina) {
         this.styleThumbnailWidthWithRetina <<= 1;
         this.styleThumbnailHeightWithRetina <<= 1;
       }
@@ -1390,7 +1368,7 @@
           oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
           this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
+          this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
         }
       },
       generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
@@ -1410,7 +1388,7 @@
           }
 
           this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
+          this.docStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
         }
       },
       drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
@@ -1423,7 +1401,7 @@
         }
 
         var drawBorder = function(b, x1, y1, x2, y2) {
-          if (null != b && c_oAscBorderStyles.None !== b.s) {
+          if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
             oGraphics.setStrokeStyle(b.c);
 
             // ToDo поправить
@@ -1440,7 +1418,7 @@
 
         // Draw text
         var fc = oStyle.getFontColor();
-        var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+        var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
         var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
@@ -1523,7 +1501,7 @@
 			this.isMatchCase = false;					// учитывать регистр
 			this.isWholeCell = false;					// ячейка целиком
 			this.scanOnOnlySheet = true;				// искать только на листе/в книге
-			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
+			this.lookIn = Asc.c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
 
 			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
 			this.isReplaceAll = false;					// заменить все (если у нас замена)

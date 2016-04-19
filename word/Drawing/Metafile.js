@@ -977,7 +977,7 @@ CMetafile.prototype =
 
         var _src = src;
 
-        var srcLocal = g_oDocumentUrls.getLocal(_src);
+        var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
 		if (srcLocal){
 			_src = srcLocal;
 		}
@@ -1203,7 +1203,7 @@ CMetafile.prototype =
             // excel
             this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
 
-			var imgLocal = g_oDocumentUrls.getLocal(img);
+			var imgLocal = AscCommon.g_oDocumentUrls.getLocal(img);
             if (imgLocal){
                 this.Memory.WriteString2(imgLocal);
             } else {
@@ -1231,16 +1231,10 @@ CMetafile.prototype =
             _src = img;
         }
 		
-		var srcLocal = g_oDocumentUrls.getLocal(_src);
+		var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
         if (srcLocal){
             _src = srcLocal;
-		} else {
-            if (window.editor.ThemeLoader !== undefined && window.editor.ThemeLoader != null)
-            {
-                if (0 == _src.indexOf(window.editor.ThemeLoader.ThemesUrl))
-                    _src = _src.substring(window.editor.ThemeLoader.ThemesUrl.length);
-            }
-        }
+		}
 
         this.Memory.WriteByte(CommandType.ctDrawImageFromFile);
         this.Memory.WriteString2(_src);

@@ -36,8 +36,11 @@
 	 */
 	function ($, window, undefined) {
 
+		var AscBrowser = AscCommon.AscBrowser;
+
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var asc_applyFunction = asc.applyFunction;
+		var c_oTargetType = AscCommonExcel.c_oTargetType;
 
 		/**
 		 * Desktop event controller for WorkbookView
@@ -928,7 +931,7 @@
 									{
 										if (0 === window.GlobalPasteFlagCounter)
 										{
-											SafariIntervalFocus2();
+											AscCommonExcel.SafariIntervalFocus2();
 											window.GlobalPasteFlag = true;
 											t.handlers.trigger("paste");
 										}
@@ -953,7 +956,7 @@
 					if (isViewerMode || t.handlers.trigger("getCellEditMode") || t.isSelectionDialogMode) {return true;}
 
 					if (event.altKey) {
-						t.handlers.trigger('addFunction', 'SUM', c_oAscPopUpSelectorType.Func, true);
+						t.handlers.trigger('addFunction', 'SUM', Asc.c_oAscPopUpSelectorType.Func, true);
 					} else {
 						t.skipKeyPress = false;
 					}

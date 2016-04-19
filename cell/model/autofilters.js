@@ -23,10 +23,6 @@
  *
 */
 "use strict";
-var maxValCol = 20000;
-var maxValRow = 100000;
-
-var maxIndividualValues = 10000;
 (
 	/**
 	 * @param {jQuery} $
@@ -39,7 +35,18 @@ var maxIndividualValues = 10000;
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
+
+		var c_oAscError = Asc.c_oAscError;
+		var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+		var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+		var CellValueType = AscCommon.CellValueType;
+
 		var prot;
+
+		var maxIndividualValues = 10000;
+		var maxValCol = 20000;
+		var maxValRow = 100000;
 
 		var g_oAutoFiltersOptionsElementsProperties = {
 			val		    : 0,
@@ -288,7 +295,7 @@ var maxIndividualValues = 10000;
 			this.worksheet = currentSheet;
 			this.changeFilters = null;
 
-			this.m_oColor = new CColor(120, 120, 120);
+			this.m_oColor = new AscCommon.CColor(120, 120, 120);
 			return this;
 		}
 
@@ -1645,14 +1652,13 @@ var maxIndividualValues = 10000;
 						}
 					}
 				}
-				
-				if(worksheet.AutoFilter && (worksheet.AutoFilter.isApplyAutoFilter() || worksheet.AutoFilter.isApplySortConditions()))
-				{
-					if(clean)
-					{
-						this._cleanFilterColumnsAndSortState(worksheet.AutoFilter, activeCell);
+
+				if (worksheet.AutoFilter &&
+					(worksheet.AutoFilter.isApplyAutoFilter() || worksheet.AutoFilter.isApplySortConditions())) {
+					if (clean) {
+						return this._cleanFilterColumnsAndSortState(worksheet.AutoFilter, activeCell);
 					}
-					}
+				}
 				
 				return false;
 			},
@@ -2430,7 +2436,7 @@ var maxIndividualValues = 10000;
 			
 			_addHistoryObj: function (oldObj, type, redoObject, deleteFilterAfterDeleteColRow, activeHistoryRange, bWithoutFilter, activeRange) {
 				var ws = this.worksheet;
-				var oHistoryObject = new UndoRedoData_AutoFilter();
+				var oHistoryObject = new AscCommonExcel.UndoRedoData_AutoFilter();
 				oHistoryObject.undo = oldObj;
 
 				if(redoObject)
@@ -2457,7 +2463,7 @@ var maxIndividualValues = 10000;
 				if(!activeHistoryRange)
 					activeHistoryRange = null;
 				
-				History.Add(g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
+				History.Add(AscCommonExcel.g_oUndoRedoAutoFilters, type, ws.getId(), activeHistoryRange, oHistoryObject);
 				if(deleteFilterAfterDeleteColRow)
 					History.ChangeActionsEndToStart();
 			},
@@ -3884,7 +3890,7 @@ var maxIndividualValues = 10000;
 						if (!worksheet.getColHidden(i))
 							aNoHiddenCol.push(i);
 					}
-					aNoHiddenCol.sort(fSortAscending);
+					aNoHiddenCol.sort(AscCommon.fSortAscending);
 					//если скрыт первый или последний столбец, то их не надо сдвигать и показывать
 					if(aNoHiddenCol.length > 0)
 					{
@@ -3900,7 +3906,7 @@ var maxIndividualValues = 10000;
 						if (!worksheet.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}
-					aNoHiddenRow.sort(fSortAscending);
+					aNoHiddenRow.sort(AscCommon.fSortAscending);
 					//если скрыты заголовок или итоги, то их не надо сдвигать и показывать
 					if(aNoHiddenRow.length > 0)
 					{

@@ -52,51 +52,6 @@ var c_oAscAlignType = {
   BOTTOM: 6
 };
 
-// image wrap style
-var c_oAscWrapStyle = {
-  Inline: 0,
-  Flow: 1
-};
-
-/*Error level & ID*/
-var c_oAscError = {
-  Level: {
-    Critical: -1,
-    NoCritical: 0
-  },
-  ID: {
-    ServerSaveComplete: 3,
-    ConvertationProgress: 2,
-    DownloadProgress: 1,
-    No: 0,
-    Unknown: -1,
-    ConvertationTimeout: -2,
-    ConvertationError: -3,
-    DownloadError: -4,
-    UnexpectedGuid: -5,
-    Database: -6,
-    FileRequest: -7,
-    FileVKey: -8,
-    UplImageSize: -9,
-    UplImageExt: -10,
-    UplImageFileCount: -11,
-    NoSupportClipdoard: -12,
-    StockChartError: -16,
-    CoAuthoringDisconnect: -18,
-    ConvertationPassword: -19,
-    VKeyEncrypt: -20,
-    KeyExpire: -21,
-    UserCountExceed: -22,
-    SplitCellMaxRows: -23,
-    SplitCellMaxCols: -24,
-    SplitCellRowsDivider: -25,
-
-    UserDrop: -100,
-    Warning: -101
-  }
-};
-
-
 var c_oAscContextMenuTypes = {
   Main: 0,
   Thumbnails: 1
@@ -106,10 +61,6 @@ var THEME_THUMBNAIL_WIDTH = 180;
 var THEME_THUMBNAIL_HEIGHT = 135;
 var LAYOUT_THUMBNAIL_WIDTH = 180;
 var LAYOUT_THUMBNAIL_HEIGHT = 135;
-
-
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
 
 var c_oAscTableSelectionType = {
   Cell: 0,
@@ -131,12 +82,6 @@ var c_oAscAlignShapeType = {
 var c_oAscTableLayout = {
   AutoFit: 0x00,
   Fixed: 0x01
-};
-
-var c_oAscMouseMoveDataTypes = {
-  Common: 0,
-  Hyperlink: 1,
-  LockedObject: 2
 };
 
 var c_oAscSlideTransitionTypes = {
@@ -188,13 +133,10 @@ var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
 
 //------------------------------------------------------------export---------------------------------------------------
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
+window['Asc'] = window['Asc'] || {};
 window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
 window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
 window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
-window['Asc']['c_oAscError'] = c_oAscError;
 window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
 window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
 window['Asc']['c_oAscSlideTransitionTypes'] = c_oAscSlideTransitionTypes;

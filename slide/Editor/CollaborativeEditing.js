@@ -47,7 +47,7 @@ function CCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-Asc.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
 
 
 CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo)
@@ -101,14 +101,14 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     for ( var Index = 0; Index < UnlockCount2; Index++ )
     {
         var Class = this.m_aNeedUnlock2[Index];
-        Class.Lock.Set_Type( locktype_None, false);
+        Class.Lock.Set_Type( AscCommon.locktype_None, false);
         if(Class.getObjectType && Class.getObjectType() === historyitem_type_Slide)
         {
             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
         }
         if(Class instanceof PropLocker)
         {
-            var Class2 = g_oTableId.Get_ById(Class.objectId);
+            var Class2 = AscCommon.g_oTableId.Get_ById(Class.objectId);
             if(Class2 && Class2.getObjectType && Class2.getObjectType() === historyitem_type_Slide && Class2.deleteLock === Class)
             {
                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class2.num);
@@ -162,7 +162,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
                 num_arr.push(parseInt(key, 10));
             }
         }
-        num_arr.sort(fSortAscending);
+        num_arr.sort(AscCommon.fSortAscending);
     }
     this.m_aNeedUnlock.length  = 0;
     this.m_aNeedUnlock2.length = 0;
@@ -229,15 +229,15 @@ CCollaborativeEditing.prototype.Release_Locks = function()
     for ( var Index = 0; Index < UnlockCount; Index++ )
     {
         var CurLockType = this.m_aNeedUnlock[Index].Lock.Get_Type();
-        if  ( locktype_Other3 != CurLockType && locktype_Other != CurLockType )
+        if  ( AscCommon.locktype_Other3 != CurLockType && AscCommon.locktype_Other != CurLockType )
         {
             //if(this.m_aNeedUnlock[Index] instanceof Slide)                                                      //TODO: проверять LockObject
             //    editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(this.m_aNeedUnlock[Index].num);
             var Class =  this.m_aNeedUnlock[Index];
-            this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_None, false);
+            this.m_aNeedUnlock[Index].Lock.Set_Type( AscCommon.locktype_None, false);
             if ( Class instanceof PropLocker )
             {
-                var object = g_oTableId.Get_ById(Class.objectId);
+                var object = AscCommon.g_oTableId.Get_ById(Class.objectId);
                 if(object instanceof CPresentation)
                 {
                     if(Class === editor.WordControl.m_oLogicDocument.themeLock)
@@ -263,9 +263,9 @@ CCollaborativeEditing.prototype.Release_Locks = function()
                 editor.sync_UnLockComment(Class.Get_Id());
             }
         }
-        else if ( locktype_Other3 === CurLockType )
+        else if ( AscCommon.locktype_Other3 === CurLockType )
         {
-            this.m_aNeedUnlock[Index].Lock.Set_Type( locktype_Other, false);
+            this.m_aNeedUnlock[Index].Lock.Set_Type( AscCommon.locktype_Other, false);
             if(this.m_aNeedUnlock[Index] instanceof Slide)
                 editor.WordControl.m_oLogicDocument.DrawingDocument.LockSlide(this.m_aNeedUnlock[Index].num);
         }
@@ -302,7 +302,7 @@ CCollaborativeEditing.prototype.OnEnd_Load_Objects = function()
     LogicDocument.Document_UpdateSelectionState();
     LogicDocument.Document_UpdateInterfaceState();
 
-    editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.ApplyChanges);
+    editor.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);
 };
 
 CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
@@ -360,10 +360,10 @@ CCollaborativeEditing.prototype.OnEnd_CheckLock = function()
                     var item = items[i];
                     if ( true !== item && false !== item ) // сравниваем по значению и типу обязательно
                     {
-                        var Class = g_oTableId.Get_ById( item );
+                        var Class = AscCommon.g_oTableId.Get_ById( item );
                         if ( null != Class )
                         {
-                            Class.Lock.Set_Type( locktype_Mine, false );
+                            Class.Lock.Set_Type( AscCommon.locktype_Mine, false );
                             if(Class instanceof Slide)
                                 editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                             this.Add_Unlock2( Class );
@@ -417,10 +417,10 @@ CCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
                 }
                 if ( true !== oItem && false !== oItem ) // сравниваем по значению и типу обязательно
                 {
-                    var Class = g_oTableId.Get_ById( item );
+                    var Class = AscCommon.g_oTableId.Get_ById( item );
                     if ( null != Class )
                     {
-                        Class.Lock.Set_Type( locktype_Mine );
+                        Class.Lock.Set_Type( AscCommon.locktype_Mine );
                         if(Class instanceof Slide)
                             editor.WordControl.m_oLogicDocument.DrawingDocument.UnLockSlide(Class.num);
                         CollaborativeEditing.Add_Unlock2( Class );
@@ -596,7 +596,7 @@ CCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     }, FOREIGN_CURSOR_LABEL_HIDETIME);
 
     var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
-    var Color  = getUserColorById(UserShortId, null, true);
+    var Color  = AscCommon.getUserColorById(UserShortId, null, true);
     var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
     if (!Color || !Coords)
         return;

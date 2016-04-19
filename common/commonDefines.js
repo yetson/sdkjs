@@ -24,7 +24,13 @@
 */
 "use strict";
 
-var g_bDate1904 = false;
+(/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function(window, undefined) {
+var g_cCharDelimiter = String.fromCharCode(5);
+var bDate1904 = false;
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 var c_oAscMaxColumnWidth = 255;
 var c_oAscMaxRowHeight = 409;
@@ -60,6 +66,86 @@ var c_oAscFileType = {
 	PPT		: 0x0082,
 	ODP		: 0x0083
 };
+
+  var c_oAscError = {
+    Level: {
+      Critical: -1,
+      NoCritical: 0
+    },
+    ID: {
+      ServerSaveComplete: 3,
+      ConvertationProgress: 2,
+      DownloadProgress: 1,
+      No: 0,
+      Unknown: -1,
+      ConvertationTimeout: -2,
+      ConvertationError: -3,
+      DownloadError: -4,
+      UnexpectedGuid: -5,
+      Database: -6,
+      FileRequest: -7,
+      FileVKey: -8,
+      UplImageSize: -9,
+      UplImageExt: -10,
+      UplImageFileCount: -11,
+      NoSupportClipdoard: -12,
+      UplImageUrl: -13,
+
+      StockChartError: -17,
+      CoAuthoringDisconnect: -18,
+      ConvertationPassword: -19,
+      VKeyEncrypt: -20,
+      KeyExpire: -21,
+      UserCountExceed: -22,
+
+      SplitCellMaxRows: -30,
+      SplitCellMaxCols: -31,
+      SplitCellRowsDivider: -32,
+
+      MobileUnexpectedCharCount: -35,
+
+      // Mail Merge
+      MailMergeLoadFile: -40,
+      MailMergeSaveFile: -41,
+
+      // for AutoFilter
+      AutoFilterDataRangeError: -50,
+      AutoFilterChangeFormatTableError: -51,
+      AutoFilterChangeError: -52,
+      AutoFilterMoveToHiddenRangeError: -53,
+      LockedAllError: -54,
+      LockedWorksheetRename: -55,
+
+      PasteMaxRangeError: -64,
+      PastInMergeAreaError: -65,
+
+      DataRangeError: -72,
+      CannotMoveRange: -71,
+
+      MaxDataSeriesError: -80,
+      CannotFillRange: -81,
+
+      UserDrop: -100,
+      Warning: -101,
+
+      /* для формул */
+      FrmlWrongCountParentheses: -300,
+      FrmlWrongOperator: -301,
+      FrmlWrongMaxArgument: -302,
+      FrmlWrongCountArgument: -303,
+      FrmlWrongFunctionName: -304,
+      FrmlAnotherParsingError: -305,
+      FrmlWrongArgumentRange: -306,
+      FrmlOperandExpected: -307,
+      FrmlParenthesesCorrectCount: -308,
+      FrmlWrongReferences: -309,
+
+      InvalidReferenceOrName: -310,
+      LockCreateDefName: -311,
+
+      OpenWarning: 500
+    }
+  };
 
 var c_oAscAsyncAction = {
 	Open				: 0,  // открытие документа
@@ -185,18 +271,24 @@ var align_Center  = 2;
 var align_Justify = 3;
 
 
-var linerule_AtLeast = 0;
-var linerule_Auto    = 1;
-var linerule_Exact   = 2;
+var linerule_AtLeast = 0x00;
+var linerule_Auto    = 0x01;
+var linerule_Exact   = 0x02;
 
-var shd_Clear = 0;
-var shd_Nil   = 1;
+var c_oAscShdClear = 0;
+var c_oAscShdNil   = 1;
 
 var vertalign_Baseline    = 0;
 var vertalign_SuperScript = 1;
 var vertalign_SubScript   = 2;
 var hdrftr_Header = 0x01;
 var hdrftr_Footer = 0x02;
+
+var c_oAscDropCap = {
+  None: 0x00,
+  Drop: 0x01,
+  Margin: 0x02
+};
 
 
 var c_oAscChartTitleShowSettings =
@@ -472,55 +564,6 @@ var c_oAscWrapStyle = {
 	Flow : 1
 };
 
-// math
-var c_oAscLimLoc = {
-    SubSup: 0x00,
-    UndOvr: 0x01
-};
-var c_oAscMathJc = {
-    Center: 0x00,
-    CenterGroup: 0x01,
-    Left: 0x02,
-    Right: 0x03
-};
-var c_oAscTopBot = {
-    Bot: 0x00,
-    Top: 0x01
-};
-var c_oAscScript = {
-    DoubleStruck: 0x00,
-    Fraktur: 0x01,
-    Monospace: 0x02,
-    Roman: 0x03,
-    SansSerif: 0x04,
-    Script: 0x05
-};
-var c_oAscShp = {
-    Centered: 0x00,
-    Match: 0x01
-};
-var c_oAscSty = {
-    Bold: 0x00,
-    BoldItalic: 0x01,
-    Italic: 0x02,
-    Plain: 0x03
-};
-var c_oAscFType = {
-    Bar: 0x00,
-    Lin: 0x01,
-    NoBar: 0x02,
-    Skw: 0x03
-};
-var c_oAscBrkBin = {
-    After: 0x00,
-    Before: 0x01,
-    Repeat: 0x02
-};
-var c_oAscBrkBinSub = {
-    PlusMinus: 0x00,
-    MinusPlus: 0x01,
-    MinusMinus: 0x02
-};
 // Толщина бордера
 var c_oAscBorderWidth = {
     None	: 0,	// 0px
@@ -552,8 +595,8 @@ var c_oAscBorderType = {
 };
 // PageOrientation
 var c_oAscPageOrientation = {
-    PagePortrait	: 1,
-    PageLandscape	: 2
+    PagePortrait	: 0x00,
+    PageLandscape	: 0x01
 };
 /**
  * lock types
@@ -589,11 +632,13 @@ var c_oAscColor = {
 };
 
 var c_oAscFill = {
+  FILL_TYPE_NONE   : 0,
 	FILL_TYPE_BLIP   : 1,
 	FILL_TYPE_NOFILL : 2,
 	FILL_TYPE_SOLID	 : 3,
-	FILL_TYPE_PATT   : 4,
-	FILL_TYPE_GRAD   : 5
+  FILL_TYPE_GRAD   : 4,
+	FILL_TYPE_PATT   : 5
+
 };
 
 // Chart defines
@@ -695,6 +740,29 @@ var c_oAscDocumentUnits = {
   Point       : 2
 };
 
+var c_oAscMouseMoveDataTypes = {
+  Common: 0,
+  Hyperlink: 1,
+  LockedObject: 2
+};
+
+
+// Print default options (in mm)
+var c_oAscPrintDefaultSettings = {
+    // Размеры страницы при печати
+    PageWidth: 210,
+    PageHeight: 297,
+    PageOrientation: c_oAscPageOrientation.PagePortrait,
+
+    // Поля для страницы при печати
+    PageLeftField: 17.8,
+    PageRightField: 17.8,
+    PageTopField: 19.1,
+    PageBottomField: 19.1,
+
+    PageGridLines: 0,
+    PageHeadings: 0
+};
 
 var c_oAscEncodings = [
     [ 0,    28596, "ISO-8859-6",       "Arabic (ISO 8859-6)" ],
@@ -824,56 +892,142 @@ var contentchanges_Remove = 2;
 var offlineMode = '_offline_';
 
 //------------------------------------------------------------export---------------------------------------------------
-if (undefined === window['Asc']) {
-  window['Asc'] = {};
-}
+window['Asc'] = window['Asc'] || {};
 window['Asc']['FONT_THUMBNAIL_HEIGHT'] = FONT_THUMBNAIL_HEIGHT;
-window['Asc']['c_oAscMaxColumnWidth'] = c_oAscMaxColumnWidth;
-window['Asc']['c_oAscMaxRowHeight'] = c_oAscMaxRowHeight;
-window['Asc']['c_oAscFileType'] = c_oAscFileType;
-window['Asc']['c_oAscAsyncAction'] = c_oAscAsyncAction;
-window['Asc']['c_oAscAdvancedOptionsID'] = c_oAscAdvancedOptionsID;
-window['Asc']['c_oAscFontRenderingModeType'] = c_oAscFontRenderingModeType;
-window['Asc']['c_oAscAsyncActionType'] = c_oAscAsyncActionType;
-window['Asc']['c_oAscNumFormatType'] = c_oAscNumFormatType;
+window['Asc']['c_oAscMaxColumnWidth'] = window['Asc'].c_oAscMaxColumnWidth = c_oAscMaxColumnWidth;
+window['Asc']['c_oAscMaxRowHeight'] = window['Asc'].c_oAscMaxRowHeight = c_oAscMaxRowHeight;
+window['Asc']['c_oAscFileType'] = window['Asc'].c_oAscFileType = c_oAscFileType;
+window['Asc']['c_oAscError'] = window['Asc'].c_oAscError = c_oAscError;
+window['Asc']['c_oAscAsyncAction'] = window['Asc'].c_oAscAsyncAction = c_oAscAsyncAction;
+window['Asc']['c_oAscAdvancedOptionsID'] = window['Asc'].c_oAscAdvancedOptionsID = c_oAscAdvancedOptionsID;
+window['Asc']['c_oAscFontRenderingModeType'] = window['Asc'].c_oAscFontRenderingModeType = c_oAscFontRenderingModeType;
+window['Asc']['c_oAscAsyncActionType'] = window['Asc'].c_oAscAsyncActionType = c_oAscAsyncActionType;
+window['Asc']['c_oAscNumFormatType'] = window['Asc'].c_oAscNumFormatType = c_oAscNumFormatType;
 window['Asc']['c_oAscDrawingLayerType'] = c_oAscDrawingLayerType;
-window['Asc']['c_oAscTypeSelectElement'] = c_oAscTypeSelectElement;
-window['Asc']['c_oAscShdClear'] = shd_Clear; //ToDo по идее должны совпадать переменные
-window['Asc']['c_oAscShdNil'] = shd_Nil;
-window['Asc']['c_oAscChartTitleShowSettings'] = c_oAscChartTitleShowSettings;
-window['Asc']['c_oAscChartHorAxisLabelShowSettings'] = c_oAscChartHorAxisLabelShowSettings;
-window['Asc']['c_oAscChartVertAxisLabelShowSettings'] = c_oAscChartVertAxisLabelShowSettings;
-window['Asc']['c_oAscChartLegendShowSettings'] = c_oAscChartLegendShowSettings;
-window['Asc']['c_oAscChartDataLabelsPos'] = c_oAscChartDataLabelsPos;
-window['Asc']['c_oAscGridLinesSettings'] = c_oAscGridLinesSettings;
-window['Asc']['c_oAscChartTypeSettings'] = c_oAscChartTypeSettings;
-window['Asc']['c_oAscValAxisRule'] = c_oAscValAxisRule;
-window['Asc']['c_oAscValAxUnits'] = c_oAscValAxUnits;
-window['Asc']['c_oAscTickMark'] = c_oAscTickMark;
-window['Asc']['c_oAscTickLabelsPos'] = c_oAscTickLabelsPos;
-window['Asc']['c_oAscCrossesRule'] = c_oAscCrossesRule;
-window['Asc']['c_oAscBetweenLabelsRule'] = c_oAscBetweenLabelsRule;
-window['Asc']['c_oAscLabelsPosition'] = c_oAscLabelsPosition;
-window['Asc']['c_oAscAxisType'] = c_oAscAxisType;
-window['Asc']['c_oAscHAnchor'] = c_oAscHAnchor;
-window['Asc']['c_oAscXAlign'] = c_oAscXAlign;
-window['Asc']['c_oAscYAlign'] = c_oAscYAlign;
-window['Asc']['c_oAscVAnchor'] = c_oAscVAnchor;
-window['Asc']['c_oAscRelativeFromH'] = c_oAscRelativeFromH;
-window['Asc']['c_oAscRelativeFromV'] = c_oAscRelativeFromV;
-window['Asc']['c_oAscPageOrientation'] = c_oAscPageOrientation;
-window['Asc']['c_oAscColor'] = c_oAscColor;
-window['Asc']['c_oAscFill'] = c_oAscFill;
-window['Asc']['c_oAscFillGradType'] = c_oAscFillGradType;
-window['Asc']['c_oAscFillBlipType'] = c_oAscFillBlipType;
-window['Asc']['c_oAscStrokeType'] = c_oAscStrokeType;
+window['Asc']['c_oAscTypeSelectElement'] = window['Asc'].c_oAscTypeSelectElement = c_oAscTypeSelectElement;
+window['Asc']['linerule_AtLeast'] = window['Asc'].linerule_AtLeast = linerule_AtLeast;
+window['Asc']['linerule_Auto'] = window['Asc'].linerule_Auto = linerule_Auto;
+window['Asc']['linerule_Exact'] = window['Asc'].linerule_Exact = linerule_Exact;
+window['Asc']['c_oAscShdClear'] = window['Asc'].c_oAscShdClear = c_oAscShdClear;
+window['Asc']['c_oAscShdNil'] = window['Asc'].c_oAscShdNil = c_oAscShdNil;
+window['Asc']['c_oAscDropCap'] = window['Asc'].c_oAscDropCap = c_oAscDropCap;
+window['Asc']['c_oAscChartTitleShowSettings'] = window['Asc'].c_oAscChartTitleShowSettings = c_oAscChartTitleShowSettings;
+window['Asc']['c_oAscChartHorAxisLabelShowSettings'] = window['Asc'].c_oAscChartHorAxisLabelShowSettings = c_oAscChartHorAxisLabelShowSettings;
+window['Asc']['c_oAscChartVertAxisLabelShowSettings'] = window['Asc'].c_oAscChartVertAxisLabelShowSettings = c_oAscChartVertAxisLabelShowSettings;
+window['Asc']['c_oAscChartLegendShowSettings'] = window['Asc'].c_oAscChartLegendShowSettings = c_oAscChartLegendShowSettings;
+window['Asc']['c_oAscChartDataLabelsPos'] = window['Asc'].c_oAscChartDataLabelsPos = c_oAscChartDataLabelsPos;
+window['Asc']['c_oAscGridLinesSettings'] = window['Asc'].c_oAscGridLinesSettings = c_oAscGridLinesSettings;
+window['Asc']['c_oAscChartTypeSettings'] = window['Asc'].c_oAscChartTypeSettings = c_oAscChartTypeSettings;
+window['Asc']['c_oAscValAxisRule'] = window['Asc'].c_oAscValAxisRule = c_oAscValAxisRule;
+window['Asc']['c_oAscValAxUnits'] = window['Asc'].c_oAscValAxUnits = c_oAscValAxUnits;
+window['Asc']['c_oAscTickMark'] = window['Asc'].c_oAscTickMark = c_oAscTickMark;
+window['Asc']['c_oAscTickLabelsPos'] = window['Asc'].c_oAscTickLabelsPos = c_oAscTickLabelsPos;
+window['Asc']['c_oAscCrossesRule'] = window['Asc'].c_oAscCrossesRule = c_oAscCrossesRule;
+window['Asc']['c_oAscBetweenLabelsRule'] = window['Asc'].c_oAscBetweenLabelsRule = c_oAscBetweenLabelsRule;
+window['Asc']['c_oAscLabelsPosition'] = window['Asc'].c_oAscLabelsPosition = c_oAscLabelsPosition;
+window['Asc']['c_oAscAxisType'] = window['Asc'].c_oAscAxisType = c_oAscAxisType;
+window['Asc']['c_oAscHAnchor'] = window['Asc'].c_oAscHAnchor = c_oAscHAnchor;
+window['Asc']['c_oAscXAlign'] = window['Asc'].c_oAscXAlign = c_oAscXAlign;
+window['Asc']['c_oAscYAlign'] = window['Asc'].c_oAscYAlign = c_oAscYAlign;
+window['Asc']['c_oAscVAnchor'] = window['Asc'].c_oAscVAnchor = c_oAscVAnchor;
+window['Asc']['c_oAscRelativeFromH'] = window['Asc'].c_oAscRelativeFromH = c_oAscRelativeFromH;
+window['Asc']['c_oAscRelativeFromV'] = window['Asc'].c_oAscRelativeFromV = c_oAscRelativeFromV;
+window['Asc']['c_oAscPageOrientation'] = window['Asc'].c_oAscPageOrientation = c_oAscPageOrientation;
+window['Asc']['c_oAscColor'] = window['Asc'].c_oAscColor = c_oAscColor;
+window['Asc']['c_oAscFill'] = window['Asc'].c_oAscFill = c_oAscFill;
+window['Asc']['c_oAscFillGradType'] = window['Asc'].c_oAscFillGradType = c_oAscFillGradType;
+window['Asc']['c_oAscFillBlipType'] = window['Asc'].c_oAscFillBlipType = c_oAscFillBlipType;
+window['Asc']['c_oAscStrokeType'] = window['Asc'].c_oAscStrokeType = c_oAscStrokeType;
 window['Asc']['c_oAscVerticalTextAlign'] = c_oAscVerticalTextAlign;
+window['Asc']['c_oAscVertDrawingText'] = c_oAscVertDrawingText;
 window['Asc']['c_oAscLineJoinType'] = c_oAscLineJoinType;
 window['Asc']['c_oAscLineCapType'] = c_oAscLineCapType;
 window['Asc']['c_oAscLineBeginType'] = c_oAscLineBeginType;
 window['Asc']['c_oAscLineBeginSize'] = c_oAscLineBeginSize;
-window['Asc']['c_oAscVertDrawingText'] = c_oAscVertDrawingText;
-window['Asc']['c_oAscCellTextDirection'] = c_oAscCellTextDirection;
-window['Asc']['c_oAscDocumentUnits'] = c_oAscDocumentUnits;
-window['Asc']['c_oAscMaxTooltipLength'] = c_oAscMaxTooltipLength;
-window['Asc']['c_oAscMaxCellOrCommentLength'] = c_oAscMaxCellOrCommentLength;
+window['Asc']['c_oAscCellTextDirection'] = window['Asc'].c_oAscCellTextDirection = c_oAscCellTextDirection;
+window['Asc']['c_oAscDocumentUnits'] = window['Asc'].c_oAscDocumentUnits = c_oAscDocumentUnits;
+window['Asc']['c_oAscMaxTooltipLength'] = window['Asc'].c_oAscMaxTooltipLength = c_oAscMaxTooltipLength;
+window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCommentLength = c_oAscMaxCellOrCommentLength;
+
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].g_cCharDelimiter = g_cCharDelimiter;
+  window["AscCommon"].bDate1904 = bDate1904;
+  window["AscCommon"].c_oAscAdvancedOptionsAction = c_oAscAdvancedOptionsAction;
+  window["AscCommon"].DownloadType = DownloadType;
+  window["AscCommon"].CellValueType = CellValueType;
+  window["AscCommon"].c_oAscCellAnchorType = c_oAscCellAnchorType;
+  window["AscCommon"].c_oAscChartDefines = c_oAscChartDefines;
+  window["AscCommon"].c_oAscStyleImage = c_oAscStyleImage;
+  window["AscCommon"].c_oAscLineDrawingRule = c_oAscLineDrawingRule;
+  window["AscCommon"].align_Right = align_Right;
+  window["AscCommon"].align_Left = align_Left;
+  window["AscCommon"].align_Center = align_Center;
+  window["AscCommon"].align_Justify = align_Justify;
+  window["AscCommon"].vertalign_Baseline = vertalign_Baseline;
+  window["AscCommon"].vertalign_SuperScript = vertalign_SuperScript;
+  window["AscCommon"].vertalign_SubScript = vertalign_SubScript;
+  window["AscCommon"].hdrftr_Header = hdrftr_Header;
+  window["AscCommon"].hdrftr_Footer = hdrftr_Footer;
+  window["AscCommon"].c_oAscSizeRelFromH = c_oAscSizeRelFromH;
+  window["AscCommon"].c_oAscSizeRelFromV = c_oAscSizeRelFromV;
+  window["AscCommon"].c_oAscWrapStyle = c_oAscWrapStyle;
+  window["AscCommon"].c_oAscBorderWidth = c_oAscBorderWidth;
+  window["AscCommon"].c_oAscBorderStyles = c_oAscBorderStyles;
+  window["AscCommon"].c_oAscBorderType = c_oAscBorderType;
+  window["AscCommon"].c_oAscLockTypes = c_oAscLockTypes;
+  window["AscCommon"].c_oAscFormatPainterState = c_oAscFormatPainterState;
+  window["AscCommon"].c_oAscSaveTypes = c_oAscSaveTypes;
+  window["AscCommon"].c_oAscChartType = c_oAscChartType;
+  window["AscCommon"].c_oAscChartSubType = c_oAscChartSubType;
+  window["AscCommon"].c_oAscCsvDelimiter = c_oAscCsvDelimiter;
+  window["AscCommon"].c_oAscUrlType = c_oAscUrlType;
+  window["AscCommon"].c_oAscMouseMoveDataTypes = c_oAscMouseMoveDataTypes;
+  window["AscCommon"].c_oAscPrintDefaultSettings = c_oAscPrintDefaultSettings;
+  window["AscCommon"].c_oAscEncodings = c_oAscEncodings;
+  window["AscCommon"].c_oAscEncodingsMap = c_oAscEncodingsMap;
+  window["AscCommon"].c_oAscCodePageUtf8 = c_oAscCodePageUtf8;
+  window["AscCommon"].c_oAscMaxFormulaLength = c_oAscMaxFormulaLength;
+
+  window["AscCommon"].locktype_None = locktype_None;
+  window["AscCommon"].locktype_Mine = locktype_Mine;
+  window["AscCommon"].locktype_Other = locktype_Other;
+  window["AscCommon"].locktype_Other2 = locktype_Other2;
+  window["AscCommon"].locktype_Other3 = locktype_Other3;
+
+  window["AscCommon"].changestype_None = changestype_None;
+  window["AscCommon"].changestype_Paragraph_Content = changestype_Paragraph_Content;
+  window["AscCommon"].changestype_Paragraph_Properties = changestype_Paragraph_Properties;
+  window["AscCommon"].changestype_Document_Content = changestype_Document_Content;
+  window["AscCommon"].changestype_Document_Content_Add = changestype_Document_Content_Add;
+  window["AscCommon"].changestype_Document_SectPr = changestype_Document_SectPr;
+  window["AscCommon"].changestype_Document_Styles = changestype_Document_Styles;
+  window["AscCommon"].changestype_Table_Properties = changestype_Table_Properties;
+  window["AscCommon"].changestype_Table_RemoveCells = changestype_Table_RemoveCells;
+  window["AscCommon"].changestype_Image_Properties = changestype_Image_Properties;
+  window["AscCommon"].changestype_HdrFtr = changestype_HdrFtr;
+  window["AscCommon"].changestype_Remove = changestype_Remove;
+  window["AscCommon"].changestype_Delete = changestype_Delete;
+  window["AscCommon"].changestype_Drawing_Props = changestype_Drawing_Props;
+  window["AscCommon"].changestype_ColorScheme = changestype_ColorScheme;
+  window["AscCommon"].changestype_Text_Props = changestype_Text_Props;
+  window["AscCommon"].changestype_RemoveSlide = changestype_RemoveSlide;
+  window["AscCommon"].changestype_Theme = changestype_Theme;
+  window["AscCommon"].changestype_SlideSize = changestype_SlideSize;
+  window["AscCommon"].changestype_SlideBg = changestype_SlideBg;
+  window["AscCommon"].changestype_SlideTiming = changestype_SlideTiming;
+  window["AscCommon"].changestype_MoveComment = changestype_MoveComment;
+  window["AscCommon"].changestype_AddComment = changestype_AddComment;
+  window["AscCommon"].changestype_Layout = changestype_Layout;
+  window["AscCommon"].changestype_AddShape = changestype_AddShape;
+  window["AscCommon"].changestype_AddShapes = changestype_AddShapes;
+  window["AscCommon"].changestype_2_InlineObjectMove = changestype_2_InlineObjectMove;
+  window["AscCommon"].changestype_2_HdrFtr = changestype_2_HdrFtr;
+  window["AscCommon"].changestype_2_Comment = changestype_2_Comment;
+  window["AscCommon"].changestype_2_Element_and_Type = changestype_2_Element_and_Type;
+  window["AscCommon"].changestype_2_ElementsArray_and_Type = changestype_2_ElementsArray_and_Type;
+  window["AscCommon"].changestype_2_AdditionalTypes = changestype_2_AdditionalTypes;
+  window["AscCommon"].contentchanges_Add = contentchanges_Add;
+  window["AscCommon"].contentchanges_Remove = contentchanges_Remove;
+
+  window["AscCommon"].offlineMode = offlineMode;
+})(window);

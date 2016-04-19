@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿$(function () {
+$(function () {
 
 	module("Utils");
 
@@ -124,7 +124,7 @@
 		strictEqual(Asc.round(-.1-.2-.9+.2), -1, "Asc.round(.1+.2+.9-.2)"); // -1.0000...2
 	});
 
-	test("Asc.extendClass", function test_extendClass() {
+	test("AscCommon.extendClass", function test_extendClass() {
 		function Base(b1) {
 			this.b1 = b1;
 		}
@@ -134,7 +134,7 @@
 			Child.superclass.constructor.call(this, b1);
 			this.c1 = c1;
 		}
-		Asc.extendClass(Child, Base);
+		AscCommon.extendClass(Child, Base);
 		Child.prototype.mc1 = function (c1) {this.c1=c1;};
 
 		var x = new Child(1, 2);
@@ -151,7 +151,7 @@
 		equal(x.c1, 4, "x.c1");
 	});
 
-	test("Asc.extendClass with fabric method", function test_extendClass2() {
+	test("AscCommon.extendClass with fabric method", function test_extendClass2() {
 		function Base(b1) {
 			if ( !(this instanceof Base) ) {return new Base(b1);}
 			this.b1 = b1;
@@ -165,7 +165,7 @@
 			this.c1 = c1;
 			return this;
 		}
-		Asc.extendClass(Child, Base);
+		AscCommon.extendClass(Child, Base);
 		Child.prototype.mc1 = function (c1) {this.c1=c1;};
 
 		var x = Child(1, 2);

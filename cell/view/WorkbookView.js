@@ -41,6 +41,12 @@
    * Import
    * -----------------------------------------------------------------------------
    */
+  var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+  var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+  var AscBrowser = AscCommon.AscBrowser;
+  var CColor = AscCommon.CColor;
+  var cBoolLocal = AscCommon.cBoolLocal;
+
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
   var asc_round = asc.round;
@@ -49,6 +55,17 @@
   var asc_CPrintPagesData = asc.CPrintPagesData;
   var asc_getcvt = asc.getCvtRatio;
   var asc_CSP = asc.asc_CStylesPainter;
+  var c_oTargetType = AscCommonExcel.c_oTargetType;
+  var c_oAscError = asc.c_oAscError;
+  var c_oAscCleanOptions = asc.c_oAscCleanOptions;
+  var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
+  var c_oAscMouseMoveType = asc.c_oAscMouseMoveType;
+  var c_oAscCellEditorState = asc.c_oAscCellEditorState;
+  var c_oAscPopUpSelectorType = asc.c_oAscPopUpSelectorType;
+  var c_oAscAsyncAction = asc.c_oAscAsyncAction;
+  var c_oAscFontRenderingModeType = asc.c_oAscFontRenderingModeType;
+  var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
+  
 
   function WorkbookCommentsModel(handlers) {
     this.workbook = {handlers: handlers};
@@ -507,11 +524,13 @@
             self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
           }
         }, "existedRange": function(range, ws) {
-              if (!ws) {
-                  self.getWorksheet().activeFormulaRange(range);
-              } else {
-                  self.getWorksheet(self.model.getWorksheetIndexByName(ws)).activeFormulaRange(range);
-              }
+          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+            self.getWorksheet().activeFormulaRange(range);
+          } else {
+            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+            self.getWorksheet().addFormulaRange(range);
+          }
         }, "updateUndoRedoChanged": function(bCanUndo, bCanRedo) {
           self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
           self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
@@ -685,10 +704,10 @@
     });
 
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
-      self.defNameAllowCreate = !(reason == c_oAscDefinedNameReason.LockDefNameManager);
+      self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
     });
 
-    this.cellCommentator = new CCellCommentator({
+    this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers),
       collaborativeEditing: this.collaborativeEditing,
       draw: function() {
@@ -714,7 +733,7 @@
     };
 
     if (this.Api.isMobileVersion) {
-      this.MobileTouchManager = new CMobileTouchManager();
+      this.MobileTouchManager = new AscCommonExcel.CMobileTouchManager();
       this.MobileTouchManager.Init(this);
     }
     return this;
@@ -893,10 +912,10 @@
           }
         }
         switch (ct.hyperlink.asc_getType()) {
-          case c_oAscHyperlinkType.WebLink:
+          case Asc.c_oAscHyperlinkType.WebLink:
             this.handlers.trigger("asc_onHyperlinkClick", ct.hyperlink.asc_getHyperlinkUrl());
             break;
-          case c_oAscHyperlinkType.RangeLink:
+          case Asc.c_oAscHyperlinkType.RangeLink:
             // ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
             this.handlers.trigger("asc_onHideComment");
             this.Api._asc_setWorksheetRange(ct.hyperlink);
@@ -938,7 +957,7 @@
           x: ct.lockAllPosLeft,
           y: ct.lockAllPosTop,
           userId: ct.userIdAllSheet,
-          lockedObjectType: c_oAscMouseMoveLockedObjectType.Sheet
+          lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Sheet
         }));
       } else {
         // Отправление эвента о залоченности свойств всего листа (только если не удален весь лист)
@@ -948,7 +967,7 @@
             x: ct.lockAllPosLeft,
             y: ct.lockAllPosTop,
             userId: ct.userIdAllProps,
-            lockedObjectType: c_oAscMouseMoveLockedObjectType.TableProperties
+            lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.TableProperties
           }));
         }
       }
@@ -959,7 +978,7 @@
           x: ct.lockRangePosLeft,
           y: ct.lockRangePosTop,
           userId: ct.userId,
-          lockedObjectType: c_oAscMouseMoveLockedObjectType.Range
+          lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Range
         }));
       }
 
@@ -1510,11 +1529,10 @@
       }
 
       if (this.cellEditor && this.cellFormulaEnterWSOpen ) {
-          if( ws.model.getId() == this.cellFormulaEnterWSOpen.model.getId() ){
+          if (ws === this.cellFormulaEnterWSOpen){
               this.cellFormulaEnterWSOpen.setFormulaEditMode( true );
               this.cellEditor._showCanvas();
-          }
-          else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
+          } else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
               this.cellFormulaEnterWSOpen.setFormulaEditMode( false );
               /*скрываем cellEditor, в редактор добавляем %selected sheet name%+"!" */
               this.cellEditor._hideCanvas();
@@ -1804,7 +1822,7 @@
           arrResult.push(new Asc.asc_CCompleteMenu(this.formulasList[i], c_oAscPopUpSelectorType.Func));
         }
       }
-      defNamesList = this.getDefinedNames(c_oAscGetDefinedNamesList.WorksheetWorkbook);
+      defNamesList = this.getDefinedNames(Asc.c_oAscGetDefinedNamesList.WorksheetWorkbook);
       formulaName = formulaName.toLowerCase();
       for (i = 0; i < defNamesList.length; ++i) {
         defName = defNamesList[i];
@@ -2088,7 +2106,7 @@
     } else {
       this.copyActiveSheet = this.wsActive;
 
-      var index, tmpSelectRange = parserHelp.parse3DRef(selectRange);
+      var index, tmpSelectRange = AscCommon.parserHelp.parse3DRef(selectRange);
       if (tmpSelectRange) {
         if (c_oAscSelectionDialogType.Chart === selectionDialogType) {
           // Получаем sheet по имени
@@ -2347,7 +2365,7 @@
   WorkbookView.prototype.unlockDefName = function() {
     this.model.unlockDefName();
     this.handlers.trigger("asc_onRefreshDefNameList");
-    this.handlers.trigger("asc_onLockDefNameManager", c_oAscDefinedNameReason.OK);
+    this.handlers.trigger("asc_onLockDefNameManager", Asc.c_oAscDefinedNameReason.OK);
   };
 
   WorkbookView.prototype._onCheckDefNameLock = function() {
@@ -2387,13 +2405,13 @@
     var activeWs;
     var printPagesData = new asc_CPrintPagesData();
     var printType = adjustPrint.asc_getPrintType();
-    if (printType === c_oAscPrintType.ActiveSheets) {
+    if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
       printPagesData.arrPages =
         ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
           activeWs);
-    } else if (printType === c_oAscPrintType.EntireWorkbook) {
+    } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
@@ -2407,7 +2425,7 @@
           printPagesData.arrPages = printPagesData.arrPages.concat(arrPages);
         }
       }
-    } else if (printType === c_oAscPrintType.Selection) {
+    } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
       printPagesData.arrPages =
@@ -2514,7 +2532,8 @@
 
   WorkbookView.prototype.initFormulasList = function() {
     this.formulasList = [];
-    var oFormulaList = cFormulaFunctionLocalized ? cFormulaFunctionLocalized : cFormulaFunction;
+    var oFormulaList = AscCommonExcel.cFormulaFunctionLocalized ? AscCommonExcel.cFormulaFunctionLocalized :
+      AscCommonExcel.cFormulaFunction;
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }

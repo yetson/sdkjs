@@ -199,14 +199,14 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-                sResultCursorType = kCurFormatPainterWord;
+                sResultCursorType = AscCommon.kCurFormatPainterWord;
             else
                 sResultCursorType = sType;
         }
         else
             sResultCursorType = this.m_sLockedCursorType;
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
         this.Native["DD_SetCursorType"](sResultCursorType, Data);
     }
     this.LockCursorType = function(sType)

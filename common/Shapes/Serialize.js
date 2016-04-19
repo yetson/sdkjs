@@ -24,6 +24,11 @@
 */
 "use strict";
 
+// Import
+var c_oAscShdClear = Asc.c_oAscShdClear;
+var c_oAscColor = Asc.c_oAscColor;
+var c_oAscFill = Asc.c_oAscFill;
+
 var c_dScalePPTXSizes = 36000;
 function IsHiddenObj(object)
 {
@@ -236,13 +241,13 @@ CBuilderImages.prototype =
             if(!this.Ln && this.SpPr && this.SpPr.Fill)
             {
                 oCopyFill = this.SpPr.Fill.createDuplicate();
-                if(oCopyFill.fill && oCopyFill.fill.type === FILL_TYPE_BLIP)
+                if(oCopyFill.fill && oCopyFill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                 {
                     oCopyFill.fill.setRasterImageId(url);
                     this.SpPr.setFill(oCopyFill);
                 }
             }
-            if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === FILL_TYPE_BLIP)
+            if(this.Ln && this.SpPr && this.SpPr === this.Ln && this.Ln.Fill && this.Ln.Fill.fill && this.Ln.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
             {
                 oCopyLn = this.Ln.createDuplicate();
                 oCopyLn.Fill.fill.setRasterImageId(url);
@@ -259,7 +264,7 @@ CBuilderImages.prototype =
                 if(this.Paragraph)
                 {
                     var oPr = this.Paragraph.Pr;
-                    if(oPr.DefaultRunPr && oPr.DefaultRunPr.Unifill && oPr.DefaultRunPr.Unifill.fill && oPr.DefaultRunPr.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(oPr.DefaultRunPr && oPr.DefaultRunPr.Unifill && oPr.DefaultRunPr.Unifill.fill && oPr.DefaultRunPr.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         var Pr = this.Paragraph.Pr.Copy();
                         Pr.DefaultRunPr.Unifill.fill.setRasterImageId(url);
@@ -268,13 +273,13 @@ CBuilderImages.prototype =
                 }
                 else if(this.ParaTextPr || this.Run)
                 {
-                    if(this.ParaTextPr && this.ParaTextPr.Value && this.ParaTextPr.Value.Unifill && this.ParaTextPr.Value.Unifill.fill && this.ParaTextPr.Value.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(this.ParaTextPr && this.ParaTextPr.Value && this.ParaTextPr.Value.Unifill && this.ParaTextPr.Value.Unifill.fill && this.ParaTextPr.Value.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         oCopyFill = this.ParaTextPr.Value.Unifill.createDuplicate();
                         oCopyFill.fill.setRasterImageId(url);
                         this.ParaTextPr.Set_Unifill(oCopyFill);
                     }
-                    if(this.Run && this.Run.Pr && this.Run.Pr.Unifill && this.Run.Pr.Unifill.fill && this.Run.Pr.Unifill.fill.type === FILL_TYPE_BLIP)
+                    if(this.Run && this.Run.Pr && this.Run.Pr.Unifill && this.Run.Pr.Unifill.fill && this.Run.Pr.Unifill.fill.type === c_oAscFill.FILL_TYPE_BLIP)
                     {
                         oCopyFill = this.Run.Pr.Unifill.createDuplicate();
                         oCopyFill.fill.setRasterImageId(url);
@@ -789,7 +794,7 @@ function BinaryPPTYLoader()
             }
 
             var font_cuts = this.Api.FontLoader.embedded_cut_manager;
-            font_cuts.Url = g_oDocumentUrls.getUrl("fonts/fonts.js");
+            font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl("fonts/fonts.js");
             font_cuts.init_cut_fonts(_embedded_fonts);
             font_cuts.bIsCutFontsUse = true;
         }
@@ -1287,7 +1292,7 @@ function BinaryPPTYLoader()
                                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                                 {
                                                     _style.TablePr.Shd = new CDocumentShd();
-                                                    _style.TablePr.Shd.Value = shd_Clear;
+                                                    _style.TablePr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _style.TablePr.Shd.Unifill = _unifill;
                                             }
@@ -1303,7 +1308,7 @@ function BinaryPPTYLoader()
                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                 {
                                     _style.TablePr.Shd = new CDocumentShd();
-                                    _style.TablePr.Shd.Value = shd_Clear;
+                                    _style.TablePr.Shd.Value = c_oAscShdClear;
                                 }
                                 _style.TablePr.Shd.FillRef = this.ReadStyleRef();
                                 break;
@@ -1532,7 +1537,7 @@ function BinaryPPTYLoader()
                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                 {
                                     _part.TableCellPr.Shd = new CDocumentShd();
-                                    _part.TableCellPr.Shd.Value = shd_Clear;
+                                    _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                 }
                                 _part.TableCellPr.Shd.FillRef = this.ReadStyleRef();
                                 break;
@@ -1553,7 +1558,7 @@ function BinaryPPTYLoader()
                                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                                 {
                                                     _part.TableCellPr.Shd = new CDocumentShd();
-                                                    _part.TableCellPr.Shd.Value = shd_Clear;
+                                                    _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _part.TableCellPr.Shd.Unifill = _unifill;
                                             }
@@ -2056,7 +2061,7 @@ function BinaryPPTYLoader()
 
             switch (_type)
             {
-                case FILL_TYPE_BLIP:
+                case c_oAscFill.FILL_TYPE_BLIP:
                 {
                     s.Skip2(1);
 
@@ -2331,7 +2336,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case FILL_TYPE_GRAD:
+                case c_oAscFill.FILL_TYPE_GRAD:
                 {
                     s.Skip2(1);
 
@@ -2427,11 +2432,26 @@ function BinaryPPTYLoader()
                             // ms office не открывает такие файлы.
                             uni_fill.fill.setPath(null);
                         }
+
+                        if(uni_fill.fill.colors.length < 2)
+                        {
+                            if(uni_fill.fill.colors.length === 1)
+                            {
+                                var oUniColor = uni_fill.fill.colors[0].color;
+                                uni_fill.fill = new CSolidFill();
+                                uni_fill.fill.color = oUniColor;
+                            }
+                            else
+                            {
+                                uni_fill.fill = new CSolidFill();
+                                uni_fill.fill.color =  CreateUniColorRGB(0, 0, 0);
+                            }
+                        }
                     }
 
                     break;
                 }
-                case FILL_TYPE_PATT:
+                case c_oAscFill.FILL_TYPE_PATT:
                 {
                     uni_fill.setFill(new CPattFill());
 
@@ -2480,7 +2500,7 @@ function BinaryPPTYLoader()
 
                     break;
                 }
-                case FILL_TYPE_SOLID:
+                case c_oAscFill.FILL_TYPE_SOLID:
                 {
                     s.Skip2(1); // type + len
 
@@ -2511,7 +2531,7 @@ function BinaryPPTYLoader()
                     }
                     break;
                 }
-                case FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_NOFILL:
                 {
                     uni_fill.setFill(new CNoFill());
                     break;
@@ -5680,7 +5700,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    row.Set_Height(s.GetULong() / 36000, heightrule_AtLeast);
+                    row.Set_Height(s.GetULong() / 36000, Asc.linerule_AtLeast);
                     break;
                 }
                 default:
@@ -6010,7 +6030,7 @@ function BinaryPPTYLoader()
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
                         props.Shd = new CDocumentShd();
-                        props.Shd.Value = shd_Clear;
+                        props.Shd.Value = c_oAscShdClear;
                         props.Shd.Unifill = _unifill;
                     }
                     break;
@@ -6125,7 +6145,7 @@ function BinaryPPTYLoader()
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
                         obj.props.Shd = new CDocumentShd();
-                        obj.props.Shd.Value = shd_Clear;
+                        obj.props.Shd.Value = c_oAscShdClear;
                         obj.props.Shd.Unifill = _unifill;
                     }
                     break;
@@ -6284,9 +6304,9 @@ function BinaryPPTYLoader()
                     var baseline = s.GetLong();
 
                     if (baseline < 0)
-                        rPr.VertAlign = vertalign_SubScript;
+                        rPr.VertAlign = AscCommon.vertalign_SubScript;
                     else if (baseline > 0)
-                        rPr.VertAlign = vertalign_SuperScript;
+                        rPr.VertAlign = AscCommon.vertalign_SuperScript;
 
                     break;
                 }
@@ -6833,15 +6853,15 @@ function BinaryPPTYLoader()
                     var _align = s.GetUChar();
                     switch (_align)
                     {
-                        case 0: { para_pr.Jc = align_Center; break; }
-                        case 1: { para_pr.Jc = align_Justify; break; }
-                        case 2: { para_pr.Jc = align_Justify; break; }
-                        case 3: { para_pr.Jc = align_Justify; break; }
-                        case 4: { para_pr.Jc = align_Left; break; }
-                        case 5: { para_pr.Jc = align_Right; break; }
-                        case 6: { para_pr.Jc = align_Justify; break; }
+                        case 0: { para_pr.Jc = AscCommon.align_Center; break; }
+                        case 1: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 2: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 3: { para_pr.Jc = AscCommon.align_Justify; break; }
+                        case 4: { para_pr.Jc = AscCommon.align_Left; break; }
+                        case 5: { para_pr.Jc = AscCommon.align_Right; break; }
+                        case 6: { para_pr.Jc = AscCommon.align_Justify; break; }
                         default:
-                            para_pr.Jc = align_Center;
+                            para_pr.Jc = AscCommon.align_Center;
                             break;
                     }
                     break;
@@ -6927,14 +6947,14 @@ function BinaryPPTYLoader()
                             {
                                 Pct = s.GetLong();
                                 para_pr.Spacing.Line = Pct/100000;
-                                para_pr.Spacing.LineRule = linerule_Auto;
+                                para_pr.Spacing.LineRule = Asc.linerule_Auto;
                                 break;
                             }
                             case 1:
                             {
                                 Pts = s.GetLong();
                                 para_pr.Spacing.Line = Pts*0.00352777778;
-                                para_pr.Spacing.LineRule = linerule_Exact;
+                                para_pr.Spacing.LineRule = Asc.linerule_Exact;
                                 break;
                             }
                             default:

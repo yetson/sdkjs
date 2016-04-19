@@ -35,16 +35,26 @@
 
 // TODO: Избавиться от функций Internal_GetStartPos, Internal_GetEndPos, Clear_CollaborativeMarks
 
+// Import
+var c_oAscLineDrawingRule = AscCommon.c_oAscLineDrawingRule;
+var align_Right = AscCommon.align_Right;
+var align_Left = AscCommon.align_Left;
+var align_Center = AscCommon.align_Center;
+var g_oTableId = AscCommon.g_oTableId;
+
+var linerule_Exact = Asc.linerule_Exact;
+var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
+
 var type_Paragraph = 0x0001;
 
 var UnknownValue  = null;
 
-var REVIEW_COLOR = new CColor(255, 0, 0, 255);
+var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Prev = null;
     this.Next = null;
@@ -141,18 +151,18 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     this.ApplyToAll = false; // Специальный параметр, используемый в ячейках таблицы.
     // True, если ячейка попадает в выделение по ячейкам.
 
-    this.Lock = new CLock(); // Зажат ли данный параграф другим пользователем
+    this.Lock = new AscCommon.CLock(); // Зажат ли данный параграф другим пользователем
     // TODO: Когда у g_oIdCounter будет тоже проверка на TurnOff заменить здесь
-    if (false === g_oIdCounter.m_bLoad && true === History.Is_On())
+    if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
-        this.Lock.Set_Type(locktype_Mine, false);
+        this.Lock.Set_Type(AscCommon.locktype_Mine, false);
         if (CollaborativeEditing)
             CollaborativeEditing.Add_Unlock2(this);
     }
 
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     // Свойства необходимые для презентаций
     this.PresentationPr =
@@ -1303,7 +1313,7 @@ Paragraph.prototype =
         var Theme    = this.Get_Theme();
         var ColorMap = this.Get_ColorMap();
         var BgColor = undefined;
-        if ( undefined !== Pr.ParaPr.Shd && shd_Nil !== Pr.ParaPr.Shd.Value && true !== Pr.ParaPr.Shd.Color.Auto )
+        if ( undefined !== Pr.ParaPr.Shd && Asc.c_oAscShdNil !== Pr.ParaPr.Shd.Value && true !== Pr.ParaPr.Shd.Color.Auto )
         {
             if(Pr.ParaPr.Shd.Unifill)
             {
@@ -1364,10 +1374,10 @@ Paragraph.prototype =
 
     Internal_Draw_1 : function(CurPage, pGraphics, Pr)
     {
-        if(this.bFromDocument)
+        if(this.bFromDocument && (pGraphics.RENDERER_PDF_FLAG !== true))
         {
             // Если данный параграф зажат другим пользователем, рисуем соответствующий знак
-            if ( locktype_None != this.Lock.Get_Type() )
+            if ( AscCommon.locktype_None != this.Lock.Get_Type() )
             {
                 if ( ( CurPage > 0 || false === this.Is_StartFromNewPage() || null === this.Get_DocumentPrev() ) )
                 {
@@ -1375,7 +1385,7 @@ Paragraph.prototype =
                     var Y_top = this.Pages[CurPage].Bounds.Top;
                     var Y_bottom = this.Pages[CurPage].Bounds.Bottom;
 
-                    if ( true === editor.isCoMarksDraw || locktype_Mine != this.Lock.Get_Type() )
+                    if ( true === editor.isCoMarksDraw || AscCommon.locktype_Mine != this.Lock.Get_Type() )
                         pGraphics.DrawLockParagraph(this.Lock.Get_Type(), X_min, Y_top, Y_bottom);
                 }
             }
@@ -1531,7 +1541,7 @@ Paragraph.prototype =
                 //----------------------------------------------------------------------------------------------------------
                 // Заливка параграфа
                 //----------------------------------------------------------------------------------------------------------
-                if ( (_Range.W > 0.001 || true === this.IsEmpty() || true !== this.Is_EmptyRange(CurLine, CurRange) ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && shd_Clear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
+                if ( (_Range.W > 0.001 || true === this.IsEmpty() || true !== this.Is_EmptyRange(CurLine, CurRange) ) && ( ( this.Pages.length - 1 === CurPage ) || ( CurLine < this.Pages[CurPage + 1].FirstLine ) ) && Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value && (Pr.ParaPr.Shd.Unifill || (Pr.ParaPr.Shd.Color && true !== Pr.ParaPr.Shd.Color.Auto)) )
                 {
                     if(pGraphics.Start_Command)
                     {
@@ -1572,7 +1582,7 @@ Paragraph.prototype =
                         if ( true === Pr.ParaPr.Brd.First )
                         {
                             // Если следующий элемент таблица, тогда PrevPr = null
-                            if ( null === PrevEl || true === this.Is_StartFromNewPage() || null === PrevPr || shd_Nil === PrevPr.ParaPr.Shd.Value || PrevLeft != CurLeft || CurRight != PrevRight || false === this.Internal_Is_NullBorders(PrevPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) )
+                            if ( null === PrevEl || true === this.Is_StartFromNewPage() || null === PrevPr || Asc.c_oAscShdNil === PrevPr.ParaPr.Shd.Value || PrevLeft != CurLeft || CurRight != PrevRight || false === this.Internal_Is_NullBorders(PrevPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) )
                             {
                                 if ( false === this.Is_StartFromNewPage() || null === PrevEl )
                                     TempTop += Pr.ParaPr.Spacing.Before;
@@ -1609,7 +1619,7 @@ Paragraph.prototype =
                         else if ( true === Pr.ParaPr.Brd.Last )
                         {
                             // Если следующий элемент таблица, тогда NextPr = null
-                            if ( null === NextEl || true === NextEl.Is_StartFromNewPage() || null === NextPr || shd_Nil === NextPr.ParaPr.Shd.Value || NextLeft != CurLeft || CurRight != NextRight || false === this.Internal_Is_NullBorders(NextPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) )
+                            if ( null === NextEl || true === NextEl.Is_StartFromNewPage() || null === NextPr || Asc.c_oAscShdNil === NextPr.ParaPr.Shd.Value || NextLeft != CurLeft || CurRight != NextRight || false === this.Internal_Is_NullBorders(NextPr.ParaPr.Brd) || false === this.Internal_Is_NullBorders(Pr.ParaPr.Brd) )
                                 TempBottom -= Pr.ParaPr.Spacing.After;
                         }
                     }
@@ -1785,7 +1795,7 @@ Paragraph.prototype =
 
                 if ( 0 === CurLine )
                 {
-                    if ( Pr.ParaPr.Brd.Top.Value === border_Single || shd_Clear === Pr.ParaPr.Shd.Value )
+                    if ( Pr.ParaPr.Brd.Top.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value )
                     {
                         if ( ( true === Pr.ParaPr.Brd.First && ( 0 === CurPage || true === this.Parent.Is_TableCellContent() || true === Pr.ParaPr.PageBreakBefore ) ) ||
                              ( true !== Pr.ParaPr.Brd.First && ( ( 0 === CurPage && null === this.Get_DocumentPrev() ) || ( 1 === CurPage && true === this.Is_StartFromNewPage() )  ) ) )
@@ -1798,7 +1808,7 @@ Paragraph.prototype =
                     var NextEl = this.Get_DocumentNext();
                     if ( null != NextEl && type_Paragraph === NextEl.GetType() && true === NextEl.Is_StartFromNewPage() )
                         TempBottom = this.Lines[CurLine].Y + this.Lines[CurLine].Metrics.Descent + this.Lines[CurLine].Metrics.LineGap;
-                    else if ( (true === Pr.ParaPr.Brd.Last || type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || shd_Clear === Pr.ParaPr.Shd.Value ) )
+                    else if ( (true === Pr.ParaPr.Brd.Last || type_Table === NextEl.Get_Type() || true === NextEl.private_IsEmptyPageWithBreak(0)) &&  ( Pr.ParaPr.Brd.Bottom.Value === border_Single || Asc.c_oAscShdClear === Pr.ParaPr.Shd.Value ) )
                         TempBottom -= Pr.ParaPr.Spacing.After;
                 }
 
@@ -6053,7 +6063,7 @@ Paragraph.prototype =
             var LastRange = this.Lines[this.Lines.length - 1].Ranges[this.Lines[this.Lines.length - 1].Ranges.length - 1];
             if (CurPage >= PagesCount - 1 && X > LastRange.W && MouseEvent.ClickCount >= 2 && Y <= this.Pages[PagesCount - 1].Bounds.Bottom)
             {
-                if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : this, CheckType : changestype_Paragraph_Content } ) )
+                if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : AscCommon.changestype_2_Element_and_Type, Element : this, CheckType : AscCommon.changestype_Paragraph_Content } ) )
                 {
                     History.Create_NewPoint(historydescription_Document_ParagraphExtendToPos);
                     History.Set_Additional_ExtendDocumentToPos();
@@ -7791,7 +7801,7 @@ Paragraph.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (undefined !== this.Parent && null !== this.Parent && true !== g_oIdCounter.m_bLoad && true !== g_oIdCounter.m_bRead)
+            if (undefined !== this.Parent && null !== this.Parent && true !== AscCommon.g_oIdCounter.m_bLoad && true !== AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)
@@ -8260,7 +8270,7 @@ Paragraph.prototype =
                 var Styles = this.Parent.Get_Styles();
 
                 var HdrFtrStyle = null;
-                if (hdrftr_Header === HdrFtr.Type)
+                if (AscCommon.hdrftr_Header === HdrFtr.Type)
                     HdrFtrStyle = Styles.Get_Default_Header();
                 else
                     HdrFtrStyle = Styles.Get_Default_Footer();
@@ -8758,7 +8768,7 @@ Paragraph.prototype =
 
         var ContentPos = 0;
 
-        if ( c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
+        if ( Asc.c_oAscRelativeFromH.Character != RelH || c_oAscRelativeFromV.Line != RelV )
         {
             var CurLine = Result.Internal.Line;
             if ( c_oAscRelativeFromV.Line != RelV )
@@ -8777,7 +8787,7 @@ Paragraph.prototype =
             Result.Y = this.Pages[CurPage].Y + this.Lines[CurLine].Y - this.Lines[CurLine].Metrics.Ascent;
         }
 
-        if ( c_oAscRelativeFromH.Character === RelH  )
+        if ( Asc.c_oAscRelativeFromH.Character === RelH  )
         {
             // Ничего не делаем
         }
@@ -9148,7 +9158,7 @@ Paragraph.prototype =
     {
         CurPage = Math.max(0, Math.min(CurPage, this.Pages.length - 1));
         var text_transform = this.Get_ParentTextTransform();
-        var MMData = new CMouseMoveData();
+        var MMData = new AscCommon.CMouseMoveData();
         var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( X, Y, this.Get_AbsolutePage(CurPage), text_transform );
         MMData.X_abs = Coords.X;
         MMData.Y_abs = Coords.Y;
@@ -9157,11 +9167,11 @@ Paragraph.prototype =
 
         if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
         {
-            MMData.Type      = c_oAscMouseMoveDataTypes.Hyperlink;
+            MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
             MMData.Hyperlink = new CHyperlinkProperty( Hyperlink );
         }
         else
-            MMData.Type      = c_oAscMouseMoveDataTypes.Common;
+            MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
         if ( null != Hyperlink && true === global_keyboardEvent.CtrlKey )
             this.DrawingDocument.SetCursorType( "pointer", MMData );
@@ -9174,11 +9184,11 @@ Paragraph.prototype =
             var _X = this.Pages[CurPage].X;
             var _Y = this.Pages[CurPage].Y;
 
-            var MMData = new CMouseMoveData();
+            var MMData = new AscCommon.CMouseMoveData();
             var Coords = this.DrawingDocument.ConvertCoordsToCursorWR( _X, _Y, this.Get_AbsolutePage(CurPage), text_transform );
             MMData.X_abs            = Coords.X - 5;
             MMData.Y_abs            = Coords.Y;
-            MMData.Type             = c_oAscMouseMoveDataTypes.LockedObject;
+            MMData.Type             = AscCommon.c_oAscMouseMoveDataTypes.LockedObject;
             MMData.UserId           = this.Lock.Get_UserId();
             MMData.HaveChanges      = this.Lock.Have_Changes();
             MMData.LockedObjectType = c_oAscMouseMoveLockedObjectType.Common;
@@ -9470,7 +9480,7 @@ Paragraph.prototype =
         if (undefined === this.Parent || (!(this.Parent instanceof CDocument) && (undefined === this.Parent.Parent || !(this.Parent.Parent instanceof CHeaderFooter))))
             return true;
 
-        if (undefined != this.Pr.FramePr && c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign)
+        if (undefined != this.Pr.FramePr && Asc.c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign)
             return false;
 
         return true;
@@ -9499,7 +9509,7 @@ Paragraph.prototype =
 
         var FrameParas = this.Internal_Get_FrameParagraphs();
 
-        // Тут FramePr- объект класса из api.js CParagraphFrame
+        // Тут FramePr- объект класса из api.js asc_CParagraphFrame
         if ( true === FramePr.FromDropCapMenu && 1 === FrameParas.length )
         {
             // Здесь мы смотрим только на количество строк, шрифт, тип и горизонтальный отступ от текста
@@ -9508,7 +9518,7 @@ Paragraph.prototype =
             if ( undefined != FramePr.DropCap )
             {
                 var OldLines = NewFramePr.Lines;
-                NewFramePr.Init_Default_DropCap( FramePr.DropCap === c_oAscDropCap.Drop ? true : false );
+                NewFramePr.Init_Default_DropCap( FramePr.DropCap === Asc.c_oAscDropCap.Drop ? true : false );
                 NewFramePr.Lines = OldLines;
             }
 
@@ -9689,7 +9699,7 @@ Paragraph.prototype =
         if ( undefined != BottomBorder && border_None != BottomBorder.Value )
             _Y1 += BottomBorder.Size + BottomBorder.Space;
 
-        if ( _Y1 > Y1 && ( heightrule_Auto === FramePr.HRule || ( heightrule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
+        if ( _Y1 > Y1 && ( Asc.linerule_Auto === FramePr.HRule || ( Asc.linerule_AtLeast === FramePr.HRule && FrameH >= FramePr.H ) ) )
             Y1 = _Y1;
 
         return { X : X0, Y : Y0, W : X1 - X0, H : Y1 - Y0 };
@@ -9789,7 +9799,7 @@ Paragraph.prototype =
             return;
 
         var FrameParas = this.Internal_Get_FrameParagraphs();
-        if ( false === LogicDocument.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
+        if ( false === LogicDocument.Document_Is_SelectionLocked( AscCommon.changestype_None, { Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : AscCommon.changestype_Paragraph_Content } ) )
         {
             History.Create_NewPoint(historydescription_Document_ParagraphChangeFrame);
             var NewFramePr = FramePr.Copy();
@@ -9798,14 +9808,14 @@ Paragraph.prototype =
             {
                 NewFramePr.X       = X;
                 NewFramePr.XAlign  = undefined;
-                NewFramePr.HAnchor = c_oAscHAnchor.Page;
+                NewFramePr.HAnchor = Asc.c_oAscHAnchor.Page;
             }
 
             if ( Math.abs( Y - this.CalculatedFrame.T ) > 0.001 )
             {
                 NewFramePr.Y       = Y;
                 NewFramePr.YAlign  = undefined;
-                NewFramePr.VAnchor = c_oAscVAnchor.Page;
+                NewFramePr.VAnchor = Asc.c_oAscVAnchor.Page;
             }
 
             if ( Math.abs( W - this.CalculatedFrame.W ) > 0.001 )
@@ -9813,7 +9823,7 @@ Paragraph.prototype =
 
             if ( Math.abs( H - this.CalculatedFrame.H ) > 0.001 )
             {
-                if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap && 1 === FrameParas.length )
+                if ( undefined != FramePr.DropCap && Asc.c_oAscDropCap.None != FramePr.DropCap && 1 === FrameParas.length )
                 {
                     var PageH = this.LogicDocument.Get_PageLimits( PageIndex).YLimit;
                     var _H = Math.min( H, PageH );
@@ -9826,7 +9836,7 @@ Paragraph.prototype =
                     if ( H <= this.CalculatedFrame.H )
                         NewFramePr.HRule = linerule_Exact;
                     else
-                        NewFramePr.HRule = linerule_AtLeast;
+                        NewFramePr.HRule = Asc.linerule_AtLeast;
 
                     NewFramePr.H = H;
                 }
@@ -9847,7 +9857,7 @@ Paragraph.prototype =
 
     Supplement_FramePr : function(FramePr)
     {
-        if ( undefined != FramePr.DropCap && dropcap_None != FramePr.DropCap )
+        if ( undefined != FramePr.DropCap && Asc.c_oAscDropCap.None != FramePr.DropCap )
         {
             var _FramePr = this.Get_FramePr();
             var FirstFramePara = this;
@@ -11706,7 +11716,7 @@ Paragraph.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
                     var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
                     if ( null != Element )
@@ -11750,7 +11760,7 @@ Paragraph.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var ChangesPos = this.m_oContentChanges.Check(contentchanges_Remove, Reader.GetLong());
+                    var ChangesPos = this.m_oContentChanges.Check(AscCommon.contentchanges_Remove, Reader.GetLong());
 
                     // действие совпало, не делаем его
                     if (false === ChangesPos)

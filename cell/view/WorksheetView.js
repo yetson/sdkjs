@@ -41,6 +41,17 @@
      * Import
      * -----------------------------------------------------------------------------
      */
+    var CellValueType = AscCommon.CellValueType;
+    var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+    var c_oAscBorderType = AscCommon.c_oAscBorderType;
+    var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+    var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+    var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+    var AscBrowser = AscCommon.AscBrowser;
+    var CColor = AscCommon.CColor;
+    var fSortAscending = AscCommon.fSortAscending;
+    var parserHelp = AscCommon.parserHelp;
+
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
     var asc_calcnpt = asc.calcNearestPt;
@@ -67,6 +78,21 @@
     var asc_CPagePrint = asc.CPagePrint;
     var asc_CSelectionMathInfo = asc.asc_CSelectionMathInfo;
     var asc_CAutoFilterInfo = asc.asc_CAutoFilterInfo;
+
+    var c_oTargetType = AscCommonExcel.c_oTargetType;
+    var c_oAscCanChangeColWidth = AscCommonExcel.c_oAscCanChangeColWidth;
+    var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;
+    var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+    var c_oAscGraphicOption = AscCommonExcel.c_oAscGraphicOption;
+    var c_oAscError = asc.c_oAscError;
+    var c_oAscMergeOptions = asc.c_oAscMergeOptions;
+    var c_oAscInsertOptions = asc.c_oAscInsertOptions;
+    var c_oAscDeleteOptions = asc.c_oAscDeleteOptions;
+    var c_oAscBorderOptions = asc.c_oAscBorderOptions;
+    var c_oAscCleanOptions = asc.c_oAscCleanOptions;
+    var c_oAscSelectionType = asc.c_oAscSelectionType;
+    var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
+    var c_oAscAutoFilterTypes = asc.c_oAscAutoFilterTypes;
 
     /*
      * Constants
@@ -371,7 +397,7 @@
         this.collaborativeEditing = collaborativeEditing;
 
         this.drawingArea = new DrawingArea( this );
-        this.cellCommentator = new CCellCommentator( this );
+        this.cellCommentator = new AscCommonExcel.CCellCommentator(this);
         this.objectRender = null;
 
         this._init();
@@ -721,7 +747,7 @@
         if ( w === t.cols[col].width ) {
             return;
         }
-        var cc = Math.min( t._colWidthToCharCount( w ), c_oAscMaxColumnWidth );
+        var cc = Math.min( t._colWidthToCharCount( w ), Asc.c_oAscMaxColumnWidth );
         var cw = t._charCountToModelColWidth( cc );
 
         var onChangeWidthCallback = function ( isSuccess ) {
@@ -822,8 +848,8 @@
         }
         if ( arrCols ) {
             // Делаем массивы уникальными и сортируем
-            arrCols = arrCols.filter( fOnlyUnique );
-            arrRows = arrRows.filter( fOnlyUnique );
+            arrCols = arrCols.filter( AscCommon.fOnlyUnique );
+            arrRows = arrRows.filter( AscCommon.fOnlyUnique );
             return {arrCols: arrCols.sort( fSortAscending ), arrRows: arrRows.sort( fSortAscending )};
         }
         else {
@@ -1186,7 +1212,7 @@
         var tm = this._roundTextMetrics( this.stringRender.measureString( "A" ) );
         this.headersHeightByFont = tm.height;
 
-        this.maxRowHeight = asc_calcnpt( c_oAscMaxRowHeight, this._getPPIY() );
+        this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
         this.defaultRowDescender = this._calcRowDescender( defaultFontSize );
         gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() || Math.max( asc_calcnpt( defaultFontSize * this.vspRatio, this._getPPIY() ) + this.height_1px, this.headersHeightByFont );
 
@@ -1730,7 +1756,7 @@
             pageBottomField = c_oAscPrintDefaultSettings.PageBottomField;
         }
 
-        if (c_oAscPageOrientation.PageLandscape === pageOrientation) {
+        if (Asc.c_oAscPageOrientation.PageLandscape === pageOrientation) {
             var tmp = pageWidth;
             pageWidth = pageHeight;
             pageHeight = tmp;
@@ -3267,9 +3293,9 @@
     WorksheetView.prototype._drawFrozenPaneLines = function ( drawingCtx ) {
         // Возможно стоит отрисовывать на overlay, а не на основной канве
         var ctx = drawingCtx ? drawingCtx : this.drawingCtx;
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, this.model.getId(), c_oAscLockNameFrozenPane );
+        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, this.model.getId(), AscCommonExcel.c_oAscLockNameFrozenPane );
         var isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
-        var color = isLocked ? c_oAscCoAuthoringOtherBorderColor : this.settings.frozenColor;
+        var color = isLocked ? AscCommonExcel.c_oAscCoAuthoringOtherBorderColor : this.settings.frozenColor;
         ctx.setLineWidth( 1 ).setStrokeStyle( color ).beginPath();
         var fHorLine, fVerLine;
         if ( isLocked ) {
@@ -3472,8 +3498,8 @@
             lastRow = this.topLeftFrozenCell.getRow0();
         }
         History.Create_NewPoint();
-        var oData = new UndoRedoData_FromTo( new UndoRedoData_BBox( new asc_Range( lastCol, lastRow, lastCol, lastRow ) ), new UndoRedoData_BBox( new asc_Range( col, row, col, row ) ), null );
-        History.Add( g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData );
+        var oData = new AscCommonExcel.UndoRedoData_FromTo( new AscCommonExcel.UndoRedoData_BBox( new asc_Range( lastCol, lastRow, lastCol, lastRow ) ), new AscCommonExcel.UndoRedoData_BBox( new asc_Range( col, row, col, row ) ), null );
+        History.Add( AscCommonExcel.g_oUndoRedoWorksheet, historyitem_Worksheet_ChangeFrozenCell, this.model.getId(), null, oData );
 
         var isUpdate = false;
         if ( 0 === col && 0 === row ) { // Очистка
@@ -4085,7 +4111,7 @@
     };
 
     WorksheetView.prototype._drawFormulaRanges = function ( arrRanges ) {
-        var i, lineWidth = 1, isDashLine = false, length = c_oAscFormulaRangeBorderColor.length;
+        var i, lineWidth = 1, isDashLine = false, length = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
         var strokeColor, fillColor, colorIndex, uniqueColorIndex = 0, tmpColors = [];
         for ( i = 0; i < arrRanges.length; ++i ) {
             var oFormulaRange = arrRanges[i].clone( true );
@@ -4096,14 +4122,14 @@
             }
             tmpColors.push( colorIndex );
 
-            strokeColor = fillColor = c_oAscFormulaRangeBorderColor[colorIndex % length];
+            strokeColor = fillColor = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % length];
             this._drawElements( this, this._drawSelectionElement, oFormulaRange, isDashLine, lineWidth, strokeColor, fillColor );
         }
     };
 
     WorksheetView.prototype._drawSelectRange = function ( oSelectRange ) {
         var lineWidth = 1, isDashLine = true;
-        this._drawElements( this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, c_oAscCoAuthoringOtherBorderColor);
+        this._drawElements( this, this._drawSelectionElement, oSelectRange, isDashLine, lineWidth, AscCommonExcel.c_oAscCoAuthoringOtherBorderColor);
     };
 
     WorksheetView.prototype._drawCollaborativeElements = function () {
@@ -4117,8 +4143,8 @@
     WorksheetView.prototype._drawCollaborativeElementsAllLock = function () {
         var currentSheetId = this.model.getId();
         var nLockAllType = this.collaborativeEditing.isLockAllOther( currentSheetId );
-        if ( c_oAscMouseMoveLockedObjectType.None !== nLockAllType ) {
-            var lineWidth = 1, isDashLine = true, isAllRange = true, strokeColor = (c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ? c_oAscCoAuthoringLockTablePropertiesBorderColor : c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range( 0, 0, gc_nMaxCol0, gc_nMaxRow0 );
+        if ( Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType ) {
+            var lineWidth = 1, isDashLine = true, isAllRange = true, strokeColor = (Asc.c_oAscMouseMoveLockedObjectType.TableProperties === nLockAllType) ? AscCommonExcel.c_oAscCoAuthoringLockTablePropertiesBorderColor : AscCommonExcel.c_oAscCoAuthoringOtherBorderColor, oAllRange = new asc_Range( 0, 0, gc_nMaxCol0, gc_nMaxRow0 );
             this._drawElements( this, this._drawSelectionElement, oAllRange, isDashLine, lineWidth, strokeColor, null, isAllRange );
         }
     };
@@ -4126,14 +4152,14 @@
     WorksheetView.prototype._drawCollaborativeElementsMeOther = function (type) {
         var currentSheetId = this.model.getId(), i, lineWidth = 1, isDashLine = true, strokeColor, arrayCells, oCellTmp;
         if ( c_oAscLockTypes.kLockTypeMine === type ) {
-            strokeColor = c_oAscCoAuthoringMeBorderColor;
+            strokeColor = AscCommonExcel.c_oAscCoAuthoringMeBorderColor;
             arrayCells = this.collaborativeEditing.getLockCellsMe( currentSheetId );
 
             arrayCells = arrayCells.concat( this.collaborativeEditing.getArrayInsertColumnsBySheetId( currentSheetId ) );
             arrayCells = arrayCells.concat( this.collaborativeEditing.getArrayInsertRowsBySheetId( currentSheetId ) );
         }
         else {
-            strokeColor = c_oAscCoAuthoringOtherBorderColor;
+            strokeColor = AscCommonExcel.c_oAscCoAuthoringOtherBorderColor;
             arrayCells = this.collaborativeEditing.getLockCellsOther( currentSheetId );
         }
 
@@ -4247,7 +4273,7 @@
             var currentSheetId = this.model.getId();
 
             var nLockAllType = this.collaborativeEditing.isLockAllOther( currentSheetId );
-            if ( c_oAscMouseMoveLockedObjectType.None !== nLockAllType ) {
+            if ( Asc.c_oAscMouseMoveLockedObjectType.None !== nLockAllType ) {
                 this.overlayCtx.clear();
             }
             else {
@@ -4414,7 +4440,7 @@
             .fillRect( x, 0, this.width_1px, h );
 
         return new asc_CMM( {
-            type      : c_oAscMouseMoveType.ResizeColumn,
+            type      : Asc.c_oAscMouseMoveType.ResizeColumn,
             sizeCCOrPt: this._colWidthToCharCount( widthPt ),
             sizePx    : widthPt * 96 / 72,
             x         : (x1 + this.cols[col].width) * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ),
@@ -4447,7 +4473,7 @@
             .fillRect( 0, y, w, this.height_1px );
 
         return new asc_CMM( {
-            type      : c_oAscMouseMoveType.ResizeRow,
+            type      : Asc.c_oAscMouseMoveType.ResizeRow,
             sizeCCOrPt: heightPt,
             sizePx    : heightPt * 96 / 72,
             x         : this.cellsLeft * asc_getcvt( 1/*pt*/, 0/*px*/, this._getPPIX() ),
@@ -4631,7 +4657,7 @@
     };
 
     WorksheetView.prototype._changeColWidth = function ( col, width, pad ) {
-        var cc = Math.min( this._colWidthToCharCount( width + pad ), c_oAscMaxColumnWidth );
+        var cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
         var modelw = this._charCountToModelColWidth( cc );
         var colw = this._calcColWidth( modelw );
 
@@ -5382,7 +5408,7 @@
     };
 
     WorksheetView.prototype.prepareDepCells = function ( se ) {
-        var activeCell = this.activeRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
+        var activeCell = this.activeRange, mc = this.model.getMergedByCell( activeCell.startRow, activeCell.startCol ), c1 = mc ? mc.c1 : activeCell.startCol, r1 = mc ? mc.r1 : activeCell.startRow, c = this._getVisibleCell( c1, r1 ), nodes = (se == AscCommonExcel.c_oAscDrawDepOptions.Master) ? this.model.workbook.dependencyFormulas.getMasterNodes( this.model.getId(), c.getName() ) : this.model.workbook.dependencyFormulas.getSlaveNodes( this.model.getId(), c.getName() );
 
         if ( !nodes ) {
             return;
@@ -5392,7 +5418,7 @@
             this.depDrawCells = {};
         }
 
-        if ( se == c_oAscDrawDepOptions.Master ) {
+        if ( se == AscCommonExcel.c_oAscDrawDepOptions.Master ) {
             c = c.getCells()[0];
             var id = getVertexId( this.model.getId(), c.getName() );
             this.depDrawCells[id] = {from: c, to: nodes};
@@ -6313,7 +6339,7 @@
 
         var frozenCursor = this._isFrozenAnchor( x, y );
         if ( !isViewerMode && frozenCursor.result ) {
-            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane );
+            lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
             isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
             if ( false !== isLocked ) {
                 // Кто-то сделал lock
@@ -6334,7 +6360,7 @@
         }
 
         var drawingInfo = this.objectRender.checkCursorDrawingObject( x, y );
-        if ( asc["editor"].isStartAddShape && CheckIdSatetShapeAdd( this.objectRender.controller.curState ) ) {
+        if ( asc["editor"].isStartAddShape && AscCommonExcel.CheckIdSatetShapeAdd( this.objectRender.controller.curState ) ) {
             return {cursor: kCurFillHandle, target: c_oTargetType.Shape, col: -1, row: -1};
         }
 
@@ -7184,7 +7210,7 @@
         if ( 1 < oSelectionMathInfo.countNumbers ) {
             // Мы должны отдавать в формате активной ячейки
             var numFormat = range.getNumFormat();
-            if ( c_oAscNumFormatType.Time === numFormat.getType() ) {
+            if ( Asc.c_oAscNumFormatType.Time === numFormat.getType() ) {
                 // Для времени нужно отдавать в формате [h]:mm:ss (http://bugzserver/show_bug.cgi?id=26271)
                 numFormat = oNumFormatCache.get( '[h]:mm:ss' );
             }
@@ -7342,7 +7368,7 @@
         cell_info.font.strikeout = c.getStrikeout();
         cell_info.font.subscript = fa === "subscript";
         cell_info.font.superscript = fa === "superscript";
-        cell_info.font.color = (fc ? asc_obj2Color( fc ) : new asc_CColor( c_opt.defaultState.color ));
+        cell_info.font.color = (fc ? asc_obj2Color( fc ) : new Asc.asc_CColor( c_opt.defaultState.color ));
 
         cell_info.fill = new asc_CFill( (null != bg) ? asc_obj2Color( bg ) : bg );
 
@@ -7423,16 +7449,16 @@
 
             var horAlign = "center";
             switch ( paraPr.Jc ) {
-                case align_Left    :
+                case AscCommon.align_Left    :
                     horAlign = "left";
                     break;
-                case align_Right  :
+                case AscCommon.align_Right  :
                     horAlign = "right";
                     break;
-                case align_Center  :
+                case AscCommon.align_Center  :
                     horAlign = "center";
                     break;
-                case align_Justify  :
+                case AscCommon.align_Justify  :
                     horAlign = "justify";
                     break;
             }
@@ -7479,10 +7505,10 @@
             objectInfo.font.italic = textPr.Italic;
             objectInfo.font.underline = textPr.Underline;
             objectInfo.font.strikeout = textPr.Strikeout;
-            objectInfo.font.subscript = textPr.VertAlign == vertalign_SubScript;
-            objectInfo.font.superscript = textPr.VertAlign == vertalign_SuperScript;
+            objectInfo.font.subscript = textPr.VertAlign == AscCommon.vertalign_SubScript;
+            objectInfo.font.superscript = textPr.VertAlign == AscCommon.vertalign_SuperScript;
             if ( textPr.Color ) {
-                objectInfo.font.color = CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
+                objectInfo.font.color = AscCommon.CreateAscColorCustom( textPr.Color.r, textPr.Color.g, textPr.Color.b );
             }
 
             var shapeHyperlink = this.objectRender.controller.getHyperlinkInfo();
@@ -7564,7 +7590,7 @@
             height >>= 1;
         }
 
-        return new asc_CRect( xL, yL, width, height );
+        return new AscCommon.asc_CRect( xL, yL, width, height );
     };
 
     WorksheetView.prototype._checkSelectionShape = function () {
@@ -8743,9 +8769,9 @@
             this.handlers.trigger( "onErrorEvent", c_oAscError.ID.CannotMoveRange, c_oAscError.Level.NoCritical );
             this._cleanSelectionMoveRange();
         }
-        else if ( resmove === -1 && this.af_isCheckMoveRange( arnFrom, arnTo ) ) {
+        else if (resmove === -1) {
             var t = this;
-            this.model.workbook.handlers.trigger( "asc_onConfirmAction", c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
+            this.model.workbook.handlers.trigger( "asc_onConfirmAction", Asc.c_oAscConfirm.ConfirmReplaceRange, function ( can ) {
                 if ( can ) {
                     t.moveRangeHandle( arnFrom, arnTo, ctrlKey );
                 }
@@ -8900,7 +8926,7 @@
                         border.setStyle( b.style );
                     }
                     if ( b.color !== null && b.color !== undefined ) {
-                        if ( b.color instanceof asc_CColor ) {
+                        if ( b.color instanceof Asc.asc_CColor ) {
                             border.c = CorrectAscColor( b.color );
                         }
                     }
@@ -9100,7 +9126,7 @@
                     break;
                 case "hyperlink":
                     if ( val && val.hyperlinkModel ) {
-                        if ( c_oAscHyperlinkType.RangeLink === val.asc_getType() ) {
+                        if ( Asc.c_oAscHyperlinkType.RangeLink === val.asc_getType() ) {
                             var hyperlinkRangeTmp = t.model.getRange2( val.asc_getRange() );
                             if ( null === hyperlinkRangeTmp ) {
                                 bIsUpdate = false;
@@ -9496,7 +9522,7 @@
                                 var nameFormat = false;
                                 //}
                                 if ( currentObj[0].cellFrom ) {
-                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
+                                    var offset = range.getCells()[0].getOffset2( currentObj[0].cellFrom ), assemb, _p_ = new AscCommonExcel.parserFormula( currentObj[0].text.substring( 1 ), "", range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
@@ -9759,7 +9785,7 @@
                                 for ( var i = 0; i < val.aComments.length; i++ ) {
                                     comment = val.aComments[i];
                                     if ( comment.nCol == pasteCol && comment.nRow == pasteRow ) {
-                                        var commentData = new asc_CCommentData( comment );
+                                        var commentData = new Asc.asc_CCommentData( comment );
                                         //change nRow, nCol
                                         commentData.asc_putCol( c + autoC * plCol );
                                         commentData.asc_putRow( r + autoR * plRow );
@@ -9870,7 +9896,7 @@
                                 //formula
                                 if ( newVal.getFormula() && !isOneMerge ) {
                                     var offset = range.getCells()[numFormula].getOffset2( value2[numFormula].sId ), assemb,
-										_p_ = new parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
+										_p_ = new AscCommonExcel.parserFormula( value2[numFormula].sFormula, firstRange.getName() ? firstRange.getName() : "", range.worksheet );
 
                                     if ( _p_.parse() ) {
                                         assemb = _p_.changeOffset( offset ).assemble();
@@ -9977,7 +10003,7 @@
     // Залочена ли панель для закрепления
     WorksheetView.prototype._isLockedFrozenPane = function ( callback ) {
         var sheetId = this.model.getId();
-        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, c_oAscLockNameFrozenPane );
+        var lockInfo = this.collaborativeEditing.getLockInfo( c_oAscLockTypeElem.Object, null, sheetId, AscCommonExcel.c_oAscLockNameFrozenPane );
 
         if ( false === this.collaborativeEditing.getCollaborativeEditing() ) {
             // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
@@ -10657,7 +10683,7 @@
         var pad, cc, cw;
         if ( width > 0 ) {
             pad = this.width_padding * 2 + this.width_1px;
-            cc = Math.min( this._colWidthToCharCount( width + pad ), c_oAscMaxColumnWidth );
+            cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
             cw = this._charCountToModelColWidth( cc );
         }
         else {
@@ -10788,7 +10814,7 @@
         // Не пользуемся RegExp, чтобы не возиться со спец.символами
         var mc = this.model.getMergedByCell( r, c );
         cell = mc ? this._getVisibleCell( mc.c1, mc.r1 ) : this._getVisibleCell( c, r );
-        cellText = (options.lookIn === c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
+        cellText = (options.lookIn === Asc.c_oAscFindLookIn.Formulas) ? cell.getValueForEdit() : cell.getValue();
         if ( true !== options.isMatchCase ) {
             cellText = cellText.toLowerCase();
         }
@@ -11055,11 +11081,11 @@
                 }
                 else if ( _C2H50H_.parsedRef.RefPos.length == 1 && _C2H50H_.parsedRef.outStack.length == 1 ) {
                     ref = _C2H50H_.parsedRef.outStack[0];
-                    if ( ref.type == cElementType.cell3D ) {
+                    if ( ref.type == AscCommonExcel.cElementType.cell3D ) {
                         range = ref.range.getBBox0().clone( true );
                         sheetName = ref.getWS();
                     }
-                    else if ( ref.type == cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
+                    else if ( ref.type == AscCommonExcel.cElementType.cellsRange3D && ref.wsFrom == ref.wsTo ) {
                         range = ref.getRange()[0].getBBox0().clone( true );
                         sheetName = this.model.workbook.getWorksheetById( ref.wsFrom );
                     }
@@ -11412,7 +11438,7 @@
             isClearCell       : isClearCell,
             isHideCursor      : isHideCursor,
             isQuickInput      : isQuickInput,
-            isAddPersentFormat: isQuickInput && c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
+            isAddPersentFormat: isQuickInput && Asc.c_oAscNumFormatType.Percent === c.getNumFormat().getType(),
             autoComplete      : arrAutoComplete,
             autoCompleteLC    : arrAutoCompleteLC,
             cellName          : c.getName(),
@@ -11434,7 +11460,7 @@
                         arrLeftS.push( tc[i].left - offsX );
                     }
                 }
-                arrLeftS.sort( fSortDescending );
+                arrLeftS.sort( AscCommon.fSortDescending );
 
                 // Для замерженных ячеек, можем уйти за границу
                 if ( isMerged && _col > vro.vr.c2 ) {
@@ -11734,6 +11760,15 @@
             }
         }
     };
+  WorksheetView.prototype.removeFormulaRange = function(range) {
+    this.arrActiveFormulaRangesPosition = -1;
+    for (var i = 0; i < this.arrActiveFormulaRanges.length; ++i) {
+      if (this.arrActiveFormulaRanges[i].isEqual(range)) {
+        this.arrActiveFormulaRanges.splice(i, 1);
+        return;
+      }
+    }
+  };
 
     WorksheetView.prototype.cleanFormulaRanges = function () {
         // Очищаем массив ячеек для текущей формулы
@@ -11851,7 +11886,7 @@
             }
 
             switch ( optionType ) {
-                case c_oAscChangeFilterOptions.filter:
+                case Asc.c_oAscChangeFilterOptions.filter:
                 {
                     //DELETE
 					if ( !val )
@@ -11898,7 +11933,7 @@
 
                     break;
                 }
-                case c_oAscChangeFilterOptions.style://CHANGE STYLE
+                case Asc.c_oAscChangeFilterOptions.style://CHANGE STYLE
                 {
                     var changeStyleFilterCallBack = function()
 					{

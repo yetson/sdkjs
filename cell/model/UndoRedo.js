@@ -23,6 +23,17 @@
  *
 */
 "use strict";
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
+// Import
+var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
 
 var c_oUndoRedoSerializeType =
 {
@@ -266,7 +277,7 @@ UndoRedoItemSerializable.prototype = {
         else
         {
             var changedObjectId = oBinaryReader.GetString2();
-            var changedObject = g_oTableId.Get_ById(changedObjectId);
+            var changedObject = AscCommon.g_oTableId.Get_ById(changedObjectId);
             this.nActionType = 1;
             this.oClass = changedObject;
             this.oData = new DrawingCollaborativeData();
@@ -449,8 +460,8 @@ var UndoRedoDataTypes = new function() {
 			case this.StyleBorderProp: return new BorderProp();break;
 			case this.StyleXfs: return new CellXfs();break;
 			case this.StyleAlign: return new Align();break;
-			case this.CommentData: return new asc_CCommentData();break;
-			case this.CompositeCommentData: return new CompositeCommentData();break;
+			case this.CommentData: return new Asc.asc_CCommentData();break;
+			case this.CompositeCommentData: return new AscCommonExcel.CompositeCommentData();break;
 			case this.ChartSeriesData: return new asc_CChartSeria();break;
 			case this.SheetAdd: return new UndoRedoData_SheetAdd();break;
 			case this.SheetRemove: return new UndoRedoData_SheetRemove();break;
@@ -2718,11 +2729,10 @@ UndoRedoDataSetAdjustmentValue.prototype =
     }
 };
 
-var g_oUndoRedoWorkbook = null;
 function UndoRedoWorkbook(wb)
 {
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoWorkbook;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoWorkbook;});
 }
 
 UndoRedoWorkbook.prototype = {
@@ -2910,7 +2920,7 @@ UndoRedoWorkbook.prototype = {
                         if(oConflictDefName)
                             oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
                     }
-                    this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
+                    this.wb.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
                 }
                 this.wb.editDefinesNames( null, Data.newName, true );
                 this.wb.handlers.trigger("asc_onEditDefName", null, Data.newName);
@@ -2936,7 +2946,7 @@ UndoRedoWorkbook.prototype = {
 //                        if(oConflictDefName)
 //                            oConflictDefName.renameDefNameToCollaborate(this.wb.getUniqueDefinedNameFrom(oConflictDefName, true));
 //                    }
-                    this.wb.handlers.trigger("asc_onLockDefNameManager",c_oAscDefinedNameReason.OK);
+                    this.wb.handlers.trigger("asc_onLockDefNameManager",Asc.c_oAscDefinedNameReason.OK);
                 }
                 oldName = Data.oldName;
                 newName = Data.newName;
@@ -2957,7 +2967,7 @@ UndoRedoWorkbook.prototype = {
 
                             n = n.returnCell();
                             if(n){
-                                n.formulaParsed = new parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
+                                n.formulaParsed = new AscCommonExcel.parserFormula( n.formulaParsed.Formula, n.formulaParsed.cellId, n.formulaParsed.ws )
                             }
                         }
                     }
@@ -2971,11 +2981,10 @@ UndoRedoWorkbook.prototype = {
 	}
 };
 
-var g_oUndoRedoCell = null;
 function UndoRedoCell(wb)
 {
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoCell;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoCell;});
 }
 UndoRedoCell.prototype = {
 	getClassType : function()
@@ -3086,10 +3095,9 @@ UndoRedoCell.prototype = {
 	}
 };
 
-var g_oUndoRedoWorksheet = null;
 function UndoRedoWoorksheet(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoWorksheet;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoWorksheet;});
 }
 UndoRedoWoorksheet.prototype = {
 	getClassType : function()
@@ -3501,7 +3509,7 @@ UndoRedoWoorksheet.prototype = {
                     for(var id in arrDefNameRecalc ){
                         dN  = arrDefNameRecalc[id];
                         if( !dN.parsedRef && dN.Ref ){
-                            dN.parsedRef = new parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
+                            dN.parsedRef = new AscCommonExcel.parserFormula(dN.Ref, "", ws.workbook.getWorksheet(0));
                             dN.parsedRef.parse();
                         }
                     }
@@ -3618,13 +3626,11 @@ UndoRedoWoorksheet.prototype = {
 	}
 };
 
-var g_oUndoRedoRow = null;
-var g_oUndoRedoCol = null;
 function UndoRedoRowCol(wb, bRow){
 	this.wb = wb;
 	this.bRow = bRow;
-	this.nTypeRow = UndoRedoClassTypes.Add(function(){return g_oUndoRedoRow;});
-	this.nTypeCol = UndoRedoClassTypes.Add(function(){return g_oUndoRedoCol;});
+	this.nTypeRow = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoRow;});
+	this.nTypeCol = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoCol;});
 }
 UndoRedoRowCol.prototype = {
 	getClassType : function()
@@ -3727,10 +3733,9 @@ UndoRedoRowCol.prototype = {
 	}
 };
 
-var g_oUndoRedoComment = null;
 function UndoRedoComment(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoComment;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoComment;});
 }
 UndoRedoComment.prototype = {
 	getClassType : function()
@@ -3787,10 +3792,9 @@ UndoRedoComment.prototype = {
 	}
 };
 
-var g_oUndoRedoAutoFilters = null;
 function UndoRedoAutoFilters(wb){
 	this.wb = wb;
-	this.nType = UndoRedoClassTypes.Add(function(){return g_oUndoRedoAutoFilters;});
+	this.nType = UndoRedoClassTypes.Add(function(){return AscCommonExcel.g_oUndoRedoAutoFilters;});
 }
 UndoRedoAutoFilters.prototype = {
 	getClassType : function() {
@@ -3818,3 +3822,42 @@ UndoRedoAutoFilters.prototype = {
 			autoFilters.Redo(Type, Data);
 	}
 };
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].UndoRedoItemSerializable = UndoRedoItemSerializable;
+	window['AscCommonExcel'].UndoRedoDataTypes = UndoRedoDataTypes;
+	window['AscCommonExcel'].UndoRedoData_CellSimpleData = UndoRedoData_CellSimpleData;
+	window['AscCommonExcel'].UndoRedoData_CellData = UndoRedoData_CellData;
+	window['AscCommonExcel'].UndoRedoData_CellValueData = UndoRedoData_CellValueData;
+	window['AscCommonExcel'].UndoRedoData_FromToRowCol = UndoRedoData_FromToRowCol;
+	window['AscCommonExcel'].UndoRedoData_FromTo = UndoRedoData_FromTo;
+	window['AscCommonExcel'].UndoRedoData_FromToHyperlink = UndoRedoData_FromToHyperlink;
+	window['AscCommonExcel'].UndoRedoData_IndexSimpleProp = UndoRedoData_IndexSimpleProp;
+	window['AscCommonExcel'].UndoRedoData_ColProp = UndoRedoData_ColProp;
+	window['AscCommonExcel'].UndoRedoData_RowProp = UndoRedoData_RowProp;
+	window['AscCommonExcel'].UndoRedoData_BBox = UndoRedoData_BBox;
+	window['AscCommonExcel'].UndoRedoData_SortData = UndoRedoData_SortData;
+	window['AscCommonExcel'].UndoRedoData_SheetAdd = UndoRedoData_SheetAdd;
+	window['AscCommonExcel'].UndoRedoData_SheetRemove = UndoRedoData_SheetRemove;
+	window['AscCommonExcel'].UndoRedoData_SheetPositions = UndoRedoData_SheetPositions;
+	window['AscCommonExcel'].UndoRedoData_DefinedNames = UndoRedoData_DefinedNames;
+	window['AscCommonExcel'].UndoRedoData_DefinedNamesChange = UndoRedoData_DefinedNamesChange;
+	window['AscCommonExcel'].UndoRedoData_ClrScheme = UndoRedoData_ClrScheme;
+	window['AscCommonExcel'].UndoRedoData_AutoFilter = UndoRedoData_AutoFilter;
+	window['AscCommonExcel'].UndoRedoData_SingleProperty = UndoRedoData_SingleProperty;
+	window['AscCommonExcel'].UndoRedoWorkbook = UndoRedoWorkbook;
+	window['AscCommonExcel'].UndoRedoCell = UndoRedoCell;
+	window['AscCommonExcel'].UndoRedoWoorksheet = UndoRedoWoorksheet;
+	window['AscCommonExcel'].UndoRedoRowCol = UndoRedoRowCol;
+	window['AscCommonExcel'].UndoRedoComment = UndoRedoComment;
+	window['AscCommonExcel'].UndoRedoAutoFilters = UndoRedoAutoFilters;
+
+	window['AscCommonExcel'].g_oUndoRedoWorkbook = null;
+	window['AscCommonExcel'].g_oUndoRedoCell = null;
+	window['AscCommonExcel'].g_oUndoRedoWorksheet = null;
+	window['AscCommonExcel'].g_oUndoRedoRow = null;
+	window['AscCommonExcel'].g_oUndoRedoCol = null;
+	window['AscCommonExcel'].g_oUndoRedoComment = null;
+	window['AscCommonExcel'].g_oUndoRedoAutoFilters = null;
+})(window);

@@ -24,6 +24,19 @@
 */
 "use strict";
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+var align_Right = AscCommon.align_Right;
+var align_Left = AscCommon.align_Left;
+var align_Center = AscCommon.align_Center;
+var align_Justify = AscCommon.align_Justify;
+var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
+
+var c_oAscError = Asc.c_oAscError;
+var c_oAscShdClear = Asc.c_oAscShdClear;
+var c_oAscShdNil = Asc.c_oAscShdNil;
+var c_oAscXAlign = Asc.c_oAscXAlign;
+
 function CDocumentReaderMode()
 {
     this.DefaultFontSize = 12;
@@ -379,7 +392,7 @@ function Editor_Copy(api, bCut)
                 ElemToSelect.oncut = __oncut;
                 __oncut = null;
 
-                if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content)) {
+                if (false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)) {
 					api.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_CutHotKey);
                     api.WordControl.m_oLogicDocument.Remove(1, true, true);
                     api.WordControl.m_oLogicDocument.Document_UpdateSelectionState();
@@ -603,7 +616,9 @@ function CopyProcessor(api, onlyBinaryCopy)
 	this.oBinaryFileWriter = new BinaryFileWriter(this.oDocument);
 	this.oPresentationWriter = new CBinaryFileWriter();
     this.oPresentationWriter.Start_UseFullUrl();
-    this.oPresentationWriter.Start_UseDocumentOrigin(this.api.documentOrigin);
+    if (this.api.ThemeLoader) {
+        this.oPresentationWriter.Start_UseDocumentOrigin(this.api.ThemeLoader.ThemesUrlAbs);
+    }
 	
 	this.oRoot = new CopyElement("root");
 }
@@ -680,9 +695,9 @@ CopyProcessor.prototype =
             //Spacing
             if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
             {
-                if(linerule_AtLeast == Item_pPr.Spacing.LineRule)
+                if(Asc.linerule_AtLeast == Item_pPr.Spacing.LineRule)
                     apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
-                else if( linerule_Auto == Item_pPr.Spacing.LineRule)
+                else if( Asc.linerule_Auto == Item_pPr.Spacing.LineRule)
                 {
                     if(1 == Item_pPr.Spacing.Line)
                         apPr.push("line-height:normal");
@@ -692,7 +707,7 @@ CopyProcessor.prototype =
             }
             if(Def_pPr.Spacing.LineRule != Item_pPr.Spacing.LineRule)
             {
-                if(linerule_Exact == Item_pPr.Spacing.LineRule)
+                if(Asc.linerule_Exact == Item_pPr.Spacing.LineRule)
                     apPr.push("mso-line-height-rule:exactly");
             }
 			//TODO при вставке в EXCEL(внутрь ячейки) появляются лишние пустые строки из-за того, что в HTML пишутся отступы - BUG #14663
@@ -702,7 +717,7 @@ CopyProcessor.prototype =
             //if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
             apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
             //Shd
-            if (null != Item_pPr.Shd && shd_Nil != Item_pPr.Shd.Value && (null != Item_pPr.Shd.Color || null != Item_pPr.Shd.Unifill))
+            if (null != Item_pPr.Shd && c_oAscShdNil != Item_pPr.Shd.Value && (null != Item_pPr.Shd.Color || null != Item_pPr.Shd.Unifill))
                 apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color, Item_pPr.Shd.Unifill));
             //Tabs
             if(Item_pPr.Tabs.Get_Count() > 0)
@@ -766,7 +781,7 @@ CopyProcessor.prototype =
 			oTarget.wrapChild(new CopyElement("s"));
 		 if (true == Value.DStrikeout)
 			 oTarget.wrapChild(new CopyElement("s"));
-        if (null != Value.Shd && shd_Nil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
+        if (null != Value.Shd && c_oAscShdNil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
             aProp.push("background-color:" + this.RGBToCSS(Value.Shd.Color, Value.Shd.Unifill));
         else if (null != Value.HighLight && highlight_None != Value.HighLight)
             aProp.push("background-color:" + this.RGBToCSS(Value.HighLight, null));
@@ -782,9 +797,9 @@ CopyProcessor.prototype =
             aProp.push("mso-style-textfill-fill-color:" + color);
         }
         if (null != Value.VertAlign) {
-            if(vertalign_SuperScript == Value.VertAlign)
+            if(AscCommon.vertalign_SuperScript == Value.VertAlign)
                 aProp.push("vertical-align:super");
-            else if(vertalign_SubScript == Value.VertAlign)
+            else if(AscCommon.vertalign_SubScript == Value.VertAlign)
                 aProp.push("vertical-align:sub");
         }
 		if(aProp.length > 0)
@@ -796,7 +811,7 @@ CopyProcessor.prototype =
         {
             case para_Text:
                 //���������� �����������
-                var sValue = encodeSurrogateChar(ParaItem.Value);
+                var sValue = AscCommon.encodeSurrogateChar(ParaItem.Value);
                 if(sValue)
 					oTarget.addChild(new CopyElement(CopyPasteCorrectString(sValue), true));
                 break;
@@ -1166,12 +1181,12 @@ CopyProcessor.prototype =
         }
         if(null != cellPr && null != cellPr.Shd)
         {
-            if (shd_Nil != cellPr.Shd.Value && (null != cellPr.Shd.Color || null != cellPr.Shd.Unifill))
+            if (c_oAscShdNil != cellPr.Shd.Value && (null != cellPr.Shd.Color || null != cellPr.Shd.Unifill))
                 tcStyle += "background-color:" + this.RGBToCSS(cellPr.Shd.Color, cellPr.Shd.Unifill) + ";";
         }
         else if(null != tablePr && null != tablePr.Shd)
         {
-            if (shd_Nil != tablePr.Shd.Value && (null != tablePr.Shd.Color || null != tablePr.Shd.Unifill))
+            if (c_oAscShdNil != tablePr.Shd.Value && (null != tablePr.Shd.Color || null != tablePr.Shd.Unifill))
                 tcStyle += "background-color:" + this.RGBToCSS(tablePr.Shd.Color, tablePr.Shd.Unifill) + ";";
         }
         var oCellMar = {};
@@ -1220,7 +1235,7 @@ CopyProcessor.prototype =
 				elems.gridEnd -= rowPr.GridAfter;
 			}
             //height
-            if(null != rowPr.Height && heightrule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
+            if(null != rowPr.Height && Asc.linerule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
             {
                 trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt;";
             }
@@ -1354,7 +1369,7 @@ CopyProcessor.prototype =
 				DomTable.oAttributes["align"] = align;
             if(null != Pr.TableInd)
                 tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
-            if (null != Pr.Shd && shd_Nil != Pr.Shd.Value && (null != Pr.Shd.Color || null != Pr.Shd.Unifill))
+            if (null != Pr.Shd && c_oAscShdNil != Pr.Shd.Value && (null != Pr.Shd.Color || null != Pr.Shd.Unifill))
                 tblStyle += "background:" + this.RGBToCSS(Pr.Shd.Color, Pr.Shd.Unifill) + ";";
             if(null != Pr.TableCellMar)
                 tblStyle += this._MarginToStyle(Pr.TableCellMar, "mso-padding-alt");
@@ -2515,10 +2530,10 @@ function trimString( str ){
 }
 function sendImgUrls(api, images, callback, bExcel) {
   var rData = {"id": api.documentId, "c": "imgurls", "vkey": api.documentVKey, "userid":  api.documentUserId, "saveindex": g_oDocumentUrls.getMaxIndex(), "data": images};
-  api.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+  api.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
 
   api.fCurCallback = function (input) {
-    api.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.LoadImage);
+    api.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.LoadImage);
     var nError = c_oAscError.ID.No;
     var data;
     if (null != input && "imgurls" == input["type"]) {
@@ -2533,7 +2548,7 @@ function sendImgUrls(api, images, callback, bExcel) {
         }
         g_oDocumentUrls.addUrls(urls);
       } else {
-        nError = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+        nError = AscCommon.mapAscServerErrorToAscError(parseInt(input["data"]));
       }
     } else {
       nError = c_oAscError.ID.Unknown;
@@ -2553,7 +2568,7 @@ function sendImgUrls(api, images, callback, bExcel) {
     }
     callback(data);
   };
-  sendCommand2(api, null, rData);
+  AscCommon.sendCommand(api, null, rData);
 }
 function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
 {
@@ -3564,7 +3579,7 @@ PasteProcessor.prototype =
                                 var b_read_layouts = false;
                                 for(var i = 0; i < arr_layouts_id.length; ++i)
                                 {
-                                    var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+                                    var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
 									if(!tempLayout || !tempLayout.Master)
                                     {
                                         b_read_layouts = true;
@@ -3608,12 +3623,12 @@ PasteProcessor.prototype =
                                     var addedLayouts = [];
                                     for(var i = 0; i < slide_count; ++i)
                                     {
-                                        var tempLayout = g_oTableId.Get_ById(arr_layouts_id[i]);
+                                        var tempLayout = AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]);
 										if(tempLayout && tempLayout.Master)
                                         {
                                             arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                             arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-                                            arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                            arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
                                         }
                                         else
                                         {
@@ -3632,7 +3647,7 @@ PasteProcessor.prototype =
                                     {
                                         arr_slides[i].changeSize(presentation.Width, presentation.Height);
                                         arr_slides[i].setSlideSize(presentation.Width, presentation.Height);
-                                        arr_slides[i].setLayout(g_oTableId.Get_ById(arr_layouts_id[i]));
+                                        arr_slides[i].setLayout(AscCommon.g_oTableId.Get_ById(arr_layouts_id[i]));
 										//arr_slides[i].Layout.setMaster(master);
                                         arr_slides[i].Width = presentation.Width;
                                         arr_slides[i].Height = presentation.Height;
@@ -3746,9 +3761,9 @@ PasteProcessor.prototype =
 					//создаём темповый CDocument
 					this.oDocument = ExecuteNoHistory(tempCDocument , this, []);
 
-                    g_oIdCounter.m_bRead = true;
+          AscCommon.g_oIdCounter.m_bRead = true;
 					var aContent = ExecuteNoHistory(this.ReadFromBinary, this, [base64FromWord]);
-                    g_oIdCounter.m_bRead = false;
+          AscCommon.g_oIdCounter.m_bRead = false;
 					//возврщаем обратно переменные и историю, документ которой заменяется при создании CDocument
 					this.oDocument = trueDocument;
 					History.Document = trueDocument;
@@ -4058,7 +4073,7 @@ PasteProcessor.prototype =
 					var targetDocContent = slide.graphicObjects.getTargetDocContent();
                     if(targetDocContent && arrShapes.length === 1 && arrImages.length === 0 && arrTables.length === 0)
                     {
-                        if(presentation.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
+                        if(presentation.Document_Is_SelectionLocked(AscCommon.changestype_Drawing_Props) === false)
                         {
                             var aNewContent = arrShapes[0].Drawing.txBody.content.Content;
                             oThis.InsertInPlacePresentation(aNewContent);
@@ -4257,7 +4272,7 @@ PasteProcessor.prototype =
 				if(null != background_color)
 				{
 					var Shd = new CDocumentShd();
-					Shd.Value = shd_Clear;
+					Shd.Value = c_oAscShdClear;
 					Shd.Color = new CDocumentColor(background_color.getR(), background_color.getG(), background_color.getB());
 					oCurCell.Set_Shd(Shd);
 				}
@@ -4333,11 +4348,11 @@ PasteProcessor.prototype =
 					{
 						var nUnicode = null;
 						var nCharCode = value.charCodeAt(k);
-						if (isLeadingSurrogateChar(nCharCode)) {
+						if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
 							if (k + 1 < length) {
 								k++;
 								var nTrailingChar = value.charCodeAt(k);
-								nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+								nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
 							}
 						}
 						else
@@ -5042,7 +5057,7 @@ PasteProcessor.prototype =
 		{
 			//для случая <td>br<span></span></td> без текста в ячейке
 			var oNewSpacing = new CParaSpacing();
-			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: linerule_Auto});
+			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
             Para.Set_Spacing(oNewSpacing);
 			return;
 		}
@@ -5178,7 +5193,7 @@ PasteProcessor.prototype =
                 if(background_color)
                 {
                     var Shd = new CDocumentShd();
-                    Shd.Value = shd_Clear;
+                    Shd.Value = c_oAscShdClear;
                     Shd.Color = background_color;
                     Para.Set_Shd(Shd);
                 }
@@ -5486,7 +5501,7 @@ PasteProcessor.prototype =
                     g : 0,
                     b : 0
                 },
-                VertAlign : vertalign_Baseline,
+                VertAlign : AscCommon.vertalign_Baseline,
                 HighLight : highlight_None
             });
         }
@@ -5606,8 +5621,8 @@ PasteProcessor.prototype =
                 rPr.Strikeout = Strikeout;
             switch(vertical_align)
             {
-                case "sub": rPr.VertAlign = vertalign_SubScript;break;
-                case "super": rPr.VertAlign = vertalign_SuperScript;break;
+                case "sub": rPr.VertAlign = AscCommon.vertalign_SubScript;break;
+                case "super": rPr.VertAlign = AscCommon.vertalign_SuperScript;break;
             }
         }
         return rPr;
@@ -6073,7 +6088,7 @@ PasteProcessor.prototype =
 			}
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
-                table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
+                table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
             var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
             if(null != oLeftBorder)
                 table.Set_TableBorder_Left(oLeftBorder);
@@ -6123,7 +6138,7 @@ PasteProcessor.prototype =
         {
             var height = node.style.height;
             if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
-                row.Set_Height(height, heightrule_AtLeast);
+                row.Set_Height(height, Asc.linerule_AtLeast);
         }
 		var bBefore = false;
 		var bAfter = false;
@@ -6229,7 +6244,7 @@ PasteProcessor.prototype =
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
                 var Shd = new CDocumentShd();
-                Shd.Value = shd_Clear;
+                Shd.Value = c_oAscShdClear;
                 Shd.Color = background_color;
                 cell.Set_Shd(Shd);
             }
@@ -6281,7 +6296,7 @@ PasteProcessor.prototype =
             var oNewPar = new Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
 			var oNewSpacing = new CParaSpacing();
-			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: linerule_Auto});
+			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
             oNewPar.Set_Spacing(oNewSpacing);
             oPasteProcessor.aContent.push(oNewPar);
         }
@@ -6373,11 +6388,11 @@ PasteProcessor.prototype =
                         {
                             var nUnicode = null;
                             var nCharCode = value.charCodeAt(i);
-                            if (isLeadingSurrogateChar(nCharCode)) {
+                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
                                 if (i + 1 < length) {
                                     i++;
                                     var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
                                 }
                             }
                             else
@@ -6489,7 +6504,7 @@ PasteProcessor.prototype =
                     if((!window["Asc"] || (window["Asc"] && window["Asc"]["editor"] === undefined)) && (isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")//первое условие - мы не в редакторе таблиц, тогда выполняем
                         ||  nWidth === 0 ||  nHeight === 0))
                     {
-                        var img_prop = new asc_CImgProperty();
+                        var img_prop = new Asc.asc_CImgProperty();
                         img_prop.asc_putImageUrl(sSrc);
                         var or_sz = img_prop.asc_getOriginSize(editor);
                         nWidth = or_sz.Width / g_dKoef_pix_to_mm;
@@ -6786,11 +6801,11 @@ PasteProcessor.prototype =
                         {
                             var nUnicode = null;
                             var nCharCode = value.charCodeAt(i);
-                            if (isLeadingSurrogateChar(nCharCode)) {
+                            if (AscCommon.isLeadingSurrogateChar(nCharCode)) {
                                 if (i + 1 < length) {
                                     i++;
                                     var nTrailingChar = value.charCodeAt(i);
-                                    nUnicode = decodeSurrogateChar(nCharCode, nTrailingChar);
+                                    nUnicode = AscCommon.decodeSurrogateChar(nCharCode, nTrailingChar);
                                 }
                             }
                             else
@@ -6875,7 +6890,7 @@ PasteProcessor.prototype =
                 if(isNaN(nWidth) || isNaN(nHeight) || !(typeof nWidth === "number") || !(typeof nHeight === "number")
                     ||  nWidth === 0 ||  nHeight === 0)
                 {
-                    var img_prop = new asc_CImgProperty();
+                    var img_prop = new Asc.asc_CImgProperty();
                     img_prop.asc_putImageUrl(sSrc);
                     var or_sz = img_prop.asc_getOriginSize(editor);
                     nWidth = or_sz.Width / g_dKoef_pix_to_mm;
@@ -7326,7 +7341,7 @@ PasteProcessor.prototype =
             }
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
-                table.Set_TableShd(shd_Clear, background_color.r, background_color.g, background_color.b);
+                table.Set_TableShd(c_oAscShdClear, background_color.r, background_color.g, background_color.b);
             var oLeftBorder = this._ExecuteBorder(computedStyle, tableNode, "left", "Left", false);
             if(null != oLeftBorder)
                 table.Set_TableBorder_Left(oLeftBorder);
@@ -7374,7 +7389,7 @@ PasteProcessor.prototype =
         {
             var height = node.style.height;
             if(!("auto" == height || "inherit" == height || -1 != height.indexOf("%")) && null != (height = this._ValueToMm(height)))
-                row.Set_Height(height, heightrule_AtLeast);
+                row.Set_Height(height, Asc.linerule_AtLeast);
         }
         var bBefore = false;
         var bAfter = false;
@@ -7480,7 +7495,7 @@ PasteProcessor.prototype =
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
                 var Shd = new CDocumentShd();
-                Shd.Value = shd_Clear;
+                Shd.Value = c_oAscShdClear;
                 Shd.Color = background_color;
                 cell.Set_Shd(Shd);
             }
@@ -7647,7 +7662,7 @@ function Editor_CopyPaste_Create(api)
 	}
 	
 	ElemToSelect.oncut = function(e){
-		if(false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+		if(false === api.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
 		{	
 			ElemToSelect.innerHTML = "";
 			Editor_Copy_Event(e, ElemToSelect);

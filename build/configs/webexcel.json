@@ -1,23 +1,17 @@
 {
-    "info": {
-        "version": "3.8.0",
-        "build": 148
-    },
-    "update_src": {
-        "revision": "HEAD",
-        "src": "../common ../word ../cell ../slide"
-    },
     "compile": {
         "sdk": {
             "common": [
                 "../common/Build/License.js",
                 "../common/browser.js",
+				"../common/commonDefines.js",
+				"../common/downloaderfiles.js",
                 "../common/docscoapicommon.js",
                 "../common/docscoapi.js",
-                "../common/downloaderfiles.js",
                 "../common/apiCommon.js",
-                "../common/commonDefines.js",
-                "../common/editorscommon.js",
+				"../common/editorscommon.js",
+				
+				"../cell/apiDefines.js",
                 "../common/NumFormat.js",
                 "../common/Charts/charts.js",
                 "../common/Charts/DrawingArea.js",
@@ -33,9 +27,9 @@
                 "../word/Drawing/Externals.js",
                 "../word/Drawing/Metafile.js",
                 "../common/GlobalLoaders.js",
-                "../cell/apiDefines.js",
                 "../cell/document/empty-workbook.js",
                 "../cell/utils/utils.js",
+				"../cell/model/UndoRedo.js",
                 "../cell/model/clipboard.js",
                 "../cell/model/autofilters.js",
                 "../cell/graphics/DrawingContext.js",
@@ -61,7 +55,6 @@
                 "../cell/model/CellInfo.js",
                 "../common/AdvancedOptions.js",
                 "../cell/model/History.js",
-                "../cell/model/UndoRedo.js",
                 "../cell/model/CellComment.js",
                 "../cell/view/mobileTouch.js",
                 "../cell/view/iscroll.js",
@@ -199,7 +192,6 @@
     },
     "tasks": {
         "build": [
-            "add_build_number",
             "compile_sdk"
         ]
     }
