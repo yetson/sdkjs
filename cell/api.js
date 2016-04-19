@@ -685,6 +685,41 @@ var editor;
     var ws = this.wb.getWorksheet();
     return ws.clearFilter();
   };
+  
+  spreadsheet_api.prototype.asc_changeSelectionFormatTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeSelectionFormatTable(tableName, optionType);
+  };
+  
+  spreadsheet_api.prototype.asc_changeFormatTableInfo = function(tableName, optionType, val) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeFormatTableInfo(tableName, optionType, val);
+  };
+  
+  spreadsheet_api.prototype.asc_insertCellsInTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_insertCellsInTable(tableName, optionType);
+  };
+  
+  spreadsheet_api.prototype.asc_deleteCellsInTable = function(tableName, optionType) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_deleteCellsInTable(tableName, optionType);
+  };
+  
+  spreadsheet_api.prototype.asc_changeDisplayNameTable = function(tableName, newName) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeDisplayNameTable(tableName, newName);
+  };
+  
+  spreadsheet_api.prototype.asc_changeTableRange = function(tableName, range) {
+    var ws = this.wb.getWorksheet();
+    return ws.af_changeTableRange(tableName, range);
+  };
+  
+  spreadsheet_api.prototype.asc_getTablePictures = function (props) 
+  { 
+	return this.wb.getTablePictures(props); 
+  };
 
   spreadsheet_api.prototype.asc_setMobileVersion = function(isMobile) {
     this.isMobileVersion = isMobile;
@@ -3378,13 +3413,20 @@ var editor;
   prot["asc_getDefaultDefinedName"] = prot.asc_getDefaultDefinedName;
   prot["asc_checkDefinedName"] = prot.asc_checkDefinedName;
 
-  // Auto filters interface
+  // Auto filters interface + format as table
   prot["asc_addAutoFilter"] = prot.asc_addAutoFilter;
   prot["asc_changeAutoFilter"] = prot.asc_changeAutoFilter;
   prot["asc_applyAutoFilter"] = prot.asc_applyAutoFilter;
   prot["asc_sortColFilter"] = prot.asc_sortColFilter;
   prot["asc_getAddFormatTableOptions"] = prot.asc_getAddFormatTableOptions;
   prot["asc_clearFilter"] = prot.asc_clearFilter;
+  prot["asc_changeSelectionFormatTable"] = prot.asc_changeSelectionFormatTable;
+  prot["asc_changeFormatTableInfo"] = prot.asc_changeFormatTableInfo;
+  prot["asc_insertCellsInTable"] = prot.asc_insertCellsInTable;
+  prot["asc_deleteCellsInTable"] = prot.asc_deleteCellsInTable;
+  prot["asc_changeDisplayNameTable"] = prot.asc_changeDisplayNameTable;
+  prot["asc_changeTableRange"] = prot.asc_changeTableRange;
+  prot["asc_getTablePictures"] = prot.asc_getTablePictures;
 
   // Drawing objects interface
 

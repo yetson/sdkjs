@@ -93,6 +93,8 @@
     var c_oAscSelectionType = asc.c_oAscSelectionType;
     var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
     var c_oAscAutoFilterTypes = asc.c_oAscAutoFilterTypes;
+    var c_oAscChangeTableStyleInfo = asc.c_oAscChangeTableStyleInfo;
+    var c_oAscChangeSelectionFormatTable = asc.c_oAscChangeSelectionFormatTable;
 
     /*
      * Constants
@@ -7303,10 +7305,9 @@
 
         var tablePartsOptions = this.model.autoFilters.searchRangeInTableParts( activeCell );
         var curTablePart = tablePartsOptions >= 0 ? this.model.TableParts[tablePartsOptions] : null;
+        var tableStyleInfo = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo : null;
 
         cell_info.autoFilterInfo = new asc_CAutoFilterInfo();
-        cell_info.autoFilterInfo.tableStyleName = curTablePart && curTablePart.TableStyleInfo ? curTablePart.TableStyleInfo.Name : null;
-        cell_info.autoFilterInfo.tableName = curTablePart ? curTablePart.DisplayName : null;
         if ( -2 === tablePartsOptions ) {
             cell_info.autoFilterInfo.isAutoFilter = null;
             cell_info.autoFilterInfo.isApplyAutoFilter = false;
@@ -7316,6 +7317,38 @@
             cell_info.autoFilterInfo.isAutoFilter = checkApplyFilterOrSort.isAutoFilter;
             cell_info.autoFilterInfo.isApplyAutoFilter = checkApplyFilterOrSort.isFilterColumns;
         }
+		
+		if(curTablePart !== null)
+		{
+			cell_info.formatTableInfo = new asc.asc_CFormatTableInfo();
+			cell_info.formatTableInfo.tableName = curTablePart.DisplayName;
+			
+			if (tableStyleInfo) {
+				cell_info.formatTableInfo.tableStyleName = tableStyleInfo.Name;
+			
+				cell_info.formatTableInfo.bandVer = tableStyleInfo.ShowColumnStripes;
+				cell_info.formatTableInfo.firstCol = tableStyleInfo.ShowFirstColumn;
+				cell_info.formatTableInfo.lastCol = tableStyleInfo.ShowLastColumn;
+				
+				cell_info.formatTableInfo.bandHor = tableStyleInfo.ShowRowStripes;
+			}
+			cell_info.formatTableInfo.lastRow = curTablePart.TotalsRowCount !== null ? true : false;
+			cell_info.formatTableInfo.firstRow = curTablePart.HeaderRowCount === null ? true : false;
+			cell_info.formatTableInfo.tableRange = curTablePart.Ref.getAbsName();
+			cell_info.formatTableInfo.filterButton = curTablePart.isShowButton();
+			
+			var checkDisableProps = this.af_checkDisableProps(curTablePart)
+			
+			cell_info.formatTableInfo.isInsertRowAbove = checkDisableProps.insertRowAbove;
+			cell_info.formatTableInfo.isInsertRowBelow = checkDisableProps.insertRowBelow;
+			cell_info.formatTableInfo.isInsertColumnLeft = checkDisableProps.insertColumnLeft;
+			cell_info.formatTableInfo.isInsertColumnRight = checkDisableProps.insertColumnRight;
+			cell_info.formatTableInfo.isDeleteRow = checkDisableProps.deleteRow;
+			cell_info.formatTableInfo.isDeleteColumn = checkDisableProps.deleteColumn;
+			cell_info.formatTableInfo.isDeleteTable = checkDisableProps.deleteTable;
+		}
+       
+		
 
         cell_info.styleName = c.getStyleName();
         cell_info.angle = c.getAngle();
@@ -10321,7 +10354,7 @@
                 range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
                 switch ( val ) {
                     case c_oAscInsertOptions.InsertCellsAndShiftRight:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftRight, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10342,7 +10375,7 @@
                         this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
                         break;
                     case c_oAscInsertOptions.InsertCellsAndShiftDown:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscInsertOptions.InsertCellsAndShiftDown, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10401,7 +10434,7 @@
                 range = t.model.getRange3( checkRange.r1, checkRange.c1, checkRange.r2, checkRange.c2 );
                 switch ( val ) {
                     case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftLeft, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -10426,7 +10459,7 @@
                         this._isLockedCells( oChangeData.changedRange, null, onChangeWorksheetCallback );
                         break;
                     case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
-                        isCheckChangeAutoFilter = t.model.autoFilters.isActiveCellsCrossHalfFTable( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop );
+                        isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, c_oAscDeleteOptions.DeleteCellsAndShiftTop, prop );
                         if ( isCheckChangeAutoFilter === false ) {
                             return;
                         }
@@ -11963,7 +11996,7 @@
             if ( false === isSuccess ) {
                 return;
             }
-			var sortProps = t.model.autoFilters.getPropForSort(type, cellId, ar, displayName)
+			var sortProps = t.model.autoFilters.getPropForSort(type, cellId, ar, displayName);
 			
 			var onSortAutoFilterCallBack = function()
 			{
@@ -12352,7 +12385,7 @@
 		{
 			for(var i = 0; i < aWs.TableParts.length; i++)
 			{
-				if(aWs.TableParts[i].AutoFilter)
+				if(aWs.TableParts[i].AutoFilter && aWs.TableParts[i].HeaderRowCount !== 0)
 					drawCurrentFilterButton(aWs.TableParts[i].AutoFilter, true);
 			}
 		}
@@ -12724,7 +12757,516 @@
 		
 		return true;
 	};
+
+    WorksheetView.prototype.af_changeSelectionFormatTable = function(tableName, optionType)
+    {
+        var t = this;
+        var ws = this.model;
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart || (tablePart && !tablePart.Ref))
+        {
+            return false;
+        }
+
+        var refTablePart = tablePart.Ref;
+
+        var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+
+        var newActiveRange;
+        switch(optionType)
+        {
+            case c_oAscChangeSelectionFormatTable.all:
+            {
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = refTablePart.r1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFormatTable.data:
+            {
+                //TODO проверить есть ли строка заголовков
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = refTablePart.r1 + 1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFormatTable.row:
+            {
+                startCol = refTablePart.c1;
+                endCol = refTablePart.c2;
+                startRow = this.activeRange.r1 < refTablePart.r1 ? refTablePart.r1 : this.activeRange.r1;
+                endRow = this.activeRange.r2 > refTablePart.r2 ? refTablePart.r2 : this.activeRange.r2;
+
+                break;
+            }
+            case c_oAscChangeSelectionFormatTable.column:
+            {
+                startCol = this.activeRange.c1 < refTablePart.c1 ? refTablePart.c1 : this.activeRange.c1;
+                endCol = this.activeRange.c2 > refTablePart.c2 ? refTablePart.c2 : this.activeRange.c2;
+                startRow = refTablePart.r1;
+                endRow = refTablePart.r2;
+
+                break;
+            }
+        }
+
+        t.setSelection(new Asc.Range(startCol, startRow, endCol, endRow));
+    };
+	
+	WorksheetView.prototype.af_changeFormatTableInfo = function(tableName, optionType, val)
+    {
+		var tablePart = this.model.autoFilters._getFilterByDisplayName(tableName);
+		var t = this;
+		
+		if(!tablePart || (tablePart && !tablePart.TableStyleInfo))
+		{
+			return false;
+		}
+		
+		var isChangeTableInfo = this.af_checkChangeTableInfo(tablePart, optionType);
+		if(isChangeTableInfo !== false)
+		{
+			var callback = function(isSuccess)
+			{
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				t.model.autoFilters.changeFormatTableInfo(tableName, optionType, val);
+				
+				t._onUpdateFormatTable(isChangeTableInfo, false, true);
+				History.EndTransaction();
+			};
 			
+			t._isLockedCells( tablePart.Ref, null, callback );
+		}
+	};
+	
+	WorksheetView.prototype.af_checkChangeTableInfo = function(tablePart, optionType)
+    {
+		var res = tablePart.Ref;
+		var ws = this.model;
+		
+		if(optionType === c_oAscChangeTableStyleInfo.rowHeader && tablePart.HeaderRowCount !== null)//add header row
+		{
+			var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
+			
+			if(this.model.autoFilters._isEmptyCurrentRange(rangeUpTable) === false && this.model.autoFilters._isPartTablePartsUnderRange(tablePart.Ref) === true)
+			{
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+				res = false;
+			}
+		}
+		else if(optionType === c_oAscChangeTableStyleInfo.rowTotal && tablePart.TotalsRowCount === null)//add total row
+		{
+			var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
+			
+			if(this.model.autoFilters._isEmptyCurrentRange(rangeUpTable) === false && this.model.autoFilters._isPartTablePartsUnderRange(tablePart.Ref) === true)
+			{
+				ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterMoveToHiddenRangeError, c_oAscError.Level.NoCritical);
+				res = false;
+			}
+		}
+		
+		return res;
+	};
+    
+	WorksheetView.prototype.af_insertCellsInTable = function(tableName, optionType)
+    {
+		var t = this;
+        var ws = this.model;
+		var activeRange = this.activeRange;
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart || (tablePart && !tablePart.Ref))
+        {
+            return false;
+        }
+		
+		var insertCellsAndShiftDownRight = function(arn, displayName, type)
+		{
+			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "insCell" );
+			if ( isCheckChangeAutoFilter === false ) {
+				return;
+			}
+
+			var callback = function (isSuccess) {
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				var shiftCells = type === c_oAscInsertOptions.InsertCellsAndShiftRight ? range.addCellsShiftRight(displayName) : range.addCellsShiftBottom(displayName);
+				if ( shiftCells ) {
+					t.cellCommentator.updateCommentsDependencies( true, type, arn );
+					t.objectRender.updateDrawingObject( true, type, arn );
+					t._onUpdateFormatTable(range, false, true);
+				}
+				History.EndTransaction();
+			};
+
+			var changedRange = new asc_Range( arn.c1, arn.r1, arn.c2, gc_nMaxRow0 );
+			t._isLockedCells( changedRange, null, callback );
+		};
+		
+		var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+		
+		var newActiveRange = this.activeRange.clone();
+		var displayName = null;
+		var type = null;
+		switch(optionType)
+		{
+			case c_oAscInsertOptions.InsertTableRowAbove:
+			{
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				type = c_oAscInsertOptions.InsertCellsAndShiftDown;
+				
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableRowBelow:
+			{
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				newActiveRange.r1 = tablePart.Ref.r2 + 1;
+				newActiveRange.r2 = tablePart.Ref.r2 + 1;
+				displayName = tableName;
+				type = c_oAscInsertOptions.InsertCellsAndShiftDown;
+				
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableColLeft:
+			{
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				type = c_oAscInsertOptions.InsertCellsAndShiftRight;
+				
+				break;
+			}
+			case c_oAscInsertOptions.InsertTableColRight:
+			{
+				newActiveRange.c1 = tablePart.Ref.c2 + 1;
+				newActiveRange.c2 = tablePart.Ref.c2 + 1;
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				displayName = tableName;
+				type = c_oAscInsertOptions.InsertCellsAndShiftRight;
+				
+				break;
+			}
+		}
+		
+		insertCellsAndShiftDownRight(newActiveRange, displayName, type)
+	};
+	
+	WorksheetView.prototype.af_deleteCellsInTable = function(tableName, optionType)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange;
+
+        var tablePart = ws.autoFilters._getFilterByDisplayName(tableName);
+
+        if(!tablePart || (tablePart && !tablePart.Ref))
+        {
+            return false;
+        }
+		
+		var deleteCellsAndShiftLeftTop = function(arn, type)
+		{
+			var range = t.model.getRange3( arn.r1, arn.c1, arn.r2, arn.c2 );
+			var isCheckChangeAutoFilter = t.af_checkInsDelCells( arn, type, "delCell" );
+			if ( isCheckChangeAutoFilter === false ) {
+				return;
+			}
+
+			var callback = function (isSuccess) {
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				if ( isCheckChangeAutoFilter === true ) {
+					t.model.autoFilters.isEmptyAutoFilters( arn, type );
+				}
+				
+				var deleteCells = type === c_oAscInsertOptions.InsertCellsAndShiftRight ? range.deleteCellsShiftLeft() : range.deleteCellsShiftUp();
+				if ( deleteCells ) {
+					t.cellCommentator.updateCommentsDependencies( true, type, arn );
+					t.objectRender.updateDrawingObject( true, type, arn );
+					t._onUpdateFormatTable(range, false, true);
+				}
+				
+				History.EndTransaction();
+			};
+
+			var changedRange = new asc_Range( arn.c1, arn.r1, gc_nMaxCol0, arn.r2 );
+			t._isLockedCells( changedRange, null, callback );
+		};
+		
+		var deleteTableCallback = function(ref)
+		{
+			
+			var callback = function(isSuccess)
+			{
+				if ( false === isSuccess ) {
+					return;
+				}
+				
+				History.Create_NewPoint();
+				History.StartTransaction();
+				
+				t.model.autoFilters.isEmptyAutoFilters(ref);
+				var cleanRange = t.model.getRange3( ref.r1, ref.c1, ref.r2, ref.c2 );
+				cleanRange.cleanAll();
+				
+				t._onUpdateFormatTable(ref, false, true);
+				
+				History.EndTransaction();
+			}
+			
+			t._isLockedCells( ref, null, callback );
+		};
+		
+		var startCol = this.activeRange.c1;
+        var endCol = this.activeRange.c2;
+        var startRow = this.activeRange.r1;
+        var endRow = this.activeRange.r2;
+		
+		var newActiveRange = this.activeRange.clone();
+		var val = null;
+		switch(optionType)
+		{
+			case c_oAscDeleteOptions.DeleteColumns:
+			{
+				newActiveRange.r1 = tablePart.Ref.r1;
+				newActiveRange.r2 = tablePart.Ref.r2;
+				
+				val = c_oAscDeleteOptions.DeleteCellsAndShiftLeft;
+				break;
+			}
+			case c_oAscDeleteOptions.DeleteRows:
+			{
+				newActiveRange.c1 = tablePart.Ref.c1;
+				newActiveRange.c2 = tablePart.Ref.c2;
+				
+				val = c_oAscDeleteOptions.DeleteCellsAndShiftTop;
+				break;
+			}
+			case c_oAscDeleteOptions.DeleteTable:
+			{
+				deleteTableCallback(tablePart.Ref.clone());
+				break;
+			}
+		}
+		
+		if(val !== null)
+		{
+			deleteCellsAndShiftLeftTop(newActiveRange, val);
+		}
+	};
+	
+	WorksheetView.prototype.af_changeDisplayNameTable = function(tableName, newName)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange.clone();
+		
+		this.model.autoFilters.changeDisplayNameTable(tableName, newName);
+	};
+	
+	WorksheetView.prototype.af_checkInsDelCells = function(activeRange, val, prop)
+    {
+		var t = this;
+        var ws = this.model;
+		var res = true;
+		
+		var intersectionTableParts = ws.autoFilters.getTableIntersectionRange(activeRange);
+		var isPartTablePartsUnderRange = ws.autoFilters._isPartTablePartsUnderRange(activeRange);
+		var isPartTablePartsRightRange = ws.autoFilters.isPartTablePartsRightRange(activeRange);
+		var isOneTableIntersection = intersectionTableParts && intersectionTableParts.length === 1 ? intersectionTableParts[0] : null;
+		
+		var checkInsCells = function()
+		{
+			switch(val)
+			{
+				case c_oAscInsertOptions.InsertCellsAndShiftDown:
+				{
+					//если внизу находится часть форматированной таблицы или это часть форматированной таблицы
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					else if(isOneTableIntersection !== null && !(isOneTableIntersection.Ref.c1 === activeRange.c1 && isOneTableIntersection.Ref.c2 === activeRange.c2))
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertCellsAndShiftRight:
+				{
+					//если справа находится часть форматированной таблицы или это часть форматированной таблицы
+					if(isPartTablePartsRightRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertColumns:
+				{
+					
+					break;
+				}
+				case c_oAscInsertOptions.InsertRows:
+				{
+					
+					break;
+				}
+			}
+		};
+		
+		var checkDelCells = function()
+		{
+			switch(val)
+			{
+				case c_oAscDeleteOptions.DeleteCellsAndShiftTop:
+				{
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
+				{
+					if(isPartTablePartsUnderRange)
+					{
+						res = false;
+					}
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteColumns:
+				{
+					
+					break;
+				}
+				case c_oAscDeleteOptions.DeleteRows:
+				{
+					
+					break;
+				}
+			}
+		};
+		
+		prop === "insCell" ? checkInsCells() : checkDelCells();
+		
+		if(res === false)
+		{
+			ws.workbook.handlers.trigger("asc_onError", c_oAscError.ID.AutoFilterChangeFormatTableError, c_oAscError.Level.NoCritical);
+		}
+		
+		return res; 
+	};
+	
+	WorksheetView.prototype.af_checkDisableProps = function(tablePart)
+    {
+		var t = this;
+        var ws = this.model;
+		var acitveRange = this.activeRange;
+		
+		if(!tablePart)
+        {
+            return false;
+        }
+		
+		var refTable = tablePart.Ref;
+		var refTableContainsActiveRange = refTable.containsRange(acitveRange);
+		
+		var insertRowAbove, insertRowBelow, insertColumnLeft, insertColumnRight, deleteRow = true, deleteColumn = true, deleteTable = true;
+		
+		//если курсор стоит в нижней строке, то разрешаем добавление нижней строки
+		insertRowBelow = !!(((tablePart.TotalsRowCount === null && acitveRange.startRow === refTable.r2) || (tablePart.TotalsRowCount !== null && acitveRange.startRow === refTable.r2 - 1)) && refTableContainsActiveRange);
+		
+		//если курсор стоит в правом столбце, то разрешаем добавление одного столбца правее
+		insertColumnRight = !!(acitveRange.startCol === refTable.c2 && refTableContainsActiveRange);
+		
+		//если внутри находится вся активная область или если выходит активная область за границу справа
+		insertColumnLeft = !!(refTableContainsActiveRange || (acitveRange.c2 > refTable.c2 && acitveRange.r1 >= refTable.r1 && acitveRange.r2 <= refTable.r2 && acitveRange.c1 >= refTable.c1));
+		
+		//если внутри находится вся активная область(кроме строки заголовков) или если выходит активная область за границу снизу
+		insertRowAbove = !!(((acitveRange.r1 > refTable.r1 && tablePart.HeaderRowCount === null) || (acitveRange.r1 >= refTable.r1 && tablePart.HeaderRowCount !== null)) && (refTableContainsActiveRange || (acitveRange.r2 > refTable.r2 && acitveRange.c1 >= refTable.c1 && acitveRange.c2 <= refTable.c2 && acitveRange.r1 >= refTable.r1)));
+		
+		
+		return {insertRowAbove: insertRowAbove, insertRowBelow: insertRowBelow, insertColumnLeft: insertColumnLeft, insertColumnRight: insertColumnRight, deleteRow: deleteRow, deleteColumn: deleteColumn, deleteTable: deleteTable};
+	};
+	
+	WorksheetView.prototype.af_changeTableRange = function(tableName, range)
+    {
+		var t = this;
+		range = Asc.g_oRangeCache.getAscRange(range);
+		
+		var callback = function (isSuccess) {
+			if ( false === isSuccess ) {
+				return;
+			}
+			
+			History.Create_NewPoint();
+			History.StartTransaction();
+			
+			t.model.autoFilters.changeTableRange(tableName, range);
+			
+			t._onUpdateFormatTable(range, false, true);
+			//TODO добавить перерисовку таблицы и перерисовку шаблонов
+			History.EndTransaction();
+		};
+		
+		t._isLockedCells( range, null, callback );
+	};
+	
+	WorksheetView.prototype.af_checkChangeRange = function(range)
+    {	
+		var res = null;
+		var ws = this.model;
+		
+		var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
+		var tablePart = intersectionTables[0];
+		if(tablePart)
+		{
+			if(range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равно первой строке выделенного диапазона
+			{
+				res = c_oAscError.ID.FTChangeTableRangeError;
+			}
+			else if(intersectionTables.length !== 1)//выделено несколько таблиц
+			{
+				res = c_oAscError.ID.FTRangeIncludedOtherTables;
+			}
+		}
+		
+		return res;
+	};
     /*
      * Export
      * -----------------------------------------------------------------------------
