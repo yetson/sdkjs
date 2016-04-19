@@ -29,6 +29,7 @@ var align_Left = AscCommon.align_Left;
 var align_Justify = AscCommon.align_Justify;
 var vertalign_Baseline = AscCommon.vertalign_Baseline;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
+var g_oTableId = AscCommon.g_oTableId;
 
 var History = null;
 var recalcSlideInterval = 30;
@@ -365,7 +366,7 @@ CShowPr.prototype.Copy = function(){
 function CPresentation(DrawingDocument)
 {
     this.History              = History;
-    this.IdCounter            = g_oIdCounter;
+    this.IdCounter            = AscCommon.g_oIdCounter;
     this.TableId              = g_oTableId;
     this.CollaborativeEditing = (("undefined" !== typeof(CCollaborativeEditing) && CollaborativeEditing instanceof CCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
@@ -381,7 +382,7 @@ function CPresentation(DrawingDocument)
 
     //------------------------------------------------------------------------
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.StartPage = 0; // Для совместимости с CDocumentContent
     this.CurPage   = 0;
@@ -423,9 +424,9 @@ function CPresentation(DrawingDocument)
     this.CopyParaPr = null; // ParaPr для копирования по образцу
 
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
 
     this.Slides = [];
@@ -790,7 +791,7 @@ CPresentation.prototype =
             }
             else
             {
-                aToRedrawSlides.sort(fSortAscending);
+                aToRedrawSlides.sort(AscCommon.fSortAscending);
                 for(i = 0; i < aToRedrawSlides.length; ++i)
                 {
                     this.DrawingDocument.OnRecalculatePage(aToRedrawSlides[i], this.Slides[aToRedrawSlides[i]]);
@@ -4290,7 +4291,7 @@ CPresentation.prototype =
     shiftSlides: function(pos, array, bCopy)
     {
         History.Create_NewPoint(historydescription_Presentation_ShiftSlides);
-        array.sort(fSortAscending);
+        array.sort(AscCommon.fSortAscending);
         var deleted = [], i;
 
         if(!(bCopy === true || global_mouseEvent.CtrlKey))
@@ -4344,7 +4345,7 @@ CPresentation.prototype =
         {
             History.Create_NewPoint(historydescription_Presentation_DeleteSlides);
             var oldLen = this.Slides.length;
-            array.sort(fSortAscending);
+            array.sort(AscCommon.fSortAscending);
             for(var i = array.length -1; i > - 1; --i)
             {
                 this.removeSlide(array[i]);

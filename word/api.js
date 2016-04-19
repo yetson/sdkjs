@@ -41,6 +41,11 @@ var changestype_Table_RemoveCells = AscCommon.changestype_Table_RemoveCells;
 var changestype_HdrFtr = AscCommon.changestype_HdrFtr;
 var asc_CTextFontFamily = AscCommon.asc_CTextFontFamily;
 var asc_CSelectedObject = AscCommon.asc_CSelectedObject;
+var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
+var sendCommand = AscCommon.sendCommand;
+var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
+var g_oIdCounter = AscCommon.g_oIdCounter;
+var g_oTableId = AscCommon.g_oTableId;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -228,7 +233,7 @@ CMailMergeSendData.prototype.put_UserId = function(v){this["userId"] = v;};
 function asc_docs_api(name)
 {
   asc_docs_api.superclass.constructor.call(this, name);
-  this.editorId = c_oEditorId.Word;
+  this.editorId = AscCommon.c_oEditorId.Word;
 
     if (window["AscDesktopEditor"])
     {
@@ -236,7 +241,7 @@ function asc_docs_api(name)
     }
 
     History    = new CHistory();
-    g_oTableId = new CTableId();
+  g_oTableId.init();
 
 	/************ private!!! **************/
     this.WordControl = new CEditorPage(this);
@@ -341,7 +346,7 @@ function asc_docs_api(name)
 
     //g_clipboardBase.Init(this);
 }
-asc.extendClass(asc_docs_api, baseEditorsApi);
+AscCommon.extendClass(asc_docs_api, baseEditorsApi);
 
 asc_docs_api.prototype.sendEvent = function() {
   this.asc_fireCallback.apply(this, arguments);
@@ -983,7 +988,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
       bUseColor = false;
     }
 
-    var oCommonColor = getUserColorById(userId, null, false, false);
+    var oCommonColor = AscCommon.getUserColorById(userId, null, false, false);
     var oColor = false === bUseColor ? null : new CDocumentColor(oCommonColor.r, oCommonColor.g, oCommonColor.b);
     t._coAuthoringSetChange(e, oColor);
     // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
@@ -1991,7 +1996,7 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
             "codepage": option.asc_getCodePage(),
             "embeddedfonts": t.isUseEmbeddedCutFonts
           };
-          sendCommand2(t, null, rData);
+          sendCommand(t, null, rData);
       } else if (this.advancedOptionsAction === c_oAscAdvancedOptionsAction.Save) {
           var options = {txtOptions: option, downloadType: this.downloadType};
           this.downloadType = DownloadType.None;
@@ -2022,7 +2027,7 @@ asc_docs_api.prototype.processSavedFile = function(url, downloadType) {
 	var t = this;
 	if (this.mailMergeFileData) {
 		this.mailMergeFileData = null;
-    g_fLoadFileContent(url, function(result) {
+    AscCommon.loadFileContent(url, function(result) {
       if (null === result) {
         t.asc_fireCallback("asc_onError", c_oAscError.ID.MailMergeLoadFile, c_oAscError.Level.NoCritical);
         return;
@@ -4480,7 +4485,7 @@ asc_docs_api.prototype.AddImage = function(){
 };
 asc_docs_api.prototype.AddImageUrl2 = function(url)
 {
-    this.AddImageUrl(getFullImageSrc2(url));
+    this.AddImageUrl(AscCommon.getFullImageSrc2(url));
 };
 
 asc_docs_api.prototype._addImageUrl = function(url) {
@@ -4527,14 +4532,14 @@ asc_docs_api.prototype.AddImageUrl = function(url, imgProp)
                         t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                     }
                 } else {
-                    t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                    t.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
                 }
             } else {
                 t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
             }
             t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
         };
-        sendCommand2(this, null, rData );
+        sendCommand(this, null, rData );
     }
 };
 asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
@@ -4856,14 +4861,14 @@ asc_docs_api.prototype.ImgApply = function(obj)
                                 oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                             }
                         } else {
-                            oApi.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                            oApi.asc_fireCallback("asc_onError", mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
                         }
                     } else {
                         oApi.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.NoCritical);
                     }
                     oApi.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.UploadImage);
                 };
-                sendCommand2(this, null, rData );
+                sendCommand(this, null, rData );
             }
             else{
                 fApplyCallback();
@@ -6656,12 +6661,12 @@ window["asc_nativeOnSpellCheck"] = function (response)
 };
 
 asc_docs_api.prototype._onNeedParams = function(data) {
-  var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+  var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
   this.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), this.advancedOptionsAction);
 };
 asc_docs_api.prototype._onOpenCommand = function(data) {
   var t = this;
-	g_fOpenFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
+  AscCommon.openFileCommand(data, this.documentUrlChanges, c_oSerFormat.Signature, function (error, result) {
 		if (error) {
 			t.asc_fireCallback("asc_onError",c_oAscError.ID.Unknown,c_oAscError.Level.Critical);
 			return;
@@ -6695,7 +6700,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
     oAdditionalData["userid"] = editor.documentUserId;
     oAdditionalData["vkey"] = editor.documentVKey;
     oAdditionalData["outputformat"] = filetype;
-    oAdditionalData["title"] = changeFileExtention(editor.documentTitle, getExtentionByFormat(filetype));
+    oAdditionalData["title"] = AscCommon.changeFileExtention(editor.documentTitle, AscCommon.getExtentionByFormat(filetype));
 	oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
     if (DownloadType.Print === options.downloadType) {
       oAdditionalData["inline"] = 1;
@@ -6717,7 +6722,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 		if (actionType) {
 			editor.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
 		}
-		var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': getEncodingParams()};
+		var cp = {'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
 		editor.downloadType = options.downloadType;
 		editor.asc_fireCallback("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.TXT, cp), editor.advancedOptionsAction);
 		return;
@@ -6783,7 +6788,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
                 }
               }
             } else {
-              error = g_fMapAscServerErrorToAscError(parseInt(input["data"]));
+              error = mapAscServerErrorToAscError(parseInt(input["data"]));
             }
           }
           if (c_oAscError.ID.No != error) {
@@ -6797,7 +6802,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
         };
     }
 	editor.fCurCallback = fCallback;
-	g_fSaveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand2(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
+  AscCommon.saveWithParts(function(fCallback1, oAdditionalData1, dataContainer1){sendCommand(editor, fCallback1, oAdditionalData1, dataContainer1);}, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
 }
 
 function _addImageUrl2 (url)
@@ -7051,7 +7056,7 @@ CRevisionsChange.prototype.ComparePrevPosition = function()
 };
 CRevisionsChange.prototype.private_UpdateUserColor = function()
 {
-    this.UserColor = getUserColorById(this.UserId, this.UserName, true, false);
+    this.UserColor = AscCommon.getUserColorById(this.UserId, this.UserName, true, false);
 };
 
 

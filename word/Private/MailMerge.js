@@ -155,7 +155,7 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
             }
             else
             {
-                t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                t.asc_fireCallback("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
         }
         else
@@ -345,7 +345,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         return null;
 
     History.TurnOff();
-    g_oTableId.TurnOff();
+    AscCommon.g_oTableId.TurnOff();
 
     var LogicDocument = new CDocument(undefined, false);
     History.Document = this;
@@ -427,7 +427,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     }
 
     this.FieldsManager = FieldsManager;
-    g_oTableId.TurnOn();
+    AscCommon.g_oTableId.TurnOn();
     History.TurnOn();
 
     return LogicDocument;

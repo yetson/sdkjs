@@ -29,6 +29,7 @@
 * @param {undefined} undefined
 */
 function(window, undefined) {
+var g_cCharDelimiter = String.fromCharCode(5);
 var bDate1904 = false;
 var FONT_THUMBNAIL_HEIGHT = (7 * 96.0 / 25.4) >> 0;
 var c_oAscMaxColumnWidth = 255;
@@ -949,6 +950,7 @@ window['Asc']['c_oAscMaxTooltipLength'] = window['Asc'].c_oAscMaxTooltipLength =
 window['Asc']['c_oAscMaxCellOrCommentLength'] = window['Asc'].c_oAscMaxCellOrCommentLength = c_oAscMaxCellOrCommentLength;
 
   window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].g_cCharDelimiter = g_cCharDelimiter;
   window["AscCommon"].bDate1904 = bDate1904;
   window["AscCommon"].c_oAscAdvancedOptionsAction = c_oAscAdvancedOptionsAction;
   window["AscCommon"].DownloadType = DownloadType;

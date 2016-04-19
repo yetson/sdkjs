@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿window.IsShapeToImageConverter = false;
+window.IsShapeToImageConverter = false;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
@@ -1151,7 +1151,7 @@ CShapeDrawer.prototype =
                     {
                         if (this.UniFill.fill.RasterImageId && this.UniFill.fill.RasterImageId.indexOf(".svg") != 0)
                         {
-                            this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
+                            this.Graphics.drawImage(AscCommon.getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, undefined);
                             bIsFill = false;
                         }
                         else
@@ -1162,13 +1162,13 @@ CShapeDrawer.prototype =
                             }
                             else
                             {
-                                this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 0);
+                                this.Graphics.put_brushTexture(AscCommon.getFullImageSrc2(this.UniFill.fill.RasterImageId), 0);
                             }
                         }
                     }
                     else
                     {
-                        this.Graphics.drawImage(getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
+                        this.Graphics.drawImage(AscCommon.getFullImageSrc2(this.UniFill.fill.RasterImageId), this.min_x, this.min_y, (this.max_x - this.min_x), (this.max_y - this.min_y), undefined, this.UniFill.fill.srcRect);
                         bIsFill = false;
                     }
                 }
@@ -1180,7 +1180,7 @@ CShapeDrawer.prototype =
                     }
                     else
                     {
-                        this.Graphics.put_brushTexture(getFullImageSrc2(this.UniFill.fill.RasterImageId), 1);
+                        this.Graphics.put_brushTexture(AscCommon.getFullImageSrc2(this.UniFill.fill.RasterImageId), 1);
                     }
                 }
                 this.Graphics.put_BrushTextureAlpha(this.UniFill.transparent);

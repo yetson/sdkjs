@@ -3476,7 +3476,7 @@
 						if (!worksheet.getColHidden(i))
 							aNoHiddenCol.push(i);
 					}
-					aNoHiddenCol.sort(fSortAscending);
+					aNoHiddenCol.sort(AscCommon.fSortAscending);
 					//если скрыт первый или последний столбец, то их не надо сдвигать и показывать
 					if(aNoHiddenCol.length > 0)
 					{
@@ -3492,7 +3492,7 @@
 						if (!worksheet.getRowHidden(i))
 							aNoHiddenRow.push(i);
 					}
-					aNoHiddenRow.sort(fSortAscending);
+					aNoHiddenRow.sort(AscCommon.fSortAscending);
 					//если скрыты заголовок или итоги, то их не надо сдвигать и показывать
 					if(aNoHiddenRow.length > 0)
 					{

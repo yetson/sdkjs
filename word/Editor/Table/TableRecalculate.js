@@ -1748,7 +1748,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         HeaderPage.Rows = [];
 
         // Временно отключаем регистрацию новых классов
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         History.TurnOff();
 
         var aContentDrawings = [];
@@ -1773,7 +1773,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
             }
         }
 
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         var bHeaderNextPage = false;

@@ -34,7 +34,7 @@
 //----------------------------------------------------------------------------------------------------------------------
 function CTableCell(Row, ColW)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Row = Row;
 
@@ -103,14 +103,14 @@ function CTableCell(Row, ColW)
     this.Index = 0;
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CTableCell.prototype =
 {
     Set_Id : function(newId)
     {
-        g_oTableId.Reset_Id( this, newId, this.Id );
+        AscCommon.g_oTableId.Reset_Id( this, newId, this.Id );
         this.Id = newId;
     },
 
@@ -253,7 +253,7 @@ CTableCell.prototype =
     {
         if ( true === this.CompiledPr.NeedRecalc )
         {
-            if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead)
+            if (true === AscCommon.g_oIdCounter.m_bLoad || true === AscCommon.g_oIdCounter.m_bRead)
             {
                 this.CompiledPr.Pr     = g_oDocumentDefaultTableCellPr;
                 this.CompiledPr.ParaPr = g_oDocumentDefaultParaPr;
@@ -2575,7 +2575,7 @@ CTableCell.prototype =
         this.Pr.Read_FromBinary( Reader );
         this.Recalc_CompiledPr();
 
-        this.Content = g_oTableId.Get_ById( Reader.GetString2() );
+        this.Content = AscCommon.g_oTableId.Get_ById( Reader.GetString2() );
 
         CollaborativeEditing.Add_NewObject( this );
     },

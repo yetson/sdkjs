@@ -31,6 +31,8 @@
  */
 
 // Import
+var g_oTableId = AscCommon.g_oTableId;
+
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;
@@ -41,7 +43,7 @@ var c_oAscVAnchor = Asc.c_oAscVAnchor;
 // колонтитулов, сносок, надписей.
 function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, TurnOffInnerWrap, bPresentation)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.CurPage = 0;    // Текущая страница, в страницах самого контента
     this.StartPage = 0;  // Начальная страница во всем документе
@@ -118,7 +120,7 @@ function CDocumentContent(Parent, DrawingDocument, X, Y, XLimit, YLimit, Split, 
 
     this.TurnOffRecalc = false;
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     this.StartState = null;
 
     this.ReindexStartPos = 0;
@@ -9839,7 +9841,7 @@ CDocumentContent.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId,
 };
 CDocumentContent.prototype.private_RecalculateNumbering = function(Elements)
 {
-    if (true === g_oIdCounter.m_bLoad || true === g_oIdCounter.m_bRead || true === this.bPresentation)
+    if (true === AscCommon.g_oIdCounter.m_bLoad || true === AscCommon.g_oIdCounter.m_bRead || true === this.bPresentation)
         return;
 
     for (var Index = 0, Count = Elements.length; Index < Count; ++Index)

@@ -47,7 +47,7 @@ function CWordCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-Asc.extendClass(CWordCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CWordCollaborativeEditing, CCollaborativeEditingBase);
 
 CWordCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo, IsUpdateInterface)
 {
@@ -251,7 +251,7 @@ CWordCollaborativeEditing.prototype.OnEnd_CheckLock = function(DontLockInFastMod
 
                 if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
                 {
-                    var Class = g_oTableId.Get_ById(oItem);
+                    var Class = AscCommon.g_oTableId.Get_ById(oItem);
                     if (null != Class)
                     {
                         Class.Lock.Set_Type(AscCommon.locktype_Mine, false);
@@ -292,7 +292,7 @@ CWordCollaborativeEditing.prototype.OnCallback_AskLock = function(result)
 
                 if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
                 {
-                    var Class = g_oTableId.Get_ById(oItem);
+                    var Class = AscCommon.g_oTableId.Get_ById(oItem);
                     if (null != Class)
                     {
                         Class.Lock.Set_Type(AscCommon.locktype_Mine);
@@ -475,7 +475,7 @@ CWordCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     }, FOREIGN_CURSOR_LABEL_HIDETIME);
 
     var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
-    var Color  = getUserColorById(UserShortId, null, true);
+    var Color  = AscCommon.getUserColorById(UserShortId, null, true);
     var Coords = DrawingDocument.Collaborative_GetTargetPosition(UserId);
     if (!Color || !Coords)
         return;

@@ -33,13 +33,14 @@
 // Import
 var hdrftr_Header = AscCommon.hdrftr_Header;
 var hdrftr_Footer = AscCommon.hdrftr_Footer;
+var g_oTableId = AscCommon.g_oTableId;
 
 //-----------------------------------------------------------------------------------
 // Класс работающий с одним колонтитулом
 //-----------------------------------------------------------------------------------
 function CHeaderFooter(Parent, LogicDocument, DrawingDocument, Type)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Parent          = Parent;
     this.DrawingDocument = DrawingDocument;
@@ -1229,7 +1230,7 @@ CHeaderFooter.prototype.Get_DocumentContent = function()
 //-----------------------------------------------------------------------------------
 function CHeaderFooterController(LogicDocument, DrawingDocument)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.DrawingDocument = DrawingDocument;
     this.LogicDocument   = LogicDocument;
@@ -1243,7 +1244,7 @@ function CHeaderFooterController(LogicDocument, DrawingDocument)
 
     this.WaitMouseDown = true;
 
-    this.Lock = new CLock();   
+    this.Lock = new AscCommon.CLock();   
 
     // Добавляем данный класс в таблицу Id (обязательно в конце конструктора)
     g_oTableId.Add( this, this.Id );

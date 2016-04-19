@@ -37,6 +37,7 @@ var changestype_None = AscCommon.changestype_None;
 var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
 var changestype_2_Element_and_Type = AscCommon.changestype_2_Element_and_Type;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var g_oTableId = AscCommon.g_oTableId;
 
 var c_oAscHAnchor = Asc.c_oAscHAnchor;
 var c_oAscXAlign = Asc.c_oAscXAlign;
@@ -951,7 +952,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 {
     // Сохраняем ссылки на глобальные объекты
     this.History              = History;
-    this.IdCounter            = g_oIdCounter;
+    this.IdCounter            = AscCommon.g_oIdCounter;
     this.TableId              = g_oTableId;
     this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
@@ -1071,9 +1072,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     if(typeof CComments !== "undefined")
         this.Comments = new CComments();
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     // Массив укзателей на все инлайновые графические объекты
     this.DrawingObjects = null;
@@ -16371,7 +16372,7 @@ CDocument.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
 };
 CDocument.prototype.private_RecalculateNumbering = function(Elements)
 {
-    if (true === g_oIdCounter.m_bLoad)
+    if (true === AscCommon.g_oIdCounter.m_bLoad)
         return;
 
     for (var Index = 0, Count = Elements.length; Index < Count; ++Index)

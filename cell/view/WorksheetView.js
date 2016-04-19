@@ -49,6 +49,8 @@
     var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
     var AscBrowser = AscCommon.AscBrowser;
     var CColor = AscCommon.CColor;
+    var fSortAscending = AscCommon.fSortAscending;
+    var parserHelp = AscCommon.parserHelp;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
@@ -846,8 +848,8 @@
         }
         if ( arrCols ) {
             // Делаем массивы уникальными и сортируем
-            arrCols = arrCols.filter( fOnlyUnique );
-            arrRows = arrRows.filter( fOnlyUnique );
+            arrCols = arrCols.filter( AscCommon.fOnlyUnique );
+            arrRows = arrRows.filter( AscCommon.fOnlyUnique );
             return {arrCols: arrCols.sort( fSortAscending ), arrRows: arrRows.sort( fSortAscending )};
         }
         else {
@@ -11427,7 +11429,7 @@
                         arrLeftS.push( tc[i].left - offsX );
                     }
                 }
-                arrLeftS.sort( fSortDescending );
+                arrLeftS.sort( AscCommon.fSortDescending );
 
                 // Для замерженных ячеек, можем уйти за границу
                 if ( isMerged && _col > vro.vr.c2 ) {

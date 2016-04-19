@@ -45,6 +45,7 @@
   var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
   var AscBrowser = AscCommon.AscBrowser;
   var CColor = AscCommon.CColor;
+  var cBoolLocal = AscCommon.cBoolLocal;
 
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
@@ -2105,7 +2106,7 @@
     } else {
       this.copyActiveSheet = this.wsActive;
 
-      var index, tmpSelectRange = parserHelp.parse3DRef(selectRange);
+      var index, tmpSelectRange = AscCommon.parserHelp.parse3DRef(selectRange);
       if (tmpSelectRange) {
         if (c_oAscSelectionDialogType.Chart === selectionDialogType) {
           // Получаем sheet по имени

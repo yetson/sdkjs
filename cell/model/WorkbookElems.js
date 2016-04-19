@@ -28,6 +28,11 @@
 var CellValueType = AscCommon.CellValueType;
 var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
 var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+var FormulaTablePartInfo = AscCommon.FormulaTablePartInfo;
+var cBoolLocal = AscCommon.cBoolLocal;
+var cErrorOrigin = AscCommon.cErrorOrigin;
+var cErrorLocal = AscCommon.cErrorLocal;
+var parserHelp = AscCommon.parserHelp;
 
 var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
@@ -58,15 +63,6 @@ var g_nColorHyperlinkVisited = 11;
 var g_nFiltersType = {
 	autoFilter: 1, 
 	tablePart: 2
-};
-
-var g_nFormulaTablePartInfo = {
-	all: 1, 
-	data: 2,
-	headers: 3,
-	totals: 4,
-	thisRow: 5,
-	columns: 6
 };
 
 var g_oThemeColorsDefaultModsSpreadsheet = [
@@ -3334,9 +3330,9 @@ CCellValue.prototype =
     if (/(^(((http|https|ftp):\/\/)|(mailto:)|(www.)))|@/i.test(val)) {
       // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
       val = val.replace(/\s+$/, '');
-      var typeHyp = getUrlType(val);
+      var typeHyp = AscCommon.getUrlType(val);
       if (AscCommon.c_oAscUrlType.Invalid != typeHyp) {
-        val = prepareUrl(val, typeHyp);
+        val = AscCommon.prepareUrl(val, typeHyp);
 
         var oNewHyperlink = new Hyperlink();
         oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
@@ -3633,7 +3629,7 @@ function IntervalTreeRBNode(low, high, storedValue){
 	this.maxHigh = this.high;
 	this.minLow = this.key;
 }
-Asc.extendClass(IntervalTreeRBNode, TreeRBNode);
+AscCommon.extendClass(IntervalTreeRBNode, TreeRBNode);
 IntervalTreeRBNode.prototype.isEqual = function (x) {
 	return this.key == x.key && this.high == x.high;
 };
@@ -3931,7 +3927,7 @@ TreeRB.prototype = {
 function IntervalTreeRB(){
 	IntervalTreeRB.superclass.constructor.call(this);
 }
-Asc.extendClass(IntervalTreeRB, TreeRB);
+AscCommon.extendClass(IntervalTreeRB, TreeRB);
 IntervalTreeRB.prototype._init = function (x) {
 	this.nil = new IntervalTreeRBNode();
 	this.nil.left = this.nil.right = this.nil.parent = this.nil;
@@ -4602,24 +4598,24 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 	var res = null;
 	switch(objectParam.param)
 	{
-		case g_nFormulaTablePartInfo.all: 
+		case FormulaTablePartInfo.all:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
             //All поразному работает в случае если у таблицы есть или нет строки Totals
             //При наличии Totals All возвращает диапазон с учетом этой строки.
 			break;
 		}
-		case g_nFormulaTablePartInfo.data: 
+		case FormulaTablePartInfo.data:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 			break;
 		}
-		case g_nFormulaTablePartInfo.headers: 
+		case FormulaTablePartInfo.headers:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
 			break;
 		}
-		case g_nFormulaTablePartInfo.totals: 
+		case FormulaTablePartInfo.totals:
 		{
 			if(this.TotalsRowCount && this.TotalsRowCount >= 1)
 			{
@@ -4628,14 +4624,14 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			
 			break;
 		}
-		case g_nFormulaTablePartInfo.thisRow: 
+		case FormulaTablePartInfo.thisRow:
 		{
 //            if( this.Ref.containsRange( objectParam.cell ) ){
                 res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
 //            }
 			break;
 		}
-		case g_nFormulaTablePartInfo.columns: 
+		case FormulaTablePartInfo.columns:
 		{
 			var startCol = this.getTableIndexColumnByName(objectParam.startCol);
 			var endCol = this.getTableIndexColumnByName(objectParam.endCol);
