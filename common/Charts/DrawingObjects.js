@@ -394,7 +394,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 {
     ExecuteNoHistory(function(){
         this.ws = worksheetView;
-        var settings = new asc_ChartSettings();
+        var settings = new AscCommon.asc_ChartSettings();
         switch(oSparklineGroup.type)
         {
             case Asc.ESparklineType.Column:
@@ -453,7 +453,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         settings.putHorGridLines(c_oAscGridLinesSettings.none);
         settings.putVertGridLines(c_oAscGridLinesSettings.none);
 
-        var val_ax_props = new asc_ValAxisSettings();
+        var val_ax_props = new AscCommon.asc_ValAxisSettings();
         if(settings.type !== c_oAscChartTypeSettings.barStackedPer)
         {
             if(oSparklineGroup.minAxisType === Asc.SparklineAxisMinMax.Custom && oSparklineGroup.manualMin != null)
@@ -495,7 +495,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
 
 
 
-        var cat_ax_props = new asc_CatAxisSettings();
+        var cat_ax_props = new AscCommon.asc_CatAxisSettings();
         cat_ax_props.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
         cat_ax_props.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
         cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);

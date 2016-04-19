@@ -3185,7 +3185,9 @@ function Woorksheet(wb, _index, sId){
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new CContentChanges();
-	
+
+    this.sparklineGroups = new sparklineGroups();
+
 	/*handlers*/
 	this.handlers = null;
 }
