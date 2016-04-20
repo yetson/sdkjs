@@ -43,6 +43,12 @@
 		var asc_applyFunction	= asc.applyFunction;
 		var asc_Range			= asc.Range;
 
+		var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+
+		var c_oAscRecalcIndexTypes = AscCommonExcel.c_oAscRecalcIndexTypes;
+		var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;
+		var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
+
 		/**
 		 * Отвечает за совместное редактирование
 		 * -----------------------------------------------------------------------------
@@ -185,7 +191,7 @@
 
 					if (true !== oItem && false !== oItem) // сравниваем по значению и типу обязательно
 					{
-						var oNewLock = new asc.CLock(oItem);
+						var oNewLock = new CLock(oItem);
 						oNewLock.setType (c_oAscLockTypes.kLockTypeMine);
 						this.addUnlock2 (oNewLock);
 					}
@@ -254,7 +260,7 @@
 				oLock = this.m_arrNeedUnlock2.shift();
 				oLock.setType(c_oAscLockTypes.kLockTypeNone, false);
 
-                var drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+                var drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
                 if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
                     drawing.lockType = c_oAscLockTypes.kLockTypeNone;
                     bRedrawGraphicObjects = true;
@@ -272,7 +278,7 @@
 				oLock = this.m_arrNeedUnlock[nIndex];
 				if (c_oAscLockTypes.kLockTypeOther2 === oLock.getType()) {
 					if (!this.handlers.trigger("checkCommentRemoveLock", oLock.Element)) {
-						drawing = g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
+						drawing = AscCommon.g_oTableId.Get_ById(oLock.Element["rangeOrObjectId"]);
 						if(drawing && drawing.lockType !== c_oAscLockTypes.kLockTypeNone) {
 							drawing.lockType = c_oAscLockTypes.kLockTypeNone;
 							bRedrawGraphicObjects = true;
@@ -505,22 +511,22 @@
 		/**
 		 * Проверка lock для всего листа
 		 * @param {Number} sheetId  элемент для проверки lock
-		 * @return {c_oAscMouseMoveLockedObjectType} oLockedObjectType
+		 * @return {Asc.c_oAscMouseMoveLockedObjectType} oLockedObjectType
 		 */
 		CCollaborativeEditing.prototype.isLockAllOther = function (sheetId) {
 			var arrayElements = this.m_arrNeedUnlock;
 			var count = arrayElements.length;
 			var element = null;
-			var oLockedObjectType = c_oAscMouseMoveLockedObjectType.None;
+			var oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.None;
 
 			for (var i = 0; i < count; ++i) {
 				element = arrayElements[i].Element;
 				if (element["sheetId"] === sheetId) {
 					if (element["type"] === c_oAscLockTypeElem.Sheet) {
-						oLockedObjectType = c_oAscMouseMoveLockedObjectType.Sheet;
+						oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.Sheet;
 						break;
 					} else if (element["type"] === c_oAscLockTypeElem.Range && null !== element["subType"])
-						oLockedObjectType = c_oAscMouseMoveLockedObjectType.TableProperties;
+						oLockedObjectType = Asc.c_oAscMouseMoveLockedObjectType.TableProperties;
 				}
 			}
 			return oLockedObjectType;
@@ -839,10 +845,6 @@
 		 * @memberOf Asc
 		 */
 		function CLock(element) {
-			if ( !(this instanceof CLock) ) {
-				return new CLock (element);
-			}
-
 			this.Type   = c_oAscLockTypes.kLockTypeNone;
 			this.UserId = null;
 			this.Element = element;
@@ -1072,12 +1074,11 @@
 			return newPosition;
 		};
 
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
+		//----------------------------------------------------------export----------------------------------------------------
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window['AscCommonExcel'].CLock = CLock;
+		
 		asc.CCollaborativeEditing = CCollaborativeEditing;
-		asc.CLock = CLock;
 		asc.CRecalcIndexElement = CRecalcIndexElement;
 		asc.CRecalcIndex = CRecalcIndex;
 	}

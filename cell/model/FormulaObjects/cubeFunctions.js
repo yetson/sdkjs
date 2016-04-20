@@ -24,24 +24,26 @@
 */
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:15
- * To change this template use File | Settings | File Templates.
- */
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+    var cElementType = AscCommonExcel.cElementType;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-
-cFormulaFunctionGroup['Cube'] = [
-    cCUBEKPIMEMBER,
-    cCUBEMEMBER,
-    cCUBEMEMBERPROPERTY,
-    cCUBERANKEDMEMBER,
-    cCUBESET,
-    cCUBESETCOUNT,
-    cCUBEVALUE
-];
+    cFormulaFunctionGroup['Cube'] = cFormulaFunctionGroup['Cube'] || [];
+    cFormulaFunctionGroup['Cube'].push(
+        cCUBEKPIMEMBER,
+        cCUBEMEMBER,
+        cCUBEMEMBERPROPERTY,
+        cCUBERANKEDMEMBER,
+        cCUBESET,
+        cCUBESETCOUNT,
+        cCUBEVALUE
+    );
 
 function cCUBEKPIMEMBER() {
 //    cBaseFunction.call( this, "CUBEKPIMEMBER" );
@@ -175,3 +177,4 @@ function cCUBEVALUE() {
 }
 
 cCUBEVALUE.prototype = Object.create( cBaseFunction.prototype );
+})(window);

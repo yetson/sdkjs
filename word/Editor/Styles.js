@@ -30,6 +30,15 @@
  * Time: 14:46
  */
 
+// Import
+var align_Left = AscCommon.align_Left;
+var g_oTableId = AscCommon.g_oTableId;
+
+var linerule_Auto = Asc.linerule_Auto;
+var c_oAscShdClear = Asc.c_oAscShdClear;
+var c_oAscShdNil = Asc.c_oAscShdNil;
+var c_oAscDropCap = Asc.c_oAscDropCap;
+
 var EvenAndOddHeaders = false;
 
 var Default_Tab_Stop = 12.5;
@@ -64,10 +73,6 @@ var tbllayout_AutoFit = 0x01;
 
 var border_None   = 0x0000;
 var border_Single = 0x0001;
-
-var heightrule_AtLeast = 0x00;
-var heightrule_Auto    = 0x01;
-var heightrule_Exact   = 0x02;
 
 var vertalignjc_Top    = 0x00;
 var vertalignjc_Center = 0x01;
@@ -198,7 +203,7 @@ CTableStylePr.prototype =
 
 function CStyle(Name, BasedOnId, NextId, type, bNoCreateTablePr)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Name    = Name;
     this.BasedOn = BasedOnId;
@@ -1388,7 +1393,7 @@ CStyle.prototype =
 
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color :
                 {
                     r : 0xD9,
@@ -1623,7 +1628,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1679,7 +1684,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xFF,
@@ -1744,7 +1749,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1786,7 +1791,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0x4F,
@@ -1816,7 +1821,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xD8,
@@ -1833,7 +1838,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0xD8,
@@ -1879,7 +1884,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 0,
@@ -1935,7 +1940,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color :
                     {
                         r : 255,
@@ -2018,7 +2023,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : 0xFE, g : 0xF4, b : 0xEC }
             }
         };
@@ -2046,7 +2051,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0x34, g : 0x8D, b : 0xA5 }
                 }
             }
@@ -2075,7 +2080,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFF, g : 0xFF, b : 0xFF }
                 }
             }
@@ -2113,7 +2118,7 @@ CStyle.prototype =
 
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFD, g : 0xE4, b : 0xD0 }
                 }
             }
@@ -2125,7 +2130,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : 0xFD, g : 0xE9, b : 0xD9 }
                 }
             }
@@ -2151,7 +2156,7 @@ CStyle.prototype =
         var TextSize1  = 11;
 
         var CellShd1   = new CDocumentShd();
-        CellShd1.Value = shd_Clear;
+        CellShd1.Value = c_oAscShdClear;
         CellShd1.Color = new CDocumentColor(Color1.r, Color1.g, Color1.b);
 
         var TableStylePrBoundary =
@@ -2265,7 +2270,7 @@ CStyle.prototype =
             {
                 Shd :
                 {
-                    Value : shd_Clear,
+                    Value : c_oAscShdClear,
                     Color : { r : Color2.r, g : Color2.g, b : Color2.b}
                 }
             }
@@ -2492,7 +2497,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorBoundary.r, g : TableShdColorBoundary.g, b : TableShdColorBoundary.b}
             }
         };
@@ -2501,7 +2506,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorVertBand.r, g : TableShdColorVertBand.g, b : TableShdColorVertBand.b}
             }
         };
@@ -2510,7 +2515,7 @@ CStyle.prototype =
         {
             Shd :
             {
-                Value : shd_Clear,
+                Value : c_oAscShdClear,
                 Color : { r : TableShdColorHorzBand.r, g : TableShdColorHorzBand.g, b : TableShdColorHorzBand.b}
             }
         };
@@ -3898,8 +3903,8 @@ function CStyles(bCreateDefault)
 {
     if (bCreateDefault !== false)
     {
-        this.Id = g_oIdCounter.Get_NewId();
-        this.Lock = new CLock();
+        this.Id = AscCommon.g_oIdCounter.Get_NewId();
+        this.Lock = new AscCommon.CLock();
 
         this.Default =
         {
@@ -4257,6 +4262,34 @@ CStyles.prototype =
         }
 
         return Styles;
+    },
+
+    Get_DefaultParaPr : function()
+    {
+        return this.Default.ParaPr;
+    },
+
+    Set_DefaultParaPr : function(ParaPr)
+    {
+        History.Add(this, {Type : historyitem_Styles_ChangeDefaultParaPr, Old : this.Default.ParaPr, New : ParaPr});
+        this.Default.ParaPr = ParaPr;
+
+        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+        //       надо будет сделать, чтобы происходил пересчет всех стилей.
+    },
+
+    Get_DefaultTextPr : function()
+    {
+        return this.Default.TextPr;
+    },
+
+    Set_DefaultTextPr : function(TextPr)
+    {
+        History.Add(this, {Type : historyitem_Styles_ChangeDefaultTextPr, Old : this.Default.TextPr, New : TextPr});
+        this.Default.TextPr = TextPr;
+
+        // TODO: Пока данная функция используется только в билдере, как только будет использоваться в самом редакторе,
+        //       надо будет сделать, чтобы происходил пересчет всех стилей.
     },
 //-----------------------------------------------------------------------------------
 //
@@ -4827,6 +4860,18 @@ CStyles.prototype =
                 this.Update_Interface(Data.Id);
                 break;
             }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                this.Default.ParaPr = Data.Old;
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                this.Default.TextPr = Data.Old;
+                break;
+            }
         }
     },
 
@@ -4847,6 +4892,18 @@ CStyles.prototype =
             {
                 delete this.Style[Data.Id];
                 this.Update_Interface(Data.Id);
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                this.Default.ParaPr = Data.New;
+                break;
+            }
+
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                this.Default.TextPr = Data.New;
                 break;
             }
         }
@@ -4942,6 +4999,14 @@ CStyles.prototype =
 
                 break;
             }
+
+            case historyitem_Styles_ChangeDefaultParaPr:
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                // Variable : ParaPr | TextPr
+                Data.New.Write_ToBinary(Writer);
+                break;
+            }
         }
 
         return Writer;
@@ -4981,6 +5046,22 @@ CStyles.prototype =
                 delete this.Style[Id];
                 this.Update_Interface(Id);
                 CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
+                break;
+            }
+            case historyitem_Styles_ChangeDefaultParaPr:
+            {
+                // Variable : ParaPr
+                var oParaPr = new CParaPr();
+                oParaPr.Read_FromBinary(Reader);
+                this.Default.ParaPr = oParaPr;
+                break;
+            }
+            case historyitem_Styles_ChangeDefaultTextPr:
+            {
+                // Variable : TextPr
+                var oTextPr = new CTextPr();
+                oTextPr.Read_FromBinary(Reader);
+                this.Default.TextPr = oTextPr;
                 break;
             }
         }
@@ -5107,7 +5188,7 @@ CDocumentColor.prototype =
 
 function CDocumentShd()
 {
-    this.Value = shd_Nil;
+    this.Value = c_oAscShdNil;
     this.Color = new CDocumentColor(255, 255, 255);
     this.Unifill = undefined;
     this.FillRef = undefined;
@@ -5141,10 +5222,10 @@ CDocumentShd.prototype =
         {
             switch ( this.Value )
             {
-                case shd_Nil:
+                case c_oAscShdNil:
                     return true;
 
-                case shd_Clear:
+                case c_oAscShdClear:
                 {
                     return this.Color.Compare( Shd.Color ) && CompareUnifillBool(this.Unifill, Shd.Unifill);
                 }
@@ -5203,7 +5284,7 @@ CDocumentShd.prototype =
     
     Init_Default : function()
     {
-        this.Value = shd_Nil;
+        this.Value = c_oAscShdNil;
         this.Color.Set( 0, 0, 0, false );
         this.Unifill = undefined;
         this.FillRef = undefined;
@@ -5213,12 +5294,12 @@ CDocumentShd.prototype =
     {
         if ( undefined === Shd )
         {
-            this.Value = shd_Nil;
+            this.Value = c_oAscShdNil;
             return;
         }
         
         this.Value = Shd.Value;
-        if ( shd_Nil != Shd.Value )
+        if ( c_oAscShdNil != Shd.Value )
         {
             if( undefined != Shd.Color )
                 this.Color.Set( Shd.Color.r, Shd.Color.g, Shd.Color.b, Shd.Color.Auto );
@@ -5248,11 +5329,11 @@ CDocumentShd.prototype =
     {
         // Byte : Value
         //
-        // Если shd_Clear
+        // Если c_oAscShdClear
         // Variable : Color
 
         Writer.WriteByte( this.Value );
-        if ( shd_Clear === this.Value )
+        if ( c_oAscShdClear === this.Value )
         {
             this.Color.Write_ToBinary(Writer);
             if(this.Unifill)
@@ -5280,12 +5361,12 @@ CDocumentShd.prototype =
     {
         // Byte : Value
         //
-        // Если shd_Clear
+        // Если c_oAscShdClear
         // Variable : Color
 
         this.Value = Reader.GetByte();
 
-        if ( shd_Clear === this.Value )
+        if ( c_oAscShdClear === this.Value )
         {
             this.Color.Read_FromBinary(Reader);
             if(Reader.GetBool())
@@ -5431,7 +5512,7 @@ CDocumentBorder.prototype =
             this.LineRef = undefined;
             this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
         }
-        if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === FILL_TYPE_NOFILL)
+        if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_NOFILL)
         {
             this.Value = border_None;
         }
@@ -6265,7 +6346,7 @@ CTableRowPr.prototype =
         this.GridBefore       = 0;
         this.Jc               = align_Left;
         this.TableCellSpacing = null;
-        this.Height           = new CTableRowHeight(0, heightrule_Auto);
+        this.Height           = new CTableRowHeight(0, Asc.linerule_Auto);
         this.WAfter           = new CTableMeasurement(tblwidth_Auto, 0);
         this.WBefore          = new CTableMeasurement(tblwidth_Auto, 0);
         this.TableHeader      = false;
@@ -6396,7 +6477,7 @@ CTableRowPr.prototype =
 
         if ( 32 & Flags )
         {
-            this.Height = new CTableRowHeight(0, heightrule_Auto);
+            this.Height = new CTableRowHeight(0, Asc.linerule_Auto);
             this.Height.Read_FromBinary(Reader);
         }
 
@@ -7553,7 +7634,7 @@ CTextPr.prototype =
         };
         this.FontSize   = 11;
         this.Color      = new CDocumentColor(0, 0, 0, true);
-        this.VertAlign  = vertalign_Baseline;
+        this.VertAlign  = AscCommon.vertalign_Baseline;
         this.HighLight  = highlight_None;
         this.RStyle     = undefined;
         this.Spacing    = 0;
@@ -8259,13 +8340,13 @@ CTextPr.prototype =
 
         switch ( this.VertAlign )
         {
-            case vertalign_Baseline:
+            case AscCommon.vertalign_Baseline:
             {
                 dFontKoef = 1;
                 break;
             }
-            case vertalign_SubScript:
-            case vertalign_SuperScript:
+            case AscCommon.vertalign_SubScript:
+            case AscCommon.vertalign_SuperScript:
             {
                 dFontKoef = vertalign_Koef_Size;
                 break;
@@ -9326,10 +9407,6 @@ CNumPr.prototype =
     }
 };
 
-var dropcap_None   = 0x00;
-var dropcap_Drop   = 0x01;
-var dropcap_Margin = 0x02;
-
 var wrap_Around    = 0x01;
 var wrap_Auto      = 0x02;
 var wrap_None      = 0x03;
@@ -9559,11 +9636,11 @@ CFramePr.prototype =
 
     Init_Default_DropCap : function(bInside)
     {
-        this.DropCap = ( true === bInside ? dropcap_Drop : dropcap_Margin );
+        this.DropCap = ( true === bInside ? c_oAscDropCap.Drop : c_oAscDropCap.Margin );
         this.Lines   = 3;
         this.Wrap    = wrap_Around;
-        this.VAnchor = c_oAscVAnchor.Text;
-        this.HAnchor = ( true === bInside ? c_oAscHAnchor.Text : c_oAscHAnchor.Page );
+        this.VAnchor = Asc.c_oAscVAnchor.Text;
+        this.HAnchor = ( true === bInside ? Asc.c_oAscHAnchor.Text : Asc.c_oAscHAnchor.Page );
 
         this.X       = undefined;
         this.XAlign  = undefined;
@@ -9587,7 +9664,7 @@ CFramePr.prototype =
 
     Is_DropCap : function()
     {
-        if ( dropcap_Margin === this.DropCap || dropcap_Drop === this.DropCap )
+        if ( c_oAscDropCap.Margin === this.DropCap || c_oAscDropCap.Drop === this.DropCap )
             return true;
 
         return false;

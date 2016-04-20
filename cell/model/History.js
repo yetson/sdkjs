@@ -127,6 +127,9 @@ var historyitem_AutoFilter_Delete   = 8;
 var historyitem_AutoFilter_ChangeTableStyle = 9;
 var historyitem_AutoFilter_Change = 10;
 var historyitem_AutoFilter_CleanFormat  = 11;
+var historyitem_AutoFilter_ChangeTableInfo = 12;
+var historyitem_AutoFilter_ChangeTableRef = 13;
+var historyitem_AutoFilter_ChangeTableName = 14;
 
 
 function CHistory(workbook)
@@ -142,6 +145,7 @@ function CHistory(workbook)
 	this.LastState = null;
 	this.LoadFonts = {};//собираем все загруженные шрифты между моментами сохранения
 	this.HasLoadFonts = false;
+	this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
 	this.SavedIndex = null;			// Номер точки отката, на которой произошло последнее сохранение
   this.ForceSave  = false;       // Нужно сохранение, случается, когда у нас точка SavedIndex смещается из-за объединения точек, и мы делаем Undo
@@ -260,7 +264,7 @@ CHistory.prototype.RedoAdd = function(oRedoObjectParam, Class, Type, sheetid, ra
 			Data.oBinaryReader.Seek2(Data.nPos);
 			if(!Class)
 			{
-				Class = g_oTableId.Get_ById(Data.sChangedObjectId);
+				Class = AscCommon.g_oTableId.Get_ById(Data.sChangedObjectId);
 				if(Class)
 					this.Add(Class, Type, sheetid, range, Data, LocalChange);
 			}
@@ -447,24 +451,27 @@ CHistory.prototype.Redo = function()
 	this.UndoRedoEnd(Point, oRedoObjectParam, false);
 };
 CHistory.prototype._addRedoObjectParam = function (oRedoObjectParam, Point) {
-	if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetViewSettings === Point.Type) {
+	if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetViewSettings === Point.Type) {
 		oRedoObjectParam.bIsReInit = true;
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
 	}
-	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type || historyitem_Worksheet_RowHide == Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RowProp == Point.Type || historyitem_Worksheet_ColProp == Point.Type || historyitem_Worksheet_RowHide == Point.Type))
 		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
-	else if (g_oUndoRedoWorkbook === Point.Class && (historyitem_Workbook_SheetAdd === Point.Type || historyitem_Workbook_SheetRemove === Point.Type || historyitem_Workbook_SheetMove === Point.Type || historyitem_Workbook_SheetPositions === Point.Type)) {
+	else if (AscCommonExcel.g_oUndoRedoWorkbook === Point.Class && (historyitem_Workbook_SheetAdd === Point.Type || historyitem_Workbook_SheetRemove === Point.Type || historyitem_Workbook_SheetMove === Point.Type || historyitem_Workbook_SheetPositions === Point.Type)) {
 		oRedoObjectParam.bUpdateWorksheetByModel = true;
 		oRedoObjectParam.bOnSheetsChanged = true;
 	}
-	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_Rename === Point.Type || historyitem_Worksheet_Hide === Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_Rename === Point.Type || historyitem_Worksheet_Hide === Point.Type))
 		oRedoObjectParam.bOnSheetsChanged = true;
-	else if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetTabColor === Point.Type)
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_SetTabColor === Point.Type)
 		oRedoObjectParam.oOnUpdateTabColor[Point.SheetId] = Point.SheetId;
-	else if (g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_ChangeFrozenCell === Point.Type)
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && historyitem_Worksheet_ChangeFrozenCell === Point.Type)
 		oRedoObjectParam.oOnUpdateSheetViewSettings[Point.SheetId] = Point.SheetId;
-	else if (g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
+	else if (AscCommonExcel.g_oUndoRedoWorksheet === Point.Class && (historyitem_Worksheet_RemoveRows === Point.Type || historyitem_Worksheet_RemoveCols === Point.Type || historyitem_Worksheet_AddRows === Point.Type || historyitem_Worksheet_AddCols === Point.Type))
 		oRedoObjectParam.bAddRemoveRowCol = true;
+	else if(AscCommonExcel.g_oUndoRedoAutoFilters === Point.Class && historyitem_AutoFilter_ChangeTableInfo === Point.Type)
+		oRedoObjectParam.oChangeWorksheetUpdate[Point.SheetId] = Point.SheetId;
+		
 };
 CHistory.prototype.Get_RecalcData = function(Point2)
 {
@@ -491,7 +498,7 @@ CHistory.prototype.Get_RecalcData = function(Point2)
 
 					if ( /*true === Item.NeedRecalc*/ Item.Class && Item.Class.Refresh_RecalcData )
 						Item.Class.Refresh_RecalcData( Item.Data );
-					if(Item.Type === historyitem_Workbook_ChangeColorScheme && Item.Class === g_oUndoRedoWorkbook)
+					if(Item.Type === historyitem_Workbook_ChangeColorScheme && Item.Class === AscCommonExcel.g_oUndoRedoWorkbook)
 					{
 						var wsViews = Asc["editor"].wb.wsViews;
 						for(var i = 0; i < wsViews.length; ++i)
@@ -587,6 +594,8 @@ CHistory.prototype.Create_NewPoint = function()
 	if ( 0 !== this.TurnOffHistory || 0 !== this.Transaction )
 		return;
 
+	this.CanNotAddChanges = false;
+
 	if (null !== this.SavedIndex && this.Index < this.SavedIndex)
 		this.Set_SavedIndex(this.Index);
 
@@ -626,6 +635,8 @@ CHistory.prototype.Add = function(Class, Type, sheetid, range, Data, LocalChange
 {
 	if ( 0 !== this.TurnOffHistory || this.Index < 0 )
 		return;
+
+	this._CheckCanNotAddChanges();
 
 	var Item;
 	if ( this.RecIndex >= this.Index )
@@ -829,7 +840,7 @@ CHistory.prototype.GetSerializeArray = function()
 		for(var j = 0, length2 = point.Items.length; j < length2; ++j)
 		{
 			var elem = point.Items[j];
-			aPointChanges.push(new UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
+			aPointChanges.push(new AscCommonExcel.UndoRedoItemSerializable(elem.Class, elem.Type, elem.SheetId, elem.Range, elem.Data, elem.LocalChange));
 		}
 		aRes.push(aPointChanges);
 	}
@@ -858,10 +869,21 @@ CHistory.prototype._addFonts = function (isCreateNew) {
 		var arrFonts = [];
 		for (var i in this.LoadFonts)
 			arrFonts.push(i);
-		this.Add(g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new UndoRedoData_SingleProperty(arrFonts));
+		this.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_AddFont, null, null, new AscCommonExcel.UndoRedoData_SingleProperty(arrFonts));
 
 		this.LoadFonts = {};
 		this.HasLoadFonts = false;
 	}
 };
+CHistory.prototype._CheckCanNotAddChanges = function () {
+    try {
+        if (this.CanNotAddChanges) {
+            var tmpErr = new Error();
+            if (tmpErr.stack) {
+                this.workbook.oApi.CoAuthoringApi.sendChangesError(tmpErr.stack);
+            }
+        }
+    } catch (e) {
+    }
+}
 var History = null;

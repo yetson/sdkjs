@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 function CGlyphOperator()
@@ -32,7 +8,6 @@ function CGlyphOperator()
     this.size = new CMathSize();
     this.stretch = 0;
     this.bStretch = true;
-
 
     this.penW = 1; // px
 }
@@ -101,7 +76,7 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
     var X = coord.XX, Y = coord.YY,
         W =  this.size.width, H =  this.size.height;
 
-    var bHor = this.loc == 0 || this.loc  == 1;
+    var bHor = this.loc == LOCATION_TOP || this.loc  == LOCATION_BOT;
     var glW = 0, glH = 0;
 
      if(bHor)
@@ -187,63 +162,6 @@ CGlyphOperator.prototype.getCoordinateGlyph = function()
         }
     }
 
-    /*if(this.loc == LOCATION_TOP)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else if(this.loc == LOCATION_BOT)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-
-        if(bLine)
-        {
-            a2 = 0; b2 = 1; c2 = (H - glH)/2;
-        }
-        else
-        {
-            a2 = 0; b2 = 1; c2 = H - glH;
-        }
-    }
-    else if(this.loc == LOCATION_LEFT)
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }
-    else if(this.loc == LOCATION_RIGHT)
-    {
-        if(bLine)
-        {
-            a1 = 0; b1 = 1; c1 = (W - glW)/2;
-        }
-        else
-        {
-            a1 = 0; b1 = 1; c1 = W - glW;
-        }
-
-        a2 = 1; b2 = 0; c2 = 0;
-    }
-    else if(this.loc == LOCATION_SEP)
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }*/
-
-
-    /*var shW = 0,
-        shH = 0;
-
-    if(bHor)
-    {
-        a1 = 1; b1 = 0; c1 = 0;
-        a2 = 0; b2 = 1; c2 = 0;
-    }
-    else
-    {
-        a1 = 0; b1 = 1; c1 = 0;
-        a2 = 1; b2 = 0; c2 = 0;
-    }*/
-
     if(this.turn == 1)
     {
         a1 *= -1; b1 *= -1; c1 += glW;
@@ -285,7 +203,7 @@ CGlyphOperator.prototype.draw = function(pGraphics, XX, YY, PDSE)
     pGraphics.p_width(this.penW*1000);
     pGraphics._s();
 
-    this.drawPath(pGraphics, XX,YY, PDSE);
+    this.drawPath(pGraphics, XX, YY, PDSE);
 
     pGraphics.df();
     pGraphics._s();
@@ -315,7 +233,7 @@ function COperatorBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorBracket, CGlyphOperator);
+AscCommon.extendClass(COperatorBracket, CGlyphOperator);
 COperatorBracket.prototype.calcSize = function( stretch )
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -853,7 +771,7 @@ function COperatorParenthesis()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorParenthesis, CGlyphOperator);
+AscCommon.extendClass(COperatorParenthesis, CGlyphOperator);
 COperatorParenthesis.prototype.calcSize = function(stretch)
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1004,7 +922,7 @@ function COperatorAngleBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorAngleBracket, CGlyphOperator);
+AscCommon.extendClass(COperatorAngleBracket, CGlyphOperator);
 COperatorAngleBracket.prototype.calcSize = function(stretch)
 {
     //скобка перевернутая
@@ -1120,7 +1038,7 @@ function CSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CSquareBracket, CGlyphOperator);
 CSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1196,7 +1114,7 @@ function CHalfSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CHalfSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CHalfSquareBracket, CGlyphOperator);
 CHalfSquareBracket.prototype.calcCoord = function(stretch)
 {
     var X = [],
@@ -1268,7 +1186,7 @@ function COperatorLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorLine, CGlyphOperator);
+AscCommon.extendClass(COperatorLine, CGlyphOperator);
 COperatorLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1336,7 +1254,7 @@ function CWhiteSquareBracket()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CWhiteSquareBracket, CGlyphOperator);
+AscCommon.extendClass(CWhiteSquareBracket, CGlyphOperator);
 CWhiteSquareBracket.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1442,7 +1360,7 @@ function COperatorDoubleLine()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(COperatorDoubleLine, CGlyphOperator);
+AscCommon.extendClass(COperatorDoubleLine, CGlyphOperator);
 COperatorDoubleLine.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1523,7 +1441,7 @@ function CSingleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CSingleArrow, CGlyphOperator);
+AscCommon.extendClass(CSingleArrow, CGlyphOperator);
 CSingleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1600,7 +1518,7 @@ function CLeftRightArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CLeftRightArrow, CGlyphOperator);
+AscCommon.extendClass(CLeftRightArrow, CGlyphOperator);
 CLeftRightArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1690,7 +1608,7 @@ function CDoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CDoubleArrow, CGlyphOperator);
+AscCommon.extendClass(CDoubleArrow, CGlyphOperator);
 CDoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1790,7 +1708,7 @@ function CLR_DoubleArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CLR_DoubleArrow, CGlyphOperator);
+AscCommon.extendClass(CLR_DoubleArrow, CGlyphOperator);
 CLR_DoubleArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1903,7 +1821,7 @@ function CCombiningArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombiningArrow, CGlyphOperator);
+AscCommon.extendClass(CCombiningArrow, CGlyphOperator);
 CCombiningArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -1978,7 +1896,7 @@ function CCombiningHalfArrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombiningHalfArrow, CGlyphOperator);
+AscCommon.extendClass(CCombiningHalfArrow, CGlyphOperator);
 CCombiningHalfArrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -2049,7 +1967,7 @@ function CCombining_LR_Arrow()
 {
     CGlyphOperator.call(this);
 }
-Asc.extendClass(CCombining_LR_Arrow, CGlyphOperator);
+AscCommon.extendClass(CCombining_LR_Arrow, CGlyphOperator);
 CCombining_LR_Arrow.prototype.calcSize = function()
 {
     var betta = this.getCtrPrp().FontSize/36;
@@ -2994,7 +2912,6 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             Bold:       false //ctrPrp.Bold
         };
 
-
         oMeasure.SetFont(Font);
 
         var bLine = this.IsLineGlyph();
@@ -3028,19 +2945,25 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
             }
         }
 
-        // Height
+        var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
+        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
 
-        var letterOperator = new CMathText(true);
-        letterOperator.add(this.code);
-        letterOperator.Measure(oMeasure, ctrPrp);
+        // Height, Ascent
 
         if(this.type === OPER_ACCENT)
         {
+            var letterOperator = new CMathText(true);
+            letterOperator.add(this.code);
+            letterOperator.Measure(oMeasure, ctrPrp);
+
             var letterX = new CMathText(true);
             letterX.add(0x78);
             letterX.Measure(oMeasure, ctrPrp);
 
             height = letterOperator.size.ascent - letterX.size.ascent;
+
+            ascent = height/2 + shCenter;
+
         }
         else
         {
@@ -3053,17 +2976,16 @@ COperator.prototype.fixSize = function(oMeasure, stretch)
                 else
                     height = dims.Height;
             }
+
+            if(!bLine && this.operator.loc == LOCATION_TOP)
+                ascent = dims.Height;
+            else if(!bLine && this.operator.loc == LOCATION_BOT)
+                ascent = this.operator.size.height;
+            else
+                ascent = height/2 + shCenter;
         }
 
-        // Ascent
 
-        var mgCtrPrp = this.Parent.Get_TxtPrControlLetter();
-        var shCenter = this.ParaMath.GetShiftCenter(oMeasure, mgCtrPrp);
-
-        if(!bLine && (this.operator.loc == LOCATION_TOP || this.operator.loc == LOCATION_BOT))
-            ascent = dims.Height/2;
-        else
-            ascent = height/2 + shCenter;
 
         this.size.width  = width;
         this.size.height = height;
@@ -3078,7 +3000,7 @@ COperator.prototype.Resize = function(oMeasure)
 {
     if(this.typeOper !== OPERATOR_EMPTY)
     {
-        var bHor = this.operator.loc == 0 || this.operator.loc  == 1;
+        var bHor = this.operator.loc == LOCATION_TOP || this.operator.loc  == LOCATION_BOT;
 
         if(bHor)
             this.fixSize(oMeasure, this.size.width);
@@ -3311,7 +3233,7 @@ function CDelimiter(props)
 {
     CDelimiter.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.GeneralMetrics = new CMathSize();
 
@@ -3325,9 +3247,9 @@ function CDelimiter(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDelimiter, CMathBase);
+AscCommon.extendClass(CDelimiter, CMathBase);
 
 CDelimiter.prototype.ClassType = historyitem_type_delimiter;
 CDelimiter.prototype.kind      = MATH_DELIMITER;
@@ -4094,7 +4016,7 @@ function CMathMenuDelimiter(Delimiter)
         this.bSingleArgument    = true;
     }
 }
-Asc.extendClass(CMathMenuDelimiter, CMathMenuBase);
+AscCommon.extendClass(CMathMenuDelimiter, CMathMenuBase);
 CMathMenuDelimiter.prototype.get_HideOpeningBracket = function(){return this.HideBegOper;};
 CMathMenuDelimiter.prototype.put_HideOpeningBracket = function(Hide){this.HideBegOper = Hide;};
 CMathMenuDelimiter.prototype.get_HideClosingBracket = function(){return this.HideEndOper;};
@@ -4128,14 +4050,14 @@ function CCharacter()
     this.operator = new COperator(OPER_GROUP_CHAR);
     CMathBase.call(this);
 }
-Asc.extendClass(CCharacter, CMathBase);
+AscCommon.extendClass(CCharacter, CMathBase);
 CCharacter.prototype.setCharacter = function(props, defaultProps)
 {
     this.operator.mergeProperties(props, defaultProps);
 };
 CCharacter.prototype.recalculateSize = function(oMeasure)
 {
-    var Base = this.Content[0];
+    var Base = this.elements[0][0];
 
     this.operator.fixSize(oMeasure, Base.size.width);
 
@@ -4164,32 +4086,36 @@ CCharacter.prototype.setPosition = function(pos, PosInfo)
     var PosOper = new CMathPosition(),
         PosBase = new CMathPosition();
 
-    var Base = this.Content[0];
+    var Base = this.elements[0][0];
 
     if(this.Pr.pos === LOCATION_TOP)
     {
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y;
 
-        this.operator.setPosition(PosOper);
-
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y + this.operator.size.height + Base.size.ascent;
+        PosBase.y = this.pos.y + this.operator.size.height;
 
-        Base.setPosition(PosBase, PosInfo);
     }
     else if(this.Pr.pos === LOCATION_BOT)
     {
         PosBase.x = this.pos.x + this.GapLeft + alignCnt;
-        PosBase.y = this.pos.y + Base.size.ascent;
+        PosBase.y = this.pos.y;
 
-        Base.setPosition(PosBase, PosInfo);
+        //Base.setPosition(PosBase, PosInfo);
 
         PosOper.x = this.pos.x + this.GapLeft + alignOp;
         PosOper.y = this.pos.y + Base.size.height;
 
-        this.operator.setPosition(PosOper);
+        //this.operator.setPosition(PosOper);
     }
+
+    this.operator.setPosition(PosOper);
+
+    if(Base.Type == para_Math_Content)
+        PosBase.y += Base.size.ascent;
+
+    Base.setPosition(PosBase, PosInfo);
 
     pos.x += this.size.width;
 };
@@ -4330,7 +4256,7 @@ function CGroupCharacter(props)
 {
     CGroupCharacter.superclass.constructor.call(this);
 
-	this.Id   = g_oIdCounter.Get_NewId();
+	this.Id   = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathGroupChrPr();
 
@@ -4338,9 +4264,9 @@ function CGroupCharacter(props)
         this.init(props);
 
     /// вызов этой функции обязательно в конце
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CGroupCharacter, CCharacter);
+AscCommon.extendClass(CGroupCharacter, CCharacter);
 CGroupCharacter.prototype.ClassType = historyitem_type_groupChr;
 CGroupCharacter.prototype.kind      = MATH_GROUP_CHARACTER;
 CGroupCharacter.prototype.init = function(props)
@@ -4413,22 +4339,17 @@ CGroupCharacter.prototype.getAscent = function(oMeasure)
 {
     var ascent;
 
-    //var shCent = DIV_CENT*this.getCtrPrp().FontSize;
-
     var ctrPrp = this.Get_TxtPrControlLetter();
     var shCent = this.ParaMath.GetShiftCenter(oMeasure, ctrPrp);
 
     if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_TOP)
-        ascent =  this.operator.size.ascent + shCent;
-        //ascent =  this.operator.size.ascent + 1.3*shCent;
+        ascent =  this.operator.size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_TOP )
         ascent = this.operator.size.height + this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_TOP && this.Pr.pos === LOCATION_BOT )
         ascent = this.elements[0][0].size.ascent;
     else if(this.Pr.vertJc === VJUST_BOT && this.Pr.pos === LOCATION_BOT )
-        ascent = this.elements[0][0].size.height + shCent + this.operator.size.height - this.operator.size.ascent;
-        //ascent = this.elements[0][0].size.height + 1.55*shCent + this.operator.size.height - this.operator.size.ascent;
-
+        ascent = this.elements[0][0].size.height + this.operator.size.height;
 
     return ascent;
 };
@@ -4537,7 +4458,7 @@ function CMathMenuGroupCharacter(GroupChr)
         this.bCanChangePos = undefined;
     }
 }
-Asc.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
+AscCommon.extendClass(CMathMenuGroupCharacter, CMathMenuBase);
 CMathMenuGroupCharacter.prototype.get_Pos         = function(){return this.Pos;};
 CMathMenuGroupCharacter.prototype.put_Pos         = function(Pos){this.Pos = Pos;};
 CMathMenuGroupCharacter.prototype.can_ChangePos   = function(){return this.bCanChangePos;};

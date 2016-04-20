@@ -26,8 +26,23 @@
 
 var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 
-var contentchanges_Add    = 1;
-var contentchanges_Remove = 2;
+// Import
+var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
+var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
+var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
+var parserHelp = AscCommon.parserHelp;
+
+var c_oAscError = Asc.c_oAscError;
+var c_oAscChartTitleShowSettings = Asc.c_oAscChartTitleShowSettings;
+var c_oAscChartHorAxisLabelShowSettings = Asc.c_oAscChartHorAxisLabelShowSettings;
+var c_oAscChartVertAxisLabelShowSettings = Asc.c_oAscChartVertAxisLabelShowSettings;
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscGridLinesSettings = Asc.c_oAscGridLinesSettings;
+var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+var c_oAscRelativeFromH = Asc.c_oAscRelativeFromH;
+var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
+var c_oAscFill = Asc.c_oAscFill;
 
 
 var HANDLE_EVENT_MODE_HANDLE = 0;
@@ -35,8 +50,20 @@ var HANDLE_EVENT_MODE_CURSOR = 1;
 
 var DISTANCE_TO_TEXT_LEFTRIGHT = 3.2;
 
-function CheckShapeBodyAutoFitReset(oShape)
+function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
 {
+    var oParaDrawing = getParaDrawing(oShape);
+    if(oParaDrawing && !(bNoResetRelSize === true))
+    {
+        if(oParaDrawing.SizeRelH)
+        {
+            oParaDrawing.SetSizeRelH(undefined);
+        }
+        if(oParaDrawing.SizeRelV)
+        {
+            oParaDrawing.SetSizeRelV(undefined);
+        }
+    }
     if(oShape instanceof CShape)
     {
         var oPropsToSet = null;
@@ -96,6 +123,148 @@ function CDistance(L, T, R, B)
     this.T = T;
     this.R = R;
     this.B = B;
+}
+
+
+function ConvertRelPositionHToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromH.InsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhInsideMargin;
+        }
+        case c_oAscRelativeFromH.LeftMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhLeftMargin;
+        }
+        case c_oAscRelativeFromH.Margin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhMargin;
+        }
+        case c_oAscRelativeFromH.OutsideMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhOutsideMargin;
+        }
+        case c_oAscRelativeFromH.Page:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+        case c_oAscRelativeFromH.RightMargin:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhRightMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromH.sizerelfromhPage;
+        }
+    }
+}
+
+function ConvertRelPositionVToRelSize(nRelPosition)
+{
+    switch(nRelPosition)
+    {
+        case c_oAscRelativeFromV.BottomMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvBottomMargin;
+        }
+        case c_oAscRelativeFromV.InsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvInsideMargin;
+        }
+        case c_oAscRelativeFromV.Margin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+        case c_oAscRelativeFromV.OutsideMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvOutsideMargin;
+        }
+        case c_oAscRelativeFromV.Page:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvPage;
+        }
+        case c_oAscRelativeFromV.TopMargin:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvTopMargin;
+        }
+        default:
+        {
+            return c_oAscSizeRelFromV.sizerelfromvMargin;
+        }
+    }
+}
+
+function ConvertRelSizeHToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromH.sizerelfromhMargin:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhPage:
+        {
+            return c_oAscRelativeFromH.Page;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhLeftMargin:
+        {
+            return c_oAscRelativeFromH.LeftMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhRightMargin:
+        {
+            return c_oAscRelativeFromH.RightMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhInsideMargin:
+        {
+            return c_oAscRelativeFromH.InsideMargin;
+        }
+        case c_oAscSizeRelFromH.sizerelfromhOutsideMargin:
+        {
+            return c_oAscRelativeFromH.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromH.Margin;
+        }
+    }
+}
+
+
+function ConvertRelSizeVToRelPosition(nRelSize)
+{
+    switch(nRelSize)
+    {
+        case c_oAscSizeRelFromV.sizerelfromvMargin:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvPage:
+        {
+            return c_oAscRelativeFromV.Page;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvTopMargin:
+        {
+            return c_oAscRelativeFromV.TopMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvBottomMargin:
+        {
+            return c_oAscRelativeFromV.BottomMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvInsideMargin:
+        {
+            return c_oAscRelativeFromV.InsideMargin;
+        }
+        case c_oAscSizeRelFromV.sizerelfromvOutsideMargin:
+        {
+            return c_oAscRelativeFromV.OutsideMargin;
+        }
+        default:
+        {
+            return c_oAscRelativeFromV.Margin;
+        }
+    }
 }
 
 function checkObjectInArray(aObjects, oObject)
@@ -350,8 +519,51 @@ function DrawingObjectsController(drawingObjects)
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 }
 
+function CanStartEditText(oController)
+{
+    var oSelector = oController.selection.groupSelection ? oController.selection.groupSelection : oController;
+    if(oSelector.selectedObjects.length === 1 && oSelector.selectedObjects[0].getObjectType() === historyitem_type_Shape)
+    {
+        return true;
+    }
+    return false;
+}
+
 DrawingObjectsController.prototype =
 {
+
+
+    //for mobile spreadsheet editor
+    startEditTextCurrentShape: function()
+    {
+        if(!CanStartEditText(this))
+        {
+            return;
+        }
+        var oSelector = this.selection.groupSelection ? this.selection.groupSelection : this;
+        var oShape = oSelector.selectedObjects[0];
+        var oContent = oShape.getDocContent();
+        if(oContent)
+        {
+            oSelector.resetInternalSelection();
+            oSelector.selection.textSelection = oShape;
+            oContent.Cursor_MoveToEndPos(false);
+            this.updateSelectionState();
+            this.updateOverlay();
+        }
+        else
+        {
+            var oThis = this;
+            this.checkSelectedObjectsAndCallback(function(){
+                oShape.createTextBody();
+                var oContent = oShape.getDocContent();
+                oSelector.resetInternalSelection();
+                oSelector.selection.textSelection = oShape;
+                oContent.Cursor_MoveToEndPos(false);
+                oThis.updateSelectionState();
+            }, [], false, historydescription_Spreadsheet_AddNewParagraph);
+        }
+    },
 
     canReceiveKeyPress: function()
     {
@@ -756,6 +968,13 @@ DrawingObjectsController.prototype =
     getLeftTopSelectedObject: function(pageIndex)
     {
         return this.getLeftTopSelectedFromArray(this.getDrawingObjects(), pageIndex);
+    },
+	
+	createWatermarkImage: function(sImageUrl)
+	{
+        return ExecuteNoHistory(function(){
+            return this.createImage(sImageUrl, 0, 0, 110, 61.875);
+        }, this, []);
     },
 
     getFromTargetTextObjectContextMenuPosition: function(oTargetTextObject, pageIndex)
@@ -1401,7 +1620,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSubscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSubscript);
     },
@@ -1410,7 +1629,7 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? vertalign_SubScript : vertalign_Baseline}));
+            oThis.paragraphAdd(new ParaTextPr({ VertAlign : isSuperscript ? AscCommon.vertalign_SubScript : AscCommon.vertalign_Baseline}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, historydescription_Spreadsheet_SetCellSuperscript);
     },
@@ -1421,22 +1640,22 @@ DrawingObjectsController.prototype =
         {
             case "left":
             {
-                align_ = align_Left;
+                align_ = AscCommon.align_Left;
                 break;
             }
             case "right":
             {
-                align_ = align_Right;
+                align_ = AscCommon.align_Right;
                 break;
             }
             case "center":
             {
-                align_ = align_Center;
+                align_ = AscCommon.align_Center;
                 break;
             }
             case "justify":
             {
-                align_ = align_Justify;
+                align_ = AscCommon.align_Justify;
             }
         }
         this.checkSelectedObjectsAndCallback(this.setParagraphAlign, [align_], false, historydescription_Spreadsheet_SetCellAlign);
@@ -1499,11 +1718,11 @@ DrawingObjectsController.prototype =
 
     setCellBackgroundColor: function (color)
     {
-        var fill = new asc_CShapeFill();
+        var fill = new Asc.asc_CShapeFill();
         if(color)
         {
             fill.type = c_oAscFill.FILL_TYPE_SOLID;
-            fill.fill = new asc_CFillSolid();
+            fill.fill = new Asc.asc_CFillSolid();
             fill.fill.color = color;
         }
         else
@@ -1970,41 +2189,70 @@ DrawingObjectsController.prototype =
         }
 
         var aGroups = [];
-        if(isRealNumber(props.Width) && isRealNumber(props.Height))
+        if(isRealNumber(props.Width) || isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
-                objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
-                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i]);
+                if(!props.SizeRelH && isRealNumber(props.Width))
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                if(!props.SizeRelV && isRealNumber(props.Height))
+                {
+                    objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                    {
+                        objects_by_type.shapes[i].parent.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                }
+                if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
+                {
+                    var oDrawing =  objects_by_type.shapes[i].parent;
+                    if (oDrawing.SizeRelH && !oDrawing.SizeRelV)
+                    {
+                        oDrawing.SetSizeRelV({RelativeFrom: c_oAscSizeRelFromV.sizerelfromvPage, Percent: 0});
+                    }
+                    if (oDrawing.SizeRelV && !oDrawing.SizeRelH)
+                    {
+                        oDrawing.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
+                    }
+                }
+                CheckShapeBodyAutoFitReset(objects_by_type.shapes[i], true);
                 if(objects_by_type.shapes[i].group)
                 {
                     checkObjectInArray(aGroups, objects_by_type.shapes[i].group.getMainGroup());
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
-            for(i = 0; i < objects_by_type.images.length; ++i)
+            if(!props.SizeRelH && !props.SizeRelV && isRealNumber(props.Width) && isRealNumber(props.Height))
             {
-                CheckSpPrXfrm(objects_by_type.images[i]);
-                objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.images[i].group)
+                for(i = 0; i < objects_by_type.images.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.images[i]);
+                    objects_by_type.images[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.images[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.images[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.images[i].group.getMainGroup());
+                    }
+                    objects_by_type.images[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.images[i].checkDrawingBaseCoords();
-            }
-            for(i = 0; i < objects_by_type.charts.length; ++i)
-            {
-                CheckSpPrXfrm(objects_by_type.charts[i]);
-                objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
-                objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
-                if(objects_by_type.charts[i].group)
+                for(i = 0; i < objects_by_type.charts.length; ++i)
                 {
-                    checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    CheckSpPrXfrm(objects_by_type.charts[i]);
+                    objects_by_type.charts[i].spPr.xfrm.setExtX(props.Width);
+                    objects_by_type.charts[i].spPr.xfrm.setExtY(props.Height);
+                    if(objects_by_type.charts[i].group)
+                    {
+                        checkObjectInArray(aGroups, objects_by_type.charts[i].group.getMainGroup());
+                    }
+                    objects_by_type.charts[i].checkDrawingBaseCoords();
                 }
-                objects_by_type.charts[i].checkDrawingBaseCoords();
             }
         }
 
@@ -2534,6 +2782,25 @@ DrawingObjectsController.prototype =
                         chart.setDefaultWalls();
                         new_chart_type.set3D(true);
                     }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
 
                     axis_by_types = new_chart_type.getAxisByTypes();
                     val_axis = axis_by_types.valAx;
@@ -2668,6 +2935,25 @@ DrawingObjectsController.prototype =
                         chart.setView3D(CreateView3d(15, 20, true, 100));
                         chart.setDefaultWalls();
                     }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
+                    }
                     new_chart_type.setMarker(b_marker);
                     new_chart_type.setGrouping(need_groupping);
                 }
@@ -2685,6 +2971,25 @@ DrawingObjectsController.prototype =
                     {
                         chart.setView3D(CreateView3d(30, 0, true, 100));
                         chart.setDefaultWalls();
+                    }
+                    else
+                    {
+                        if(chart.view3D)
+                        {
+                            chart.setView3D(null);
+                        }
+                        if(chart.floor)
+                        {
+                            chart.setFloor(null);
+                        }
+                        if(chart.sideWall)
+                        {
+                            chart.setSideWall(null);
+                        }
+                        if(chart.backWall)
+                        {
+                            chart.setBackWall(null);
+                        }
                     }
                 }
                 else
@@ -2807,8 +3112,7 @@ DrawingObjectsController.prototype =
                 if(chart_type.getObjectType() !== historyitem_type_ScatterChart)
                 {
                     new_chart_type = new CScatterChart();
-                    plot_area.addChart(new_chart_type, 0);
-                    new_chart_type.setFromOtherChart(chart_type);
+                    replaceChart(plot_area, chart_type, new_chart_type);
                     for(var j = 0; j < new_chart_type.series.length; ++j)
                     {
                         new_chart_type.series[j].setMarker(null);
@@ -3091,6 +3395,10 @@ DrawingObjectsController.prototype =
                                 {
                                     finish_dlbl_pos = DLBL_POS_CTR;
                                 }
+                            }
+                            if(chart.view3D)
+                            {
+                                finish_dlbl_pos = null;
                             }
                             break;
                         }
@@ -3406,7 +3714,7 @@ DrawingObjectsController.prototype =
     getPropsFromChart: function(chart_space)
     {
         var chart = chart_space.chart, plot_area = chart_space.chart.plotArea;
-        var ret = new asc_ChartSettings();
+        var ret = new AscCommon.asc_ChartSettings();
         var range_obj = chart_space.getRangeObjectStr();
         if(range_obj)
         {
@@ -3450,7 +3758,7 @@ DrawingObjectsController.prototype =
             {
                 if(ret.horAxisProps)
                 {
-                    ret.horAxisProps.putLabelsPosition(c_oAscLabelsPosition.byDivisions);
+                    ret.horAxisProps.putLabelsPosition(Asc.c_oAscLabelsPosition.byDivisions);
                 }
             }
         }
@@ -3682,7 +3990,7 @@ DrawingObjectsController.prototype =
             for(var i = 0; i < chart_type.series.length; ++i)
             {
                 if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                    chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                 {
                     b_no_line = false;
                     break;
@@ -3787,7 +4095,7 @@ DrawingObjectsController.prototype =
                 for(var i = 0; i < chart_type.series.length; ++i)
                 {
                     if(!(chart_type.series[i].spPr && chart_type.series[i].spPr.ln &&
-                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === FILL_TYPE_NOFILL))
+                        chart_type.series[i].spPr.ln.Fill &&chart_type.series[i].spPr.ln.Fill.fill && chart_type.series[i].spPr.ln.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL))
                     {
                         break;
                     }
@@ -4926,7 +5234,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                this.setCellAlign(ParaPr.Jc === align_Center ? "left" : "center" );
+                this.setCellAlign(ParaPr.Jc === AscCommon.align_Center ? "left" : "center" );
                 bRetValue = true;
             }
         }
@@ -4944,7 +5252,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Justify ? "left" : "justify" );
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Justify ? "left" : "justify" );
                 bRetValue = true;
             }
         }
@@ -4959,7 +5267,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Left ? "justify" : "left");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Left ? "justify" : "left");
                 bRetValue = true;
             }
 
@@ -4979,7 +5287,7 @@ DrawingObjectsController.prototype =
             var ParaPr = drawingObjectsController.getParagraphParaPr();
             if ( isRealObject(ParaPr))
             {
-                drawingObjectsController.setCellAlign(ParaPr.Jc === align_Right ? "left" : "right");
+                drawingObjectsController.setCellAlign(ParaPr.Jc === AscCommon.align_Right ? "left" : "right");
                 bRetValue = true;
             }
         }
@@ -5029,9 +5337,9 @@ DrawingObjectsController.prototype =
             if ( isRealObject(TextPr))
             {
                 if ( true === e.shiftKey )
-                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                    drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 else
-                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                    drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5040,7 +5348,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === vertalign_SuperScript ? false : true );
+                drawingObjectsController.setCellSuperscript(TextPr.VertAlign === AscCommon.vertalign_SuperScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5077,7 +5385,7 @@ DrawingObjectsController.prototype =
             var TextPr = drawingObjectsController.getParagraphTextPr();
             if ( isRealObject(TextPr))
             {
-                drawingObjectsController.setCellSubscript(TextPr.VertAlign === vertalign_SubScript ? false : true );
+                drawingObjectsController.setCellSubscript(TextPr.VertAlign === AscCommon.vertalign_SubScript ? false : true );
                 bRetValue = true;
             }
         }
@@ -5172,7 +5480,7 @@ DrawingObjectsController.prototype =
         {
             return ExecuteNoHistory(function()
             {
-                var options = new asc_ChartSettings();
+                var options = new AscCommon.asc_ChartSettings();
                 options.type = type;
                 options.putTitle(c_oAscChartTitleShowSettings.noOverlay);
                 var chartSeries = {series: DrawingObjectsController.prototype.getSeriesDefault.call(this, type),
@@ -5185,10 +5493,10 @@ DrawingObjectsController.prototype =
                 }
                 if(type === c_oAscChartTypeSettings.scatter)
                 {
-                    var new_hor_axis_settings = new asc_ValAxisSettings();
+                    var new_hor_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_hor_axis_settings.setDefault();
                     options.putHorAxisProps(new_hor_axis_settings);
-                    var new_vert_axis_settings = new asc_ValAxisSettings();
+                    var new_vert_axis_settings = new AscCommon.asc_ValAxisSettings();
                     new_vert_axis_settings.setDefault();
                     options.putVertAxisProps(new_vert_axis_settings);
                     options.putHorGridLines(c_oAscGridLinesSettings.major);
@@ -6221,17 +6529,17 @@ DrawingObjectsController.prototype =
                         table_props = new_table_props;
                         if(new_table_props.CellsBackground)
                         {
-                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== FILL_TYPE_NONE)
+                            if(new_table_props.CellsBackground.Unifill && new_table_props.CellsBackground.Unifill.fill && new_table_props.CellsBackground.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                             {
                                 new_table_props.CellsBackground.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                 var RGBA = new_table_props.CellsBackground.Unifill.getRGBAColor();
                                 new_table_props.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
-                                new_table_props.CellsBackground.Value = shd_Clear;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdClear;
                             }
                             else
                             {
                                 new_table_props.CellsBackground.Color = new CDocumentColor(0, 0, 0, false);
-                                new_table_props.CellsBackground.Value = shd_Nil;
+                                new_table_props.CellsBackground.Value = Asc.c_oAscShdNil;
                             }
                         }
                         if(new_table_props.CellBorders)
@@ -6240,7 +6548,7 @@ DrawingObjectsController.prototype =
                             {
                                 if(!border)
                                     return;
-                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== FILL_TYPE_NONE)
+                                if(border.Unifill && border.Unifill.fill && border.Unifill.fill.type !== c_oAscFill.FILL_TYPE_NONE)
                                 {
                                     border.Unifill.check(drawing.Get_Theme(), drawing.Get_ColorMap());
                                     var RGBA = border.Unifill.getRGBAColor();
@@ -6418,9 +6726,9 @@ DrawingObjectsController.prototype =
         var ret = [], i, bParaLocked = false;
         if(isRealObject(props.shapeChartProps))
         {
-            shape_props = new asc_CImgProperty();
+            shape_props = new Asc.asc_CImgProperty();
             shape_props.fromGroup = props.shapeChartProps.fromGroup;
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeChartProps.type;
             shape_props.ShapeProperties.fill = props.shapeChartProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeChartProps.stroke;
@@ -6429,7 +6737,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeChartProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeChartProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeChartProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeChartProps.verticalTextAlign;
             shape_props.vert = props.shapeChartProps.vert;
@@ -6440,7 +6748,7 @@ DrawingObjectsController.prototype =
             var oTextArtProperties;
             if (!isRealObject(props.shapeProps))
             {
-                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+                if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6458,7 +6766,7 @@ DrawingObjectsController.prototype =
                 if(pr.textArtProperties)
                 {
                     oTextArtProperties = pr.textArtProperties;
-                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                    if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                     {
                         if(api)
                             this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6481,9 +6789,9 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.shapeProps))
         {
-            shape_props = new asc_CImgProperty();
-            shape_props.fromGroup = props.shapeProps.fromGroup;
-            shape_props.ShapeProperties = new asc_CShapeProperty();
+            shape_props = new Asc.asc_CImgProperty();
+            shape_props.fromGroup = CanStartEditText(this);
+            shape_props.ShapeProperties = new Asc.asc_CShapeProperty();
             shape_props.ShapeProperties.type =  props.shapeProps.type;
             shape_props.ShapeProperties.fill = props.shapeProps.fill;
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
@@ -6494,7 +6802,7 @@ DrawingObjectsController.prototype =
             if(props.shapeProps.textArtProperties)
             {
                 oTextArtProperties = props.shapeProps.textArtProperties;
-                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == FILL_TYPE_BLIP)
+                if(oTextArtProperties && oTextArtProperties.Fill && oTextArtProperties.Fill.fill  && oTextArtProperties.Fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
                 {
                     if(api)
                         this.drawingObjects.drawingDocument.InitGuiCanvasTextArt(api.textArtElementId);
@@ -6509,7 +6817,7 @@ DrawingObjectsController.prototype =
 
             if(props.shapeProps.paddings)
             {
-                shape_props.ShapeProperties.paddings = new asc_CPaddings(props.shapeProps.paddings);
+                shape_props.ShapeProperties.paddings = new Asc.asc_CPaddings(props.shapeProps.paddings);
             }
             shape_props.verticalTextAlign = props.shapeProps.verticalTextAlign;
             shape_props.vert = props.shapeProps.vert;
@@ -6517,7 +6825,7 @@ DrawingObjectsController.prototype =
             shape_props.Width = props.shapeProps.w;
             shape_props.Height = props.shapeProps.h;
             var pr = shape_props.ShapeProperties;
-            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == c_oAscFill.FILL_TYPE_BLIP)
             {
                 if(api)
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
@@ -6543,7 +6851,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.imageProps))
         {
-            image_props = new asc_CImgProperty();
+            image_props = new Asc.asc_CImgProperty();
             image_props.Width = props.imageProps.w;
             image_props.Height = props.imageProps.h;
             image_props.ImageUrl = props.imageProps.ImageUrl;
@@ -6557,7 +6865,7 @@ DrawingObjectsController.prototype =
         }
         if (isRealObject(props.chartProps) && isRealObject(props.chartProps.chartProps))
         {
-            chart_props = new asc_CImgProperty();
+            chart_props = new Asc.asc_CImgProperty();
             chart_props.Width = props.chartProps.w;
             chart_props.Height = props.chartProps.h;
             chart_props.ChartProperties = props.chartProps.chartProps;
@@ -6570,7 +6878,7 @@ DrawingObjectsController.prototype =
         }
         for (i = 0; i < ret.length; i++)
         {
-            ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Image, new asc_CImgProperty(ret[i]) ));
+            ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Image, new Asc.asc_CImgProperty(ret[i]) ));
         }
 
         // Текстовые свойства объекта
@@ -6612,8 +6920,8 @@ DrawingObjectsController.prototype =
         var _this = this;
         var trigger = this.drawingObjects.callTrigger;
 
-        ParaPr.Subscript   = ( TextPr.VertAlign === vertalign_SubScript   ? true : false );
-        ParaPr.Superscript = ( TextPr.VertAlign === vertalign_SuperScript ? true : false );
+        ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript   ? true : false );
+        ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
         ParaPr.Strikeout   = TextPr.Strikeout;
         ParaPr.DStrikeout  = TextPr.DStrikeout;
         ParaPr.AllCaps     = TextPr.Caps;
@@ -6649,12 +6957,12 @@ DrawingObjectsController.prototype =
         else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
             ParaPr.Spacing.Before = UnknownValue;
 
-        trigger("asc_onParaSpacingLine", new asc_CParagraphSpacing( ParaPr.Spacing ));
+        trigger("asc_onParaSpacingLine", new AscCommon.asc_CParagraphSpacing( ParaPr.Spacing ));
 
         // ParaPr.Jc
         trigger("asc_onPrAlign", ParaPr.Jc);
 
-        ascSelectedObjects.push(new asc_CSelectedObject ( c_oAscTypeSelectElement.Paragraph, new asc_CParagraphProperty( ParaPr ) ));
+        ascSelectedObjects.push(new AscCommon.asc_CSelectedObject ( Asc.c_oAscTypeSelectElement.Paragraph, new Asc.asc_CParagraphProperty( ParaPr ) ));
     },
 
     createImage: function(rasterImageId, x, y, extX, extY)
@@ -6796,7 +7104,7 @@ DrawingObjectsController.prototype =
         }
         oContent.Set_ApplyToAll(true);
         oContent.Paragraph_Add(new ParaTextPr(oTextPr));
-        oContent.Set_ParagraphAlign(align_Center);
+        oContent.Set_ParagraphAlign(AscCommon.align_Center);
         oContent.Set_ApplyToAll(false);
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;
@@ -6888,12 +7196,12 @@ DrawingObjectsController.prototype =
 
     setGraphicObjectProps: function(props)
     {
-        if(typeof asc_CParagraphProperty !== "undefined" && !(props instanceof asc_CParagraphProperty))
+        if(typeof Asc.asc_CParagraphProperty !== "undefined" && !(props instanceof Asc.asc_CParagraphProperty))
         {
             if(props && props.ChartProperties && typeof props.ChartProperties.range === "string")
             {
                 var editor = window["Asc"]["editor"];
-                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
+                var check = parserHelp.checkDataRange(editor.wbModel, editor.wb, Asc.c_oAscSelectionDialogType.Chart, props.ChartProperties.range, true, !props.ChartProperties.inColumns, props.ChartProperties.type);
                 if(check === c_oAscError.ID.StockChartError || check === c_oAscError.ID.DataRangeError
                     || check === c_oAscError.ID.MaxDataSeriesError)
                 {
@@ -7089,11 +7397,11 @@ DrawingObjectsController.prototype =
             var TextPr = new CTextPr();
 
             if ( true === Props.Subscript )
-                TextPr.VertAlign = vertalign_SubScript;
+                TextPr.VertAlign = AscCommon.vertalign_SubScript;
             else if ( true === Props.Superscript )
-                TextPr.VertAlign = vertalign_SuperScript;
+                TextPr.VertAlign = AscCommon.vertalign_SuperScript;
             else if ( false === Props.Superscript || false === Props.Subscript )
-                TextPr.VertAlign = vertalign_Baseline;
+                TextPr.VertAlign = AscCommon.vertalign_Baseline;
 
             if ( undefined != Props.Strikeout )
             {
@@ -7554,6 +7862,636 @@ DrawingObjectsController.prototype =
 };
 
 
+
+function CBoundsController()
+{
+    this.min_x = 0xFFFF;
+    this.min_y = 0xFFFF;
+    this.max_x = -0xFFFF;
+    this.max_y = -0xFFFF;
+
+    this.Rects = [];
+}
+
+CBoundsController.prototype =
+{
+    ClearNoAttack : function()
+    {
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+
+        if (0 != this.Rects.length)
+            this.Rects.splice(0, this.Rects.length);
+    },
+
+    CheckPageRects : function(rects, ctx)
+    {
+        var _bIsUpdate = false;
+        if (rects.length != this.Rects.length)
+        {
+            _bIsUpdate = true;
+        }
+        else
+        {
+            for (var i = 0; i < rects.length; i++)
+            {
+                var _1 = this.Rects[i];
+                var _2 = rects[i];
+
+                if (_1.x != _2.x || _1.y != _2.y || _1.w != _2.w || _1.h != _2.h)
+                    _bIsUpdate = true;
+            }
+        }
+
+        if (!_bIsUpdate)
+            return;
+
+        this.Clear(ctx);
+
+        if (0 != this.Rects.length)
+            this.Rects.splice(0, this.Rects.length);
+
+        for (var i = 0; i < rects.length; i++)
+        {
+            var _r = rects[i];
+            this.CheckRect(_r.x, _r.y, _r.w, _r.h);
+            this.Rects.push(_r);
+        }
+    },
+
+    Clear : function(ctx)
+    {
+        if (this.max_x != -0xFFFF && this.max_y != -0xFFFF)
+        {
+            ctx.fillRect(this.min_x - 5, this.min_y - 5, this.max_x - this.min_x + 10, this.max_y - this.min_y + 10);
+        }
+        this.min_x = 0xFFFF;
+        this.min_y = 0xFFFF;
+        this.max_x = -0xFFFF;
+        this.max_y = -0xFFFF;
+    },
+
+    CheckPoint1 : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+    },
+    CheckPoint2 : function(x,y)
+    {
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+    CheckPoint : function(x,y)
+    {
+        if (x < this.min_x)
+            this.min_x = x;
+        if (y < this.min_y)
+            this.min_y = y;
+        if (x > this.max_x)
+            this.max_x = x;
+        if (y > this.max_y)
+            this.max_y = y;
+    },
+    CheckRect : function(x,y,w,h)
+    {
+        this.CheckPoint1(x,y);
+        this.CheckPoint2(x + w,y + h);
+    },
+
+    fromBounds : function(_bounds)
+    {
+        this.min_x = _bounds.min_x;
+        this.min_y = _bounds.min_y;
+        this.max_x = _bounds.max_x;
+        this.max_y = _bounds.max_y;
+    }
+};
+
+function CSlideBoundsChecker()
+{
+    this.map_bounds_shape = {};
+    this.map_bounds_shape["heart"] = true;
+
+    this.IsSlideBoundsCheckerType = true;
+
+    this.Bounds = new CBoundsController();
+
+    this.m_oCurFont     = null;
+    this.m_oTextPr      = null;
+
+    this.m_oCoordTransform  = new CMatrixL();
+    this.m_oTransform       = new CMatrixL();
+    this.m_oFullTransform   = new CMatrixL();
+
+    this.IsNoSupportTextDraw = true;
+
+    this.LineWidth = null;
+    this.AutoCheckLineWidth = false;
+}
+
+CSlideBoundsChecker.prototype =
+{
+    DrawLockParagraph: function()
+    {},
+
+    GetIntegerGrid: function()
+    {
+        return false;
+    },
+
+    AddSmartRect: function()
+    {},
+
+    drawCollaborativeChanges: function()
+    {},
+
+    drawSearchResult : function(x, y, w, h)
+    {},
+
+    IsShapeNeedBounds : function(preset)
+    {
+        if (preset === undefined || preset == null)
+            return true;
+        return (true === this.map_bounds_shape[preset]) ? false : true;
+    },
+
+    init : function(width_px, height_px, width_mm, height_mm)
+    {
+        this.m_lHeightPix   = height_px;
+        this.m_lWidthPix    = width_px;
+        this.m_dWidthMM     = width_mm;
+        this.m_dHeightMM    = height_mm;
+        this.m_dDpiX        = 25.4 * this.m_lWidthPix / this.m_dWidthMM;
+        this.m_dDpiY        = 25.4 * this.m_lHeightPix / this.m_dHeightMM;
+
+        this.m_oCoordTransform.sx   = this.m_dDpiX / 25.4;
+        this.m_oCoordTransform.sy   = this.m_dDpiY / 25.4;
+
+        this.Bounds.ClearNoAttack();
+    },
+
+    SetCurrentPage: function()
+    {},
+
+    EndDraw : function(){},
+    put_GlobalAlpha : function(enable, alpha)
+    {
+    },
+    Start_GlobalAlpha : function()
+    {
+    },
+    End_GlobalAlpha : function()
+    {
+    },
+    // pen methods
+    p_color : function(r,g,b,a)
+    {
+    },
+    p_width : function(w)
+    {
+    },
+    // brush methods
+    b_color1 : function(r,g,b,a)
+    {
+    },
+    b_color2 : function(r,g,b,a)
+    {
+    },
+
+    SetIntegerGrid : function()
+    {
+    },
+
+    transform : function(sx,shy,shx,sy,tx,ty)
+    {
+        this.m_oTransform.sx    = sx;
+        this.m_oTransform.shx   = shx;
+        this.m_oTransform.shy   = shy;
+        this.m_oTransform.sy    = sy;
+        this.m_oTransform.tx    = tx;
+        this.m_oTransform.ty    = ty;
+
+        this.CalculateFullTransform();
+    },
+    CalculateFullTransform : function()
+    {
+        this.m_oFullTransform.sx = this.m_oTransform.sx;
+        this.m_oFullTransform.shx = this.m_oTransform.shx;
+        this.m_oFullTransform.shy = this.m_oTransform.shy;
+        this.m_oFullTransform.sy = this.m_oTransform.sy;
+        this.m_oFullTransform.tx = this.m_oTransform.tx;
+        this.m_oFullTransform.ty = this.m_oTransform.ty;
+        global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
+    },
+    // path commands
+    _s : function()
+    {
+    },
+    _e : function()
+    {
+    },
+    _z : function()
+    {
+    },
+    _m : function(x,y)
+    {
+        var _x = this.m_oFullTransform.TransformPointX(x,y);
+        var _y = this.m_oFullTransform.TransformPointY(x,y);
+
+        this.Bounds.CheckPoint(_x, _y);
+    },
+    _l : function(x,y)
+    {
+        var _x = this.m_oFullTransform.TransformPointX(x,y);
+        var _y = this.m_oFullTransform.TransformPointY(x,y);
+
+        this.Bounds.CheckPoint(_x, _y);
+    },
+    _c : function(x1,y1,x2,y2,x3,y3)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x1,y1);
+        var _y1 = this.m_oFullTransform.TransformPointY(x1,y1);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x2,y2);
+        var _y2 = this.m_oFullTransform.TransformPointY(x2,y2);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x3,y3);
+        var _y3 = this.m_oFullTransform.TransformPointY(x3,y3);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+    },
+    _c2 : function(x1,y1,x2,y2)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x1,y1);
+        var _y1 = this.m_oFullTransform.TransformPointY(x1,y1);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x2,y2);
+        var _y2 = this.m_oFullTransform.TransformPointY(x2,y2);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+    },
+    ds : function()
+    {
+    },
+    df : function()
+    {
+    },
+
+    // canvas state
+    save : function()
+    {
+    },
+    restore : function()
+    {
+    },
+    clip : function()
+    {
+    },
+
+    reset : function()
+    {
+        this.m_oTransform.Reset();
+        this.CalculateFullTransform();
+    },
+
+    transform3 : function(m)
+    {
+        this.m_oTransform = m.CreateDublicate();
+        this.CalculateFullTransform();
+    },
+
+    transform00 : function(m)
+    {
+        this.m_oTransform = m.CreateDublicate();
+        this.m_oTransform.tx = 0;
+        this.m_oTransform.ty = 0;
+        this.CalculateFullTransform();
+    },
+
+    // images
+    drawImage2 : function(img,x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y+h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y+h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y+h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y+h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+    drawImage : function(img,x,y,w,h)
+    {
+        return this.drawImage2(img, x, y, w, h);
+    },
+
+    // text
+    font : function(font_id,font_size)
+    {
+        this.m_oFontManager.LoadFontFromFile(font_id, font_size, this.m_dDpiX, this.m_dDpiY);
+    },
+    GetFont : function()
+    {
+        return this.m_oCurFont;
+    },
+    SetFont : function(font)
+    {
+        this.m_oCurFont = font;
+    },
+    SetTextPr : function(textPr)
+    {
+        this.m_oTextPr = textPr;
+    },
+    SetFontSlot : function(slot, fontSizeKoef)
+    {
+    },
+    GetTextPr : function()
+    {
+        return this.m_oTextPr;
+    },
+    FillText : function(x,y,text)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    FillTextCode : function(x, y, lUnicode)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    t : function(text,x,y)
+    {
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    FillText2 : function(x,y,text,cropX,cropW)
+    {
+        // убыстеренный вариант. здесь везде заточка на то, что приходит одна буква
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    t2 : function(text,x,y,cropX,cropW)
+    {
+        if (this.m_bIsBreak)
+            return;
+
+        // TODO: нужен другой метод отрисовки!!!
+        var _x = this.m_oFullTransform.TransformPointX(x, y);
+        var _y = this.m_oFullTransform.TransformPointY(x, y);
+        this.Bounds.CheckRect(_x, _y, 1, 1);
+    },
+    charspace : function(space)
+    {
+    },
+
+    // private methods
+    DrawHeaderEdit : function(yPos)
+    {
+    },
+    DrawFooterEdit : function(yPos)
+    {
+    },
+
+    DrawEmptyTableLine : function(x1,y1,x2,y2)
+    {
+    },
+
+    DrawSpellingLine : function(y0, x0, x1, w)
+    {
+    },
+
+    // smart methods for horizontal / vertical lines
+    drawHorLine : function(align, y, x, r, penW)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y-penW);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y-penW);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x,y+penW);
+        var _y2 = this.m_oFullTransform.TransformPointY(x,y+penW);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(r,y-penW);
+        var _y3 = this.m_oFullTransform.TransformPointY(r,y-penW);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(r,y+penW);
+        var _y4 = this.m_oFullTransform.TransformPointY(r,y+penW);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+    drawHorLine2 : function(align, y, x, r, penW)
+    {
+        return this.drawHorLine(align, y, x, r, penW);
+    },
+    drawVerLine : function(align, x, y, b, penW)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x-penW,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x-penW,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+penW,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+penW,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x-penW,b);
+        var _y3 = this.m_oFullTransform.TransformPointY(x-penW,b);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x+penW,b);
+        var _y4 = this.m_oFullTransform.TransformPointY(x+penW,b);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    // мега крутые функции для таблиц
+    drawHorLineExt : function(align, y, x, r, penW, leftMW, rightMW)
+    {
+        this.drawHorLine(align, y, x + leftMW, r + rightMW);
+    },
+
+    rect : function(x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y+h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y+h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y+h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y+h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    rect2 : function(x,y,w,h)
+    {
+        var _x1 = this.m_oFullTransform.TransformPointX(x,y);
+        var _y1 = this.m_oFullTransform.TransformPointY(x,y);
+
+        var _x2 = this.m_oFullTransform.TransformPointX(x+w,y);
+        var _y2 = this.m_oFullTransform.TransformPointY(x+w,y);
+
+        var _x3 = this.m_oFullTransform.TransformPointX(x+w,y-h);
+        var _y3 = this.m_oFullTransform.TransformPointY(x+w,y-h);
+
+        var _x4 = this.m_oFullTransform.TransformPointX(x,y-h);
+        var _y4 = this.m_oFullTransform.TransformPointY(x,y-h);
+
+        this.Bounds.CheckPoint(_x1, _y1);
+        this.Bounds.CheckPoint(_x2, _y2);
+        this.Bounds.CheckPoint(_x3, _y3);
+        this.Bounds.CheckPoint(_x4, _y4);
+    },
+
+    TableRect : function(x,y,w,h)
+    {
+        this.rect(x, y, w, h);
+    },
+
+    // функции клиппирования
+    AddClipRect : function(x, y, w, h)
+    {
+    },
+    RemoveClipRect : function()
+    {
+    },
+
+    SetClip : function(r)
+    {
+    },
+    RemoveClip : function()
+    {
+    },
+
+    SavePen : function()
+    {
+    },
+    RestorePen : function()
+    {
+    },
+
+    SaveBrush : function()
+    {
+    },
+    RestoreBrush : function()
+    {
+    },
+
+    SavePenBrush : function()
+    {
+    },
+    RestorePenBrush : function()
+    {
+    },
+
+    SaveGrState : function()
+    {
+    },
+    RestoreGrState : function()
+    {
+    },
+
+    StartClipPath : function()
+    {
+    },
+
+    EndClipPath : function()
+    {
+    },
+
+    CorrectBounds : function()
+    {
+        if (this.LineWidth != null)
+        {
+            var _correct = this.LineWidth / 2.0;
+
+            this.Bounds.min_x -= _correct;
+            this.Bounds.min_y -= _correct;
+            this.Bounds.max_x += _correct;
+            this.Bounds.max_y += _correct;
+        }
+    },
+
+    CorrectBounds2 : function()
+    {
+        if (this.LineWidth != null)
+        {
+            var _correct = this.LineWidth * this.m_oCoordTransform.sx / 2;
+
+            this.Bounds.min_x -= _correct;
+            this.Bounds.min_y -= _correct;
+            this.Bounds.max_x += _correct;
+            this.Bounds.max_y += _correct;
+        }
+    },
+
+    CheckLineWidth : function(shape)
+    {
+        if (!shape)
+            return;
+        var _ln = shape.pen;
+        if (_ln != null && _ln.Fill != null && _ln.Fill.fill != null)
+        {
+            this.LineWidth = (_ln.w == null) ? 12700 : parseInt(_ln.w);
+            this.LineWidth /= 36000.0;
+        }
+    },
+
+    DrawLockObjectRect : function()
+    {
+    },
+
+    DrawPresentationComment : function(type, x, y, w, h)
+    {
+        this.rect(x, y, w, h);
+    }
+};
 //-----------------------------------------------------------------------------------
 // ASC Classes
 //-----------------------------------------------------------------------------------

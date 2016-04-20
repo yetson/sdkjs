@@ -27,6 +27,23 @@
 // TODO: Сейчас Paragraph.Recalculate_FastWholeParagraph работает только на добавлении текста, надо переделать
 //       алгоритм определения изменений, чтобы данная функция работала и при других изменениях.
 
+// Import
+var c_oAscLineDrawingRule = AscCommon.c_oAscLineDrawingRule;
+var align_Left = AscCommon.align_Left;
+var hdrftr_Header = AscCommon.hdrftr_Header;
+var hdrftr_Footer = AscCommon.hdrftr_Footer;
+var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+var changestype_None = AscCommon.changestype_None;
+var changestype_Paragraph_Content = AscCommon.changestype_Paragraph_Content;
+var changestype_2_Element_and_Type = AscCommon.changestype_2_Element_and_Type;
+var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var g_oTableId = AscCommon.g_oTableId;
+
+var c_oAscHAnchor = Asc.c_oAscHAnchor;
+var c_oAscXAlign = Asc.c_oAscXAlign;
+var c_oAscYAlign = Asc.c_oAscYAlign;
+var c_oAscVAnchor = Asc.c_oAscVAnchor;
+
 var Page_Width     = 210;
 var Page_Height    = 297;
 
@@ -935,7 +952,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 {
     // Сохраняем ссылки на глобальные объекты
     this.History              = History;
-    this.IdCounter            = g_oIdCounter;
+    this.IdCounter            = AscCommon.g_oIdCounter;
     this.TableId              = g_oTableId;
     this.CollaborativeEditing = (("undefined" !== typeof(CWordCollaborativeEditing) && CollaborativeEditing instanceof CWordCollaborativeEditing) ? CollaborativeEditing : null);
     this.Api                  = editor;
@@ -1055,9 +1072,9 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     if(typeof CComments !== "undefined")
         this.Comments = new CComments();
 
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     // Массив укзателей на все инлайновые графические объекты
     this.DrawingObjects = null;
@@ -2000,6 +2017,9 @@ CDocument.prototype =
         var StartIndex         = this.FullRecalc.StartIndex;
         var bResetStartElement = this.FullRecalc.ResetStartElement;
 
+        //console.log("Page " + PageIndex + " Section " + SectionIndex + " Column " + ColumnIndex + " Element " + StartIndex);
+        //console.log(this.RecalcInfo);
+
         var StartPos = this.Get_PageContentStartPos2(PageIndex, ColumnIndex, 0, StartIndex);
 
         var X      = StartPos.X;
@@ -2514,11 +2534,20 @@ CDocument.prototype =
 
         if (true === this.RecalcInfo.Can_RecalcObject())
         {
-            Element.Set_DocumentIndex(Index);
-            Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+            var ElementPageIndex = 0;
+            if ((0 === Index && 0 === PageIndex) || Index != StartIndex || (Index === StartIndex && true === bResetStartElement))
+            {
+                Element.Set_DocumentIndex(Index);
+                Element.Reset(X, Y, XLimit, YLimit, PageIndex, ColumnIndex, ColumnsCount);
+                ElementPageIndex = 0;
+            }
+            else
+            {
+                ElementPageIndex = PageIndex - Element.PageNum;
+            }
 
-            var TempRecalcResult = Element.Recalculate_Page(0);
-            this.RecalcInfo.Set_FlowObject(Element, 0, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
+            var TempRecalcResult = Element.Recalculate_Page(ElementPageIndex);
+            this.RecalcInfo.Set_FlowObject(Element, ElementPageIndex, TempRecalcResult, -1, {X : X, Y : Y, XLimit: XLimit, YLimit : YLimit});
 
             if (((0 === Index && 0 === PageIndex) || Index != StartIndex) && true != Element.Is_ContentOnFirstPage() && true !== isColumns)
             {
@@ -2669,8 +2698,8 @@ CDocument.prototype =
                 FrameW = Frame_XLimit;
             }
 
-            var FrameHRule = ( undefined === FramePr.HRule ? heightrule_Auto : FramePr.HRule );
-            if ((heightrule_AtLeast === FrameHRule && FrameH < FramePr.H) || heightrule_Exact === FrameHRule)
+            var FrameHRule = ( undefined === FramePr.HRule ? Asc.linerule_Auto : FramePr.HRule );
+            if ((Asc.linerule_AtLeast === FrameHRule && FrameH < FramePr.H) || Asc.linerule_Exact === FrameHRule)
             {
                 FrameH = FramePr.H;
             }
@@ -3726,8 +3755,8 @@ CDocument.prototype =
                     Drawing.Set_WrappingType( WRAPPING_TYPE_SQUARE );
                     Drawing.Set_BehindDoc( false );
                     Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                    Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
-                    Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
+                    Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+                    Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
                 }
                 this.Paragraph_Add( Drawing );
                 this.Select_DrawingObject( Drawing.Get_Id() );
@@ -3760,8 +3789,8 @@ CDocument.prototype =
                 Drawing.Set_WrappingType( WRAPPING_TYPE_NONE );
                 Drawing.Set_BehindDoc( false );
                 Drawing.Set_Distance( 3.2, 0, 3.2, 0 );
-                Drawing.Set_PositionH(c_oAscRelativeFromH.Column, false, 0, false);
-                Drawing.Set_PositionV(c_oAscRelativeFromV.Paragraph, false, 0, false);
+                Drawing.Set_PositionH(Asc.c_oAscRelativeFromH.Column, false, 0, false);
+                Drawing.Set_PositionV(Asc.c_oAscRelativeFromV.Paragraph, false, 0, false);
 
                 if ( true == this.Selection.Use )
                     this.Remove( 1, true );
@@ -3836,29 +3865,29 @@ CDocument.prototype =
             {
                 case type_Paragraph:
                 {
-                    // Если на текущй странице одна колонка, тогда мы добавляем таблицу по ширине этой колонке, а если
-                    // колонок больше одной, тогда добавляем таблицу минимальной ширины.
-
+                    // Ширину таблицы делаем по минимальной ширине колонки.
                     var Page = this.Pages[this.CurPage];
-                    var SectionIndex = this.private_GetPageSectionByContentPosition(this.CurPage, this.CurPos.ContentPos);
-                    var Section = Page.Sections[SectionIndex];
-
+                    var SectPr = this.SectionsInfo.Get_SectPr(this.CurPos.ContentPos).SectPr;
 
                     var PageFields = this.Get_PageFields( this.CurPage );
                     
                     // Создаем новую таблицу
-                    var W = ( PageFields.XLimit - PageFields.X  + 2 * 1.9);
+                    var W = (PageFields.XLimit - PageFields.X  + 2 * 1.9);
                     var Grid = [];
 
-                    if (Section.Columns.length > 1)
+                    if (SectPr.Get_ColumnsCount() > 1)
                     {
-                        if (Cols <= 3)
-                            W = 1124 / 20 * 25.4 / 72;
-                        else
-                            W = 360 / 20 * 25.4 / 72 * Cols;
+                        for (var CurCol = 0, ColsCount = SectPr.Get_ColumnsCount(); CurCol < ColsCount; ++CurCol)
+                        {
+                            var ColumnWidth = SectPr.Get_ColumnWidth(CurCol);
+                            if (W > ColumnWidth)
+                                W = ColumnWidth;
+                        }
+
+                        W += 2 * 1.9;
                     }
 
-                    W = Math.max( W, Cols * 2 * 1.9 );
+                    W = Math.max(W, Cols * 2 * 1.9);
 
                     for ( var Index = 0; Index < Cols; Index++ )
                         Grid[Index] = W / Cols;
@@ -9826,7 +9855,7 @@ CDocument.prototype =
             var Para = NearPos.Paragraph;
             
             // Если мы копируем, тогда не надо проверять выделенные параграфы, а если переносим, тогда проверяем
-            var CheckChangesType = (true !== bCopy ? changestype_Document_Content : changestype_None);
+            var CheckChangesType = (true !== bCopy ? AscCommon.changestype_Document_Content : changestype_None);
             if (false === this.Document_Is_SelectionLocked(CheckChangesType, {Type : changestype_2_ElementsArray_and_Type, Elements : [Para], CheckType : changestype_Paragraph_Content}))
             {
                 // Если надо удаляем выделенную часть (пересчет отключаем на время удаления)
@@ -10237,7 +10266,7 @@ CDocument.prototype =
         // Ничего не делаем
         if ( true === this.DrawingDocument.IsCursorInTableCur( X, Y, PageIndex ) )
         {
-            this.DrawingDocument.SetCursorType( "default", new CMouseMoveData() );
+            this.DrawingDocument.SetCursorType( "default", new AscCommon.CMouseMoveData() );
             editor.sync_MouseMoveEndCallback();
             return;
         }
@@ -10376,7 +10405,7 @@ CDocument.prototype =
 
         if ( e.KeyCode == 8 && false === editor.isViewMode ) // BackSpace
         {
-            if (false === this.Document_Is_SelectionLocked(changestype_Remove, null, true))
+            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
                 this.Remove(-1, true);
@@ -10421,7 +10450,7 @@ CDocument.prototype =
                     var ParaPr    = Paragraph.Get_CompiledPr2(false).ParaPr;
                     if ( null != Paragraph && ( true === Paragraph.Cursor_IsStart() || true === Paragraph.Selection_IsFromStart() ) && ( undefined != Paragraph.Numbering_Get() || ( true != Paragraph.IsEmpty() && ParaPr.Tabs.Tabs.length <= 0 ) ) )
                     {
-                        if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Properties } ) )
+                        if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : AscCommon.changestype_Paragraph_Properties } ) )
                         {
                             this.Create_NewHistoryPoint(historydescription_Document_MoveParagraphByTab);
                             Paragraph.Add_Tab(e.ShiftKey);
@@ -10456,7 +10485,7 @@ CDocument.prototype =
             {
                 if (false === editor.isViewMode)
                 {
-                    var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : changestype_Document_Content_Add );
+                    var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
                     if (false === this.Document_Is_SelectionLocked(CheckType))
                     {
                         this.Create_NewHistoryPoint(historydescription_Document_EnterButton);
@@ -10881,7 +10910,7 @@ CDocument.prototype =
                 {
                     if (!window.GlobalPasteFlag)
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
                             this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
 
@@ -10911,7 +10940,7 @@ CDocument.prototype =
         {
             if ( true != e.ShiftKey )
             {
-                if (false === this.Document_Is_SelectionLocked(changestype_Delete, null, true))
+                if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true))
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
@@ -10929,7 +10958,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 49 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num1 - применяем стиль Heading1
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+            if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading1);
                 this.Set_ParagraphStyle( "Heading 1" );
@@ -10939,7 +10968,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 50 && false === editor.isViewMode && true === e.AltKey && !e.AltGr) // Alt + Ctrl + Num2 - применяем стиль Heading2
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+            if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading2);
                 this.Set_ParagraphStyle( "Heading 2" );
@@ -10949,7 +10978,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 51 && false === editor.isViewMode && true === e.AltKey && !e.AltGr ) // Alt + Ctrl + Num3 - применяем стиль Heading3
         {
-            if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties) )
+            if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading3);
                 this.Set_ParagraphStyle( "Heading 3" );
@@ -11008,7 +11037,7 @@ CDocument.prototype =
         {
             if ( true !== e.AltKey ) // Ctrl + E - переключение прилегания параграфа между center и left
             {
-                this.private_ToggleParagraphAlignByHotkey(align_Center);
+                this.private_ToggleParagraphAlignByHotkey(AscCommon.align_Center);
                     bRetValue = keydownresult_PreventAll;
                 }
             else // Ctrl + Alt + E - добавляем знак евро €
@@ -11040,7 +11069,7 @@ CDocument.prototype =
         }
         else if ( e.KeyCode == 74 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + J переключение прилегания параграфа между justify и left
         {
-            this.private_ToggleParagraphAlignByHotkey(align_Justify);
+            this.private_ToggleParagraphAlignByHotkey(AscCommon.align_Justify);
                 bRetValue = keydownresult_PreventAll;
             }
         else if ( e.KeyCode == 75 && false === editor.isViewMode && true === e.CtrlKey && false === e.ShiftKey ) // Ctrl + K - добавление гиперссылки
@@ -11090,13 +11119,13 @@ CDocument.prototype =
             }
             else // Ctrl + P - print
             {
-                this.DrawingDocument.m_oWordControl.m_oApi.asc_Print();
+                this.DrawingDocument.m_oWordControl.m_oApi.onPrint();
                 bRetValue = keydownresult_PreventAll;
             }
         }
         else if ( e.KeyCode == 82 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + R - переключение прилегания параграфа между right и left
         {
-            this.private_ToggleParagraphAlignByHotkey(align_Right);
+            this.private_ToggleParagraphAlignByHotkey(AscCommon.align_Right);
                 bRetValue = keydownresult_PreventAll;
             }
         else if ( e.KeyCode == 83 && false === editor.isViewMode && true === e.CtrlKey ) // Ctrl + S - save
@@ -11135,7 +11164,7 @@ CDocument.prototype =
                 {
                     if (!window.GlobalPasteFlag)
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
                             this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
 
@@ -11160,7 +11189,7 @@ CDocument.prototype =
                     }
                     else
                     {
-                        if (!window.USER_AGENT_SAFARI_MACOS)
+                        if (!AscCommon.AscBrowser.isSafariMacOs)
                             bRetValue = keydownresult_PreventAll;
                     }
                 }
@@ -11247,9 +11276,9 @@ CDocument.prototype =
                     {
                         this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey);
                         if (true === e.ShiftKey)
-                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript }));
+                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript }));
                         else
-                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript }));
+                            this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript }));
                         this.Document_UpdateInterfaceState();
                     }
                     bRetValue = keydownresult_PreventAll;
@@ -11278,7 +11307,7 @@ CDocument.prototype =
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey2);
-                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SuperScript ? vertalign_Baseline : vertalign_SuperScript } ) );
+                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -11308,7 +11337,7 @@ CDocument.prototype =
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
                     this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey3);
-                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === vertalign_SubScript ? vertalign_Baseline : vertalign_SubScript } ) );
+                    this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -11642,7 +11671,7 @@ CDocument.prototype =
 
                 // Вызываем стандартное событие mouseMove, чтобы сбросить различные подсказки, если они были
                 editor.sync_MouseMoveStartCallback();
-                editor.sync_MouseMoveCallback(new CMouseMoveData());
+                editor.sync_MouseMoveCallback(new AscCommon.CMouseMoveData());
                 editor.sync_MouseMoveEndCallback();
 
                 this.DrawingDocument.StartTrackText();                
@@ -11773,7 +11802,7 @@ CDocument.prototype =
         return this.Content[ContentPos].Get_NearestPos(ElementPageIndex, X, Y, bAnchor, Drawing);
     },
 
-    Internal_Content_Add : function(Position, NewObject)
+    Internal_Content_Add : function(Position, NewObject, bCheckTable)
     {
         // Position = this.Content.length  допускается
         if ( Position < 0 || Position > this.Content.length )
@@ -11808,7 +11837,7 @@ CDocument.prototype =
         this.Check_SectionLastParagraph();
 
         // Проверим, что последний элемент не таблица
-        if ( type_Table == this.Content[this.Content.length - 1].GetType() )
+        if ( false != bCheckTable && type_Table == this.Content[this.Content.length - 1].GetType() )
             this.Internal_Content_Add(this.Content.length, new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 ) );
 
         // Запоминаем, что нам нужно произвести переиндексацию элементов
@@ -14024,7 +14053,7 @@ CDocument.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos     = this.m_oContentChanges.Check( contentchanges_Add, Reader.GetLong() );
+                    var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
                     var Element = g_oTableId.Get_ById( Reader.GetString2() );
 
                     Pos = Math.min(Pos, this.Content.length);
@@ -14072,7 +14101,7 @@ CDocument.prototype =
 
                 for ( var Index = 0; Index < Count; Index++ )
                 {
-                    var Pos = this.m_oContentChanges.Check( contentchanges_Remove, Reader.GetLong() );
+                    var Pos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Reader.GetLong() );
 
                     // действие совпало, не делаем его
                     if ( false === Pos )
@@ -16006,6 +16035,10 @@ CDocument.prototype.private_UpdateTargetForCollaboration = function()
 {
     this.NeedUpdateTargetForCollaboration = true;
 };
+CDocument.prototype.Get_HdrFtr = function()
+{
+    return this.HdrFtr;
+};
 CDocument.prototype.Get_DrawingDocument = function()
 {
     return this.DrawingDocument;
@@ -16058,10 +16091,10 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
         var ParaPr = this.Get_Paragraph_ParaPr();
         if (null != ParaPr)
         {
-            if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Properties))
+            if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
             {
                 this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
-                this.Set_ParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? align_Justify : align_Left) : Align);
+                this.Set_ParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? AscCommon.align_Justify : align_Left) : Align);
                 this.Document_UpdateInterfaceState();
             }
         }
@@ -16223,7 +16256,7 @@ CDocument.prototype.Update_ColumnsMarkupFromRuler = function(NewMarkup)
     if (!SectPr)
         return;
 
-    if (false === this.Document_Is_SelectionLocked(changestype_Document_SectPr))
+    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
         this.Create_NewHistoryPoint(historydescription_Document_SetColumnsFromRuler);
 
@@ -16256,7 +16289,7 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
     if (!SectPr)
         return;
 
-    if (false === this.Document_Is_SelectionLocked(changestype_Document_SectPr))
+    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
         this.Create_NewHistoryPoint(historydescription_Document_SetColumnsProps);
 
@@ -16339,7 +16372,7 @@ CDocument.prototype.Get_NumberingInfo = function(NumberingEngine, ParaId, NumPr)
 };
 CDocument.prototype.private_RecalculateNumbering = function(Elements)
 {
-    if (true === g_oIdCounter.m_bLoad)
+    if (true === AscCommon.g_oIdCounter.m_bLoad)
         return;
 
     for (var Index = 0, Count = Elements.length; Index < Count; ++Index)
@@ -16365,7 +16398,7 @@ CDocument.prototype.Set_SectionProps = function(Props)
     var CurPos = this.CurPos.ContentPos;
     var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
-    if (SectPr && false === this.Document_Is_SelectionLocked(changestype_Document_SectPr))
+    if (SectPr && false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
         this.Create_NewHistoryPoint(historydescription_Document_SetSectionProps);
 
@@ -16378,7 +16411,7 @@ CDocument.prototype.Set_SectionProps = function(Props)
 
         if (undefined !== Props.get_Orientation())
         {
-            var Orient = Props.get_Orientation() === c_oAscPageOrientation.Portrait ? orientation_Portrait : orientation_Landscape;
+            var Orient = Props.get_Orientation() === Asc.c_oAscPageOrientation.PagePortrait ? orientation_Portrait : orientation_Landscape;
             SectPr.Set_Orientation(Orient, false);
         }
 
@@ -16417,6 +16450,15 @@ CDocument.prototype.Get_SectionProps = function()
     var SectPr = this.SectionsInfo.Get_SectPr(CurPos).SectPr;
 
     return new CDocumentSectionProps(SectPr);
+};
+CDocument.prototype.Get_FirstParagraph = function()
+{
+    if (type_Paragraph == this.Content[0].GetType())
+        return this.Content[0];
+    else if (type_Table == this.Content[0].GetType())
+        return this.Content[0].Get_FirstParagraph();
+
+    return null;
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Settings

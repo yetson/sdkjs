@@ -33,7 +33,7 @@ baseEditorsApi.prototype._onEndPermissions = function()
 {
 	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) 
 	{
-		var oResult = new window['Asc'].asc_CAscEditorPermissions();
+		var oResult = new AscCommon.asc_CAscEditorPermissions();
 		oResult.asc_setCanLicense(true);
 		oResult.asc_setCanBranding(true);
  		this.sendEvent('asc_onGetEditorPermissions', oResult);
@@ -102,59 +102,47 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 /////////////////////////////////////////////////////////
 //////////////       IMAGES      ////////////////////////
 /////////////////////////////////////////////////////////
-function DocumentUrls()
-{
-	this.urls = {};
-	this.documentUrl = "";
-	this.imageCount = 0;
-}
-DocumentUrls.prototype = 
-{
-	mediaPrefix: 'media/',
-	init: function (urls) {
-	},
-	getUrls: function () {
-		return this.urls;
-	},
-	addUrls : function(urls){
-	},
-	addImageUrl : function(strPath, url){
-	},
-	getImageUrl : function(strPath){		
-		if (0 === strPath.indexOf('theme'))
-			return null;
-		
-		if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
-			return null;
-		
-		return this.documentUrl + "/media/" + strPath;
-	},
-	getImageLocal : function(url){
-		var _first = this.documentUrl + "/media/";
-		if (0 == url.indexOf(_first))
-			return url.substring(_first.length);
-		return null;
-	},
-	imagePath2Local : function(imageLocal){
-		return this.getImageLocal(imageLocal);
-	},
-	getUrl : function(strPath){		
-		if (0 === strPath.indexOf('theme'))
-			return null;
-		
-		if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
-			return null;
-		
-		return this.documentUrl + "/media/" + strPath;
-	},
-	getLocal : function(url){		
-		return this.getImageLocal(url);
-	},
-	getMaxIndex : function(url){
-		return this.imageCount;
-	}
+var prot = AscCommon.DocumentUrls.prototype;
+prot.mediaPrefix = 'media/';
+prot.init = function(urls) {
 };
-g_oDocumentUrls = new DocumentUrls();
+prot.getUrls = function() {
+	return this.urls;
+};
+prot.addUrls = function(urls){
+};
+prot.addImageUrl = function(strPath, url){
+};
+prot.getImageUrl = function(strPath){
+	if (0 === strPath.indexOf('theme'))
+		return null;
+
+	if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
+		return null;
+
+	return this.documentUrl + "/media/" + strPath;
+};
+prot.getImageLocal = function(url){
+	var _first = this.documentUrl + "/media/";
+	if (0 == url.indexOf(_first))
+		return url.substring(_first.length);
+	return null;
+};
+prot.imagePath2Local = function(imageLocal){
+	return this.getImageLocal(imageLocal);
+};
+prot.getUrl = function(strPath){
+	if (0 === strPath.indexOf('theme'))
+		return null;
+
+	if (window.editor && window.editor.ThemeLoader && window.editor.ThemeLoader.ThemesUrl != "" && strPath.indexOf(window.editor.ThemeLoader.ThemesUrl) == 0)
+		return null;
+
+	return this.documentUrl + "/media/" + strPath;
+};
+prot.getLocal = function(url){
+	return this.getImageLocal(url);
+};
 
 function sendImgUrls(api, images, callback)
 {
@@ -162,7 +150,7 @@ function sendImgUrls(api, images, callback)
 	for (var i = 0; i < images.length; i++)
 	{
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](images[i]);
-		_data[i] = { url: images[i], path : g_oDocumentUrls.getImageUrl(_url) };
+		_data[i] = { url: images[i], path : AscCommon.g_oDocumentUrls.getImageUrl(_url) };
 	}
 	callback(_data);  
 }
@@ -191,11 +179,11 @@ function DesktopOfflineUpdateLocalName(_api)
 	window["AscDesktopEditor"]["SetDocumentName"](_name);
 }
 
-window["CDocsCoApi"].prototype.askSaveChanges = function(callback) 
+AscCommon.CDocsCoApi.prototype.askSaveChanges = function(callback)
 {
     callback({"saveLock": false});
 };
-window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
+AscCommon.CDocsCoApi.prototype.saveChanges = function(arrayChanges, deleteIndex, excelAdditionalInfo)
 {
 	window["AscDesktopEditor"]["LocalFileSaveChanges"](arrayChanges.join("\",\""), deleteIndex, arrayChanges.length);
 	//this.onUnSaveLock();
@@ -203,18 +191,18 @@ window["CDocsCoApi"].prototype.saveChanges = function(arrayChanges, deleteIndex,
 
 window["NativeCorrectImageUrlOnCopy"] = function(url)
 {
-	g_oDocumentUrls.getImageUrl(url);
+	AscCommon.g_oDocumentUrls.getImageUrl(url);
 };
 window["NativeCorrectImageUrlOnPaste"] = function(url)
 {
 	return window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
 };
 
-function InitDragAndDrop(oHtmlElement, callback) {
+AscCommon.InitDragAndDrop = function(oHtmlElement, callback) {
 	if ("undefined" != typeof(FileReader) && null != oHtmlElement) {
 		oHtmlElement["ondragover"] = function (e) {
 			e.preventDefault();
-			e.dataTransfer.dropEffect = CanDropFiles(e) ? 'copy' : 'none';
+			e.dataTransfer.dropEffect = AscCommon.CanDropFiles(e) ? 'copy' : 'none';
 			return false;
 		};
 		oHtmlElement["ondrop"] = function (e) {

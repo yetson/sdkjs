@@ -24,41 +24,82 @@
 */
 "use strict";
 
+(
 /**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 15:21
- * To change this template use File | Settings | File Templates.
- */
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+    function _getRowTitle( row ) {
+        return "" + (row + 1);
+    }
 
-function _getRowTitle( row ) {
-    return "" + (row + 1);
-}
+    var g_cCharDelimiter = AscCommon.g_cCharDelimiter;
+    var parserHelp = AscCommon.parserHelp;
+    
+    var cElementType = AscCommonExcel.cElementType;
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cBool = AscCommonExcel.cBool;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cRef = AscCommonExcel.cRef;
+    var cRef3D = AscCommonExcel.cRef3D;
+    var cEmpty = AscCommonExcel.cEmpty;
+    var cArray = AscCommonExcel.cArray;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
 
-cFormulaFunctionGroup['LookupAndReference'] = [
-    cADDRESS,
-    cAREAS,
-    cCHOOSE,
-    cCOLUMN,
-    cCOLUMNS,
-    cGETPIVOTDATA,
-    cHLOOKUP,
-    cHYPERLINK,
-    cINDEX,
-    cINDIRECT,
-    cLOOKUP,
-    cMATCH,
-    cOFFSET,
-    cROW,
-    cROWS,
-    cRTD,
-    cTRANSPOSE,
-    cVLOOKUP,
+    var checkTypeCell = AscCommonExcel.checkTypeCell;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
 
-    /*new funcions with _xlnf-prefix*/
-    cFORMULATEXT
-];
+    var _func = AscCommonExcel._func;
+
+    cFormulaFunctionGroup['LookupAndReference'] = cFormulaFunctionGroup['LookupAndReference'] || [];
+    cFormulaFunctionGroup['LookupAndReference'].push(
+        cADDRESS,
+        cAREAS,
+        cCHOOSE,
+        cCOLUMN,
+        cCOLUMNS,
+        cGETPIVOTDATA,
+        cHLOOKUP,
+        cHYPERLINK,
+        cINDEX,
+        cINDIRECT,
+        cLOOKUP,
+        cMATCH,
+        cOFFSET,
+        cROW,
+        cROWS,
+        cRTD,
+        cTRANSPOSE,
+        cVLOOKUP
+    );
+
+    function searchRegExp(str, flags) {
+        var vFS = str
+          .replace(/(\\)/g, "\\")
+          .replace(/(\^)/g, "\\^")
+          .replace(/(\()/g, "\\(")
+          .replace(/(\))/g, "\\)")
+          .replace(/(\+)/g, "\\+")
+          .replace(/(\[)/g, "\\[")
+          .replace(/(\])/g, "\\]")
+          .replace(/(\{)/g, "\\{")
+          .replace(/(\})/g, "\\}")
+          .replace(/(\$)/g, "\\$")
+          .replace(/(~)?\*/g, function($0, $1) {
+              return $1 ? $0 : '(.*)';
+          })
+          .replace(/(~)?\?/g, function($0, $1) {
+              return $1 ? $0 : '.{1}';
+          })
+          .replace(/(~\*)/g, "\\*").replace(/(~\?)/g, "\\?");
+
+        return new RegExp(vFS + "$", flags ? flags : "i");
+    }
 
 function cADDRESS() {
 //    cBaseFunction.call( this, "ADDRESS" );
@@ -326,8 +367,6 @@ function cGETPIVOTDATA() {
 }
 
 cGETPIVOTDATA.prototype = Object.create( cBaseFunction.prototype );
-
-var g_oHLOOKUPCache = new VHLOOKUPCache( true );
 
 function cHLOOKUP() {
 //    cBaseFunction.call( this, "HLOOKUP" );
@@ -635,7 +674,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
                 found_operand.isAbsolute = true;
         }
         else if ( parserHelp.isName.call( o, o.Formula, o.pCurrPos, wb )[0] ) {
-            found_operand = new cName( o.operand_str, wb, r1.worksheet );
+            found_operand = new AscCommonExcel.cName( o.operand_str, wb, r1.worksheet );
         }
     }
 
@@ -656,7 +695,7 @@ cINDIRECT.prototype.Calculate = function ( arg ) {
     }
 
     if ( found_operand ) {
-        if ( found_operand instanceof cName ) {
+        if ( found_operand instanceof AscCommonExcel.cName ) {
             found_operand = found_operand.toRef();
         }
 
@@ -924,7 +963,7 @@ cMATCH.prototype.Calculate = function ( arg ) {
         else if ( a2Value == 0 ) {
             if ( a0 instanceof cString ) {
                 for ( var i = 0; i < arr.length; i++ ) {
-                    if ( searchRegExp2( arr[i].toString(), a0Value ) ) {
+                    if ( AscCommonExcel.searchRegExp2( arr[i].toString(), a0Value ) ) {
                         index = i;
                         break;
                     }
@@ -1405,7 +1444,6 @@ VHLOOKUPCache.prototype.clean = function () {
     this.cacheId = {};
     this.cacheRanges = {};
 };
-var g_oVLOOKUPCache = new VHLOOKUPCache( false );
 
 function cVLOOKUP() {
 //    cBaseFunction.call( this, "VLOOKUP" );
@@ -1645,3 +1683,12 @@ cVLOOKUP.prototype.getInfo = function () {
         args:"( lookup-value  ,  table-array  ,  col-index-num  [  ,  [  range-lookup-flag  ] ] )"
     };
 };
+
+var g_oVLOOKUPCache = new VHLOOKUPCache( false );
+var g_oHLOOKUPCache = new VHLOOKUPCache( true );
+
+//----------------------------------------------------------export----------------------------------------------------
+window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+window['AscCommonExcel'].g_oVLOOKUPCache = g_oVLOOKUPCache;
+window['AscCommonExcel'].g_oHLOOKUPCache = g_oHLOOKUPCache;
+})(window);

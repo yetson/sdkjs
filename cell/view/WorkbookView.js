@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* WorkbookView.js
  *
@@ -41,6 +41,12 @@
    * Import
    * -----------------------------------------------------------------------------
    */
+  var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+  var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;
+  var AscBrowser = AscCommon.AscBrowser;
+  var CColor = AscCommon.CColor;
+  var cBoolLocal = AscCommon.cBoolLocal;
+
   var asc = window["Asc"];
   var asc_applyFunction = asc.applyFunction;
   var asc_round = asc.round;
@@ -49,6 +55,17 @@
   var asc_CPrintPagesData = asc.CPrintPagesData;
   var asc_getcvt = asc.getCvtRatio;
   var asc_CSP = asc.asc_CStylesPainter;
+  var c_oTargetType = AscCommonExcel.c_oTargetType;
+  var c_oAscError = asc.c_oAscError;
+  var c_oAscCleanOptions = asc.c_oAscCleanOptions;
+  var c_oAscSelectionDialogType = asc.c_oAscSelectionDialogType;
+  var c_oAscMouseMoveType = asc.c_oAscMouseMoveType;
+  var c_oAscCellEditorState = asc.c_oAscCellEditorState;
+  var c_oAscPopUpSelectorType = asc.c_oAscPopUpSelectorType;
+  var c_oAscAsyncAction = asc.c_oAscAsyncAction;
+  var c_oAscFontRenderingModeType = asc.c_oAscFontRenderingModeType;
+  var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
+  
 
   function WorkbookCommentsModel(handlers) {
     this.workbook = {handlers: handlers};
@@ -389,7 +406,7 @@
         }, "showCellEditorCursor": function() {
           self._onShowCellEditorCursor.apply(self, arguments);
         }, "print": function() {
-          self.Api.asc_Print();
+          self.Api.onPrint();
         }, "addFunction": function() {
           self.insertFormulaInEditor.apply(self, arguments);
         }, "canvasClick": function() {
@@ -507,11 +524,13 @@
             self.getWorksheet(self.model.getWorksheetIndexByName(ws)).addFormulaRange(range);
           }
         }, "existedRange": function(range, ws) {
-              if (!ws) {
-                  self.getWorksheet().activeFormulaRange(range);
-              } else {
-                  self.getWorksheet(self.model.getWorksheetIndexByName(ws)).activeFormulaRange(range);
-              }
+          var editRangeSheet = ws ? self.model.getWorksheetIndexByName(ws) : self.copyActiveSheet;
+          if (-1 === editRangeSheet || editRangeSheet === self.wsActive) {
+            self.getWorksheet().activeFormulaRange(range);
+          } else {
+            self.getWorksheet(editRangeSheet).removeFormulaRange(range);
+            self.getWorksheet().addFormulaRange(range);
+          }
         }, "updateUndoRedoChanged": function(bCanUndo, bCanRedo) {
           self.handlers.trigger("asc_onCanUndoChanged", bCanUndo);
           self.handlers.trigger("asc_onCanRedoChanged", bCanRedo);
@@ -685,10 +704,10 @@
     });
 
     this.handlers.add("asc_onLockDefNameManager", function(reason) {
-      self.defNameAllowCreate = !(reason == c_oAscDefinedNameReason.LockDefNameManager);
+      self.defNameAllowCreate = !(reason == Asc.c_oAscDefinedNameReason.LockDefNameManager);
     });
 
-    this.cellCommentator = new CCellCommentator({
+    this.cellCommentator = new AscCommonExcel.CCellCommentator({
       model: new WorkbookCommentsModel(this.handlers),
       collaborativeEditing: this.collaborativeEditing,
       draw: function() {
@@ -714,7 +733,7 @@
     };
 
     if (this.Api.isMobileVersion) {
-      this.MobileTouchManager = new CMobileTouchManager();
+      this.MobileTouchManager = new AscCommonExcel.CMobileTouchManager();
       this.MobileTouchManager.Init(this);
     }
     return this;
@@ -893,10 +912,10 @@
           }
         }
         switch (ct.hyperlink.asc_getType()) {
-          case c_oAscHyperlinkType.WebLink:
+          case Asc.c_oAscHyperlinkType.WebLink:
             this.handlers.trigger("asc_onHyperlinkClick", ct.hyperlink.asc_getHyperlinkUrl());
             break;
-          case c_oAscHyperlinkType.RangeLink:
+          case Asc.c_oAscHyperlinkType.RangeLink:
             // ToDo надо поправить отрисовку комментария для данной ячейки (с которой уходим)
             this.handlers.trigger("asc_onHideComment");
             this.Api._asc_setWorksheetRange(ct.hyperlink);
@@ -938,7 +957,7 @@
           x: ct.lockAllPosLeft,
           y: ct.lockAllPosTop,
           userId: ct.userIdAllSheet,
-          lockedObjectType: c_oAscMouseMoveLockedObjectType.Sheet
+          lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Sheet
         }));
       } else {
         // Отправление эвента о залоченности свойств всего листа (только если не удален весь лист)
@@ -948,7 +967,7 @@
             x: ct.lockAllPosLeft,
             y: ct.lockAllPosTop,
             userId: ct.userIdAllProps,
-            lockedObjectType: c_oAscMouseMoveLockedObjectType.TableProperties
+            lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.TableProperties
           }));
         }
       }
@@ -959,7 +978,7 @@
           x: ct.lockRangePosLeft,
           y: ct.lockRangePosTop,
           userId: ct.userId,
-          lockedObjectType: c_oAscMouseMoveLockedObjectType.Range
+          lockedObjectType: Asc.c_oAscMouseMoveLockedObjectType.Range
         }));
       }
 
@@ -1402,8 +1421,8 @@
     }
   };
 
-  WorkbookView.prototype.getTablePictures = function() {
-      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont);
+  WorkbookView.prototype.getTablePictures = function(props) {
+      return this.af_getTablePictures(this.model, this.fmgrGraphics, this.m_oFont, props);
   };
 
   WorkbookView.prototype.getCellStyles = function() {
@@ -1510,11 +1529,10 @@
       }
 
       if (this.cellEditor && this.cellFormulaEnterWSOpen ) {
-          if( ws.model.getId() == this.cellFormulaEnterWSOpen.model.getId() ){
+          if (ws === this.cellFormulaEnterWSOpen){
               this.cellFormulaEnterWSOpen.setFormulaEditMode( true );
               this.cellEditor._showCanvas();
-          }
-          else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
+          } else if (this.cellFormulaEnterWSOpen.getCellEditMode() && this.cellEditor.isFormula() ) {
               this.cellFormulaEnterWSOpen.setFormulaEditMode( false );
               /*скрываем cellEditor, в редактор добавляем %selected sheet name%+"!" */
               this.cellEditor._hideCanvas();
@@ -1804,7 +1822,7 @@
           arrResult.push(new Asc.asc_CCompleteMenu(this.formulasList[i], c_oAscPopUpSelectorType.Func));
         }
       }
-      defNamesList = this.getDefinedNames(c_oAscGetDefinedNamesList.WorksheetWorkbook);
+      defNamesList = this.getDefinedNames(Asc.c_oAscGetDefinedNamesList.WorksheetWorkbook);
       formulaName = formulaName.toLowerCase();
       for (i = 0; i < defNamesList.length; ++i) {
         defName = defNamesList[i];
@@ -1977,7 +1995,7 @@
 
   WorkbookView.prototype.cutToClipboard = function() {
     var t = this, ws, v;
-    if (!t.getCellEditMode() && !window.USER_AGENT_SAFARI_MACOS) {
+    if (!t.getCellEditMode() && !AscBrowser.isSafariMacOs) {
       ws = t.getWorksheet();
 
       // Запрещаем копирование диаграмм в iframe
@@ -1986,7 +2004,7 @@
 
       t.clipboard.copyRange(ws.getSelectedRange(), ws, true);
       ws.emptySelection(c_oAscCleanOptions.All);
-    } else if (!window.USER_AGENT_SAFARI_MACOS) {
+    } else if (!AscBrowser.isSafariMacOs) {
       v = t.cellEditor.cutSelection();
       if (v) {
         t.clipboard.copyCellValue(v);
@@ -2088,7 +2106,7 @@
     } else {
       this.copyActiveSheet = this.wsActive;
 
-      var index, tmpSelectRange = parserHelp.parse3DRef(selectRange);
+      var index, tmpSelectRange = AscCommon.parserHelp.parse3DRef(selectRange);
       if (tmpSelectRange) {
         if (c_oAscSelectionDialogType.Chart === selectionDialogType) {
           // Получаем sheet по имени
@@ -2347,7 +2365,7 @@
   WorkbookView.prototype.unlockDefName = function() {
     this.model.unlockDefName();
     this.handlers.trigger("asc_onRefreshDefNameList");
-    this.handlers.trigger("asc_onLockDefNameManager", c_oAscDefinedNameReason.OK);
+    this.handlers.trigger("asc_onLockDefNameManager", Asc.c_oAscDefinedNameReason.OK);
   };
 
   WorkbookView.prototype._onCheckDefNameLock = function() {
@@ -2387,19 +2405,19 @@
     var activeWs;
     var printPagesData = new asc_CPrintPagesData();
     var printType = adjustPrint.asc_getPrintType();
-//			var layoutPageType = adjustPrint.asc_getLayoutPageType();
-    var bFitToWidth = adjustPrint.getFitToWidth();
-    var bFitToHeight = adjustPrint.getFitToHeight();
-    if (printType == c_oAscPrintType.ActiveSheets) {
+    if (printType === Asc.c_oAscPrintType.ActiveSheets) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
-      printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
-    } else if (printType == c_oAscPrintType.EntireWorkbook) {
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/
+          activeWs);
+    } else if (printType === Asc.c_oAscPrintType.EntireWorkbook) {
       // Колличество листов
       var countWorksheets = this.model.getWorksheetCount();
       for (var i = 0; i < countWorksheets; ++i) {
         ws = this.getWorksheet(i);
-        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false, /*indexWorksheet*/i, bFitToWidth, bFitToHeight);
+        var arrPages = ws.calcPagesPrint(wb.getWorksheet(i).PagePrintOptions, /*printOnlySelection*/false,
+          /*indexWorksheet*/i);
         if (null !== arrPages) {
           if (null === printPagesData.arrPages) {
             printPagesData.arrPages = [];
@@ -2407,10 +2425,12 @@
           printPagesData.arrPages = printPagesData.arrPages.concat(arrPages);
         }
       }
-    } else if (printType == c_oAscPrintType.Selection) {
+    } else if (printType === Asc.c_oAscPrintType.Selection) {
       activeWs = wb.getActive();
       ws = this.getWorksheet();
-      printPagesData.arrPages = ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/activeWs, bFitToWidth, bFitToHeight);
+      printPagesData.arrPages =
+        ws.calcPagesPrint(wb.getWorksheet(activeWs).PagePrintOptions, /*printOnlySelection*/true, /*indexWorksheet*/
+          activeWs);
     }
 
     return printPagesData;
@@ -2512,7 +2532,8 @@
 
   WorkbookView.prototype.initFormulasList = function() {
     this.formulasList = [];
-    var oFormulaList = cFormulaFunctionLocalized ? cFormulaFunctionLocalized : cFormulaFunction;
+    var oFormulaList = AscCommonExcel.cFormulaFunctionLocalized ? AscCommonExcel.cFormulaFunctionLocalized :
+      AscCommonExcel.cFormulaFunction;
     for (var f in oFormulaList) {
       this.formulasList.push(f);
     }
@@ -2580,7 +2601,7 @@
     this.defaults.worksheetView.cells.paddingPlusBorder = 2 * this.defaults.worksheetView.cells.padding + 1;
   };
   
-    WorkbookView.prototype.af_getTablePictures = function(wb, fmgrGraphics, oFont)
+    WorkbookView.prototype.af_getTablePictures = function(wb, fmgrGraphics, oFont, props)
     {
         var styleThumbnailWidth = 61;
         var styleThumbnailHeight = 46;
@@ -2607,7 +2628,7 @@
                         name: i,
                         displayName: customStyles[i].displayName,
                         type: 'custom',
-                        image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont)
+                        image: this.af_getSmallIconTable(canvas, customStyles[i], fmgrGraphics, oFont, props)
                     };
                     result[n] = new Asc.formatTablePictures(options);
                     n++;
@@ -2626,7 +2647,7 @@
                         name: i,
                         displayName: defaultStyles[i].displayName,
                         type: 'default',
-                        image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont)
+                        image: this.af_getSmallIconTable(canvas, defaultStyles[i], fmgrGraphics, oFont, props)
                     };
                     result[n] = new Asc.formatTablePictures(options);
                     n++;
@@ -2636,20 +2657,38 @@
         return result;
     };
 
-    WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont)
+    WorkbookView.prototype.af_getSmallIconTable = function(canvas, style, fmgrGraphics, oFont, props)
     {
         var ctx = new Asc.DrawingContext({canvas: canvas, units: 1/*pt*/, fmgrGraphics: fmgrGraphics, font: oFont});
         var styleOptions = style;
 		
         //по умолчанию ставим строку заголовка и чередующиеся строки, позже нужно будет получать параметр
-		var styleInfo = 
+		var styleInfo;
+		if(props)
 		{
-			ShowColumnStripes: false,
-			ShowFirstColumn: false,
-			ShowLastColumn: false,
-			ShowRowStripes: true,
-			TotalsRowCount: 0
-		};
+			styleInfo = 
+			{
+				ShowColumnStripes: props.asc_getBandVer(),
+				ShowFirstColumn: props.asc_getFirstCol(),
+				ShowLastColumn: props.asc_getLastCol(),
+				ShowRowStripes: props.asc_getBandHor(),
+				HeaderRowCount: props.asc_getFirstRow(),
+				TotalsRowCount: props.asc_getLastRow()
+			};
+		}
+		else
+		{
+			styleInfo = 
+			{
+				ShowColumnStripes: false,
+				ShowFirstColumn: false,
+				ShowLastColumn: false,
+				ShowRowStripes: true,
+				HeaderRowCount: true,
+				TotalsRowCount: false
+			};
+		}
+		
 
         var pxToMM = 72 / 96;
         var ySize = 45 * pxToMM;
@@ -2673,19 +2712,19 @@
             if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
             {
                 ctx.setFillStyle(styleOptions.wholeTable.dxf.fill.bg);
-                ctx.fillRect(0,0,xSize,ySize);
+                ctx.fillRect(0, 0, xSize, ySize);
             }
             else
             {
                 ctx.setFillStyle(whiteColor);
-                ctx.fillRect(0,0,xSize,ySize);
+                ctx.fillRect(0, 0, xSize, ySize);
             }
             if(styleInfo.ShowColumnStripes)//column stripes
             {
                 for(k = 0; k < 6; k++)
                 {
                     color = defaultColorBackground;
-                    if((k)%2 == 0)
+                    if(k % 2 == 0)
                     {
                         if(styleOptions.firstColumnStripe && styleOptions.firstColumnStripe.dxf.fill && null != styleOptions.firstColumnStripe.dxf.fill.bg)
                             color =  styleOptions.firstColumnStripe.dxf.fill.bg;
@@ -2700,79 +2739,73 @@
                             color =  styleOptions.wholeTable.dxf.fill.bg;
                     }
                     ctx.setFillStyle(color);
-                    ctx.fillRect(k*stepX,0,stepX,ySize);
+                    ctx.fillRect(k * stepX, 0, stepX, ySize);
                 }
             }
 
             if(styleInfo.ShowRowStripes)//row stripes
             {
-                for(k = 0; k < 6; k++)
+                for(var k = 0; k < 6; k++)
                 {
                     color = null;
-                    if(styleOptions)//styleOptions.headerRow
-                    {
-                        if(k ==0)
-                            k++;
-                        if((k)%2 != 0)
-                        {
-                            if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-                                color = styleOptions.firstRowStripe.dxf.fill.bg;
-                        }
-                        else
-                        {
-                            if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-                                color = styleOptions.secondRowStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color = styleOptions.wholeTable.dxf.fill.bg;
-
-                        }
-                        if(color != null)
-                        {
-                            ctx.setFillStyle(color);
-                            if(k == 1)
-                                ctx.fillRect(0, k*stepY, xSize, stepY);
-                            else if(k == 3)
-                                ctx.fillRect(0, k*stepY, xSize,stepY);
-                            else
-                                ctx.fillRect(0, k*stepY, xSize, stepY);
-                            //else
-                            //ctx.fillRect(0,k*stepY,xSize,stepY);
-                        }
-
-                    }
-                    else
-                    {
-                        color = null;
-                        if((k+1)%2 != 0)
-                        {
-                            if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
-                                color =  styleOptions.firstRowStripe.dxf.fill.bg;
-                        }
-                        else
-                        {
-                            if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
-                                color =  styleOptions.secondRowStripe.dxf.fill.bg;
-                            else if(styleOptions.wholeTable && styleOptions.wholeTable.dxf.fill && null != styleOptions.wholeTable.dxf.fill.bg)
-                                color =  styleOptions.wholeTable.dxf.fill.bg;
-                        }
-
-                        if(color != null)
-                        {
-                            ctx.setFillStyle(color);
-                            ctx.fillRect(0, k*stepY, xSize, stepY);
-                        }
-                    }
-
+					
+					if(k == 0 && styleInfo.HeaderRowCount)
+						continue;
+					
+					if(styleInfo.HeaderRowCount)
+					{
+						if(k % 2 != 0)
+						{
+							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.firstRowStripe.dxf.fill.bg;
+							}
+						}
+						else
+						{
+							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.secondRowStripe.dxf.fill.bg;
+							}
+						}
+					}
+					else
+					{
+						if(k % 2 != 0)
+						{
+							if(styleOptions.secondRowStripe && styleOptions.secondRowStripe.dxf.fill && null != styleOptions.secondRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.secondRowStripe.dxf.fill.bg;
+							}
+						}
+						else
+						{
+							if(styleOptions.firstRowStripe && styleOptions.firstRowStripe.dxf.fill && null != styleOptions.firstRowStripe.dxf.fill.bg)
+							{
+								color = styleOptions.firstRowStripe.dxf.fill.bg;
+							}
+						}
+					}
+					
+					if(color != null)
+					{
+						ctx.setFillStyle(color);
+						ctx.fillRect(0, k * stepY, xSize, stepY);
+					}
                 }
-
             }
+			
             if(styleInfo.ShowFirstColumn && styleOptions.firstColumn)//first column
             {
-                if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
-                    ctx.setFillStyle(styleOptions.firstColumn.dxf.fill.bg);
-                else
-                    ctx.setFillStyle(defaultColorBackground);
-                ctx.fillRect(0,0,stepX,ySize);
+                color = null;
+				if(styleOptions.firstColumn && styleOptions.firstColumn.dxf.fill && null != styleOptions.firstColumn.dxf.fill.bg)
+                    color = styleOptions.firstColumn.dxf.fill.bg;
+				
+				if(color != null)
+                {
+					ctx.setFillStyle(color);
+					ctx.fillRect(0, 0, stepX, ySize);
+				}
             }
             if(styleInfo.ShowLastColumn)//last column
             {
@@ -2783,11 +2816,11 @@
                 if(color != null)
                 {
                     ctx.setFillStyle(color);
-                    ctx.fillRect(4*stepX,0,stepX,ySize);
+                    ctx.fillRect(4*stepX + 1, 0, stepX, ySize);
                 }
 
             }
-            if(styleOptions)//header row
+            if(styleInfo.HeaderRowCount)//header row
             {
                 if(styleOptions.headerRow && styleOptions.headerRow.dxf.fill && null != styleOptions.headerRow.dxf.fill.bg)
                 {
@@ -2805,10 +2838,12 @@
                 color = null;
                 if(styleOptions.totalRow && styleOptions.totalRow.dxf.fill && null != styleOptions.totalRow.dxf.fill.bg)
                     color = styleOptions.totalRow.dxf.fill.bg;
-                else
-                    color = defaultColorBackground;
-                ctx.setFillStyle(color);
-                ctx.fillRect(0, stepY*4, xSize, stepY);
+                
+				if(color !== null)
+				{
+					ctx.setFillStyle(color);
+					ctx.fillRect(0, stepY * 4, xSize, stepY);
+				}
             }
 
 
@@ -2933,7 +2968,7 @@
                     ctx.lineVer(0, xSize, ySize);
                 }
             }
-            if(styleOptions.headerRow && styleOptions.headerRow.dxf.border)//header row
+            if(styleOptions.headerRow && styleOptions.headerRow.dxf.border && styleInfo.HeaderRowCount)//header row
             {
                 border = styleOptions.headerRow.dxf.border;
                 if(border.t.s !== c_oAscBorderStyles.None)

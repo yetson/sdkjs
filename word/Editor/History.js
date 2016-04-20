@@ -40,6 +40,7 @@ function CHistory(Document)
     this.Document   = Document;
     this.Api                  = null;
     this.CollaborativeEditing = null;
+    this.CanNotAddChanges = false;//флаг для отслеживания ошибок добавления изменений без точки:Create_NewPoint->Add->Save_Changes->Add
 
     this.RecalculateData =
     {
@@ -104,7 +105,7 @@ CHistory.prototype =
         {
             // Проверяем первое изменение. Если оно уже нужного типа, тогда мы его удаляем. Добавляем специфическое
             // первое изменение с описанием.
-            var Class = g_oTableId;
+            var Class = AscCommon.g_oTableId;
 
             if (Point.Items.length > 0)
             {
@@ -303,6 +304,8 @@ CHistory.prototype =
 		if ( 0 !== this.TurnOffHistory )
 			return;
 
+        this.CanNotAddChanges = false;
+
         if (null !== this.SavedIndex && this.Index < this.SavedIndex)
             this.Set_SavedIndex(this.Index);
 
@@ -353,7 +356,7 @@ CHistory.prototype =
 
         for(var Key in RecalcData.Drawings.Map)
         {
-            if(null != g_oTableId.Get_ById(Key))
+            if(null != AscCommon.g_oTableId.Get_ById(Key))
             {
                 return true;
             }
@@ -375,6 +378,8 @@ CHistory.prototype =
     {
 		if (0 !== this.TurnOffHistory || this.Index < 0)
             return;
+
+        this._CheckCanNotAddChanges();
 
         // Заглушка на случай, если у нас во время создания одной точки в истории, после нескольких изменений идет
         // пересчет, потом снова добавляются изменения и снова запускается пересчет и т.д.
@@ -437,7 +442,7 @@ CHistory.prototype =
                 ( Class instanceof CDocumentContent && historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
-            var ContentChanges = new CContentChangesElement( ( bAdd == true ? contentchanges_Add : contentchanges_Remove ), Data.Pos, Count, Item );
+            var ContentChanges = new AscCommon.CContentChangesElement( ( bAdd == true ? AscCommon.contentchanges_Add : AscCommon.contentchanges_Remove ), Data.Pos, Count, Item );
             Class.Add_ContentChanges( ContentChanges );
             this.CollaborativeEditing.Add_NewDC( Class );
 
@@ -600,7 +605,7 @@ CHistory.prototype =
         // Пересчитываем таблицы
         for (var TableId in this.RecalculateData.Tables)
         {
-            var Table = g_oTableId.Get_ById(TableId);
+            var Table = AscCommon.g_oTableId.Get_ById(TableId);
             if (null !== Table)
             {
                 if (true === Table.Check_ChangedTableGrid())
@@ -995,6 +1000,18 @@ CHistory.prototype =
         this.BinaryWriter.WriteLong(PosInfo.Position);
         var BinaryLen = this.BinaryWriter.GetCurPosition() - BinaryPos;
         return  (BinaryLen + ";" + this.BinaryWriter.GetBase64Memory2(BinaryPos, BinaryLen));
+    },
+
+    _CheckCanNotAddChanges : function() {
+        try {
+            if (this.CanNotAddChanges && this.Api) {
+                var tmpErr = new Error();
+                if (tmpErr.stack) {
+                    this.Api.CoAuthoringApi.sendChangesError(tmpErr.stack);
+                }
+            }
+        } catch (e) {
+        }
     }
 };
 

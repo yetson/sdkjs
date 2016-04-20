@@ -22,7 +22,10 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿$(function(){
+$(function(){
+  // Import
+  var CellFormat = AscCommon.CellFormat;
+
 	var fGetFormatedText = function(aFormated)
 	{
 		var res = "";
@@ -31,7 +34,7 @@
 			res += aFormated[i].text;
 		}
 		return res;
-	}
+	};
     module("Formats");
 	test("General", function test_date(){
 		var form = new CellFormat("General");

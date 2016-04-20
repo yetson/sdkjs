@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var CColor = AscCommon.CColor;
+
 var g_fontManager = new CFontManager();
 g_fontManager.Initialize(true);
 
@@ -1026,7 +1029,7 @@ CDrawingCollaborativeTarget.prototype =
             this.HtmlElement.width = 1;
             this.HtmlElement.height = 1;
 
-            this.Color = getUserColorById(this.ShortId, null, true);
+            this.Color = AscCommon.getUserColorById(this.ShortId, null, true);
             this.Style ="rgb(" + this.Color.r + "," + this.Color.g + "," + this.Color.b + ")";
         }
 
@@ -1293,14 +1296,14 @@ function CDrawingDocument()
         if ("" == this.m_sLockedCursorType)
         {
             if (this.m_oWordControl.m_oApi.isPaintFormat && (("default" == sType) || ("text" == sType)))
-                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
+                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = AscCommon.kCurFormatPainterWord;
             else
                 this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
         }
         else
             this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
         if ( "undefined" === typeof(Data) || null === Data )
-            Data = new CMouseMoveData();
+            Data = new AscCommon.CMouseMoveData();
 
         editor.sync_MouseMoveCallback( Data );
     }
@@ -1542,7 +1545,7 @@ function CDrawingDocument()
         {
             bIsChange = true;
 
-            this.GuiLastTextProps = new asc_CParagraphProperty();
+            this.GuiLastTextProps = new Asc.asc_CParagraphProperty();
 
             this.GuiLastTextProps.Subscript     = props.Subscript;
             this.GuiLastTextProps.Superscript   = props.Superscript;
@@ -1622,11 +1625,11 @@ function CDrawingDocument()
         _textPr.Strikeout  = this.GuiLastTextProps.Strikeout;
 
         if (true === this.GuiLastTextProps.Subscript)
-            _textPr.VertAlign  = vertalign_SubScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SubScript;
         else if (true === this.GuiLastTextProps.Superscript)
-            _textPr.VertAlign  = vertalign_SuperScript;
+            _textPr.VertAlign  = AscCommon.vertalign_SuperScript;
         else
-            _textPr.VertAlign = vertalign_Baseline;
+            _textPr.VertAlign = AscCommon.vertalign_Baseline;
 
         _textPr.DStrikeout = this.GuiLastTextProps.DStrikeout;
         _textPr.Caps       = this.GuiLastTextProps.AllCaps;
@@ -2934,7 +2937,7 @@ function CDrawingDocument()
         for (var i = 0; i < _count_defaults; ++i)
         {
             var _obj = g_oUserColorScheme[i];
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _obj["name"];
 
             _c = _obj["dk1"];
@@ -2985,7 +2988,7 @@ function CDrawingDocument()
         {
             var _scheme = _extra[i].clrScheme;
 
-            infos[_index] = new CAscColorScheme();
+            infos[_index] = new AscCommon.CAscColorScheme();
             infos[_index].Name = _scheme.name;
 
             _scheme.colors[8].Calculate(_theme, null, null, null, _rgba);
@@ -3061,7 +3064,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrl)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrl)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -3131,7 +3134,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrlSlide)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlSlide)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlSlide)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -3203,7 +3206,7 @@ function CDrawingDocument()
         if (null == this.LastDrawingUrlTextArt)
             return;
 
-        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[getFullImageSrc2(this.LastDrawingUrlTextArt)];
+        var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrlTextArt)];
         if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
         {
             var _x = 0;
@@ -4035,9 +4038,9 @@ function CThumbnailsManager()
             if (!oThis.IsMouseDownTrackSimple)
             {
                 var cursor_dragged = "default";
-                if (AscBrowser.isWebkit)
+                if (AscCommon.AscBrowser.isWebkit)
                     cursor_dragged = "-webkit-grabbing";
-                else if (AscBrowser.isMozilla)
+                else if (AscCommon.AscBrowser.isMozilla)
                     cursor_dragged = "-moz-grabbing";
 
                 oThis.m_oWordControl.m_oThumbnails.HtmlElement.style.cursor = cursor_dragged;
@@ -5190,7 +5193,7 @@ function CThumbnailsManager()
                 if(global_keyboardEvent.CtrlKey)
                 {
                     var doc = editor.WordControl.m_oLogicDocument;
-                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(changestype_RemoveSlide) === false)
+                    if(this.m_oWordControl.m_oLogicDocument.viewMode === true || doc.Document_Is_SelectionLocked(AscCommon.changestype_RemoveSlide) === false)
                     {
                         Editor_Copy(editor, this.m_oWordControl.m_oLogicDocument.viewMode === false);
                         return undefined;
@@ -5206,7 +5209,7 @@ function CThumbnailsManager()
                     {
 						if(this.m_oWordControl.m_oLogicDocument.viewMode === false)
 						{							
-							if (!window.USER_AGENT_SAFARI_MACOS)
+							if (!AscCommon.AscBrowser.isSafariMacOs)
 							{
 								this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Presentation_PasteOnThumbnails);
 
@@ -5234,7 +5237,7 @@ function CThumbnailsManager()
                     }
                     else
                     {
-                        if (window.USER_AGENT_SAFARI_MACOS)
+                        if (AscCommon.AscBrowser.isSafariMacOs)
                             return undefined;
                     }
                 }
@@ -5368,7 +5371,7 @@ function CThumbnailsManager()
             {
                 if(global_keyboardEvent.CtrlKey)
                 {
-                    this.m_oWordControl.m_oApi.asc_Print();
+                    this.m_oWordControl.m_oApi.onPrint();
                 }
                 break;
             }

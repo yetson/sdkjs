@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* Utils.js
  *
@@ -31,14 +31,18 @@
  */
 (
 	/**
-	 * @param {jQuery} $
 	 * @param {Window} window
 	 * @param {undefined} undefined
 	 */
-	function ($, window, undefined) {
+	function (window, undefined) {
 
+		// Import
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
 		var prot;
+
+		var c_oAscPrintDefaultSettings = AscCommon.c_oAscPrintDefaultSettings;
+
+		var c_oAscSelectionType = asc.c_oAscSelectionType;
 
 
 		/** @const */
@@ -499,7 +503,7 @@
 			this.startRow = 0; // Активная ячейка в выделении
 			this._updateAdditionalData();
 		}
-		asc.extendClass(ActiveRange, Range);
+		AscCommon.extendClass(ActiveRange, Range);
 		
 		ActiveRange.prototype.assign = function () {
 			ActiveRange.superclass.assign.apply(this, arguments);
@@ -626,7 +630,7 @@
 			this.r2Abs = false;
 			this.c2Abs = false;
 		}
-		asc.extendClass(FormulaRange, Range);
+		AscCommon.extendClass(FormulaRange, Range);
 		FormulaRange.prototype.clone = function(){
 			var oRes = new FormulaRange(FormulaRange.superclass.clone.apply(this, arguments));
 			oRes.r1Abs = this.r1Abs;
@@ -1029,16 +1033,16 @@
 			asc_setType: function (val) {
 				// В принципе эта функция избыточна
 				switch (val) {
-					case c_oAscHyperlinkType.WebLink:
+					case Asc.c_oAscHyperlinkType.WebLink:
 						this.hyperlinkModel.setLocation(null);
 						break;
-					case c_oAscHyperlinkType.RangeLink:
+					case Asc.c_oAscHyperlinkType.RangeLink:
 						this.hyperlinkModel.Hyperlink = null;
 						break;
 				}
 			},
 			asc_setHyperlinkUrl: function (val) { this.hyperlinkModel.Hyperlink = val; },
-			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, c_oAscMaxTooltipLength) : val; },
+			asc_setTooltip: function (val) { this.hyperlinkModel.Tooltip = val ? val.slice(0, Asc.c_oAscMaxTooltipLength) : val; },
 			asc_setLocation: function (val) { this.hyperlinkModel.setLocation(val); },
 			asc_setSheet: function (val) { this.hyperlinkModel.setLocationSheet(val); },
 			asc_setRange: function (val) { this.hyperlinkModel.setLocationRange(val); },
@@ -1047,10 +1051,6 @@
 
 		/** @constructor */
 		function asc_CPageMargins (obj) {
-			if ( !(this instanceof asc_CPageMargins) ) {
-				return new asc_CPageMargins(obj);
-			}
-
 			if (obj) {
 				this.left = obj.left;
 				this.right = obj.right;
@@ -1079,40 +1079,41 @@
 		asc_CPageMargins.prototype.asc_setTop = function (val) { this.top = val; };
 		asc_CPageMargins.prototype.asc_setBottom = function (val) { this.bottom = val; };
 		/** @constructor */
-		function asc_CPageSetup (obj) {
-			if ( !(this instanceof asc_CPageSetup) ) {
-				return new asc_CPageSetup(obj);
-			}
+		function asc_CPageSetup () {
+			this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
+			this.width = c_oAscPrintDefaultSettings.PageWidth;
+			this.height = c_oAscPrintDefaultSettings.PageHeight;
 
-			if (obj) {
-				this.orientation = obj.orientation;
-				this.width = obj.width;
-				this.height = obj.height;
-			}
+			this.fitToWidth = false; //ToDo can be a number
+			this.fitToHeight = false; //ToDo can be a number
+
+			// ToDo
+			this.blackAndWhite = false;
+			this.cellComments = 0; // none ST_CellComments
+			this.copies = 1;
+			this.draft = false;
+			this.errors = 0; // displayed ST_PrintError
+			this.firstPageNumber = -1;
+			this.pageOrder = 0; // downThenOver ST_PageOrder
+			this.scale = 100;
+			this.useFirstPageNumber = false;
+			this.usePrinterDefaults = true;
 
 			return this;
 		}
-		asc_CPageSetup.prototype.init = function () {
-			if (null == this.orientation)
-				this.orientation = c_oAscPrintDefaultSettings.PageOrientation;
-			if (null == this.width)
-				this.width = c_oAscPrintDefaultSettings.PageWidth;
-			if (null == this.height)
-				this.height = c_oAscPrintDefaultSettings.PageHeight;
-		};
 		asc_CPageSetup.prototype.asc_getOrientation = function () { return this.orientation; };
 		asc_CPageSetup.prototype.asc_getWidth = function () { return this.width; };
 		asc_CPageSetup.prototype.asc_getHeight = function () { return this.height; };
 		asc_CPageSetup.prototype.asc_setOrientation = function (val) { this.orientation = val; };
 		asc_CPageSetup.prototype.asc_setWidth = function (val) { this.width = val; };
 		asc_CPageSetup.prototype.asc_setHeight = function (val) { this.height = val; };
+		asc_CPageSetup.prototype.asc_getFitToWidth = function () { return this.fitToWidth; };
+		asc_CPageSetup.prototype.asc_getFitToHeight = function () { return this.fitToHeight; };
+		asc_CPageSetup.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
+		asc_CPageSetup.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
 		function asc_CPageOptions (obj) {
-			if ( !(this instanceof asc_CPageOptions) ) {
-				return new asc_CPageOptions(obj);
-			}
-
 			if (obj) {
 				this.pageMargins = obj.pageMargins;
 				this.pageSetup = obj.pageSetup;
@@ -1129,7 +1130,6 @@
 
 			if (!this.pageSetup)
 				this.pageSetup = new asc_CPageSetup();
-			this.pageSetup.init();
 
 			if (null == this.gridLines)
 				this.gridLines = c_oAscPrintDefaultSettings.PageGridLines;
@@ -1146,10 +1146,6 @@
 		asc_CPageOptions.prototype.asc_setHeadings = function (val) { this.headings = val; };
 
 		function CPagePrint () {
-			if ( !(this instanceof CPagePrint) ) {
-				return new CPagePrint();
-			}
-
 			this.pageWidth = 0;
 			this.pageHeight = 0;
 
@@ -1176,9 +1172,6 @@
 			return this;
 		}
 		function CPrintPagesData () {
-			if ( !(this instanceof CPrintPagesData) ) {
-				return new CPrintPagesData();
-			}
 			this.arrPages = null;
 			this.currentIndex = 0;
 
@@ -1186,30 +1179,14 @@
 		}
 		/** @constructor */
 		function asc_CAdjustPrint () {
-			if ( !(this instanceof asc_CAdjustPrint) ) {
-				return new asc_CAdjustPrint();
-			}
 			// Вид печати
-			this.printType = c_oAscPrintType.ActiveSheets;
-			// Вид печати
-			this.layoutPageType = c_oAscLayoutPageType.ActualSize;
-
-			// По ширине
-			this.fitToWidth = false;
-			// По высоте
-			this.fitToHeight = false;
+			this.printType = Asc.c_oAscPrintType.ActiveSheets;
+			// ToDo сюда же start и end page index
 
 			return this;
 		}
 		asc_CAdjustPrint.prototype.asc_getPrintType = function () { return this.printType; };
-		asc_CAdjustPrint.prototype.asc_getLayoutPageType = function () { return this.layoutPageType; };
 		asc_CAdjustPrint.prototype.asc_setPrintType = function (val) { this.printType = val; };
-		asc_CAdjustPrint.prototype.asc_setLayoutPageType = function (val) { this.layoutPageType = val; };
-
-		asc_CAdjustPrint.prototype.getFitToWidth = function () { return this.fitToWidth; };
-		asc_CAdjustPrint.prototype.getFitToHeight = function () { return this.fitToHeight; };
-		asc_CAdjustPrint.prototype.asc_setFitToWidth = function (val) { this.fitToWidth = val; };
-		asc_CAdjustPrint.prototype.asc_setFitToHeight = function (val) { this.fitToHeight = val; };
 
 		/** @constructor */
 		function asc_CLockInfo () {
@@ -1234,10 +1211,6 @@
 			};
 		/** @constructor */
 		function asc_CSheetViewSettings () {
-			if (!(this instanceof asc_CSheetViewSettings)) {
-				return new asc_CSheetViewSettings();
-			}
-
 			this.Properties = g_oCSheetViewSettingsProperties;
 
 			// Показывать ли сетку
@@ -1296,10 +1269,6 @@
 
 		/** @constructor */
 		function asc_CPane () {
-			if (!(this instanceof asc_CPane)) {
-				return new asc_CPane();
-			}
-
 			this.state = null;
 			this.topLeftCell = null;
 			this.xSplit = 0;
@@ -1324,7 +1293,7 @@
 		};
 		asc_CPane.prototype.init = function() {
 			// ToDo Обрабатываем пока только frozen и frozenSplit
-			if ((c_oAscPaneState.Frozen === this.state || c_oAscPaneState.FrozenSplit === this.state) &&
+			if ((AscCommonExcel.c_oAscPaneState.Frozen === this.state || AscCommonExcel.c_oAscPaneState.FrozenSplit === this.state) &&
 				(0 < this.xSplit || 0 < this.ySplit)) {
 				this.topLeftFrozenCell = new CellAddress(this.ySplit, this.xSplit, 0);
 				if (!this.topLeftFrozenCell.isValid())
@@ -1333,10 +1302,6 @@
 		};
 
 		function RedoObjectParam () {
-			if (!(this instanceof RedoObjectParam)) {
-				return new RedoObjectParam();
-			}
-
 			this.bIsOn = false;
 			this.bIsReInit = false;
 			this.oChangeWorksheetUpdate = {};
@@ -1360,7 +1325,7 @@
 
       this.styleThumbnailWidthWithRetina = this.styleThumbnailWidth;
       this.styleThumbnailHeightWithRetina = this.styleThumbnailHeight;
-      if (AscBrowser.isRetina) {
+      if (AscCommon.AscBrowser.isRetina) {
         this.styleThumbnailWidthWithRetina <<= 1;
         this.styleThumbnailHeightWithRetina <<= 1;
       }
@@ -1403,7 +1368,7 @@
           oCustomStyle = cellStylesAll.getCustomStyleByBuiltinId(oStyle.BuiltinId);
 
           this.drawStyle(oGraphics, stringRenderer, oCustomStyle || oStyle, oStyle.Name);
-          this.defaultStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
+          this.defaultStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Default, oCanvas.toDataURL("image/png")));
         }
       },
       generateDocumentStyles: function(cellStylesAll, fmgrGraphics, oFont, stringRenderer) {
@@ -1423,7 +1388,7 @@
           }
 
           this.drawStyle(oGraphics, stringRenderer, oStyle, oStyle.Name);
-          this.docStyles.push(new CStyleImage(oStyle.Name, c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
+          this.docStyles.push(new AscCommon.CStyleImage(oStyle.Name, AscCommon.c_oAscStyleImage.Document, oCanvas.toDataURL("image/png")));
         }
       },
       drawStyle: function(oGraphics, stringRenderer, oStyle, sStyleName) {
@@ -1436,7 +1401,7 @@
         }
 
         var drawBorder = function(b, x1, y1, x2, y2) {
-          if (null != b && c_oAscBorderStyles.None !== b.s) {
+          if (null != b && AscCommon.c_oAscBorderStyles.None !== b.s) {
             oGraphics.setStrokeStyle(b.c);
 
             // ToDo поправить
@@ -1453,7 +1418,7 @@
 
         // Draw text
         var fc = oStyle.getFontColor();
-        var oFontColor = fc !== null ? fc : new CColor(0, 0, 0);
+        var oFontColor = fc !== null ? fc : new AscCommon.CColor(0, 0, 0);
         var format = oStyle.getFont();
         // Для размера шрифта делаем ограничение для превью в 16pt (у Excel 18pt, но и высота превью больше 22px)
         var oFont = new asc.FontProperties(format.fn, (16 < format.fs) ? 16 : format.fs, format.b, format.i, format.u, format.s);
@@ -1536,7 +1501,7 @@
 			this.isMatchCase = false;					// учитывать регистр
 			this.isWholeCell = false;					// ячейка целиком
 			this.scanOnOnlySheet = true;				// искать только на листе/в книге
-			this.lookIn = c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
+			this.lookIn = Asc.c_oAscFindLookIn.Formulas;	// искать в формулах/значениях/примечаниях
 
 			this.replaceWith = "";						// текст, на который заменяем (если у нас замена)
 			this.isReplaceAll = false;					// заменить все (если у нас замена)
@@ -1688,6 +1653,10 @@
 		prot["asc_setOrientation"] = prot.asc_setOrientation;
 		prot["asc_setWidth"] = prot.asc_setWidth;
 		prot["asc_setHeight"] = prot.asc_setHeight;
+		prot["asc_getFitToWidth"] = prot.asc_getFitToWidth;
+		prot["asc_getFitToHeight"] = prot.asc_getFitToHeight;
+		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
+		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
 		window["Asc"]["asc_CPageOptions"] = window["Asc"].asc_CPageOptions = asc_CPageOptions;
 		prot = asc_CPageOptions.prototype;
@@ -1706,11 +1675,7 @@
 		window["Asc"]["asc_CAdjustPrint"] = window["Asc"].asc_CAdjustPrint = asc_CAdjustPrint;
 		prot = asc_CAdjustPrint.prototype;
 		prot["asc_getPrintType"] = prot.asc_getPrintType;
-		prot["asc_getLayoutPageType"] = prot.asc_getLayoutPageType;
 		prot["asc_setPrintType"] = prot.asc_setPrintType;
-		prot["asc_setLayoutPageType"] = prot.asc_setLayoutPageType;
-		prot["asc_setFitToWidth"] = prot.asc_setFitToWidth;
-		prot["asc_setFitToHeight"] = prot.asc_setFitToHeight;
 
 		window["Asc"].asc_CLockInfo = asc_CLockInfo;
 
@@ -1761,4 +1726,4 @@
 		prot["asc_getName"] = prot.asc_getName;
 		prot["asc_getType"] = prot.asc_getType;
 }
-)(jQuery, window);
+)(window);

@@ -24,6 +24,9 @@
 */
 ﻿"use strict";
 
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+
 var g_bIsAppleDevices = AscBrowser.isAppleDevices;
 
 function get_raster_bounds(data, width, height, stride)
@@ -1335,6 +1338,8 @@ function CFontManager()
 
     this.LOAD_MODE = 40970;
 
+    this.IsAdvanceNeedBoldFonts = true;
+
     this.AfterLoad = function()
     {
         if (null == this.m_pFont)
@@ -1718,5 +1723,10 @@ function CFontManager()
 
             this.LOAD_MODE = 40970;
         }
+    }
+
+    this.SetAdvanceNeedBoldFonts = function(value)
+    {
+        this.IsAdvanceNeedBoldFonts = value;
     }
 }

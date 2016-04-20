@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿function CTableMarkup(Table)
+function CTableMarkup(Table)
 {
     this.Internal =
     {
@@ -2217,7 +2217,7 @@ CDrawingDocument.prototype =
         var Rows = 5;
 
         History.TurnOff();
-        g_oTableId.m_bTurnOff = true;
+        AscCommon.g_oTableId.m_bTurnOff = true;
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
             var i = _styles[i1];
@@ -2239,7 +2239,7 @@ CDrawingDocument.prototype =
                 _table_styles.Set_Props({TableStyle : i, TableLook : tableLook, TableLayout : c_oAscTableLayout.Fixed});
 
                 for (var j = 0; j < Rows; j++)
-                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+                    _table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
             }
             else
             {
@@ -2247,7 +2247,7 @@ CDrawingDocument.prototype =
                 _table_styles.Recalc_CompiledPr2();
 
                 for (var j = 0; j < Rows; j++)
-                    _table_styles.Content[j].Set_Height(H / Rows, heightrule_AtLeast);
+                    _table_styles.Content[j].Set_Height(H / Rows, Asc.linerule_AtLeast);
             }
 
 
@@ -2256,7 +2256,7 @@ CDrawingDocument.prototype =
             var _w_px = TABLE_STYLE_WIDTH_PIX;
             var _h_px = TABLE_STYLE_HEIGHT_PIX;
 
-            if (AscBrowser.isRetina)
+            if (AscCommon.AscBrowser.isRetina)
             {
                 _w_px *= 2;
                 _h_px *= 2;
@@ -2279,7 +2279,7 @@ CDrawingDocument.prototype =
             this.Native["DD_EndNativeDraw"](_stream);
             _graphics.ClearParams();
         }
-        g_oTableId.m_bTurnOff = false;
+        AscCommon.g_oTableId.m_bTurnOff = false;
         History.TurnOn();
 
         _stream["ClearNoAttack"]();

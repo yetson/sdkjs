@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (	/**
 	 * @param {jQuery} $
@@ -35,6 +35,10 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
+		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+		var c_oAscMaxCellOrCommentLength = AscCommon.c_oAscMaxCellOrCommentLength;
+		var AscBrowser = AscCommon.AscBrowser;
+
 		var doc = window.document;
 		
 		var isTruePaste = false;
@@ -43,6 +47,15 @@
 		var isOnlyLocalBufferSafari = false;
 		var copyPasteUseBinary = true;
 		var copyPasteFromWordUseBinary = true;
+
+		var COPY_ELEMENT_ID2 = "clipboard-helper";
+		var kElementTextId = "clipboard-helper-text";
+		var isNeedEmptyAfterCut = false;
+
+		if (AscBrowser.isSafariMacOs)
+		{
+			PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
+		}
 
 		function number2color(n) {
 			if( typeof(n)=="string" && n.indexOf("rgb")>-1)
@@ -106,7 +119,7 @@
 				t.element.style.top = '-100px';
 				t.element.style.left = '0px';
 				
-				if(window.USER_AGENT_MACOS)
+				if(AscBrowser.isMacOs)
 					t.element.style.width = '100px';
 				else
 					t.element.style.width = '10000px';
@@ -134,7 +147,7 @@
 					t.elementText.style.position = "absolute";
 					// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 					// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
-					if(window.USER_AGENT_MACOS)
+					if(AscBrowser.isMacOs)
 						t.element.style.width = '100px';
 					else
 						t.element.style.width = '10000px';
@@ -327,7 +340,7 @@
 				if(text == false)
 					return;
 				
-				if(window.USER_AGENT_SAFARI_MACOS && !worksheet.isCellEditMode)
+				if(AscBrowser.isSafariMacOs && !worksheet.isCellEditMode)
 				{
 					this.element.appendChild(text);
 					
@@ -339,7 +352,7 @@
 					
 					if(sBase64)
 					{
-						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+						if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -391,7 +404,7 @@
 						else
 						{
 							var sBase64 = this._getBinaryForCopy(worksheet);
-							if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+							if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 							{
 								$(this.element.children[0]).css("font-weight", "normal");
 								$(this.element.children[0]).wrap(document.createElement("b"));
@@ -535,7 +548,7 @@
 					else
 					{
 						var sBase64 = this._getBinaryForCopy(worksheet);
-						if(this.element.children && this.element.children.length == 1 && (window.USER_AGENT_WEBKIT || window.USER_AGENT_SAFARI_MACOS))
+						if(this.element.children && this.element.children.length == 1 && (AscBrowser.isWebkit || AscBrowser.isSafariMacOs))
 						{
 							$(this.element.children[0]).css("font-weight", "normal");
 							$(this.element.children[0]).wrap(document.createElement("b"));
@@ -611,7 +624,7 @@
 							
 							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 							var sBase64 = oBinaryFileWriter.Write();
-							if(this.element.children && this.element.children.length == 1 && window.USER_AGENT_WEBKIT && (true !== window.USER_AGENT_SAFARI_MACOS))
+							if(this.element.children && this.element.children.length == 1 && AscBrowser.isWebkit && (true !== AscBrowser.isSafariMacOs))
 							{
 								$(this.element.children[0]).css("font-weight", "normal");
 								$(this.element.children[0]).wrap(document.createElement("b"));
@@ -926,7 +939,7 @@
 				var _interval_time = 0;
 				if(AscBrowser.isMozilla)
 					_interval_time = 10;
-				else if(window.USER_AGENT_MACOS && window.USER_AGENT_WEBKIT)
+				else if(AscBrowser.isMacOs && AscBrowser.isWebkit)
 					_interval_time = 200;
 				
 				// ждем выполнения
@@ -1017,7 +1030,7 @@
 			// Private
 
 			_cleanElement: function () {
-				if(!window.USER_AGENT_SAFARI_MACOS)
+				if(!AscBrowser.isSafariMacOs)
 				{
 					this.element.style.left = "0px";
 					this.element.style.top = "-100px";
@@ -1048,7 +1061,7 @@
 			},
 			
             _editorPaste: function (worksheet,callback) {
-                if(window.USER_AGENT_SAFARI_MACOS)
+                if(AscBrowser.isSafariMacOs)
 					return;
 				
 				var t = this;
@@ -1107,7 +1120,7 @@
 						}
 					}
 					
-					if (window.USER_AGENT_SAFARI_MACOS)
+					if (AscBrowser.isSafariMacOs)
 					{
 						if (window.GlobalPasteFlagCounter != 2 && !window.GlobalPasteFlag)
 						{
@@ -1135,7 +1148,7 @@
 					if (callback && callback.call) {callback();}
 				};
 
-				var _interval_time = window.USER_AGENT_MACOS ? 200 : 100;
+				var _interval_time = AscBrowser.isMacOs ? 200 : 100;
 
 				PASTE_EMPTY_COUNTER = 0;
 				window.setTimeout( func_timeout, _interval_time );
@@ -1154,7 +1167,7 @@
                     pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
 					
-                    if(window.USER_AGENT_MACOS)
+                    if(AscBrowser.isMacOs)
 						t.element.style.width = '100px';
 					else
 						t.element.style.width = '10000px';
@@ -1388,7 +1401,7 @@
 					ifr.style.top = '-100px';
 					ifr.style.left = '0px';
 					
-					if(window.USER_AGENT_MACOS)
+					if(AscBrowser.isMacOs)
 						ifr.style.width = '100px';
 					else
 						ifr.style.width = '10000px';
@@ -1841,7 +1854,7 @@
 				if(cMax > gc_nMaxCol0 || rMax > gc_nMaxRow0)
 				{
 					if(isWriteError)
-						worksheet.handlers.trigger ("onErrorEvent", c_oAscError.ID.PasteMaxRangeError, c_oAscError.Level.NoCritical);
+						worksheet.handlers.trigger ("onErrorEvent", Asc.c_oAscError.ID.PasteMaxRangeError, Asc.c_oAscError.Level.NoCritical);
 					return false;
 				}
 				return true;
@@ -2162,7 +2175,7 @@
 							var sFrom = aImagesToDownload[i];
 							if (null != elem.url) 
 							{
-								var name = g_oDocumentUrls.imagePath2Local(elem.path);
+								var name = AscCommon.g_oDocumentUrls.imagePath2Local(elem.path);
 								t.oImages[sFrom] = name;
 							} 
 							else 
@@ -2187,6 +2200,33 @@
 			{
 				//TODO сделать вставку текста всегда через эту функцию
 				this.activeRange = worksheet.activeRange.clone(true);
+				
+				//если находимся внутри шейпа
+				var isIntoShape = worksheet.objectRender.controller.getTargetDocContent();
+				if(isIntoShape)
+				{
+					var callback = function(isSuccess)
+					{
+						if(isSuccess === false)
+						{
+							return false;
+						}
+						
+						var Count = text.length;
+						for ( var Index = 0; Index < Count; Index++ )
+						{
+							var _char = text.charAt(Index);
+							if (" " == _char)
+								isIntoShape.Paragraph_Add(new ParaSpace());
+							else
+								isIntoShape.Paragraph_Add(new ParaText(_char));
+						}
+					};
+					
+					worksheet.objectRender.controller.checkSelectedObjectsAndCallback2(callback);
+					return;
+				}
+				
 				var aResult = [];
 				aResult[this.activeRange.r1] = [];
 				
@@ -2247,7 +2287,7 @@
 			ReadFromBinaryWord : function(sBase64, worksheet)
 			{
 			    History.TurnOff();
-                g_oIdCounter.m_bRead = true;
+				AscCommon.g_oIdCounter.m_bRead = true;
 				//передавать CDrawingDocument текущего worksheet
 				var oTempDrawingDocument = worksheet.model.DrawingDocument;
 				
@@ -2271,7 +2311,7 @@
 				
 				window.global_pptx_content_loader.End_UseFullUrl();
 				History.TurnOn();
-                g_oIdCounter.m_bRead = false;
+				AscCommon.g_oIdCounter.m_bRead = false;
 			    editor = oOldEditor;
 
 			    return oRes;
@@ -2584,7 +2624,7 @@
 					if(divContent)
 						htmlInShape = divContent;	
 					
-					t.lStorageText = this._getTextFromHtml(htmlInShape);
+					t.lStorageText = this._getTextFromShape(isIntoShape);
 					
 					return htmlInShape;
 				}
@@ -2616,7 +2656,7 @@
 							if(isImage)
 								imageUrl = cloneImg.graphicObject.getImageUrl();
 							if(isImage && imageUrl)
-								url = getFullImageSrc2(imageUrl);
+								url = AscCommon.getFullImageSrc2(imageUrl);
 							else
 								url = cloneImg.graphicObject.getBase64Img();
 							curImage.alt = altAttr;
@@ -2742,6 +2782,32 @@
 				};
 				
 				return text;
+			},
+			
+			_getTextFromShape: function(documentContent)
+			{
+				var res = "";
+				
+				if(documentContent && documentContent.Content && documentContent.Content.length)
+				{
+					for(var i = 0; i < documentContent.Content.length; i++)
+					{
+						if(documentContent.Content[i])
+						{
+							var paraText = documentContent.Content[i].Get_SelectedText();
+							if(paraText)
+							{
+								if(i !== 0)
+								{
+									res += '\n';
+								}
+								res += paraText;
+							}
+						}
+					}
+				}
+				
+				return res;
 			},
 			
 			_makeCellValuesHtml: function (node,isText) {
@@ -4384,10 +4450,10 @@
 					if(Def_pPr.Jc != Item_pPr.Jc){
 						switch(Item_pPr.Jc)
 						{
-							case align_Left: apPr.push("text-align:left");break;
-							case align_Center: apPr.push("text-align:center");break;
-							case align_Right: apPr.push("text-align:right");break;
-							case align_Justify: apPr.push("text-align:justify");break;
+							case AscCommon.align_Left: apPr.push("text-align:left");break;
+							case AscCommon.align_Center: apPr.push("text-align:center");break;
+							case AscCommon.align_Right: apPr.push("text-align:right");break;
+							case AscCommon.align_Justify: apPr.push("text-align:justify");break;
 						}
 					}
 					//KeepLines , WidowControl
@@ -4409,9 +4475,9 @@
 					//Spacing
 					if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
 					{
-						if(linerule_AtLeast == Item_pPr.Spacing.LineRule)
+						if(Asc.linerule_AtLeast == Item_pPr.Spacing.LineRule)
 							apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
-						else if( linerule_Auto == Item_pPr.Spacing.LineRule)
+						else if( Asc.linerule_Auto == Item_pPr.Spacing.LineRule)
 						{
 							if(1 == Item_pPr.Spacing.Line)
 								apPr.push("line-height:normal");
@@ -4421,7 +4487,7 @@
 					}
 					if(Def_pPr.Spacing.LineRule != Item_pPr.Spacing.LineRule)
 					{
-						if(linerule_Exact == Item_pPr.Spacing.LineRule)
+						if(Asc.linerule_Exact == Item_pPr.Spacing.LineRule)
 							apPr.push("mso-line-height-rule:exactly");
 					}
 					//��� ������� � word ����� ����� ��� �������� ������������ ������
@@ -4524,9 +4590,9 @@
 					aProp.push("mso-style-textfill-fill-color:" + color);
 				}
 				if (null != Value.VertAlign) {
-					if(vertalign_SuperScript == Value.VertAlign)
+					if(AscCommon.vertalign_SuperScript == Value.VertAlign)
 						aProp.push("vertical-align:super");
-					else if(vertalign_SubScript == Value.VertAlign)
+					else if(AscCommon.vertalign_SubScript == Value.VertAlign)
 						aProp.push("vertical-align:sub");
 				}
 
@@ -4910,7 +4976,7 @@
 												tempAr[k] = s_arr[k].y;
 											}
 										}
-										tempAr.sort(fSortAscending);
+										tempAr.sort(AscCommon.fSortAscending);
 										newArr = [];
 										for(var k = 0; k < tempAr.length; k++)
 										{
@@ -4975,7 +5041,7 @@
 									{
 										this.oBinaryFileWriter.CopyEnd();
 										var sBase64 = this.oBinaryFileWriter.GetResult();
-										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+										if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 										{
 											$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 											$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5057,7 +5123,7 @@
 								{
 									this.oBinaryFileWriter.CopyEnd();
 									var sBase64 = this.oBinaryFileWriter.GetResult();
-									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+									if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 									{
 										$(this.ElemToSelect.children[0]).css("font-weight", "normal");
 										$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5082,7 +5148,7 @@
 				if(copyPasteUseBinary && this.oBinaryFileWriter.copyParams.itemCount > 0)
 				{
 					var sBase64 = this.oBinaryFileWriter.GetResult();
-					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && window.USER_AGENT_SAFARI_MACOS)
+					if(this.ElemToSelect.children && this.ElemToSelect.children.length == 1 && AscBrowser.isSafariMacOs)
 					{
 						$(this.ElemToSelect.children[0]).css("font-weight", "normal");;
 						$(this.ElemToSelect.children[0]).wrap(document.createElement("b"));
@@ -5093,6 +5159,189 @@
 			}
 
 		};
+
+		function SafariIntervalFocus2()
+		{
+			var api = window["Asc"]["editor"];
+			if (api)
+			{
+				if((api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive) || (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isSelectionDialogMode))
+					return;
+				var pastebin = document.getElementById(COPY_ELEMENT_ID2);
+				var pastebinText = document.getElementById(kElementTextId);
+				if(pastebinText && (api.wb && api.wb.getCellEditMode()) && api.IsFocus)
+				{
+					pastebinText.focus();
+				}
+				else if (pastebin && api.IsFocus)
+					pastebin.focus();
+				else if(!pastebin || !pastebinText)
+				{
+					// create
+					Editor_CopyPaste_Create2(api);
+				}
+			}
+		}
+
+		function Editor_Copy_Event_Excel(e, ElemToSelect, isCut, isAlreadyReadyHtml)
+		{
+			var api = window["Asc"]["editor"];
+			var wb = api.wb;
+			var ws = wb.getWorksheet();
+
+			var sBase64;
+			if(!isAlreadyReadyHtml)
+			{
+				if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
+					sBase64 = wb.clipboard._getHtmlBase64(ws.getSelectedRange(), ws, isCut, true);
+				else
+					sBase64 = wb.clipboard.copyRange(ws.getSelectedRange(), ws, isCut, true);
+			}
+
+
+			if(isCut)
+				ws.emptySelection(Asc.c_oAscCleanOptions.All);
+
+			if(sBase64)
+				e.clipboardData.setData("text/x-custom", sBase64);
+			e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
+			//TODO для вставки в ячейку(пересмотреть!!!)
+			e.clipboardData.setData("text/plain", ElemToSelect.innerText);
+		}
+
+		function Editor_CopyPaste_Create2(api)
+		{
+			var ElemToSelect = document.createElement("div");
+			ElemToSelect.id = COPY_ELEMENT_ID2;
+			ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
+
+			ElemToSelect.style.left = '0px';
+			ElemToSelect.style.top = '100px';
+
+			if(AscBrowser.isMacOs)
+				ElemToSelect.style.width = '1000px';
+			else
+				ElemToSelect.style.width = '10000px';
+
+			ElemToSelect.style.height = '100px';
+			ElemToSelect.style.overflow = 'hidden';
+			ElemToSelect.style.zIndex = -1000;
+			ElemToSelect.style.MozUserSelect = "text";
+			ElemToSelect.style["-khtml-user-select"] = "text";
+			ElemToSelect.style["-o-user-select"] = "text";
+			ElemToSelect.style["user-select"] = "text";
+			ElemToSelect.style["-webkit-user-select"] = "text";
+			ElemToSelect.setAttribute("contentEditable", true);
+
+			ElemToSelect.style.lineHeight = "1px";
+
+			ElemToSelect.oncopy = function(e){
+				var api = window["Asc"]["editor"];
+				if(api.controller.isCellEditMode)
+					return;
+
+				Editor_Copy_Event_Excel(e, ElemToSelect);
+				e.preventDefault();
+			};
+
+			ElemToSelect.oncut = function(e){
+				var api = window["Asc"]["editor"];
+				if(api.controller.isCellEditMode)
+					return;
+
+				Editor_Copy_Event_Excel(e, ElemToSelect, true);
+				e.preventDefault();
+			};
+
+			ElemToSelect.onpaste = function(e){
+				var api = window["Asc"]["editor"];
+				var wb = api.wb;
+				var ws = wb.getWorksheet();
+
+				wb.clipboard._bodyPaste(ws,e);
+				e.preventDefault();
+			};
+
+			ElemToSelect["onbeforecut"] = function(e){
+				var api = window["Asc"]["editor"];
+				if(api.controller.isCellEditMode)
+					return;
+
+				var selection = window.getSelection();
+				var rangeToSelect = document.createRange();
+
+				ElemToSelect.innerText = "&nbsp";
+
+				rangeToSelect.selectNodeContents (ElemToSelect);
+
+				selection.removeAllRanges ();
+				selection.addRange (rangeToSelect);
+			};
+
+			ElemToSelect["onbeforecopy"] = function(e){
+				var api = window["Asc"]["editor"];
+				if(api.controller.isCellEditMode)
+					return;
+
+				var selection = window.getSelection();
+				var rangeToSelect = document.createRange();
+
+				ElemToSelect.innerText = "&nbsp";
+
+				rangeToSelect.selectNodeContents (ElemToSelect);
+
+				selection.removeAllRanges ();
+				selection.addRange (rangeToSelect);
+			};
+
+			document.body.appendChild( ElemToSelect );
+
+
+			//******для редактора ячейки
+			var elementText = document.createElement("textarea");
+
+			elementText.id = kElementTextId;
+			elementText.style.position = "absolute";
+
+			if(AscBrowser.isMacOs)
+				ElemToSelect.style.width = '100px';
+			else
+				ElemToSelect.style.width = '10000px';
+
+			elementText.style.height = '100px';
+			elementText.style.left = '0px';
+			elementText.style.top = '100px';
+			elementText.style.overflow = 'hidden';
+			elementText.style.zIndex = -1000;
+			elementText.style.display = ELEMENT_DISPAY_STYLE;
+			elementText.setAttribute("contentEditable", true);
+			elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
+
+			elementText["onbeforecopy"] = function(e){
+				if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+				{
+					var v = api.wb.cellEditor.copySelection();
+					if (v) {api.wb.clipboard.copyCellValue(v);}
+				}
+			};
+
+			elementText["onbeforecut"] = function(e){
+				api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
+				if(isNeedEmptyAfterCut == true)
+				{
+					isNeedEmptyAfterCut = false;
+					if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
+					{
+						var v = api.wb.cellEditor.cutSelection();
+						if (v) {api.wb.clipboard.copyCellValue(v);}
+					}
+				}
+				else
+					isNeedEmptyAfterCut = true;
+			};
+
+			document.body.appendChild(elementText);
+		}
 		
 		/*
 		 * Export
@@ -5103,197 +5352,7 @@
 		window["Asc"].pasteFromBinaryWord = pasteFromBinaryWord;
 		window["Asc"].DocumentContentBounds = DocumentContentBounds;
 
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].SafariIntervalFocus2 = SafariIntervalFocus2;
 	}
 )(jQuery, window);
-
-var COPY_ELEMENT_ID2 = "clipboard-helper";
-
-var kElementTextId = "clipboard-helper-text";
-var isNeedEmptyAfterCut = false;
-
-if (window.USER_AGENT_SAFARI_MACOS)
-{
-	PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
-}
-function SafariIntervalFocus2()
-{
-    var api = window["Asc"]["editor"];
-	if (api)
-    {
-		if((api.wb && api.wb.cellEditor && api.wb.cellEditor != null && api.wb.cellEditor.isTopLineActive) || (api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isSelectionDialogMode))
-			return;
-		var pastebin = document.getElementById(COPY_ELEMENT_ID2);
-		var pastebinText = document.getElementById(kElementTextId);
-		if(pastebinText && (api.wb && api.wb.getCellEditMode()) && api.IsFocus)
-		{
-			pastebinText.focus();
-		}	
-		else if (pastebin && api.IsFocus)
-            pastebin.focus();
-        else if(!pastebin || !pastebinText)
-        {
-            // create
-            Editor_CopyPaste_Create2(api);
-        }
-    }
-}
-
-function Editor_Copy_Event_Excel(e, ElemToSelect, isCut, isAlreadyReadyHtml)
-{	
-	var api = window["Asc"]["editor"];
-	var wb = api.wb;
-	var ws = wb.getWorksheet();
-	
-	var sBase64;
-	if(!isAlreadyReadyHtml)
-	{
-		if (window["AscDesktopEditorButtonMode"] === true && window["AscDesktopEditor"])
-			sBase64 = wb.clipboard._getHtmlBase64(ws.getSelectedRange(), ws, isCut, true);
-		else
-			sBase64 = wb.clipboard.copyRange(ws.getSelectedRange(), ws, isCut, true);
-	}
-		
-
-	if(isCut)
-		ws.emptySelection(c_oAscCleanOptions.All);
-	
-	if(sBase64)
-		e.clipboardData.setData("text/x-custom", sBase64);
-	e.clipboardData.setData("text/html", ElemToSelect.innerHTML);
-	//TODO для вставки в ячейку(пересмотреть!!!)
-	e.clipboardData.setData("text/plain", ElemToSelect.innerText);
-}
-
-function Editor_CopyPaste_Create2(api)
-{
-    var ElemToSelect = document.createElement("div");
-    ElemToSelect.id = COPY_ELEMENT_ID2;
-    ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
-
-    ElemToSelect.style.left = '0px';
-    ElemToSelect.style.top = '100px';
-	
-	if(window.USER_AGENT_MACOS)
-		ElemToSelect.style.width = '1000px';
-	else
-		ElemToSelect.style.width = '10000px';
-		
-    ElemToSelect.style.height = '100px';
-    ElemToSelect.style.overflow = 'hidden';
-    ElemToSelect.style.zIndex = -1000;
-    ElemToSelect.style.MozUserSelect = "text";
-    ElemToSelect.style["-khtml-user-select"] = "text";
-    ElemToSelect.style["-o-user-select"] = "text";
-    ElemToSelect.style["user-select"] = "text";
-    ElemToSelect.style["-webkit-user-select"] = "text";
-    ElemToSelect.setAttribute("contentEditable", true);
-
-    ElemToSelect.style.lineHeight = "1px";
-
-    ElemToSelect.oncopy = function(e){
-		var api = window["Asc"]["editor"];
-		if(api.controller.isCellEditMode)
-			return;
-		
-		Editor_Copy_Event_Excel(e, ElemToSelect);
-		e.preventDefault();
-	};
-	
-	ElemToSelect.oncut = function(e){
-		var api = window["Asc"]["editor"];
-		if(api.controller.isCellEditMode)
-			return;
-		
-		Editor_Copy_Event_Excel(e, ElemToSelect, true);
-		e.preventDefault();
-	};
-	
-	ElemToSelect.onpaste = function(e){
-		var api = window["Asc"]["editor"];
-		var wb = api.wb;
-		var ws = wb.getWorksheet();
-	
-		wb.clipboard._bodyPaste(ws,e);
-		e.preventDefault();
-	};
-
-    ElemToSelect["onbeforecut"] = function(e){
-        var api = window["Asc"]["editor"];
-		if(api.controller.isCellEditMode)
-			return;
-		
-		var selection = window.getSelection();
-		var rangeToSelect = document.createRange();
-
-		ElemToSelect.innerText = "&nbsp";
-		
-        rangeToSelect.selectNodeContents (ElemToSelect);
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    };
-
-    ElemToSelect["onbeforecopy"] = function(e){
-		var api = window["Asc"]["editor"];
-		if(api.controller.isCellEditMode)
-			return;
-		
-		var selection = window.getSelection();
-		var rangeToSelect = document.createRange();
-		
-		ElemToSelect.innerText = "&nbsp";
-
-        rangeToSelect.selectNodeContents (ElemToSelect);
-
-        selection.removeAllRanges ();
-        selection.addRange (rangeToSelect);
-    };
-	
-    document.body.appendChild( ElemToSelect );
-	
-	
-	//******для редактора ячейки
-	var elementText = document.createElement("textarea");
-
-	elementText.id = kElementTextId;
-	elementText.style.position = "absolute";
-
-	if(window.USER_AGENT_MACOS)
-		ElemToSelect.style.width = '100px';
-	else
-		ElemToSelect.style.width = '10000px';
-		
-	elementText.style.height = '100px';
-	elementText.style.left = '0px';
-	elementText.style.top = '100px';
-	elementText.style.overflow = 'hidden';
-	elementText.style.zIndex = -1000;
-	elementText.style.display = ELEMENT_DISPAY_STYLE;
-	elementText.setAttribute("contentEditable", true);
-	elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
-	
-	 elementText["onbeforecopy"] = function(e){
-		if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
-		{
-			var v = api.wb.cellEditor.copySelection();
-			if (v) {api.wb.clipboard.copyCellValue(v);}
-		}	
-    };
-	
-	elementText["onbeforecut"] = function(e){
-		api.wb.clipboard.copyRange(api.wb.getWorksheet().getSelectedRange(), api.wb.getWorksheet());
-		if(isNeedEmptyAfterCut == true)
-		{
-			isNeedEmptyAfterCut = false;
-			if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
-			{
-				var v = api.wb.cellEditor.cutSelection();
-				if (v) {api.wb.clipboard.copyCellValue(v);}
-			}	
-		}
-		else
-			isNeedEmptyAfterCut = true;		
-    };
-
-	document.body.appendChild(elementText);
-}

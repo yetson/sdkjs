@@ -1,4 +1,4 @@
-﻿/*
+/*
  *
  * (c) Copyright Ascensio System Limited 2010-2016
  *
@@ -22,8 +22,15 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
-(function($, window, undefined) {
+"use strict";
+(function(window, undefined) {
+
+      // Import
+      var CellValueType = AscCommon.CellValueType;
+      var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
+      var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+
+      var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
 
     /** @enum */
     var c_oSerFormat = {
@@ -203,7 +210,8 @@
         ConditionalFormatting: 21,
         SheetViews: 22,
         SheetView: 23,
-        SheetPr: 24
+        SheetPr: 24,
+        SparklineGroups: 25
     };
     /** @enum */
     var c_oSerWorksheetPropTypes =
@@ -634,6 +642,40 @@
         TabColor							: 9
     };
     /** @enum */
+    var c_oSer_Sparkline = {
+        SparklineGroup: 0,
+        ManualMax: 1,
+        ManualMin: 2,
+        LineWeight: 3,
+        Type: 4,
+        DateAxis: 5,
+        DisplayEmptyCellsAs: 6,
+        Markers: 7,
+        High: 8,
+        Low: 9,
+        First: 10,
+        Last: 11,
+        Negative: 12,
+        DisplayXAxis: 13,
+        DisplayHidden: 14,
+        MinAxisType: 15,
+        MaxAxisType: 16,
+        RightToLeft: 17,
+        ColorSeries: 18,
+        ColorNegative: 19,
+        ColorAxis: 20,
+        ColorMarkers: 21,
+        ColorFirst: 22,
+        ColorLast: 23,
+        ColorHigh: 24,
+        ColorLow: 25,
+        Ref: 26,
+        Sparklines: 27,
+        Sparkline: 28,
+        SparklineRef: 29,
+        SparklineSqRef: 30
+    };
+    /** @enum */
     var EBorderStyle =
     {
         borderstyleDashDot:  0,
@@ -945,6 +987,21 @@
         Percent: 4,
         Percentile: 5
     };
+      var ESparklineType = {
+          Line: 0,
+          Column: 1,
+          Stacked: 2
+      };
+      var EDispBlanksAs = {
+          Span: 0,
+          Gap: 1,
+          Zero: 2
+      };
+      var SparklineAxisMinMax = {
+          Individual: 0,
+          Group: 1,
+          Custom: 2
+      };
 
     var DocumentPageSize = new function() {
         this.oSizes = [
@@ -1036,6 +1093,19 @@
             return this.oSizes[8];//A4
         };
     };
+
+	function ReadColorSpreadsheet2(bcr, length) {
+		var output = null;
+		var color = new OpenColor();
+		var res = bcr.Read2Spreadsheet(length, function(t,l){
+			return bcr.ReadColorSpreadsheet(t,l, color);
+		});
+		if(null != color.theme)
+			output = g_oColorManager.getThemeColor(color.theme, color.tint);
+		else if(null != color.rgb)
+			output = new RgbColor(0x00ffffff & color.rgb);
+		return output;
+	};
 
     /** @constructor */
     function BinaryTableWriter(memory, aDxfs, isCopyPaste)
@@ -2365,6 +2435,9 @@
                 oBinaryTableWriter = new BinaryTableWriter(this.memory, this.aDxfs, this.isCopyPaste);
                 this.bs.WriteItem(c_oSerWorksheetsTypes.TableParts, function(){oBinaryTableWriter.Write(ws.TableParts);});
             }
+            if (null != ws.sparklineGroups && ws.sparklineGroups.arrSparklineGroup.length > 0) {
+                this.bs.WriteItem(c_oSerWorksheetsTypes.SparklineGroups, function(){oThis.WriteSparklineGroups(ws.sparklineGroups);});
+            }
         };
         this.WriteWorksheetProp = function(ws, index)
         {
@@ -2405,7 +2478,7 @@
             var aIndexes = [];
             for(var i in aCols)
                 aIndexes.push(i - 0);
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             var fInitCol = function(col, nMin, nMax){
                 var oRes = {BestFit: col.BestFit, hd: col.hd, Max: nMax, Min: nMin, xfsid: null, width: col.width, CustomWidth: col.CustomWidth};
                 if(null == oRes.width)
@@ -2542,7 +2615,7 @@
         this.WriteSheetViewPane = function (oPane) {
             var oThis = this;
             // Всегда пишем Frozen
-            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(c_oAscPaneState.Frozen);});
+            this.bs.WriteItem(c_oSer_Pane.State, function(){oThis.memory.WriteString3(AscCommonExcel.c_oAscPaneState.Frozen);});
             this.bs.WriteItem(c_oSer_Pane.TopLeftCell, function(){oThis.memory.WriteString3(oPane.topLeftFrozenCell.getID());});
 
             var col = oPane.topLeftFrozenCell.getCol0();
@@ -2922,7 +2995,7 @@
                 for(var i in ws.aGCells)
                     aIndexes.push(i - 0);
             }
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             for(var i = 0, length = aIndexes.length; i < length; ++i)
             {
                 var row = ws.aGCells[aIndexes[i]];
@@ -2991,7 +3064,7 @@
                 for(var i in row.c)
                     aIndexes.push(i - 0);
             }
-            aIndexes.sort(fSortAscending);
+            aIndexes.sort(AscCommon.fSortAscending);
             for(var i = 0, length = aIndexes.length; i < length; ++i)
             {
                 var cell = row.c[aIndexes[i]];
@@ -3539,7 +3612,116 @@
             var oThis = this;
             for(var i = 0, length = aReplies.length; i < length; ++i)
                 this.bs.WriteItem( c_oSer_CommentData.Reply, function(){oThis.WriteCommentData(aReplies[i]);});
-        }
+        };
+		this.WriteSparklineGroups = function(oSparklineGroups)
+        {
+            var oThis = this;
+            for(var i = 0, length = oSparklineGroups.arrSparklineGroup.length; i < length; ++i)
+                this.bs.WriteItem( c_oSer_Sparkline.SparklineGroup, function(){oThis.WriteSparklineGroup(oSparklineGroups.arrSparklineGroup[i]);});
+        };
+		this.WriteSparklineGroup = function(oSparklineGroup)
+        {
+			var oThis = this;
+			if (null != oSparklineGroup.manualMax) {
+                this.bs.WriteItem( c_oSer_Sparkline.ManualMax, function(){oThis.memory.WriteDouble2(oSparklineGroup.manualMax);});
+			}
+			if (null != oSparklineGroup.manualMin) {
+                this.bs.WriteItem( c_oSer_Sparkline.ManualMin, function(){oThis.memory.WriteDouble2(oSparklineGroup.manualMin);});
+			}
+			if (null != oSparklineGroup.lineWeight) {
+                this.bs.WriteItem( c_oSer_Sparkline.LineWeight, function(){oThis.memory.WriteDouble2(oSparklineGroup.lineWeight);});
+			}
+			if (null != oSparklineGroup.type) {
+                this.bs.WriteItem( c_oSer_Sparkline.Type, function(){oThis.memory.WriteByte(oSparklineGroup.type);});
+			}
+			if (null != oSparklineGroup.dateAxis) {
+                this.bs.WriteItem( c_oSer_Sparkline.DateAxis, function(){oThis.memory.WriteBool(oSparklineGroup.dateAxis);});
+			}
+			if (null != oSparklineGroup.displayEmptyCellsAs) {
+                this.bs.WriteItem( c_oSer_Sparkline.DisplayEmptyCellsAs, function(){oThis.memory.WriteByte(oSparklineGroup.displayEmptyCellsAs);});
+			}
+			if (null != oSparklineGroup.markers) {
+                this.bs.WriteItem( c_oSer_Sparkline.Markers, function(){oThis.memory.WriteBool(oSparklineGroup.markers);});
+			}
+			if (null != oSparklineGroup.high) {
+                this.bs.WriteItem( c_oSer_Sparkline.High, function(){oThis.memory.WriteBool(oSparklineGroup.high);});
+			}
+			if (null != oSparklineGroup.low) {
+                this.bs.WriteItem( c_oSer_Sparkline.Low, function(){oThis.memory.WriteBool(oSparklineGroup.low);});
+			}
+			if (null != oSparklineGroup.first) {
+                this.bs.WriteItem( c_oSer_Sparkline.First, function(){oThis.memory.WriteBool(oSparklineGroup.first);});
+			}
+			if (null != oSparklineGroup.last) {
+                this.bs.WriteItem( c_oSer_Sparkline.Last, function(){oThis.memory.WriteBool(oSparklineGroup.last);});
+			}
+			if (null != oSparklineGroup.negative) {
+                this.bs.WriteItem( c_oSer_Sparkline.Negative, function(){oThis.memory.WriteBool(oSparklineGroup.negative);});
+			}
+			if (null != oSparklineGroup.displayXAxis) {
+                this.bs.WriteItem( c_oSer_Sparkline.DisplayXAxis, function(){oThis.memory.WriteBool(oSparklineGroup.displayXAxis);});
+			}
+			if (null != oSparklineGroup.displayHidden) {
+                this.bs.WriteItem( c_oSer_Sparkline.DisplayHidden, function(){oThis.memory.WriteBool(oSparklineGroup.displayHidden);});
+			}
+			if (null != oSparklineGroup.minAxisType) {
+                this.bs.WriteItem( c_oSer_Sparkline.MinAxisType, function(){oThis.memory.WriteByte(oSparklineGroup.minAxisType);});
+			}
+			if (null != oSparklineGroup.maxAxisType) {
+                this.bs.WriteItem( c_oSer_Sparkline.MaxAxisType, function(){oThis.memory.WriteByte(oSparklineGroup.maxAxisType);});
+			}
+			if (null != oSparklineGroup.rightToLeft) {
+                this.bs.WriteItem( c_oSer_Sparkline.RightToLeft, function(){oThis.memory.WriteBool(oSparklineGroup.rightToLeft);});
+			}
+			if (null != oSparklineGroup.colorSeries) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorSeries, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorSeries);});
+			}
+			if (null != oSparklineGroup.colorNegative) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorNegative, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorNegative);});
+			}
+			if (null != oSparklineGroup.colorAxis) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorAxis, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorAxis);});
+			}
+			if (null != oSparklineGroup.colorMarkers) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorMarkers, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorMarkers);});
+			}
+			if (null != oSparklineGroup.colorFirst) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorFirst, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorFirst);});
+			}
+			if (null != oSparklineGroup.colorLast) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorLast, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorLast);});
+			}
+			if (null != oSparklineGroup.colorHigh) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorHigh, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorHigh);});
+			}
+			if (null != oSparklineGroup.colorLow) {
+                this.bs.WriteItem(c_oSer_Sparkline.ColorLow, function(){oThis.bs.WriteColorSpreadsheet(oSparklineGroup.colorLow);});
+			}
+			if (null != oSparklineGroup.f) {
+                this.memory.WriteByte(c_oSer_Sparkline.Ref);
+                this.memory.WriteString2(oSparklineGroup.f);
+			}
+			if (null != oSparklineGroup.arrSparklines) {
+				this.bs.WriteItem(c_oSer_Sparkline.Sparklines, function(){oThis.WriteSparklines(oSparklineGroup);});
+			}
+		};
+		this.WriteSparklines = function(oSparklineGroup)
+        {
+            var oThis = this;
+            for(var i = 0, length = oSparklineGroup.arrSparklines.length; i < length; ++i)
+                this.bs.WriteItem( c_oSer_Sparkline.Sparkline, function(){oThis.WriteSparkline(oSparklineGroup.arrSparklines[i]);});
+        };
+		this.WriteSparkline = function(oSparkline)
+        {
+			if (null != oSparkline.f) {
+                this.memory.WriteByte(c_oSer_Sparkline.SparklineRef);
+                this.memory.WriteString2(oSparkline.f);
+			}
+			if (null != oSparkline.sqref) {
+				this.memory.WriteByte(c_oSer_Sparkline.SparklineSqRef);
+                this.memory.WriteString2(oSparkline.sqref.getName());
+			}
+		}
     }
     /** @constructor */
     function BinaryOtherTableWriter(memory, wb)
@@ -4210,18 +4392,12 @@
             var oThis = this;
             if ( c_oSerFontTypes.Bold == type )
                 rPr.b = this.stream.GetBool();
-            else if ( c_oSerFontTypes.Color == type )
-            {
-                var color = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, color);
-                });
-                if(null != color.theme)
-                    rPr.c = g_oColorManager.getThemeColor(color.theme, color.tint);
-                else if(null != color.rgb)
-                    rPr.c = new RgbColor(0x00ffffff & color.rgb);
-            }
-            else if ( c_oSerFontTypes.Italic == type )
+            else if ( c_oSerFontTypes.Color == type ){
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (color) {
+					rPr.c = color;
+				}
+			} else if ( c_oSerFontTypes.Italic == type )
                 rPr.i = this.stream.GetBool();
             else if ( c_oSerFontTypes.RFont == type )
                 rPr.fn = this.stream.GetString2LE(length);
@@ -4673,16 +4849,11 @@
                     default :										oBorderProp.setStyle(c_oAscBorderStyles.None);break;
                 }
             }
-            else if ( c_oSerBorderPropTypes.Color == type )
-            {
-                var color = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, color);
-                });
-                if(null != color.theme)
-                    oBorderProp.c = g_oColorManager.getThemeColor(color.theme, color.tint);
-                else if(null != color.rgb)
-                    oBorderProp.c = new RgbColor(0x00ffffff & color.rgb);
+            else if ( c_oSerBorderPropTypes.Color == type ) {
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (null != color) {
+					oBorderProp.c = color;
+				}
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -4833,16 +5004,11 @@
         {
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
-            if ( c_oSerFillTypes.PatternFillBgColor == type )
-            {
-                var color = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, color);
-                });
-                if(null != color.theme)
-                    oFill.bg = g_oColorManager.getThemeColor(color.theme, color.tint);
-                else if(null != color.rgb)
-                    oFill.bg = new RgbColor(0x00ffffff & color.rgb);
+            if ( c_oSerFillTypes.PatternFillBgColor == type ) {
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (null != color) {
+					oFill.bg = color;
+				}
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5131,8 +5297,8 @@
             if ( c_oSerWorkbookPrTypes.Date1904 == type )
             {
                 WorkbookPr.Date1904 = this.stream.GetBool();
-                g_bDate1904 = WorkbookPr.Date1904;
-                c_DateCorrectConst = g_bDate1904?c_Date1904Const:c_Date1900Const;
+                AscCommon.bDate1904 = WorkbookPr.Date1904;
+                AscCommonExcel.c_DateCorrectConst = AscCommon.bDate1904?AscCommonExcel.c_Date1904Const:AscCommonExcel.c_Date1900Const;
             }
             else if ( c_oSerWorkbookPrTypes.DateCompatibility == type )
                 WorkbookPr.DateCompatibility = this.stream.GetBool();
@@ -5435,6 +5601,10 @@
                 oWorksheet.sheetPr = new Asc.asc_CSheetPr();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSheetPr(t, l, oWorksheet.sheetPr);
+                });
+			} else if (c_oSerWorksheetsTypes.SparklineGroups === type) {
+                res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadSparklineGroups(t, l, oWorksheet.sparklineGroups);
                 });
             } else
                 res = c_oSerConstants.ReadUnknown;
@@ -6016,7 +6186,7 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Comment == type )
             {
-                var oCommentCoords = new Asc.asc_CCommentCoords();
+                var oCommentCoords = new AscCommonExcel.asc_CCommentCoords();
                 var aCommentData = [];
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadComment(t,l, oCommentCoords, aCommentData);
@@ -6229,14 +6399,10 @@
                 });
                 oColorScale.aCFVOs.push(oObject);
             } else if (c_oSer_ConditionalFormattingRuleColorScale.Color === type) {
-                oObject = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
-                });
-                if(null != oObject.theme)
-                    oColorScale.aColors.push(g_oColorManager.getThemeColor(oObject.theme, oObject.tint));
-                else if(null != oObject.rgb)
-                    oColorScale.aColors.push(new RgbColor(0x00ffffff & oObject.rgb));
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (null != color) {
+					oColorScale.aColors.push(color);
+				}
             } else
                 res = c_oSerConstants.ReadUnknown;
             return res;
@@ -6252,14 +6418,10 @@
             else if (c_oSer_ConditionalFormattingDataBar.ShowValue === type)
                 oDataBar.ShowValue = this.stream.GetBool();
             else if (c_oSer_ConditionalFormattingDataBar.Color === type) {
-                oObject = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
-                });
-                if(null != oObject.theme)
-                    oDataBar.Color = g_oColorManager.getThemeColor(oObject.theme, oObject.tint);
-                else if(null != oObject.rgb)
-                    oDataBar.Color = new RgbColor(0x00ffffff & oObject.rgb);
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (color) {
+					oDataBar.Color = color;
+				}
             } else if (c_oSer_ConditionalFormattingDataBar.CFVO === type) {
                 oObject = new Asc.CConditionalFormatValueObject();
                 res = this.bcr.Read1(length, function (t, l) {
@@ -6373,18 +6535,112 @@
             else if (c_oSer_SheetPr.TransitionEvaluation === type)
                 oSheetPr.TransitionEvaluation = this.stream.GetBool();
             else if (c_oSer_SheetPr.TabColor === type) {
-                var oObject = new OpenColor();
-                res = this.bcr.Read2Spreadsheet(length, function(t,l){
-                    return oThis.bcr.ReadColorSpreadsheet(t,l, oObject);
-                });
-                if(null != oObject.theme)
-                    oSheetPr.TabColor = g_oColorManager.getThemeColor(oObject.theme, oObject.tint);
-                else if(null != oObject.rgb)
-                    oSheetPr.TabColor = new RgbColor(0x00ffffff & oObject.rgb);
-            }
-            else
+				var color = ReadColorSpreadsheet2(this.bcr, length);
+				if (color) {
+					oSheetPr.TabColor = color;
+				}
+            } else
                 res = c_oSerConstants.ReadUnknown;
 
+            return res;
+        };
+		this.ReadSparklineGroups = function (type, length, oSparklineGroups) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_Sparkline.SparklineGroup === type) {
+				var newSparklineGroup = new sparklineGroup();
+				res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
+                });
+				oSparklineGroups.arrSparklineGroup.push(newSparklineGroup);
+			} else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+		this.ReadSparklineGroup = function (type, length, oSparklineGroup) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_Sparkline.ManualMax === type) {
+				oSparklineGroup.manualMax = this.stream.GetDoubleLE();
+			} else if (c_oSer_Sparkline.ManualMin === type) {
+				oSparklineGroup.manualMin = this.stream.GetDoubleLE();
+			} else if (c_oSer_Sparkline.LineWeight === type) {
+				oSparklineGroup.lineWeight = this.stream.GetDoubleLE();
+			} else if (c_oSer_Sparkline.Type === type) {
+				oSparklineGroup.type = this.stream.GetUChar();
+			} else if (c_oSer_Sparkline.DateAxis === type) {
+				oSparklineGroup.dateAxis = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.DisplayEmptyCellsAs === type) {
+				oSparklineGroup.displayEmptyCellsAs = this.stream.GetUChar();
+			} else if (c_oSer_Sparkline.Markers === type) {
+				oSparklineGroup.markers = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.High === type) {
+				oSparklineGroup.high = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.Low === type) {
+				oSparklineGroup.low = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.First === type) {
+				oSparklineGroup.first = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.Last === type) {
+				oSparklineGroup.last = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.Negative === type) {
+				oSparklineGroup.negative = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.DisplayXAxis === type) {
+				oSparklineGroup.displayXAxis = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.DisplayHidden === type) {
+				oSparklineGroup.displayHidden = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.MinAxisType === type) {
+				oSparklineGroup.minAxisType = this.stream.GetUChar();
+			} else if (c_oSer_Sparkline.MaxAxisType === type) {
+				oSparklineGroup.maxAxisType = this.stream.GetUChar();
+			} else if (c_oSer_Sparkline.RightToLeft === type) {
+				oSparklineGroup.rightToLeft = this.stream.GetBool();
+			} else if (c_oSer_Sparkline.ColorSeries === type) {
+				oSparklineGroup.colorSeries = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorNegative === type) {
+				oSparklineGroup.colorNegative = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorAxis === type) {
+				oSparklineGroup.colorAxis = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorMarkers === type) {
+				oSparklineGroup.colorMarkers = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorFirst === type) {
+				oSparklineGroup.colorFirst = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorLast === type) {
+				oSparklineGroup.colorLast = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorHigh === type) {
+				oSparklineGroup.colorHigh = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.ColorLow === type) {
+				oSparklineGroup.colorLow = ReadColorSpreadsheet2(this.bcr, length);
+			} else if (c_oSer_Sparkline.Ref === type) {
+				oSparklineGroup.f = this.stream.GetString2LE(length);
+			} else if (c_oSer_Sparkline.Sparklines === type) {
+				res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadSparklines(t, l, oSparklineGroup);
+                });
+			} else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+		this.ReadSparklines = function (type, length, oSparklineGroup) {
+            var oThis = this;
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_Sparkline.Sparkline === type) {
+				var newSparkline = new sparkline();
+				res = this.bcr.Read1(length, function (t, l) {
+                    return oThis.ReadSparkline(t, l, newSparkline);
+                });
+				oSparklineGroup.arrSparklines.push(newSparkline);
+			} else
+                res = c_oSerConstants.ReadUnknown;
+            return res;
+        };
+		this.ReadSparkline = function (type, length, oSparkline) {
+            var res = c_oSerConstants.ReadOk;
+            if (c_oSer_Sparkline.SparklineRef === type) {
+				oSparkline.f = this.stream.GetString2LE(length);
+			} else if (c_oSer_Sparkline.SparklineSqRef === type) {
+				oSparkline.setSqref(this.stream.GetString2LE(length));
+			} else
+                res = c_oSerConstants.ReadUnknown;
             return res;
         };
         this.Iso8601ToDate = function(sDate)
@@ -6563,7 +6819,7 @@
                 if(true == api.isUseEmbeddedCutFonts)
                 {
                     var font_cuts = api.FontLoader.embedded_cut_manager;
-                    font_cuts.Url = g_oDocumentUrls.getUrl('fonts/fonts.js');
+                    font_cuts.Url = AscCommon.g_oDocumentUrls.getUrl('fonts/fonts.js');
                     font_cuts.init_cut_fonts(_embedded_fonts);
                     font_cuts.bIsCutFontsUse = true;
                 }
@@ -6601,7 +6857,7 @@
             {
                 var src = this.stream.GetString2LE(length);
                 if(0 != src.indexOf("http:") && 0 != src.indexOf("data:") && 0 != src.indexOf("https:") && 0 != src.indexOf("ftp:") && 0 != src.indexOf("file:"))
-                    oNewMedia.src = g_oDocumentUrls.getImageUrl(src);
+                    oNewMedia.src = AscCommon.g_oDocumentUrls.getImageUrl(src);
                 else
                     oNewMedia.src = src;
             }
@@ -7052,23 +7308,6 @@
                     if(0 == (rowIndex - headerRowCount) % 2)
                     {
                         if(0 == colIndex % 2)
-                            res = styles.rightRowBand1ColBand1LC;
-                        else
-                            res = styles.rightRowBand1ColBand2LC;
-                    }
-                    else
-                    {
-                        if(0 == colIndex % 2)
-                            res = styles.rightRowBand2ColBand1LC;
-                        else
-                            res = styles.rightRowBand2ColBand2LC;
-                    }
-                }
-                else
-                {
-                    if(0 == (rowIndex - headerRowCount) % 2)
-                    {
-                        if(0 == colIndex % 2)
                             res = styles.rightBottomRowBand1ColBand1LC;
                         else
                             res = styles.rightBottomRowBand1ColBand2LC;
@@ -7079,6 +7318,23 @@
                             res = styles.rightBottomRowBand2ColBand1LC;
                         else
                             res = styles.rightBottomRowBand2ColBand2LC;
+                    }
+                }
+                else
+                {
+                    if(0 == (rowIndex - headerRowCount) % 2)
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand1ColBand1LC;
+                        else
+                            res = styles.rightRowBand1ColBand2LC;
+                    }
+                    else
+                    {
+                        if(0 == colIndex % 2)
+                            res = styles.rightRowBand2ColBand1LC;
+                        else
+                            res = styles.rightRowBand2ColBand2LC;
                     }
                 }
             }
@@ -7847,6 +8103,9 @@
     window["Asc"].EFontScheme = EFontScheme;
     window["Asc"].EIconSetType = EIconSetType;
 	window["Asc"].ECfType = ECfType;
+      window["Asc"].ESparklineType = ESparklineType;
+      window["Asc"].EDispBlanksAs = EDispBlanksAs;
+      window["Asc"].SparklineAxisMinMax = SparklineAxisMinMax;
 
     window["Asc"].CTableStyles = CTableStyles;
     window["Asc"].CTableStyle = CTableStyle;
@@ -7856,4 +8115,4 @@
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
 }
-    )(jQuery, window);
+    )(window);

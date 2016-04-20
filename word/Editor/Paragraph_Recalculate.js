@@ -405,6 +405,7 @@ Paragraph.prototype.Prepare_RecalculateObject = function()
 Paragraph.prototype.Start_FromNewPage = function()
 {
     this.Pages.length = 1;
+    this.Pages[0] = new CParaPage(this.X, this.Y, this.XLimit, this.YLimit, 0);
 
     // Добавляем разрыв страницы
     this.Pages[0].Set_EndLine(-1);
@@ -1323,7 +1324,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
             && true === ParaPr.WidowControl
             && CurLine - this.Pages[CurPage].StartLine <= 1
             && CurLine >= 1 && true != PRS.BreakPageLine
-            && ( 0 === RealCurPage && null != this.Get_DocumentPrev() ) )
+            && ( 0 === CurPage && null != this.Get_DocumentPrev() ) )
         {
             // Вызываем данную функцию для удаления картинок с предыдущей страницы
             this.Recalculate_Drawing_AddPageBreak(0, 0, true);
@@ -1676,22 +1677,22 @@ Paragraph.prototype.private_RecalculateLineAlign       = function(CurLine, CurPa
                 // RangeWidth - ширина всего пространства в данном отрезке, а Range.W - ширина занимаемого пространства
                 switch (ParaPr.Jc)
                 {
-                    case align_Left :
+                    case AscCommon.align_Left :
                     {
                         X = Range.X;
                         break;
                     }
-                    case align_Right:
+                    case AscCommon.align_Right:
                     {
                         X = Math.max(Range.X + RangeWidth - Range.W, Range.X);
                         break;
                     }
-                    case align_Center:
+                    case AscCommon.align_Center:
                     {
                         X = Math.max(Range.X + (RangeWidth - Range.W) / 2, Range.X);
                         break;
                     }
-                    case align_Justify:
+                    case AscCommon.align_Justify:
                     {
                         X = Range.X;
 
@@ -1885,7 +1886,7 @@ Paragraph.prototype.private_RecalculateRangeEndPos     = function(PRS, PRP, Dept
     this.Lines[CurLine].Set_RangeEndPos( CurRange, CurPos );
 };
 
-Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
+Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage, NumTab)
 {
     var PRS = this.m_oPRSW;
 
@@ -1906,10 +1907,9 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
         var Tab = ParaPr.Tabs.Get(Index);
         var TabPos = Tab.Pos + PageStart.X;
 
-        // Здесь 0.001 убавляется из-за замечания ниже
-        if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left - 0.001 )
+        if ( true === bCheckLeft && TabPos > PageStart.X + ParaPr.Ind.Left )
         {
-            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
+            TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
             bCheckLeft = false;
         }
 
@@ -1917,9 +1917,8 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
             TabsPos.push( Tab );
     }
 
-    // Здесь 0.001 убавляется из-за замечания ниже
     if ( true === bCheckLeft )
-        TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left - 0.001) );
+        TabsPos.push( new CParaTab(tab_Left, ParaPr.Ind.Left ) );
 
     TabsCount = TabsPos.length;
 
@@ -1929,8 +1928,14 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
         var TempTab = TabsPos[Index];
 
         // TODO: Пока здесь сделаем поправку на погрешность. Когда мы сделаем так, чтобы все наши значения хранились
-        //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть строгое равенство (см. баг 22586)
-        if ( X < TempTab.Pos + PageStart.X + 0.001 )
+        //       в тех же единицах, что и в формате Docx, тогда и здесь можно будет вернуть обычное сравнение (см. баг 22586)
+        //       Разница с NumTab возникла из-за бага 22586, везде нестрогое оставлять нельзя из-за бага 32051.
+
+        var _X1 = (X * 72 * 20) | 0;
+        var _X2 = ((TempTab.Pos + PageStart.X) * 72 * 20) | 0;
+
+        //if (X < TempTab.Pos + PageStart.X)
+        if ((true === NumTab && _X1 <= _X2) || (true !== NumTab && _X1 < _X2))
         {
             Tab = TempTab;
             break;
@@ -1959,8 +1964,7 @@ Paragraph.prototype.private_RecalculateGetTabPos = function(X, ParaPr, CurPage)
     }
     else
     {
-        // Здесь 0.001 добавляется из-за замечания выше
-        NewX = Tab.Pos + PageStart.X + 0.001;
+        NewX = Tab.Pos + PageStart.X;
     }
 
     return { NewX : NewX, TabValue : ( null === Tab ? tab_Left : Tab.Value ), DefaultTab : (null === Tab ? true : false) };
@@ -2177,7 +2181,7 @@ CParaLineMetrics.prototype =
 
         this.LineGap = this.Recalculate_LineGap( ParaPr, this.TextAscent, this.TextDescent );
 
-        if (linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
+        if (Asc.linerule_AtLeast === ParaPr.Spacing.LineRule && (this.Ascent + this.Descent + this.LineGap) > (this.TextAscent + this.TextDescent))
         {
             // В такой ситуации Word располагает текст внизу строки
             this.Ascent  = this.Ascent + this.LineGap;
@@ -2190,12 +2194,12 @@ CParaLineMetrics.prototype =
         var LineGap = 0;
         switch ( ParaPr.Spacing.LineRule )
         {
-            case linerule_Auto:
+            case Asc.linerule_Auto:
             {
                 LineGap = ( TextAscent + TextDescent ) * ( ParaPr.Spacing.Line - 1 );
                 break;
             }
-            case linerule_Exact:
+            case Asc.linerule_Exact:
             {
                 var ExactValue = Math.max( 25.4 / 72, ParaPr.Spacing.Line );
                 LineGap = ExactValue - ( TextAscent + TextDescent );
@@ -2258,7 +2262,7 @@ CParaLineMetrics.prototype =
 
                 break;
             }
-            case linerule_AtLeast:
+            case Asc.linerule_AtLeast:
             {
                 var TargetLineGap = ParaPr.Spacing.Line;
                 var TextLineGap   = TextAscent + TextDescent;
@@ -2697,17 +2701,17 @@ CParagraphRecalculateStateWrap.prototype =
 
                 switch ( NumJc )
                 {
-                    case align_Right:
+                    case AscCommon.align_Right:
                     {
                         NumberingItem.WidthVisible = 0;
                         break;
                     }
-                    case align_Center:
+                    case AscCommon.align_Center:
                     {
                         NumberingItem.WidthVisible = NumberingItem.WidthNum / 2;
                         break;
                     }
-                    case align_Left:
+                    case AscCommon.align_Left:
                     default:
                     {
                         NumberingItem.WidthVisible = NumberingItem.WidthNum;
@@ -2739,7 +2743,7 @@ CParagraphRecalculateStateWrap.prototype =
                     }
                     case numbering_suff_Tab:
                     {
-                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage).NewX;
+                        var NewX = Para.private_RecalculateGetTabPos(X, ParaPr, CurPage, true).NewX;
 
                         NumberingItem.WidthSuff = NewX - X;
 

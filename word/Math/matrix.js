@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 var MATH_MC_JC = MCJC_CENTER;
@@ -330,7 +306,7 @@ function CMatrixBase()
 
     this.Set_DefaultSpace();
 }
-Asc.extendClass(CMatrixBase, CMathBase);
+AscCommon.extendClass(CMatrixBase, CMathBase);
 CMatrixBase.prototype.recalculateSize = function(oMeasure, RPI)
 {
     if(this.RecalcInfo.bProps)
@@ -634,7 +610,7 @@ function CMathMatrix(props)
 {
     CMathMatrix.superclass.constructor.call(this);
 
-	this.Id             = g_oIdCounter.Get_NewId();
+	this.Id             = AscCommon.g_oIdCounter.Get_NewId();
     this.Pr             = new CMathMatrixPr();
 
     this.column         = 0;
@@ -642,9 +618,9 @@ function CMathMatrix(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CMathMatrix, CMatrixBase);
+AscCommon.extendClass(CMathMatrix, CMatrixBase);
 
 CMathMatrix.prototype.ClassType = historyitem_type_matrix;
 CMathMatrix.prototype.kind      = MATH_MATRIX;
@@ -1169,7 +1145,7 @@ function CMathMenuMatrix(MathMatrix)
         this.bHidePlh       = undefined;
     }
 }
-Asc.extendClass(CMathMenuMatrix, CMathMenuBase);
+AscCommon.extendClass(CMathMenuMatrix, CMathMenuBase);
 CMathMenuMatrix.prototype.get_MatrixAlign     = function(){return this.BaseJc;};
 CMathMenuMatrix.prototype.put_MatrixAlign     = function(Align){this.BaseJc = Align;};
 CMathMenuMatrix.prototype.get_ColumnAlign     = function(){return this.ColumnJc;};
@@ -1305,7 +1281,7 @@ function CEqArray(props)
 {
     CEqArray.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
     this.Pr = new CMathEqArrPr();
 
     // for ampersand in Run
@@ -1317,9 +1293,9 @@ function CEqArray(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CEqArray, CMatrixBase);
+AscCommon.extendClass(CEqArray, CMatrixBase);
 
 CEqArray.prototype.ClassType = historyitem_type_eqArr;
 CEqArray.prototype.kind      = MATH_EQ_ARRAY;
@@ -1347,17 +1323,15 @@ CEqArray.prototype.getColsCount = function()
 };
 CEqArray.prototype.Resize = function(oMeasure, RPI)
 {
-    // на случай, чтобы не затереть массив
-    //var CurrAmperWPoints = RPI.AmperWPoints,
-    //    CurrEqArray     = RPI.bEqArray;
-
-    var NewRPI = RPI.Copy();
-    NewRPI.bEqArray = true;
+    var bEqArray = RPI.bEqArray;
+    RPI.bEqArray = true;
 
     for(var i = 0; i < this.nRow; i++)
-        this.elements[i][0].Resize(oMeasure, NewRPI);
+        this.elements[i][0].Resize(oMeasure, RPI);
 
     this.recalculateSize(oMeasure);
+
+    RPI.bEqArray = bEqArray;
 };
 CEqArray.prototype.getMetrics = function()
 {
@@ -1367,7 +1341,6 @@ CEqArray.prototype.getMetrics = function()
 
     // нумерация начинается с нуля, поэтому все четные точки идут с нечетными номерами в массиве
 
-    //var lngW = RPI.Widths.length; // this.nRow
     var EndWidths = 0;
 
     var even, // четная точка
@@ -1684,7 +1657,7 @@ function CMathMenuEqArray(EqArray)
         this.RowGap  = undefined;
     }
 }
-Asc.extendClass(CMathMenuEqArray, CMathMenuBase);
+AscCommon.extendClass(CMathMenuEqArray, CMathMenuBase);
 CMathMenuEqArray.prototype.get_Align    = function(){return this.BaseJc;};
 CMathMenuEqArray.prototype.put_Align    = function(Align){this.BaseJc = Align;};
 CMathMenuEqArray.prototype.get_LineRule = function(){return this.RowRule;};

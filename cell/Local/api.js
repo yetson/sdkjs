@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 /////////////////////////////////////////////////////////
 //////////////        OPEN       ////////////////////////
 /////////////////////////////////////////////////////////
@@ -49,7 +52,7 @@
 	
 	asc['spreadsheet_api'].prototype._OfflineAppDocumentEndLoad = function(_data)
 	{
-		g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
+		AscCommon.g_oIdCounter.m_sUserId = window["AscDesktopEditor"]["CheckUserId"]();
 		if (_data == "")
 		{
 			this.sendEvent("asc_onError", c_oAscError.ID.ConvertationError, c_oAscError.Level.Critical);
@@ -70,8 +73,8 @@
 	asc['spreadsheet_api'].prototype._onNeedParams = function(data) 
 	{
 		var cp = JSON.parse("{\"codepage\":46,\"delimiter\":1}");
-		cp['encodings'] = getEncodingParams();
-		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), c_oAscAdvancedOptionsAction.Open);
+		cp['encodings'] = AscCommon.getEncodingParams();
+		this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, cp), AscCommon.c_oAscAdvancedOptionsAction.Open);
 	};
 	
 	asc['spreadsheet_api'].prototype.asc_addImageDrawingObject = function(url)
@@ -82,7 +85,7 @@
 		if (ws) 
 		{
 			var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-			ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+			ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
 		}
 	};
 	asc['spreadsheet_api'].prototype.asc_showImageFileDialog = function()
@@ -108,12 +111,12 @@ window["asc_initAdvancedOptions"] = function()
 
 window["DesktopOfflineAppDocumentEndLoad"] = function(_url, _data)
 {
-    g_oDocumentUrls.documentUrl = _url;
-	if (g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
+	AscCommon.g_oDocumentUrls.documentUrl = _url;
+	if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("file:") != 0)
 	{
-		if (g_oDocumentUrls.documentUrl.indexOf("/") != 0)
-			g_oDocumentUrls.documentUrl = "/" + g_oDocumentUrls.documentUrl;
-		g_oDocumentUrls.documentUrl = "file://" + g_oDocumentUrls.documentUrl;
+		if (AscCommon.g_oDocumentUrls.documentUrl.indexOf("/") != 0)
+			AscCommon.g_oDocumentUrls.documentUrl = "/" + AscCommon.g_oDocumentUrls.documentUrl;
+		AscCommon.g_oDocumentUrls.documentUrl = "file://" + AscCommon.g_oDocumentUrls.documentUrl;
 	}
 	
     window["Asc"]["editor"]._OfflineAppDocumentEndLoad(_data);
@@ -183,7 +186,7 @@ window["Asc"]['spreadsheet_api'].prototype.onUpdateDocumentModified = function(b
   
 window["Asc"]['spreadsheet_api'].prototype.asc_Save = function (isNoUserSave, isSaveAs)
 {
-	if (this.isChartEditor || c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
+	if (this.isChartEditor || AscCommon.c_oAscAdvancedOptionsAction.None !== this.advancedOptionsAction)
 		return;
     	
 	var t = this;
@@ -220,19 +223,19 @@ window["Asc"]['spreadsheet_api'].prototype.asc_isOffline = function()
 
 window["DesktopOfflineAppDocumentStartSave"] = function(isSaveAs)
 {
-	window["Asc"]["editor"].sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	
 	var _param = "";
 	if (isSaveAs === true)
 		_param += "saveas=true;";
-	if (AscBrowser.isRetina)
+	if (AscCommon.AscBrowser.isRetina)
 		_param += "retina=true;";
 	
 	window["AscDesktopEditor"]["LocalFileSave"](_param);
 };
 window["DesktopOfflineAppDocumentEndSave"] = function(error)
 {
-	window["Asc"]["editor"].sync_EndAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Save);
+	window["Asc"]["editor"].sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.Save);
 	if (0 == error)
 		DesktopOfflineUpdateLocalName(window["Asc"]["editor"]);
 	else
@@ -261,7 +264,7 @@ window["DesktopOfflineAppDocumentAddImageEnd"] = function(url)
     if (ws) 
 	{
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](url);
-        ws.objectRender.addImageDrawingObject(g_oDocumentUrls.getImageUrl(_url) , null);
+        ws.objectRender.addImageDrawingObject(AscCommon.g_oDocumentUrls.getImageUrl(_url) , null);
     }
 };
 

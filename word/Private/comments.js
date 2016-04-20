@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
   if (true === CollaborativeEditing.Get_GlobalLock()) {
@@ -34,7 +34,7 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
   }
 
   // Комментарий без цитаты позволяем добавить всегда
-  if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content)) {
+  if (true !== this.can_AddQuotedComment() || false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content)) {
     var CommentData = new CCommentData();
     CommentData.Read_FromAscCommentData(AscCommentData);
 
@@ -47,3 +47,4 @@ asc_docs_api.prototype.asc_addComment = function(AscCommentData) {
     return Comment.Get_Id();
   }
 };
+asc_docs_api.prototype['asc_addComment'] = asc_docs_api.prototype.asc_addComment;

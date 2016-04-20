@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var g_oTableId = AscCommon.g_oTableId;
+
 function Slide(presentation, slideLayout, slideNum)
 {
     this.kind = SLIDE_KIND;
@@ -59,7 +62,7 @@ function Slide(presentation, slideLayout, slideNum)
     this.writecomments = [];
     this.maxId = 1000;
 
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
 
     this.commentX = 0;
     this.commentY = 0;
@@ -71,8 +74,8 @@ function Slide(presentation, slideLayout, slideNum)
     this.transitionLock = null;
     this.layoutLock     = null;
 
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
     if(presentation)
@@ -694,9 +697,9 @@ Slide.prototype =
                 }
                 if(typeof CollaborativeEditing !== "undefined")
                 {
-                    if(Fill && Fill.fill && Fill.fill.type === FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
+                    if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                     {
-						CollaborativeEditing.Add_NewImage(getFullImageSrc2(Fill.fill.RasterImageId));
+						CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
                     }
                 }
                 break;
@@ -714,14 +717,14 @@ Slide.prototype =
             {
                 var Pos = readLong(r);
                 var Item = readObject(r);
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Add, Pos );
+                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Pos );
                 this.cSld.spTree.splice(ChangesPos, 0, Item);
                 break;
             }
             case historyitem_SlideRemoveFromSpTree:
             {
                 var Pos = readLong(r);
-                var ChangesPos = this.m_oContentChanges.Check( contentchanges_Remove, Pos );
+                var ChangesPos = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, Pos );
                 if(!(ChangesPos === false))
                 {
                     this.cSld.spTree.splice(ChangesPos, 1);
@@ -927,7 +930,7 @@ Slide.prototype =
     {
         if(this.cSld.Bg && this.cSld.Bg.bgPr && this.cSld.Bg.bgPr.Fill && this.cSld.Bg.bgPr.Fill.fill instanceof  CBlipFill && typeof this.cSld.Bg.bgPr.Fill.fill.RasterImageId === "string" )
         {
-            images[getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
+            images[AscCommon.getFullImageSrc2(this.cSld.Bg.bgPr.Fill.fill.RasterImageId)] = true;
         }
         for(var i = 0; i < this.cSld.spTree.length; ++i)
         {
@@ -1256,7 +1259,7 @@ Slide.prototype =
       //  var sp_tree = this.cSld.spTree;
       //  for(var i = 0; i < sp_tree.length; ++i)
       //  {
-      //      if(sp_tree[i].Lock.Type !== locktype_Mine && sp_tree[i].Lock.Type !== locktype_None)
+      //      if(sp_tree[i].Lock.Type !== locktype_Mine && sp_tree[i].Lock.Type !== AscCommon.locktype_None)
       //          return true;
       //  }
         return false;
@@ -1410,8 +1413,8 @@ Slide.prototype =
 function PropLocker(objectId)
 {
     this.objectId = null;
-    this.Lock = new CLock();
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 
     if(typeof  objectId === "string")
@@ -1541,9 +1544,9 @@ CTextBody.prototype.checkCurrentPlaceholder = function()
 function SlideComments(slide)
 {
     this.comments = [];
-    this.m_oContentChanges = new CContentChanges(); // список изменений(добавление/удаление элементов)
+    this.m_oContentChanges = new AscCommon.CContentChanges(); // список изменений(добавление/удаление элементов)
     this.slide = slide;
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
     g_oTableId.Add(this, this.Id);
 }
 
@@ -1692,7 +1695,7 @@ SlideComments.prototype =
             {
                 var pos = r.GetLong();
                 var id = r.GetString2();
-                var pos2 = this.m_oContentChanges.Check( contentchanges_Add, pos);
+                var pos2 = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, pos);
                 this.comments.splice(pos2, 0,  g_oTableId.Get_ById(id));
                 this.comments[pos2].slideComments = this;
                 editor.sync_AddComment( id, this.comments[pos2].Data);
@@ -1701,7 +1704,7 @@ SlideComments.prototype =
             case historyitem_SlideCommentsRemoveComment:
             {
                 var pos = r.GetLong();
-                var pos2 = this.m_oContentChanges.Check( contentchanges_Remove, pos);
+                var pos2 = this.m_oContentChanges.Check( AscCommon.contentchanges_Remove, pos);
 
                 var comment = this.comments.splice(pos2, 1)[0];
                 editor.sync_RemoveComment(comment.Id);

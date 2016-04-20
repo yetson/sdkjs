@@ -22,7 +22,11 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
+
+// Import
+var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
+var c_oAscTickMark = Asc.c_oAscTickMark;
 
 function ChartPreviewManager() {
 	this.previewGroups = [];
@@ -273,7 +277,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 {
 	return ExecuteNoHistory(function()
 	{
-		var settings = new asc_ChartSettings();
+		var settings = new AscCommon.asc_ChartSettings();
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
 		var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
@@ -295,34 +299,34 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		chart_space.spPr.xfrm.setOffY(0);
 		chart_space.spPr.xfrm.setExtX(50);
 		chart_space.spPr.xfrm.setExtY(50);
-		settings.putTitle(c_oAscChartTitleShowSettings.none);
-		settings.putHorAxisLabel(c_oAscChartTitleShowSettings.none);
-		settings.putVertAxisLabel(c_oAscChartTitleShowSettings.none);
-		settings.putLegendPos(c_oAscChartLegendShowSettings.none);
-		settings.putHorGridLines(c_oAscGridLinesSettings.none);
-		settings.putVertGridLines(c_oAscGridLinesSettings.none);
+		settings.putTitle(Asc.c_oAscChartTitleShowSettings.none);
+		settings.putHorAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
+		settings.putVertAxisLabel(Asc.c_oAscChartTitleShowSettings.none);
+		settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.none);
+		settings.putHorGridLines(Asc.c_oAscGridLinesSettings.none);
+		settings.putVertGridLines(Asc.c_oAscGridLinesSettings.none);
 
 
-		var val_ax_props = new asc_ValAxisSettings();
-		val_ax_props.putMinValRule(c_oAscValAxisRule.auto);
-		val_ax_props.putMaxValRule(c_oAscValAxisRule.auto);
-		val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		var val_ax_props = new AscCommon.asc_ValAxisSettings();
+		val_ax_props.putMinValRule(Asc.c_oAscValAxisRule.auto);
+		val_ax_props.putMaxValRule(Asc.c_oAscValAxisRule.auto);
+		val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		val_ax_props.putInvertValOrder(false);
-		val_ax_props.putDispUnitsRule(c_oAscValAxUnits.none);
+		val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
 		val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		val_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
-		val_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+		val_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
 
 
-		var cat_ax_props = new asc_CatAxisSettings();
-		cat_ax_props.putIntervalBetweenLabelsRule(c_oAscBetweenLabelsRule.auto);
-		cat_ax_props.putLabelsPosition(c_oAscLabelsPosition.betweenDivisions);
-		cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		var cat_ax_props = new AscCommon.asc_CatAxisSettings();
+		cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
+		cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
+		cat_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		cat_ax_props.putLabelsAxisDistance(100);
 		cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		cat_ax_props.putIntervalBetweenTick(1);
-		cat_ax_props.putCrossesRule(c_oAscCrossesRule.auto);
+		cat_ax_props.putCrossesRule(Asc.c_oAscCrossesRule.auto);
 		var vert_axis_settings, hor_axis_settings, isScatter;
 		switch(type)
 		{
@@ -439,7 +443,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
             this._canvas_charts.width = this.CHART_PREVIEW_WIDTH_PIX;
             this._canvas_charts.height = this.CHART_PREVIEW_HEIGHT_PIX;
 
-            if (AscBrowser.isRetina) {
+            if (AscCommon.AscBrowser.isRetina) {
                 this._canvas_charts.width <<= 1;
                 this._canvas_charts.height <<= 1;
             }
@@ -496,27 +500,27 @@ function arrReverse(arr) {
 
 function CreateAscColorByIndex(nIndex)
 {
-	var oColor = new asc_CColor();
-	oColor.type = c_oAscColor.COLOR_TYPE_SCHEME;
+	var oColor = new Asc.asc_CColor();
+	oColor.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
 	oColor.value = nIndex;
 	return oColor;
 }
 
 function CreateAscFillByIndex(nIndex)
 {
-	var oAscFill = new CAscFill();
-	oAscFill.type = c_oAscFill.FILL_TYPE_SOLID;
-	oAscFill.fill = new asc_CFillSolid();
+	var oAscFill = new Asc.asc_CShapeFill();
+	oAscFill.type = Asc.c_oAscFill.FILL_TYPE_SOLID;
+	oAscFill.fill = new Asc.asc_CFillSolid();
 	oAscFill.fill.color = CreateAscColorByIndex(nIndex);
 	return oAscFill;
 }
 
 function CreateAscGradFillByIndex(nIndex1, nIndex2, nAngle)
 {
-	var oAscFill = new CAscFill();
-	oAscFill.type = c_oAscFill.FILL_TYPE_GRAD;
-	oAscFill.fill = new asc_CFillGrad();
-	oAscFill.fill.GradType = c_oAscFillGradType.GRAD_LINEAR;
+	var oAscFill = new Asc.asc_CShapeFill();
+	oAscFill.type = Asc.c_oAscFill.FILL_TYPE_GRAD;
+	oAscFill.fill = new Asc.asc_CFillGrad();
+	oAscFill.fill.GradType = Asc.c_oAscFillGradType.GRAD_LINEAR;
 	oAscFill.fill.LinearAngle = nAngle;
 	oAscFill.fill.LinearScale = true;
 	oAscFill.fill.Colors = [CreateAscColorByIndex(nIndex1), CreateAscColorByIndex(nIndex2)];
@@ -686,7 +690,7 @@ TextArtPreviewManager.prototype.getCanvas = function()
 		this.canvas.width = this.canvasWidth;
 		this.canvas.height = this.canvasHeight;
 
-		if (AscBrowser.isRetina) {
+		if (AscCommon.AscBrowser.isRetina) {
 			this.canvas.width <<= 1;
 			this.canvas.height <<= 1;
 		}
@@ -823,7 +827,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 		}
 	}
 	oContent.Set_ApplyToAll(true);
-	oContent.Set_ParagraphAlign(align_Center);
+	oContent.Set_ParagraphAlign(AscCommon.align_Center);
 	oContent.Paragraph_Add(new ParaTextPr({FontSize: 36, Spacing: TextSpacing}));
 	oContent.Set_ApplyToAll(false);
 
@@ -927,7 +931,7 @@ TextArtPreviewManager.prototype.getTAShape = function()
 		}
 		oContent.Set_ApplyToAll(true);
 		oContent.Paragraph_Add(new ParaTextPr({FontSize: 109, RFonts: {Ascii : {Name: "Arial", Index: -1}}}));
-		oContent.Set_ParagraphAlign(align_Center);
+		oContent.Set_ParagraphAlign(AscCommon.align_Center);
 		oContent.Set_ParagraphIndent({FirstLine: 0, Left: 0, Right: 0});
 		oContent.Set_ApplyToAll(false);
 		this.TAShape = oShape;

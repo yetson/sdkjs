@@ -24,6 +24,24 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+// Import
+var AscBrowser = AscCommon.AscBrowser;
+var locktype_None = AscCommon.locktype_None;
+var locktype_Mine = AscCommon.locktype_Mine;
+var locktype_Other = AscCommon.locktype_Other;
+var locktype_Other2 = AscCommon.locktype_Other2;
+var locktype_Other3 = AscCommon.locktype_Other3;
+var contentchanges_Add = AscCommon.contentchanges_Add;
+var CColor = AscCommon.CColor;
+
+var c_oAscFileType = Asc.c_oAscFileType;
+
 if (typeof String.prototype.startsWith != 'function') {
 	String.prototype.startsWith = function (str){
 		return this.indexOf(str) === 0;
@@ -90,17 +108,16 @@ String.prototype.strongMatch = function(regExp){
 
 if (typeof require =="function" && !window["XRegExp"]){window["XRegExp"] = require("xregexp");}
 
-var g_oZipChanges = null;
-var g_sDownloadServiceLocalUrl = "/downloadas";
-var g_sUploadServiceLocalUrl = "/upload";
-var g_sUploadServiceLocalUrlOld = "/uploadold";
-var g_nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
-var g_cCharDelimiter = String.fromCharCode(5);
+var oZipChanges = null;
+var sDownloadServiceLocalUrl = "/downloadas";
+var sUploadServiceLocalUrl = "/upload";
+var sUploadServiceLocalUrlOld = "/uploadold";
+var nMaxRequestLength = 5242880;//5mb <requestLimits maxAllowedContentLength="30000000" /> default 30mb
 
 function getEncodingParams() {
 	var res = [];
-	for(var i = 0; i < c_oAscEncodings.length; ++i) {
-		var encoding = c_oAscEncodings[i];
+	for(var i = 0; i < AscCommon.c_oAscEncodings.length; ++i) {
+		var encoding = AscCommon.c_oAscEncodings[i];
 		var newElem = {'codepage': encoding[0], 'name': encoding[3]};
 		res.push(newElem);
 	}
@@ -109,6 +126,7 @@ function getEncodingParams() {
 function DocumentUrls(){
 	this.urls = {};
 	this.urlsReverse = {};
+  this.documentUrl = "";
 	this.imageCount = 0;
 }
 DocumentUrls.prototype = {
@@ -155,8 +173,8 @@ DocumentUrls.prototype = {
 	getLocal : function(url){
 		if(this.urlsReverse){
 			var res = this.urlsReverse[url];
-			if (!res && typeof editor !== 'undefined' && editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrl)) {
-				res = url.substring(editor.ThemeLoader.ThemesUrl.length);
+			if (!res && typeof editor !== 'undefined' && editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrlAbs)) {
+				res = url.substring(editor.ThemeLoader.ThemesUrlAbs.length);
 			}
 			return res;
 		}
@@ -175,21 +193,21 @@ function OpenFileResult () {
 	this.changes = null;
 }
 
-function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer) {
+function saveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer) {
 	var index = dataContainer.index;
-	if(null == dataContainer.part && (!dataContainer.data || dataContainer.data.length <= g_nMaxRequestLength)){
-		oAdditionalData["savetype"] = c_oAscSaveTypes.CompleteAll;
+	if(null == dataContainer.part && (!dataContainer.data || dataContainer.data.length <= nMaxRequestLength)){
+		oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.CompleteAll;
 	}
 	else{
 		if(0 == index){
-			oAdditionalData["savetype"] = c_oAscSaveTypes.PartStart;
-			dataContainer.count = Math.ceil(dataContainer.data.length / g_nMaxRequestLength);
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.PartStart;
+			dataContainer.count = Math.ceil(dataContainer.data.length / nMaxRequestLength);
 		} else if(index != dataContainer.count - 1){
-			oAdditionalData["savetype"] = c_oAscSaveTypes.Part;
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Part;
 		} else {
-			oAdditionalData["savetype"] = c_oAscSaveTypes.Complete;
+			oAdditionalData["savetype"] = AscCommon.c_oAscSaveTypes.Complete;
 		}
-		dataContainer.part = dataContainer.data.substring(index * g_nMaxRequestLength, (index + 1) * g_nMaxRequestLength);
+		dataContainer.part = dataContainer.data.substring(index * nMaxRequestLength, (index + 1) * nMaxRequestLength);
 	}
 	dataContainer.index++;
 	oAdditionalData["saveindex"] = dataContainer.index;
@@ -197,7 +215,7 @@ function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditional
 		if(null != incomeObject && "ok" == incomeObject["status"]){
 			if(dataContainer.index < dataContainer.count) {
 				oAdditionalData["savekey"] = incomeObject["data"];
-				g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
+        saveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditionalData, dataContainer);
 			} else if(fCallbackRequest){
 				fCallbackRequest(incomeObject);
 			}
@@ -207,7 +225,7 @@ function g_fSaveWithParts(fSendCommand, fCallback, fCallbackRequest, oAdditional
 	}, oAdditionalData, dataContainer);
 }
 
-function g_fLoadFileContent(url, callback) {
+function loadFileContent(url, callback) {
   asc_ajax({
     url: url,
     dataType: "text",
@@ -218,19 +236,19 @@ function g_fLoadFileContent(url, callback) {
   });
 }
 
-function g_fGetJSZipUtils() {
+function getJSZipUtils() {
   return window['JSZipUtils'] ? window['JSZipUtils'] : require('jsziputils');
 }
-function g_fGetImageFromChanges (name) {
+function getImageFromChanges (name) {
 	var file;
 	var ext = GetFileExtension(name);
-	if (null !== ext && g_oZipChanges && (file = g_oZipChanges.files[name])) {
+	if (null !== ext && oZipChanges && (file = oZipChanges.files[name])) {
 		var oFileArray = file.asUint8Array();
 		return 'data:image/' + ext + ';base64,' + Base64Encode(oFileArray, oFileArray.length, 0);
 	}
 	return null;
 }
-function g_fOpenFileCommand(binUrl, changesUrl, Signature, callback) {
+function openFileCommand(binUrl, changesUrl, Signature, callback) {
   var bError = false, oResult = new OpenFileResult(), bEndLoadFile = false, bEndLoadChanges = false;
   var onEndOpen = function() {
     if (bEndLoadFile && bEndLoadChanges) {
@@ -266,7 +284,7 @@ function g_fOpenFileCommand(binUrl, changesUrl, Signature, callback) {
     }
   });
   if (null != changesUrl) {
-    g_fGetJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
+    getJSZipUtils().getBinaryContent(changesUrl, function(err, data) {
       bEndLoadChanges = true;
       if (err) {
         bError = true;
@@ -274,12 +292,12 @@ function g_fOpenFileCommand(binUrl, changesUrl, Signature, callback) {
         return;
       }
 
-      g_oZipChanges = new (require('jszip'))(data);
+      oZipChanges = new (require('jszip'))(data);
       oResult.changes = [];
-      for (var i in g_oZipChanges.files) {
+      for (var i in oZipChanges.files) {
         if (i.endsWith('.json')) {
           // Заглушка на имя файла (стоило его начинать с цифры)
-          oResult.changes[parseInt(i.slice('changes'.length))] = JSON.parse(g_oZipChanges.files[i].asText());
+          oResult.changes[parseInt(i.slice('changes'.length))] = JSON.parse(oZipChanges.files[i].asText());
         }
       }
       onEndOpen();
@@ -288,7 +306,7 @@ function g_fOpenFileCommand(binUrl, changesUrl, Signature, callback) {
     bEndLoadChanges = true;
   }
 }
-function sendCommand2(editor, fCallback, rdata, dataContainer) {
+function sendCommand(editor, fCallback, rdata, dataContainer) {
   //json не должен превышать размера 2097152, иначе при его чтении будет exception
   var docConnectionId = editor.CoAuthoringApi.getDocId();
   if (docConnectionId && docConnectionId !== rdata["id"]) {
@@ -302,7 +320,7 @@ function sendCommand2(editor, fCallback, rdata, dataContainer) {
   rdata["userconnectionid"] = editor.CoAuthoringApi.getUserConnectionId();
   asc_ajax({
     type: 'POST',
-    url: g_sDownloadServiceLocalUrl + '/' + rdata["id"] + '?cmd=' + encodeURIComponent(JSON.stringify(rdata)),
+    url: sDownloadServiceLocalUrl + '/' + rdata["id"] + '?cmd=' + encodeURIComponent(JSON.stringify(rdata)),
     data: dataContainer.part || dataContainer.data,
     contentType: "application/octet-stream",
     error: function() {
@@ -318,25 +336,25 @@ function sendCommand2(editor, fCallback, rdata, dataContainer) {
   });
 }
 
-function g_fMapAscServerErrorToAscError (nServerError) {
-	var nRes = c_oAscError.ID.Unknown;
+function mapAscServerErrorToAscError(nServerError) {
+	var nRes = Asc.c_oAscError.ID.Unknown;
 	switch (nServerError) {
-		case c_oAscServerError.NoError : nRes = c_oAscError.ID.No; break;
+		case c_oAscServerError.NoError : nRes = Asc.c_oAscError.ID.No; break;
 		case c_oAscServerError.TaskQueue :
-		case c_oAscServerError.TaskResult : nRes = c_oAscError.ID.Database; break;
-		case c_oAscServerError.ConvertDownload : nRes = c_oAscError.ID.DownloadError; break;
-		case c_oAscServerError.ConvertTimeout : nRes = c_oAscError.ID.ConvertationTimeout; break;
-		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = c_oAscError.ID.ConvertationPassword; break;
+		case c_oAscServerError.TaskResult : nRes = Asc.c_oAscError.ID.Database; break;
+		case c_oAscServerError.ConvertDownload : nRes = Asc.c_oAscError.ID.DownloadError; break;
+		case c_oAscServerError.ConvertTimeout : nRes = Asc.c_oAscError.ID.ConvertationTimeout; break;
+		case c_oAscServerError.ConvertMS_OFFCRYPTO : nRes = Asc.c_oAscError.ID.ConvertationPassword; break;
 		case c_oAscServerError.ConvertUnknownFormat :
 		case c_oAscServerError.ConvertReadFile :
-		case c_oAscServerError.Convert : nRes = c_oAscError.ID.ConvertationError; break;
-		case c_oAscServerError.UploadContentLength : nRes = c_oAscError.ID.UplImageSize; break;
-		case c_oAscServerError.UploadExtension : nRes = c_oAscError.ID.UplImageExt; break;
-		case c_oAscServerError.UploadCountFiles : nRes = c_oAscError.ID.UplImageFileCount; break;
-		case c_oAscServerError.VKey : nRes = c_oAscError.ID.FileVKey; break;
-		case c_oAscServerError.VKeyEncrypt : nRes = c_oAscError.ID.VKeyEncrypt; break;
-		case c_oAscServerError.VKeyKeyExpire : nRes = c_oAscError.ID.KeyExpire; break;
-		case c_oAscServerError.VKeyUserCountExceed : nRes = c_oAscError.ID.UserCountExceed; break;
+		case c_oAscServerError.Convert : nRes = Asc.c_oAscError.ID.ConvertationError; break;
+		case c_oAscServerError.UploadContentLength : nRes = Asc.c_oAscError.ID.UplImageSize; break;
+		case c_oAscServerError.UploadExtension : nRes = Asc.c_oAscError.ID.UplImageExt; break;
+		case c_oAscServerError.UploadCountFiles : nRes = Asc.c_oAscError.ID.UplImageFileCount; break;
+		case c_oAscServerError.VKey : nRes = Asc.c_oAscError.ID.FileVKey; break;
+		case c_oAscServerError.VKeyEncrypt : nRes = Asc.c_oAscError.ID.VKeyEncrypt; break;
+		case c_oAscServerError.VKeyKeyExpire : nRes = Asc.c_oAscError.ID.KeyExpire; break;
+		case c_oAscServerError.VKeyUserCountExceed : nRes = Asc.c_oAscError.ID.UserCountExceed; break;
 		case c_oAscServerError.Storage :
 		case c_oAscServerError.StorageFileNoFound :
 		case c_oAscServerError.StorageRead :
@@ -346,19 +364,34 @@ function g_fMapAscServerErrorToAscError (nServerError) {
 		case c_oAscServerError.StorageGetInfo :
 		case c_oAscServerError.Upload :
 		case c_oAscServerError.ReadRequestStream :
-		case c_oAscServerError.Unknown : nRes = c_oAscError.ID.Unknown; break;
+		case c_oAscServerError.Unknown : nRes = Asc.c_oAscError.ID.Unknown; break;
 	}
 	return nRes;
 }
 
+function joinUrls(base, relative) {
+    //http://stackoverflow.com/questions/14780350/convert-relative-path-to-absolute-using-javascript
+    var stack = base.split("/"),
+        parts = relative.split("/");
+    stack.pop(); // remove current file name (or empty string)
+                 // (omit if "base" is the current folder without trailing slash)
+    for (var i=0; i<parts.length; i++) {
+        if (parts[i] == ".")
+            continue;
+        if (parts[i] == "..")
+            stack.pop();
+        else
+            stack.push(parts[i]);
+    }
+    return stack.join("/");
+}
 function getFullImageSrc2 (src) {
 	if (window["NATIVE_EDITOR_ENJINE"])
 		return src;
 
 	var start = src.slice(0, 6);
-	if (0 === start.indexOf('theme')){
-		var themesUrl = editor.ThemeLoader ? editor.ThemeLoader.ThemesUrl : undefined;
-		return themesUrl + src;
+	if (0 === start.indexOf('theme') && editor.ThemeLoader){
+		return  editor.ThemeLoader.ThemesUrlAbs + src;
 	}
 
 	if (0 !== start.indexOf('http:') && 0 !== start.indexOf('data:') && 0 !== start.indexOf('https:') &&
@@ -581,11 +614,22 @@ function test_defName(){
     return this;
 }
 
-var cStrucTableLocalColumns = {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"},
-	cBoolLocal = {"t":"TRUE","f":"FALSE"},
+  var cStrucTableReservedWords = {
+    all: "#All", data: "#Data", headers: "#Headers", totals: "#Totals", thisrow: "#This Row", at: "@"
+  };
+  var FormulaTablePartInfo = {
+    all: 1,
+    data: 2,
+    headers: 3,
+    totals: 4,
+    thisRow: 5,
+    columns: 6
+  };
+  
+var cStrucTableLocalColumns = null,
+	cBoolLocal = {},
 	cErrorOrigin = {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"},
-	cErrorLocal = {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"};
-
+	cErrorLocal = {};
 
 function build_local_rx(data){
 	build_rx_table_local(data?data["StructureTables"]:null);
@@ -598,7 +642,7 @@ function build_rx_table_local(local){
 	rx_table_local = build_rx_table(local);
 }
 function build_rx_table(local){
-	cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
+  cStrucTableLocalColumns = ( local ? local : {"h": "Headers", "d": "Data", "a": "All", "tr": "This row", "t": "Totals"} );
     var loc_all = cStrucTableLocalColumns['a'],
         loc_headers = cStrucTableLocalColumns['h'],
         loc_data = cStrucTableLocalColumns['d'],
@@ -630,9 +674,12 @@ function build_rx_bool_local(local){
 	rx_bool_local = build_rx_bool(local);
 }
 function build_rx_bool(local){
-	cBoolLocal = ( local ? local : {"t":"TRUE","f":"FALSE"} );
-	var f = cBoolLocal['f'], t = cBoolLocal['t'];
-	build_rx_array_local(local)
+  // ToDo переделать на более правильную реализацию. Не особо правильное копирование
+  local = local ? local : {"t":"TRUE","f":"FALSE"};
+  var t = cBoolLocal['t'] = local['t'];
+  var f = cBoolLocal['f'] = local['f'];
+
+	build_rx_array_local(local);
 	return new RegExp( "^("+t+"|"+f+")([-+*\\/^&%<=>: ;),]|$)","i" );
 }
 
@@ -640,7 +687,17 @@ function build_rx_error_local(local){
 	rx_error_local = build_rx_error(local);
 }
 function build_rx_error(local){
-	cErrorLocal = ( local ? local : {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"} );
+  // ToDo переделать на более правильную реализацию. Не особо правильное копирование
+  local = local ? local : {"nil":"#NULL!","div":"#DIV\/0!","value":"#VALUE!","ref":"#REF!","name":"#NAME\\?","num":"#NUM!","na":"#N\/A","getdata":"#GETTING_DATA","uf":"#UNSUPPORTED_FUNCTION!"};
+	cErrorLocal['nil'] = local['nil'];
+  cErrorLocal['div'] = local['div'];
+  cErrorLocal['value'] = local['value'];
+  cErrorLocal['ref'] = local['ref'];
+  cErrorLocal['name'] = local['name'];
+  cErrorLocal['num'] = local['num'];
+  cErrorLocal['na'] = local['na'];
+  cErrorLocal['getdata'] = local['getdata'];
+  cErrorLocal['uf'] = local['uf'];
 
 	return new RegExp( "^(" + 	cErrorLocal["nil"] 		+ "|" +
 								cErrorLocal["div"] 		+ "|" +
@@ -660,14 +717,9 @@ function build_rx_array_local(localBool, digitSepar, localError){
 function build_rx_array(localBool, digitSepar, localError){
 	return new RegExp("^\\{(([+-]?\\d*(\\d|\\"+digitSepar+")\\d*([eE][+-]?\\d+)?)?(\"((\"\"|[^\"])*)\")?"+
 			          "(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|"+
-			          localBool["t"]+"|"+localBool["f"]+")?["+arrayRowSeparator+"\\"+arrayColSeparator +"]?)*\\}","i");
+			          localBool["t"]+"|"+localBool["f"]+")?["+FormulaSeparators.arrayRowSeparator+"\\"+FormulaSeparators.arrayColSeparator +"]?)*\\}","i");
 
 }
-var c_oEditorId = {
-    Word:0,
-    Spreadsheet:1,
-    Presentation:2
-};
 
 var PostMessageType = {
     UploadImage:0,
@@ -781,11 +833,11 @@ function InitOnMessage (callback) {
 										break;
 									}
 								}
-								callback(c_oAscError.ID.No, firstUrl);
+								callback(Asc.c_oAscError.ID.No, firstUrl);
 							}
 
 						} else
-							callback(g_fMapAscServerErrorToAscError(data["error"]));
+							callback(mapAscServerErrorToAscError(data["error"]));
 					}
 				} catch (err) {
 				}
@@ -799,14 +851,14 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 		fileName = GetUploadInput(function (e) {
 			if (e && e.target && e.target.files) {
 				var nError = ValidateUploadImage(e.target.files);
-				callback(g_fMapAscServerErrorToAscError(nError), e.target.files);
+				callback(mapAscServerErrorToAscError(nError), e.target.files);
 			} else {
-				callback(c_oAscError.ID.Unknown);
+				callback(Asc.c_oAscError.ID.Unknown);
 			}
 		});
 	} else {
 		var frameWindow = GetUploadIFrame();
-		var content = '<html><head></head><body><form action="'+g_sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
+		var content = '<html><head></head><body><form action="'+sUploadServiceLocalUrlOld+'/'+documentId+'/'+documentUserId+'/'+g_oDocumentUrls.getMaxIndex()+'" method="POST" enctype="multipart/form-data"><input id="apiiuFile" name="apiiuFile" type="file" accept="image/*" size="1"><input id="apiiuSubmit" name="apiiuSubmit" type="submit" style="display:none;"></form></body></html>';
 		frameWindow.document.open();
 		frameWindow.document.write(content);
 		frameWindow.document.close();
@@ -818,11 +870,11 @@ function ShowImageFileDialog (documentId, documentUserId, callback, callbackOld)
 			if (e && e.target && e.target.files) {
 				var nError = ValidateUploadImage(e.target.files);
 				if (c_oAscServerError.NoError != nError) {
-					callbackOld(g_fMapAscServerErrorToAscError(nError));
+					callbackOld(mapAscServerErrorToAscError(nError));
 					return;
 				}
 			}
-			callbackOld(c_oAscError.ID.No);
+			callbackOld(Asc.c_oAscError.ID.No);
 			fileSubmit.click();
 		};
 	}
@@ -844,7 +896,7 @@ function InitDragAndDrop (oHtmlElement, callback) {
 			e.preventDefault();
 			var files = e.dataTransfer.files;
 			var nError = ValidateUploadImage(files);
-			callback(g_fMapAscServerErrorToAscError(nError), files);
+			callback(mapAscServerErrorToAscError(nError), files);
 		};
 	}
 }
@@ -852,7 +904,7 @@ function UploadImageFiles (files, documentId, documentUserId, callback) {
 	if (files.length > 0) {
 		var file = files[0];
 		var xhr = new XMLHttpRequest();
-		xhr.open('POST', g_sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex(), true);
+		xhr.open('POST', sUploadServiceLocalUrl + '/' + documentId + '/' + documentUserId + '/' + g_oDocumentUrls.getMaxIndex(), true);
 		xhr.setRequestHeader('Content-Type', file.type || 'application/octet-stream');
 		xhr.onreadystatechange = function() {
 			if (4 == this.readyState) {
@@ -866,14 +918,14 @@ function UploadImageFiles (files, documentId, documentUserId, callback) {
 							break;
 						}
 					}
-					callback(c_oAscError.ID.No, firstUrl);
+					callback(Asc.c_oAscError.ID.No, firstUrl);
 				} else
-					callback(c_oAscError.ID.Unknown);
+					callback(Asc.c_oAscError.ID.Unknown);
 			}
 		};
 		xhr.send(file);
 	} else {
-		callback(c_oAscError.ID.Unknown);
+		callback(Asc.c_oAscError.ID.Unknown);
 	}
 }
 function ValidateUploadImage( files ) {
@@ -897,7 +949,7 @@ function ValidateUploadImage( files ) {
 				if (false == bSupported)
 					nRes = c_oAscServerError.UploadExtension;
 			}
-			if (c_oAscError.ID.No == nRes) {
+			if (Asc.c_oAscError.ID.No == nRes) {
 				var nSize = file.fileSize || file.size;
 				if (nSize && c_oAscImageUploadProp.MaxFileSize < nSize)
 					nRes = c_oAscServerError.UploadContentLength;
@@ -969,14 +1021,30 @@ function GetUploadInput(onchange) {
     return input;
 }
 
-var arrayRowSeparatorDef = ";", arrayColSeparatorDef = ",", digitSeparatorDef = ".", functionArgumentSeparatorDef = ",",
-    arrayRowSeparator = ";", arrayColSeparator = ",", digitSeparator = ".", functionArgumentSeparator = ",";
+  var FormulaSeparators = {
+    arrayRowSeparatorDef : ';',
+    arrayColSeparatorDef : ',',
+    digitSeparatorDef : '.',
+    functionArgumentSeparatorDef: ',',
+    arrayRowSeparator : ';',
+    arrayColSeparator : ',',
+    digitSeparator : '.',
+    functionArgumentSeparator : ','
+  };
+
+var g_oCodeSpace = 32; // Code of space
+var g_arrCodeOperators = [37, 38, 42, 43, 45, 47, 58, 94]; // Code of operators [%, &, *, +, -, /, :, ^]
+var g_oStartCodeOperatorsCompare = 60; // Start code of operators <=>
+var g_oEndCodeOperatorsCompare = 62; // End code of operators <=>
+var g_oCodeLeftParentheses = 40; // Code of (
+var g_oCodeRightParentheses = 41; // Code of )
+var g_oCodeLeftBrace = 123; // Code of )
+var g_oCodeRightBrace = 125; // Code of )
 
 /*Functions that checks of an element in formula*/
 var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A\u008C-\u0091\u0093-\u0094\u0096-\u0097\u0099-\u009A\u009C-\u009F\u00A1-\u00A5\u00A7-\u00A8\u00AA\u00AD\u00AF-\u00BA\u00BC-\u02B8\u02BB-\u02C1\u02C7\u02C9-\u02CB\u02CD\u02D0-\u02D1\u02D8-\u02DB\u02DD\u02E0-\u02E4\u02EE\u0370-\u0373\u0376-\u0377\u037A-\u037D\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u0523\u0531-\u0556\u0559\u0561-\u0587\u05D0-\u05EA\u05F0-\u05F2\u0621-\u064A\u066E-\u066F\u0671-\u06D3\u06D5\u06E5-\u06E6\u06EE-\u06EF\u06FA-\u06FC\u06FF\u0710\u0712-\u072F\u074D-\u07A5\u07B1\u07CA-\u07EA\u07F4-\u07F5\u07FA\u0904-\u0939\u093D\u0950\u0958-\u0961\u0971-\u0972\u097B-\u097F\u0985-\u098C\u098F-\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD\u09CE\u09DC-\u09DD\u09DF-\u09E1\u09F0-\u09F1\u0A05-\u0A0A\u0A0F-\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32-\u0A33\u0A35-\u0A36\u0A38-\u0A39\u0A59-\u0A5C\u0A5E\u0A72-\u0A74\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2-\u0AB3\u0AB5-\u0AB9\u0ABD\u0AD0\u0AE0-\u0AE1\u0B05-\u0B0C\u0B0F-\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32-\u0B33\u0B35-\u0B39\u0B3D\u0B5C-\u0B5D\u0B5F-\u0B61\u0B71\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99-\u0B9A\u0B9C\u0B9E-\u0B9F\u0BA3-\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BD0\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D\u0C58-\u0C59\u0C60-\u0C61\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD\u0CDE\u0CE0-\u0CE1\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D28\u0D2A-\u0D39\u0D3D\u0D60-\u0D61\u0D7A-\u0D7F\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0E01-\u0E3A\u0E40-\u0E4E\u0E81-\u0E82\u0E84\u0E87-\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA-\u0EAB\u0EAD-\u0EB0\u0EB2-\u0EB3\u0EBD\u0EC0-\u0EC4\u0EC6\u0EDC-\u0EDD\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F88-\u0F8B\u1000-\u102A\u103F\u1050-\u1055\u105A-\u105D\u1061\u1065-\u1066\u106E-\u1070\u1075-\u1081\u108E\u10A0-\u10C5\u10D0-\u10FA\u10FC\u1100-\u1159\u115F-\u11A2\u11A8-\u11F9\u1200-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u1676\u1681-\u169A\u16A0-\u16EA\u16EE-\u16F0\u1700-\u170C\u170E-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176C\u176E-\u1770\u1780-\u17B3\u17D7\u17DC\u1820-\u1877\u1880-\u18A8\u18AA\u1900-\u191C\u1950-\u196D\u1970-\u1974\u1980-\u19A9\u19C1-\u19C7\u1A00-\u1A16\u1B05-\u1B33\u1B45-\u1B4B\u1B83-\u1BA0\u1BAE-\u1BAF\u1C00-\u1C23\u1C4D-\u1C4F\u1C5A-\u1C7D\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u200e\u2010\u2013-\u2016\u2018\u201C-\u201D\u2020-\u2021\u2025-\u2027\u2030\u2032-\u2033\u2035\u203B\u2071\u2074\u207F\u2081-\u2084\u2090-\u2094\u2102-\u2103\u2105\u2107\u2109-\u2113\u2115-\u2116\u2119-\u211D\u2121-\u2122\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2153-\u2154\u215B-\u215E\u2160-\u2188\u2190-\u2199\u21D2\u21D4\u2200\u2202-\u2203\u2207-\u2208\u220B\u220F\u2211\u2215\u221A\u221D-\u2220\u2223\u2225\u2227-\u222C\u222E\u2234-\u2237\u223C-\u223D\u2248\u224C\u2252\u2260-\u2261\u2264-\u2267\u226A-\u226B\u226E-\u226F\u2282-\u2283\u2286-\u2287\u2295\u2299\u22A5\u22BF\u2312\u2460-\u24B5\u24D0-\u24E9\u2500-\u254B\u2550-\u2574\u2581-\u258F\u2592-\u2595\u25A0-\u25A1\u25A3-\u25A9\u25B2-\u25B3\u25B6-\u25B7\u25BC-\u25BD\u25C0-\u25C1\u25C6-\u25C8\u25CB\u25CE-\u25D1\u25E2-\u25E5\u25EF\u2605-\u2606\u2609\u260E-\u260F\u261C\u261E\u2640\u2642\u2660-\u2661\u2663-\u2665\u2667-\u266A\u266C-\u266D\u266F\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2C6F\u2C71-\u2C7D\u2C80-\u2CE4\u2D00-\u2D25\u2D30-\u2D65\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u3000-\u3003\u3005-\u3017\u301D-\u301F\u3021-\u3029\u3031-\u3035\u3038-\u303C\u3041-\u3096\u309B-\u309F\u30A1-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31B7\u31F0-\u321C\u3220-\u3229\u3231-\u3232\u3239\u3260-\u327B\u327F\u32A3-\u32A8\u3303\u330D\u3314\u3318\u3322-\u3323\u3326-\u3327\u332B\u3336\u333B\u3349-\u334A\u334D\u3351\u3357\u337B-\u337E\u3380-\u3384\u3388-\u33CA\u33CD-\u33D3\u33D5-\u33D6\u33D8\u33DB-\u33DD\u3400-\u4DB5\u4E00-\u9FC3\uA000-\uA48C\uA500-\uA60C\uA610-\uA61F\uA62A-\uA62B\uA640-\uA65F\uA662-\uA66E\uA680-\uA697\uA722-\uA787\uA78B-\uA78C\uA7FB-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA822\uA840-\uA873\uA882-\uA8B3\uA90A-\uA925\uA930-\uA946\uAA00-\uAA28\uAA40-\uAA42\uAA44-\uAA4B\uAC00-\uD7A3\uE000-\uF848\uF900-\uFA2D\uFA30-\uFA6A\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D\uFB1F-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40-\uFB41\uFB43-\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE30-\uFE31\uFE33-\uFE44\uFE49-\uFE52\uFE54-\uFE57\uFE59-\uFE66\uFE68-\uFE6B\uFE70-\uFE74\uFE76-\uFEFC\uFF01-\uFF5E\uFF61-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC\uFFE0-\uFFE6",
     str_namedSheetsRange = "\u0001-\u0026\u0028-\u0029\u002B-\u002D\u003B-\u003E\u0040\u005E\u0060\u007B-\u007F\u0082\u0084\u008B\u0092\u0095\u0098\u009B\u00A0\u00A6\u00A9\u00AB-\u00AC\u00AE\u00BB\u0378-\u0379\u037E-\u0383\u0387\u038B\u038D\u03A2\u0524-\u0530\u0557-\u0558\u055A-\u0560\u0588-\u0590\u05BE\u05C0\u05C3\u05C6\u05C8-\u05CF\u05EB-\u05EF\u05F3-\u05FF\u0604-\u0605\u0609-\u060A\u060C-\u060D\u061B-\u061E\u0620\u065F\u066A-\u066D\u06D4\u0700-\u070E\u074B-\u074C\u07B2-\u07BF\u07F7-\u07F9\u07FB-\u0900\u093A-\u093B\u094E-\u094F\u0955-\u0957\u0964-\u0965\u0970\u0973-\u097A\u0980\u0984\u098D-\u098E\u0991-\u0992\u09A9\u09B1\u09B3-\u09B5\u09BA-\u09BB\u09C5-\u09C6\u09C9-\u09CA\u09CF-\u09D6\u09D8-\u09DB\u09DE\u09E4-\u09E5\u09FB-\u0A00\u0A04\u0A0B-\u0A0E\u0A11-\u0A12\u0A29\u0A31\u0A34\u0A37\u0A3A-\u0A3B\u0A3D\u0A43-\u0A46\u0A49-\u0A4A\u0A4E-\u0A50\u0A52-\u0A58\u0A5D\u0A5F-\u0A65\u0A76-\u0A80\u0A84\u0A8E\u0A92\u0AA9\u0AB1\u0AB4\u0ABA-\u0ABB\u0AC6\u0ACA\u0ACE-\u0ACF\u0AD1-\u0ADF\u0AE4-\u0AE5\u0AF0\u0AF2-\u0B00\u0B04\u0B0D-\u0B0E\u0B11-\u0B12\u0B29\u0B31\u0B34\u0B3A-\u0B3B\u0B45-\u0B46\u0B49-\u0B4A\u0B4E-\u0B55\u0B58-\u0B5B\u0B5E\u0B64-\u0B65\u0B72-\u0B81\u0B84\u0B8B-\u0B8D\u0B91\u0B96-\u0B98\u0B9B\u0B9D\u0BA0-\u0BA2\u0BA5-\u0BA7\u0BAB-\u0BAD\u0BBA-\u0BBD\u0BC3-\u0BC5\u0BC9\u0BCE-\u0BCF\u0BD1-\u0BD6\u0BD8-\u0BE5\u0BFB-\u0C00\u0C04\u0C0D\u0C11\u0C29\u0C34\u0C3A-\u0C3C\u0C45\u0C49\u0C4E-\u0C54\u0C57\u0C5A-\u0C5F\u0C64-\u0C65\u0C70-\u0C77\u0C80-\u0C81\u0C84\u0C8D\u0C91\u0CA9\u0CB4\u0CBA-\u0CBB\u0CC5\u0CC9\u0CCE-\u0CD4\u0CD7-\u0CDD\u0CDF\u0CE4-\u0CE5\u0CF0\u0CF3-\u0D01\u0D04\u0D0D\u0D11\u0D29\u0D3A-\u0D3C\u0D45\u0D49\u0D4E-\u0D56\u0D58-\u0D5F\u0D64-\u0D65\u0D76-\u0D78\u0D80-\u0D81\u0D84\u0D97-\u0D99\u0DB2\u0DBC\u0DBE-\u0DBF\u0DC7-\u0DC9\u0DCB-\u0DCE\u0DD5\u0DD7\u0DE0-\u0DF1\u0DF4-\u0E00\u0E3B-\u0E3E\u0E4F\u0E5A-\u0E80\u0E83\u0E85-\u0E86\u0E89\u0E8B-\u0E8C\u0E8E-\u0E93\u0E98\u0EA0\u0EA4\u0EA6\u0EA8-\u0EA9\u0EAC\u0EBA\u0EBE-\u0EBF\u0EC5\u0EC7\u0ECE-\u0ECF\u0EDA-\u0EDB\u0EDE-\u0EFF\u0F04-\u0F12\u0F3A-\u0F3D\u0F48\u0F6D-\u0F70\u0F85\u0F8C-\u0F8F\u0F98\u0FBD\u0FCD\u0FD0-\u0FFF\u104A-\u104F\u109A-\u109D\u10C6-\u10CF\u10FB\u10FD-\u10FF\u115A-\u115E\u11A3-\u11A7\u11FA-\u11FF\u1249\u124E-\u124F\u1257\u1259\u125E-\u125F\u1289\u128E-\u128F\u12B1\u12B6-\u12B7\u12BF\u12C1\u12C6-\u12C7\u12D7\u1311\u1316-\u1317\u135B-\u135E\u1361-\u1368\u137D-\u137F\u139A-\u139F\u13F5-\u1400\u166D-\u166E\u1677-\u167F\u169B-\u169F\u16EB-\u16ED\u16F1-\u16FF\u170D\u1715-\u171F\u1735-\u173F\u1754-\u175F\u176D\u1771\u1774-\u177F\u17D4-\u17D6\u17D8-\u17DA\u17DE-\u17DF\u17EA-\u17EF\u17FA-\u180A\u180F\u181A-\u181F\u1878-\u187F\u18AB-\u18FF\u191D-\u191F\u192C-\u192F\u193C-\u193F\u1941-\u1945\u196E-\u196F\u1975-\u197F\u19AA-\u19AF\u19CA-\u19CF\u19DA-\u19DF\u1A1C-\u1AFF\u1B4C-\u1B4F\u1B5A-\u1B60\u1B7D-\u1B7F\u1BAB-\u1BAD\u1BBA-\u1BFF\u1C38-\u1C3F\u1C4A-\u1C4C\u1C7E-\u1CFF\u1DE7-\u1DFD\u1F16-\u1F17\u1F1E-\u1F1F\u1F46-\u1F47\u1F4E-\u1F4F\u1F58\u1F5A\u1F5C\u1F5E\u1F7E-\u1F7F\u1FB5\u1FC5\u1FD4-\u1FD5\u1FDC\u1FF0-\u1FF1\u1FF5\u1FFF\u200e\u2011-\u2012\u2017\u2019-\u201B\u201E-\u201F\u2022-\u2024\u2031\u2034\u2036-\u203A\u203C-\u2043\u2045-\u2051\u2053-\u205E\u2065-\u2069\u2072-\u2073\u207D-\u207E\u208D-\u208F\u2095-\u209F\u20B6-\u20CF\u20F1-\u20FF\u2150-\u2152\u2189-\u218F\u2329-\u232A\u23E8-\u23FF\u2427-\u243F\u244B-\u245F\u269E-\u269F\u26BD-\u26BF\u26C4-\u2700\u2705\u270A-\u270B\u2728\u274C\u274E\u2753-\u2755\u2757\u275F-\u2760\u2768-\u2775\u2795-\u2797\u27B0\u27BF\u27C5-\u27C6\u27CB\u27CD-\u27CF\u27E6-\u27EF\u2983-\u2998\u29D8-\u29DB\u29FC-\u29FD\u2B4D-\u2B4F\u2B55-\u2BFF\u2C2F\u2C5F\u2C70\u2C7E-\u2C7F\u2CEB-\u2CFC\u2CFE-\u2CFF\u2D26-\u2D2F\u2D66-\u2D6E\u2D70-\u2D7F\u2D97-\u2D9F\u2DA7\u2DAF\u2DB7\u2DBF\u2DC7\u2DCF\u2DD7\u2DDF\u2E00-\u2E2E\u2E30-\u2E7F\u2E9A\u2EF4-\u2EFF\u2FD6-\u2FEF\u2FFC-\u2FFF\u3018-\u301C\u3030\u303D\u3040\u3097-\u3098\u30A0\u3100-\u3104\u312E-\u3130\u318F\u31B8-\u31BF\u31E4-\u31EF\u321F\u3244-\u324F\u32FF\u4DB6-\u4DBF\u9FC4-\u9FFF\uA48D-\uA48F\uA4C7-\uA4FF\uA60D-\uA60F\uA62C-\uA63F\uA660-\uA661\uA673-\uA67B\uA67E\uA698-\uA6FF\uA78D-\uA7FA\uA82C-\uA83F\uA874-\uA87F\uA8C5-\uA8CF\uA8DA-\uA8FF\uA92F\uA954-\uA9FF\uAA37-\uAA3F\uAA4E-\uAA4F\uAA5A-\uABFF\uD7A4-\uD7FF\uFA2E-\uFA2F\uFA6B-\uFA6F\uFADA-\uFAFF\uFB07-\uFB12\uFB18-\uFB1C\uFB37\uFB3D\uFB3F\uFB42\uFB45\uFBB2-\uFBD2\uFD3E-\uFD4F\uFD90-\uFD91\uFDC8-\uFDEF\uFDFE-\uFDFF\uFE10-\uFE1F\uFE27-\uFE2F\uFE32\uFE45-\uFE48\uFE53\uFE58\uFE67\uFE6C-\uFE6F\uFE75\uFEFD-\uFEFE\uFF00\uFF5F-\uFF60\uFFBF-\uFFC1\uFFC8-\uFFC9\uFFD0-\uFFD1\uFFD8-\uFFD9\uFFDD-\uFFDF\uFFE7\uFFEF-\uFFF8\uFFFE-\uFFFF",
     rx_operators = /^ *[-+*\/^&%<=>:] */,
-    rx_LG = /^ *[<=>]+ */,
     rx_Lt = /^ *< */,
     rx_Le = /^ *<= */,
     rx_Gt = /^ *> */,
@@ -998,26 +1066,17 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_Comma = /^ *[,;] */,
     rx_arraySeparators = /^ *[,;] */,
 
-    rx_error = build_rx_error(null ),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
-    rx_error_local = build_rx_error_local(null),// /^(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA)/i,
+    rx_error = build_rx_error(null ),
+    rx_error_local = build_rx_error(null),
 
     rx_bool = build_rx_bool(null),
     rx_bool_local = build_rx_bool(null),
     rx_string = /^\"((\"\"|[^\"])*)\"/,
     rx_test_ws_name = new test_ws_name2(),
-    rx_LeftBrace = /^ *\{ */,
-    rx_RightBrace = /^ *\}/,
     rx_space_g = /\s/g,
     rx_space = /\s/,
 	rx_intersect = /^ +/,
     rg_str_allLang = /[A-Za-z\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\xF8-\u02C1\u02C6-\u02D1\u02E0-\u02E4\u02EC\u02EE\u0345\u0370-\u0374\u0376\u0377\u037A-\u037D\u0386\u0388-\u038A\u038C\u038E-\u03A1\u03A3-\u03F5\u03F7-\u0481\u048A-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05B0-\u05BD\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7\u05D0-\u05EA\u05F0-\u05F2\u0610-\u061A\u0620-\u0657\u0659-\u065F\u066E-\u06D3\u06D5-\u06DC\u06E1-\u06E8\u06ED-\u06EF\u06FA-\u06FC\u06FF\u0710-\u073F\u074D-\u07B1\u07CA-\u07EA\u07F4\u07F5\u07FA\u0800-\u0817\u081A-\u082C\u0840-\u0858\u08A0\u08A2-\u08AC\u08E4-\u08E9\u08F0-\u08FE\u0900-\u093B\u093D-\u094C\u094E-\u0950\u0955-\u0963\u0971-\u0977\u0979-\u097F\u0981-\u0983\u0985-\u098C\u098F\u0990\u0993-\u09A8\u09AA-\u09B0\u09B2\u09B6-\u09B9\u09BD-\u09C4\u09C7\u09C8\u09CB\u09CC\u09CE\u09D7\u09DC\u09DD\u09DF-\u09E3\u09F0\u09F1\u0A01-\u0A03\u0A05-\u0A0A\u0A0F\u0A10\u0A13-\u0A28\u0A2A-\u0A30\u0A32\u0A33\u0A35\u0A36\u0A38\u0A39\u0A3E-\u0A42\u0A47\u0A48\u0A4B\u0A4C\u0A51\u0A59-\u0A5C\u0A5E\u0A70-\u0A75\u0A81-\u0A83\u0A85-\u0A8D\u0A8F-\u0A91\u0A93-\u0AA8\u0AAA-\u0AB0\u0AB2\u0AB3\u0AB5-\u0AB9\u0ABD-\u0AC5\u0AC7-\u0AC9\u0ACB\u0ACC\u0AD0\u0AE0-\u0AE3\u0B01-\u0B03\u0B05-\u0B0C\u0B0F\u0B10\u0B13-\u0B28\u0B2A-\u0B30\u0B32\u0B33\u0B35-\u0B39\u0B3D-\u0B44\u0B47\u0B48\u0B4B\u0B4C\u0B56\u0B57\u0B5C\u0B5D\u0B5F-\u0B63\u0B71\u0B82\u0B83\u0B85-\u0B8A\u0B8E-\u0B90\u0B92-\u0B95\u0B99\u0B9A\u0B9C\u0B9E\u0B9F\u0BA3\u0BA4\u0BA8-\u0BAA\u0BAE-\u0BB9\u0BBE-\u0BC2\u0BC6-\u0BC8\u0BCA-\u0BCC\u0BD0\u0BD7\u0C01-\u0C03\u0C05-\u0C0C\u0C0E-\u0C10\u0C12-\u0C28\u0C2A-\u0C33\u0C35-\u0C39\u0C3D-\u0C44\u0C46-\u0C48\u0C4A-\u0C4C\u0C55\u0C56\u0C58\u0C59\u0C60-\u0C63\u0C82\u0C83\u0C85-\u0C8C\u0C8E-\u0C90\u0C92-\u0CA8\u0CAA-\u0CB3\u0CB5-\u0CB9\u0CBD-\u0CC4\u0CC6-\u0CC8\u0CCA-\u0CCC\u0CD5\u0CD6\u0CDE\u0CE0-\u0CE3\u0CF1\u0CF2\u0D02\u0D03\u0D05-\u0D0C\u0D0E-\u0D10\u0D12-\u0D3A\u0D3D-\u0D44\u0D46-\u0D48\u0D4A-\u0D4C\u0D4E\u0D57\u0D60-\u0D63\u0D7A-\u0D7F\u0D82\u0D83\u0D85-\u0D96\u0D9A-\u0DB1\u0DB3-\u0DBB\u0DBD\u0DC0-\u0DC6\u0DCF-\u0DD4\u0DD6\u0DD8-\u0DDF\u0DF2\u0DF3\u0E01-\u0E3A\u0E40-\u0E46\u0E4D\u0E81\u0E82\u0E84\u0E87\u0E88\u0E8A\u0E8D\u0E94-\u0E97\u0E99-\u0E9F\u0EA1-\u0EA3\u0EA5\u0EA7\u0EAA\u0EAB\u0EAD-\u0EB9\u0EBB-\u0EBD\u0EC0-\u0EC4\u0EC6\u0ECD\u0EDC-\u0EDF\u0F00\u0F40-\u0F47\u0F49-\u0F6C\u0F71-\u0F81\u0F88-\u0F97\u0F99-\u0FBC\u1000-\u1036\u1038\u103B-\u103F\u1050-\u1062\u1065-\u1068\u106E-\u1086\u108E\u109C\u109D\u10A0-\u10C5\u10C7\u10CD\u10D0-\u10FA\u10FC-\u1248\u124A-\u124D\u1250-\u1256\u1258\u125A-\u125D\u1260-\u1288\u128A-\u128D\u1290-\u12B0\u12B2-\u12B5\u12B8-\u12BE\u12C0\u12C2-\u12C5\u12C8-\u12D6\u12D8-\u1310\u1312-\u1315\u1318-\u135A\u135F\u1380-\u138F\u13A0-\u13F4\u1401-\u166C\u166F-\u167F\u1681-\u169A\u16A0-\u16EA\u16EE-\u16F0\u1700-\u170C\u170E-\u1713\u1720-\u1733\u1740-\u1753\u1760-\u176C\u176E-\u1770\u1772\u1773\u1780-\u17B3\u17B6-\u17C8\u17D7\u17DC\u1820-\u1877\u1880-\u18AA\u18B0-\u18F5\u1900-\u191C\u1920-\u192B\u1930-\u1938\u1950-\u196D\u1970-\u1974\u1980-\u19AB\u19B0-\u19C9\u1A00-\u1A1B\u1A20-\u1A5E\u1A61-\u1A74\u1AA7\u1B00-\u1B33\u1B35-\u1B43\u1B45-\u1B4B\u1B80-\u1BA9\u1BAC-\u1BAF\u1BBA-\u1BE5\u1BE7-\u1BF1\u1C00-\u1C35\u1C4D-\u1C4F\u1C5A-\u1C7D\u1CE9-\u1CEC\u1CEE-\u1CF3\u1CF5\u1CF6\u1D00-\u1DBF\u1E00-\u1F15\u1F18-\u1F1D\u1F20-\u1F45\u1F48-\u1F4D\u1F50-\u1F57\u1F59\u1F5B\u1F5D\u1F5F-\u1F7D\u1F80-\u1FB4\u1FB6-\u1FBC\u1FBE\u1FC2-\u1FC4\u1FC6-\u1FCC\u1FD0-\u1FD3\u1FD6-\u1FDB\u1FE0-\u1FEC\u1FF2-\u1FF4\u1FF6-\u1FFC\u2071\u207F\u2090-\u209C\u2102\u2107\u210A-\u2113\u2115\u2119-\u211D\u2124\u2126\u2128\u212A-\u212D\u212F-\u2139\u213C-\u213F\u2145-\u2149\u214E\u2160-\u2188\u24B6-\u24E9\u2C00-\u2C2E\u2C30-\u2C5E\u2C60-\u2CE4\u2CEB-\u2CEE\u2CF2\u2CF3\u2D00-\u2D25\u2D27\u2D2D\u2D30-\u2D67\u2D6F\u2D80-\u2D96\u2DA0-\u2DA6\u2DA8-\u2DAE\u2DB0-\u2DB6\u2DB8-\u2DBE\u2DC0-\u2DC6\u2DC8-\u2DCE\u2DD0-\u2DD6\u2DD8-\u2DDE\u2DE0-\u2DFF\u2E2F\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303C\u3041-\u3096\u309D-\u309F\u30A1-\u30FA\u30FC-\u30FF\u3105-\u312D\u3131-\u318E\u31A0-\u31BA\u31F0-\u31FF\u3400-\u4DB5\u4E00-\u9FCC\uA000-\uA48C\uA4D0-\uA4FD\uA500-\uA60C\uA610-\uA61F\uA62A\uA62B\uA640-\uA66E\uA674-\uA67B\uA67F-\uA697\uA69F-\uA6EF\uA717-\uA71F\uA722-\uA788\uA78B-\uA78E\uA790-\uA793\uA7A0-\uA7AA\uA7F8-\uA801\uA803-\uA805\uA807-\uA80A\uA80C-\uA827\uA840-\uA873\uA880-\uA8C3\uA8F2-\uA8F7\uA8FB\uA90A-\uA92A\uA930-\uA952\uA960-\uA97C\uA980-\uA9B2\uA9B4-\uA9BF\uA9CF\uAA00-\uAA36\uAA40-\uAA4D\uAA60-\uAA76\uAA7A\uAA80-\uAABE\uAAC0\uAAC2\uAADB-\uAADD\uAAE0-\uAAEF\uAAF2-\uAAF5\uAB01-\uAB06\uAB09-\uAB0E\uAB11-\uAB16\uAB20-\uAB26\uAB28-\uAB2E\uABC0-\uABEA\uAC00-\uD7A3\uD7B0-\uD7C6\uD7CB-\uD7FB\uF900-\uFA6D\uFA70-\uFAD9\uFB00-\uFB06\uFB13-\uFB17\uFB1D-\uFB28\uFB2A-\uFB36\uFB38-\uFB3C\uFB3E\uFB40\uFB41\uFB43\uFB44\uFB46-\uFBB1\uFBD3-\uFD3D\uFD50-\uFD8F\uFD92-\uFDC7\uFDF0-\uFDFB\uFE70-\uFE74\uFE76-\uFEFC\uFF21-\uFF3A\uFF41-\uFF5A\uFF66-\uFFBE\uFFC2-\uFFC7\uFFCA-\uFFCF\uFFD2-\uFFD7\uFFDA-\uFFDC]/,
-    rg_validBINNumber = /^[01]{1,10}$/,
-    rg_validDEC2BINNumber = /^-?[0-9]{1,3}$/,
-    rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/,
-    rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
-    rg_validHEXNumber = /^[0-9A-F]{1,10}$/i,
-    rg_validOCTNumber = /^[0-7]{1,10}$/,
-    rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" ),
     rx_name = new XRegExp( "^(?<name>" + "[" + str_namedRanges + "][" + str_namedRanges + "\\d.]*)([-+*\\/^&%<=>: ;),]|$)" ),
     rx_defName = new test_defName(),
     rx_arraySeparatorsDef = /^ *[,;] */,
@@ -1028,7 +1087,6 @@ var str_namedRanges = "A-Za-z\u005F\u0080-\u0081\u0083\u0085-\u0087\u0089-\u008A
     rx_array =       /^\{(([+-]?\d*(\d|\.)\d*([eE][+-]?\d+)?)?(\"((\"\"|[^\"])*)\")?(#NULL!|#DIV\/0!|#VALUE!|#REF!|#NAME\?|#NUM!|#UNSUPPORTED_FUNCTION!|#N\/A|#GETTING_DATA|FALSE|TRUE)?[,;]?)*\}/i,
 
 	rx_ControlSymbols = /^ *[\u0000-\u001F\u007F-\u009F] */,
-    rx_sFuncPref = /_xlfn\./i,
 
     emailRe = /^(mailto:)?([a-z0-9'\._-]+@[a-z0-9\.-]+\.[a-z0-9]{2,4})([a-яё0-9\._%+-=\? :&]*)/i,
     ipRe = /^(((https?)|(ftps?)):\/\/)?([\-\wа-яё]*:?[\-\wа-яё]*@)?(((1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9])\.){3}(1[0-9]{2}|2[0-4][0-9]|25[0-5]|[1-9][0-9]|[0-9]))(:\d+)?(\/[%\-\wа-яё]*(\.[\wа-яё]{2,})?(([\wа-яё\-\.\?\\\/+@&#;:`~=%!,\(\)]*)(\.[\wа-яё]{2,})?)*)*\/?/i,
@@ -1047,11 +1105,11 @@ function getUrlType(url) {
   isEmail = checkvalue.strongMatch(emailRe);
   !isvalid && (isvalid = isEmail);
 
-  return isvalid ? (isEmail ? c_oAscUrlType.Email : c_oAscUrlType.Http) : c_oAscUrlType.Invalid;
+  return isvalid ? (isEmail ? AscCommon.c_oAscUrlType.Email : AscCommon.c_oAscUrlType.Http) : AscCommon.c_oAscUrlType.Invalid;
 }
 function prepareUrl(url, type) {
   if (!/(((^https?)|(^ftp)):\/\/)|(^mailto:)/i.test(url)) {
-    url = ( (c_oAscUrlType.Email == type) ? 'mailto:' : 'http://' ) + url;
+    url = ( (AscCommon.c_oAscUrlType.Email == type) ? 'mailto:' : 'http://' ) + url;
   }
 
   return url.replace(new RegExp("%20", 'g'), " ");
@@ -1082,21 +1140,51 @@ parserHelper.prototype.isControlSymbols = function ( formula, start_pos, digitDe
     }
     return false;
 };
-parserHelper.prototype.isOperator = function ( formula, start_pos ) {
-	if (this instanceof parserHelper) {
-		this._reset();
-	}
+parserHelper.prototype.isOperator = function(formula, start_pos) {
+  // ToDo нужно ли это?
+  if (this instanceof parserHelper) {
+    this._reset();
+  }
 
-	var str = formula.substring( start_pos );
-	var match = str.match( rx_operators );
-	if (match != null) {
-		var mt = str.match( rx_LG );
-		if ( mt ) match = mt;
-		this.operand_str = match[0].replace( rx_space_g, "" );
-		this.pCurrPos += match[0].length;
-		return true;
-	}
-	return false;
+  var code, find = false, length = formula.length;
+  while (start_pos !== length) {
+    code = formula.charCodeAt(start_pos);
+    if (-1 !== g_arrCodeOperators.indexOf(code)) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      find = true;
+      break;
+    } else if (g_oStartCodeOperatorsCompare <= code && code <= g_oEndCodeOperatorsCompare) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      while (start_pos !== length) {
+        code = formula.charCodeAt(start_pos);
+        if (g_oStartCodeOperatorsCompare > code || code > g_oEndCodeOperatorsCompare) {
+          break;
+        }
+        this.operand_str += formula[start_pos];
+        ++start_pos;
+      }
+      find = true;
+      break;
+    } else if (code === g_oCodeSpace) {
+      ++start_pos;
+    } else {
+      break;
+    }
+  }
+  if (find) {
+    while (start_pos !== length) {
+      code = formula.charCodeAt(start_pos);
+      if (code !== g_oCodeSpace) {
+        break;
+      }
+      ++start_pos;
+    }
+    this.pCurrPos = start_pos;
+    return true;
+  }
+  return false;
 };
 parserHelper.prototype.isFunc = function ( formula, start_pos ) {
 	if ( this instanceof parserHelper ) {
@@ -1172,18 +1260,19 @@ parserHelper.prototype.is3DRef = function ( formula, start_pos ) {
 	}
 	return [false, null, null];
 };
-parserHelper.prototype.isNextPtg = function ( formula, start_pos, digitDelim ) {
-	if ( this instanceof parserHelper ) {
-		this._reset();
-	}
+parserHelper.prototype.isNextPtg = function(formula, start_pos, digitDelim) {
+  if (this instanceof parserHelper) {
+    this._reset();
+  }
 
-	var subSTR = formula.substring( start_pos ), match;
-	if( subSTR.match( rx_RightParentheses ) == null && subSTR.match( digitDelim?rx_Comma:rx_CommaDef ) == null && subSTR.match( rx_operators ) == null && (match = subSTR.match( rx_intersect )) != null ){
-		this.pCurrPos += match[0].length;
-		this.operand_str = match[0][0];
-		return true;
-	}
-	return false;
+  var subSTR = formula.substring(start_pos), match;
+  if (subSTR.match(rx_RightParentheses) == null && subSTR.match(digitDelim ? rx_Comma : rx_CommaDef) == null &&
+    subSTR.match(rx_operators) == null && (match = subSTR.match(rx_intersect)) != null) {
+    this.pCurrPos += match[0].length;
+    this.operand_str = match[0][0];
+    return true;
+  }
+  return false;
 };
 parserHelper.prototype.isNumber = function ( formula, start_pos, digitDelim ) {
 	if ( this instanceof parserHelper ) {
@@ -1192,7 +1281,7 @@ parserHelper.prototype.isNumber = function ( formula, start_pos, digitDelim ) {
 
 	var match = (formula.substring( start_pos )).match( digitDelim?rx_number:rx_numberDef );
 	if (match != null) {
-		this.operand_str = match[0].replace(digitSeparator,digitSeparatorDef);
+		this.operand_str = match[0].replace(FormulaSeparators.digitSeparator,FormulaSeparators.digitSeparatorDef);
 		this.pCurrPos += match[0].length;
 
 		return true;
@@ -1204,26 +1293,65 @@ parserHelper.prototype.isLeftParentheses = function ( formula, start_pos ) {
 		this._reset();
 	}
 
-	var match = (formula.substring( start_pos )).match( rx_LeftParentheses );
-	if (match != null) {
-		this.operand_str = match[0].replace( rx_space_g, "" );
-		this.pCurrPos += match[0].length;
-		return true;
-	}
-	return false;
+  var code, find = false, length = formula.length;
+  while (start_pos !== length) {
+    code = formula.charCodeAt(start_pos);
+    if (code === g_oCodeLeftParentheses) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      find = true;
+      break;
+    } else if (code === g_oCodeSpace) {
+      ++start_pos;
+    } else {
+      break;
+    }
+  }
+
+  if (find) {
+    while (start_pos !== length) {
+      code = formula.charCodeAt(start_pos);
+      if (code !== g_oCodeSpace) {
+        break;
+      }
+      ++start_pos;
+    }
+    this.pCurrPos = start_pos;
+    return true;
+  }
+  return false;
 };
 parserHelper.prototype.isRightParentheses = function ( formula, start_pos ) {
 	if ( this instanceof parserHelper ) {
 		this._reset();
 	}
 
-	var match = (formula.substring( start_pos )).match( rx_RightParentheses );
-	if (match != null) {
-		this.operand_str = match[0].replace( rx_space_g, "" );
-		this.pCurrPos += match[0].length;
-		return true;
-	}
-	return false;
+  var code, find = false, length = formula.length;
+  while (start_pos !== length) {
+    code = formula.charCodeAt(start_pos);
+    if (code === g_oCodeRightParentheses) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      find = true;
+      break;
+    } else if (code === g_oCodeSpace) {
+      ++start_pos;
+    } else {
+      break;
+    }
+  }
+
+  if (find) {
+    while (start_pos !== length) {
+      code = formula.charCodeAt(start_pos);
+      if (code !== g_oCodeSpace) {
+        break;
+      }
+      ++start_pos;
+    }
+    this.pCurrPos = start_pos;
+    return true;
+  }
 };
 parserHelper.prototype.isComma = function ( formula, start_pos, digitDelim ) {
 	if ( this instanceof parserHelper ) {
@@ -1327,30 +1455,68 @@ parserHelper.prototype.isArray = function ( formula, start_pos, digitDelim ) {
 	return false;
 };
 parserHelper.prototype.isLeftBrace = function ( formula, start_pos ) {
-	if ( this instanceof parserHelper ) {
-		this._reset();
-	}
+  if ( this instanceof parserHelper ) {
+    this._reset();
+  }
 
-	var match = (formula.substring( start_pos )).match( rx_LeftBrace );
-	if (match != null) {
-		this.operand_str = match[0].replace( /\s/, "" );
-		this.pCurrPos += match[0].length;
-		return true;
-	}
-	return false;
+  var code, find = false, length = formula.length;
+  while (start_pos !== length) {
+    code = formula.charCodeAt(start_pos);
+    if (code === g_oCodeLeftBrace) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      find = true;
+      break;
+    } else if (code === g_oCodeSpace) {
+      ++start_pos;
+    } else {
+      break;
+    }
+  }
+
+  if (find) {
+    while (start_pos !== length) {
+      code = formula.charCodeAt(start_pos);
+      if (code !== g_oCodeSpace) {
+        break;
+      }
+      ++start_pos;
+    }
+    this.pCurrPos = start_pos;
+    return true;
+  }
 };
 parserHelper.prototype.isRightBrace = function ( formula, start_pos ) {
-	if ( this instanceof parserHelper ) {
-		this._reset();
-	}
+  if ( this instanceof parserHelper ) {
+    this._reset();
+  }
 
-	var match = (formula.substring( start_pos )).match( rx_RightBrace );
-	if (match != null) {
-		this.operand_str = match[0].replace( rx_space, "" );
-		this.pCurrPos += match[0].length;
-		return true;
-	}
-	return false;
+  var code, find = false, length = formula.length;
+  while (start_pos !== length) {
+    code = formula.charCodeAt(start_pos);
+    if (code === g_oCodeRightBrace) {
+      this.operand_str = formula[start_pos];
+      ++start_pos;
+      find = true;
+      break;
+    } else if (code === g_oCodeSpace) {
+      ++start_pos;
+    } else {
+      break;
+    }
+  }
+
+  if (find) {
+    while (start_pos !== length) {
+      code = formula.charCodeAt(start_pos);
+      if (code !== g_oCodeSpace) {
+        break;
+      }
+      ++start_pos;
+    }
+    this.pCurrPos = start_pos;
+    return true;
+  }
 };
 parserHelper.prototype.isTable = function ( formula, start_pos, local ){
     if ( this instanceof parserHelper ) {
@@ -1367,7 +1533,7 @@ parserHelper.prototype.isTable = function ( formula, start_pos, local ){
     }
 
     return false;
-}
+};
 // Парсим ссылку на диапазон в листе
 parserHelper.prototype.parse3DRef = function ( formula ) {
 	// Сначала получаем лист
@@ -1413,32 +1579,32 @@ parserHelper.prototype.getEscapeSheetName = function (sheet) {
  * Проверяем ссылку на валидность для диаграммы или автофильтра
  * @param {Workbook} model
  * @param {WorkbookView} wb
- * @param {c_oAscSelectionDialogType} dialogType
+ * @param {Asc.c_oAscSelectionDialogType} dialogType
  * @param {string} dataRange
  * @param {boolean} fullCheck
  * @param {boolean} isRows
- * @param {c_oAscChartTypeSettings} chartType
+ * @param {Asc.c_oAscChartTypeSettings} chartType
  * @returns {*}
  */
 parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRange, fullCheck, isRows, chartType) {
     var sDataRange = dataRange, sheetModel;
-	if (c_oAscSelectionDialogType.Chart === dialogType) {
+	if (Asc.c_oAscSelectionDialogType.Chart === dialogType) {
 		dataRange = parserHelp.parse3DRef(dataRange);
         if(dataRange)
         {
             sheetModel =  model.getWorksheetByName(dataRange.sheet);
         }
 		if (null === dataRange || !sheetModel)
-			return c_oAscError.ID.DataRangeError;
+			return Asc.c_oAscError.ID.DataRangeError;
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange.range);
 	} else
 		dataRange = Asc.g_oRangeCache.getAscRange(dataRange);
 
 	if (null === dataRange)
-		return c_oAscError.ID.DataRangeError;
+		return Asc.c_oAscError.ID.DataRangeError;
 
 	if (fullCheck) {
-		if (c_oAscSelectionDialogType.Chart === dialogType) {
+		if (Asc.c_oAscSelectionDialogType.Chart === dialogType) {
 			// Проверка максимального дипазона
 			var maxSeries = 255;
 			var minStockVal = 4;
@@ -1452,46 +1618,121 @@ parserHelper.prototype.checkDataRange = function (model, wb, dialogType, dataRan
 				intervalValues = dataRange.r2 - dataRange.r1 + 1;
 			}
 
-			if (c_oAscChartTypeSettings.stock === chartType) {
-                var chartSettings = new asc_ChartSettings();
-                chartSettings.putType(c_oAscChartTypeSettings.stock);
+			if (Asc.c_oAscChartTypeSettings.stock === chartType) {
+                var chartSettings = new AscCommon.asc_ChartSettings();
+                chartSettings.putType(Asc.c_oAscChartTypeSettings.stock);
                 chartSettings.putRange(sDataRange);
                 chartSettings.putInColumns(!isRows);
                 var chartSeries = getChartSeries (sheetModel, chartSettings).series;
 				if (minStockVal !== chartSeries.length || !chartSeries[0].Val || !chartSeries[0].Val.NumCache || chartSeries[0].Val.NumCache.length < minStockVal)
-					return c_oAscError.ID.StockChartError;
+					return Asc.c_oAscError.ID.StockChartError;
 			} else if (intervalSeries > maxSeries)
-				return c_oAscError.ID.MaxDataSeriesError;
-		} else if (c_oAscSelectionDialogType.FormatTable === dialogType) {
+				return Asc.c_oAscError.ID.MaxDataSeriesError;
+		} else if (Asc.c_oAscSelectionDialogType.FormatTable === dialogType) {
 			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
 			if (true === wb.getWorksheet().model.autoFilters.isRangeIntersectionTableOrFilter(dataRange))
 				return c_oAscError.ID.AutoFilterDataRangeError;
+		} else if (Asc.c_oAscSelectionDialogType.FormatTableChangeRange === dialogType) {
+			// ToDo убрать эту проверку, заменить на более грамотную после правки функции _searchFilters
+			var checkChangeRange = wb.getWorksheet().af_checkChangeRange(dataRange);
+			if (null !== checkChangeRange)
+				return checkChangeRange;
 		}
 	}
-	return c_oAscError.ID.No;
+	return Asc.c_oAscError.ID.No;
 };
 parserHelper.prototype.setDigitSeparator = function( sep ){
-    if( sep != digitSeparatorDef ){
-        digitSeparator = sep;
-        arrayRowSeparator = ";";
-        arrayColSeparator = "\\";
-        functionArgumentSeparator = ";";
-        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparator +")\\d*([eE][+-]?\\d+)?");
-        rx_Comma = new RegExp("^ *["+functionArgumentSeparator+"] *");
+    if( sep != FormulaSeparators.digitSeparatorDef ){
+      FormulaSeparators.digitSeparator = sep;
+      FormulaSeparators.arrayRowSeparator = ";";
+      FormulaSeparators.arrayColSeparator = "\\";
+      FormulaSeparators.functionArgumentSeparator = ";";
+        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ FormulaSeparators.digitSeparator +")\\d*([eE][+-]?\\d+)?");
+        rx_Comma = new RegExp("^ *["+FormulaSeparators.functionArgumentSeparator+"] *");
 //		build_rx_array_local( cBoolLocal, digitSeparator, null);
-        rx_arraySeparators = new RegExp("^ *["+arrayRowSeparator+"\\"+arrayColSeparator+"] *");
+        rx_arraySeparators = new RegExp("^ *["+FormulaSeparators.arrayRowSeparator+"\\"+FormulaSeparators.arrayColSeparator+"] *");
     }
     else{
-        arrayRowSeparator = arrayRowSeparatorDef;
-        arrayColSeparator = arrayColSeparatorDef;
-        digitSeparator = digitSeparatorDef;
-        functionArgumentSeparator = functionArgumentSeparatorDef;
-        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
-        rx_Comma = new RegExp("^ *["+functionArgumentSeparatorDef+"] *");
+      FormulaSeparators.arrayRowSeparator = FormulaSeparators.arrayRowSeparatorDef;
+      FormulaSeparators.arrayColSeparator = FormulaSeparators.arrayColSeparatorDef;
+      FormulaSeparators.digitSeparator = FormulaSeparators.digitSeparatorDef;
+      FormulaSeparators.functionArgumentSeparator = FormulaSeparators.functionArgumentSeparatorDef;
+        rx_number = new RegExp("^ *[+-]?\\d*(\\d|\\"+ FormulaSeparators.digitSeparatorDef +")\\d*([eE][+-]?\\d+)?");
+        rx_Comma = new RegExp("^ *["+FormulaSeparators.functionArgumentSeparatorDef+"] *");
 //		build_rx_array_local( cBoolLocal, digitSeparatorDef, null);
-        rx_arraySeparators = new RegExp("^ *["+arrayRowSeparatorDef+"\\"+arrayColSeparatorDef+"] *");
+        rx_arraySeparators = new RegExp("^ *["+FormulaSeparators.arrayRowSeparatorDef+"\\"+FormulaSeparators.arrayColSeparatorDef+"] *");
     }
 };
+  parserHelper.prototype.getColumnTypeByName = function(value) {
+    var res;
+    switch (value.toLowerCase()) {
+      case "#" + cStrucTableLocalColumns['a'].toLocaleLowerCase():
+      case cStrucTableReservedWords.all.toLocaleLowerCase():
+        res = FormulaTablePartInfo.all;
+        break;
+      case "#" + cStrucTableLocalColumns['d'].toLocaleLowerCase():
+      case cStrucTableReservedWords.data.toLocaleLowerCase():
+        res = FormulaTablePartInfo.data;
+        break;
+      case "#" + cStrucTableLocalColumns['h'].toLocaleLowerCase():
+      case cStrucTableReservedWords.headers.toLocaleLowerCase():
+        res = FormulaTablePartInfo.headers;
+        break;
+      case "#" + cStrucTableLocalColumns['t'].toLocaleLowerCase():
+      case cStrucTableReservedWords.totals.toLocaleLowerCase():
+        res = FormulaTablePartInfo.totals;
+        break;
+      case "#" + cStrucTableLocalColumns['tr'].toLocaleLowerCase():
+      case cStrucTableReservedWords.at.toLocaleLowerCase():
+      case cStrucTableReservedWords.thisrow.toLocaleLowerCase():
+        res = FormulaTablePartInfo.thisRow;
+        break;
+      default:
+        res = FormulaTablePartInfo.data;
+        break;
+    }
+    return res;
+  };
+  parserHelper.prototype.getColumnNameByType = function(value) {
+    switch (value) {
+      case FormulaTablePartInfo.all:
+      {
+        if (local) {
+          return "#" + cStrucTableLocalColumns['a'];
+        }
+        return cStrucTableReservedWords.all;
+      }
+      case FormulaTablePartInfo.data:
+      {
+        if (local) {
+          return "#" + cStrucTableLocalColumns['d'];
+        }
+        return cStrucTableReservedWords.data;
+      }
+      case FormulaTablePartInfo.headers:
+      {
+        if (local) {
+          return "#" + cStrucTableLocalColumns['h'];
+        }
+        return cStrucTableReservedWords.headers;
+      }
+      case FormulaTablePartInfo.totals:
+      {
+        if (local) {
+          return "#" + cStrucTableLocalColumns['t'];
+        }
+        return cStrucTableReservedWords.totals;
+      }
+      case FormulaTablePartInfo.thisRow:
+      {
+        if (local) {
+          return "#" + cStrucTableLocalColumns['tr'];
+        }
+        return cStrucTableReservedWords.thisrow;
+      }
+    }
+    return null;
+  };
 
 var parserHelp = new parserHelper();
 
@@ -1505,28 +1746,13 @@ else if (AscBrowser.isOpera)
 else
 	kCurFormatPainterWord = "url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAATCAYAAACdkl3yAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAJxJREFUeNrslGEOwBAMhVtxM5yauxnColWJzt+9pFkl9vWlBeac4VINYG4h3vueFUeKIHLOjRTsp+pdKaX6QY2jufripobpzRoB0ro6qdW5I+q3qGxowXONI9LACcBBBMYhA/RuFJxA+WnXK1CBJJg0kKMD2cc8hNKe25P9gxSy01VY3pjdhHYgCCG0RYyR5Bphpk8kMofHjh4BBgA9UXIXw7elTAAAAABJRU5ErkJggg==') 2 11, pointer";
 
-(
-	/**
-	 * @param {Window} window
-	 * @param {undefined} undefined
-	 */
-	function (window, undefined) {
-		/*
-		 * Import
-		 * -----------------------------------------------------------------------------
-		 */
-		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-		function extendClass (Child, Parent) {
-			var F = function() { };
-			F.prototype = Parent.prototype;
-			Child.prototype = new F();
-			Child.prototype.constructor = Child;
-			Child.superclass = Parent.prototype;
-		}
-
-		asc.extendClass = extendClass;
-	}
-)(window);
+  function extendClass (Child, Parent) {
+    var F = function() { };
+    F.prototype = Parent.prototype;
+    Child.prototype = new F();
+    Child.prototype.constructor = Child;
+    Child.superclass = Parent.prototype;
+  }
 
 function asc_ajax (obj) {
 	var url = "", type = "GET",
@@ -1661,11 +1887,23 @@ CIdCounter.prototype.Clear = function()
 
 function CTableId()
 {
-    this.m_aPairs   = {};
+    this.m_aPairs = null;
     this.m_bTurnOff = false;
-    this.Id         = g_oIdCounter.Get_NewId();
-    this.Add(this, this.Id);
+    this.Id = null;
+    this.isInit = false;
 }
+CTableId.prototype.checkInit = function()
+{
+  return this.isInit;
+};
+CTableId.prototype.init = function()
+{
+  this.m_aPairs   = {};
+  this.m_bTurnOff = false;
+  this.Id         = g_oIdCounter.Get_NewId();
+  this.Add(this, this.Id);
+  this.isInit = true;
+};
 CTableId.prototype.Add = function(Class, Id)
 {
     if (false === this.m_bTurnOff)
@@ -1994,6 +2232,51 @@ CTableId.prototype.Load_Changes = function(Reader, Reader2)
 
     switch ( Type )
     {
+        case historyitem_Common_AddWatermark:
+        {
+            var sUrl = Reader.GetString2();
+            if('undefined' != typeof editor && editor.WordControl && editor.WordControl.m_oLogicDocument)
+            {
+                var oLogicDocument = editor.WordControl.m_oLogicDocument;
+                if(oLogicDocument instanceof CDocument)
+                {
+                    var oParaDrawing = oLogicDocument.DrawingObjects.getTrialImage(sUrl);
+                    var oFirstParagraph = oLogicDocument.Get_FirstParagraph();
+                    ExecuteNoHistory(function(){
+                        var oRun = new ParaRun();
+                        oRun.Content.splice(0, 0, oParaDrawing);
+                        oFirstParagraph.Content.splice(0, 0, oRun);
+						oLogicDocument.DrawingObjects.addGraphicObject(oParaDrawing);
+                    }, this, []);
+                }
+                else if(oLogicDocument instanceof CPresentation)
+                {
+                    if(oLogicDocument.Slides[0])
+                    {
+                        var oDrawing = oLogicDocument.Slides[0].graphicObjects.createWatermarkImage(sUrl);
+                        oDrawing.spPr.xfrm.offX = (oLogicDocument.Width - oDrawing.spPr.xfrm.extX)/2;
+                        oDrawing.spPr.xfrm.offY = (oLogicDocument.Height - oDrawing.spPr.xfrm.extY)/2;
+						oDrawing.parent = oLogicDocument.Slides[0];
+                        oLogicDocument.Slides[0].cSld.spTree.push(oDrawing);
+                    }
+                }
+            }
+            else
+            {
+                var oWsModel = window["Asc"]["editor"].wbModel.aWorksheets[0];
+                if(oWsModel)
+                {
+                    var objectRender = new DrawingObjects();
+                    var oNewDrawing = objectRender.createDrawingObject(AscCommon.c_oAscCellAnchorType.cellanchorAbsolute);
+                    var oImage = DrawingObjectsController.prototype.createWatermarkImage(sUrl);
+                    oNewDrawing.ext.cx = oImage.spPr.xfrm.extX;
+                    oNewDrawing.ext.cy = oImage.spPr.xfrm.extY;
+                    oNewDrawing.graphicObject = oImage;
+                    oWsModel.Drawings.push(oNewDrawing);
+                }
+            }
+            break;
+        }
         case historyitem_TableId_Add:
         {
             // String   : Id элемента
@@ -2274,7 +2557,7 @@ CContentChangesElement.prototype.Check_Changes = function(Type, Pos)
 				}
 				else //if ( CurPos === this.m_aPositions[Index] )
 				{
-					if ( contentchanges_Remove === this.m_nType )
+					if ( AscCommon.contentchanges_Remove === this.m_nType )
 					{
 						// Отмечаем, что действия совпали
 						this.m_aPositions[Index] = false;
@@ -2311,6 +2594,9 @@ CContentChangesElement.prototype.Make_ArrayOfSimpleActions = function(Type, Pos,
 var g_oUserColorById = {}, g_oUserNextColorIndex = 0;
 function getUserColorById(userId, userName, isDark, isNumericValue)
 {
+    if ((!userId || "" === userId) && (!userName || "" === userName))
+        return new CColor(0, 0, 0, 255);
+
     var res;
     if (g_oUserColorById.hasOwnProperty(userId))
     {
@@ -2322,7 +2608,7 @@ function getUserColorById(userId, userName, isDark, isNumericValue)
     }
     else
     {
-        var nColor = c_oAscArrUserColors[g_oUserNextColorIndex % c_oAscArrUserColors.length];
+        var nColor = Asc.c_oAscArrUserColors[g_oUserNextColorIndex % Asc.c_oAscArrUserColors.length];
         ++g_oUserNextColorIndex;
 
       res = g_oUserColorById[userId||userName] = new CUserCacheColor(nColor);
@@ -2361,10 +2647,63 @@ CUserCacheColor.prototype.init = function(nColor) {
 };
 
 var g_oIdCounter = new CIdCounter();
-var g_oTableId = null;
+var g_oTableId = new CTableId();
 
 window["SetDoctRendererParams"] = function(_params)
 {
 	if (_params["retina"] === true)
 		AscBrowser.isRetina = true;
 };
+  
+  //------------------------------------------------------------export---------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].getEncodingParams = getEncodingParams;
+  window["AscCommon"].saveWithParts = saveWithParts;
+  window["AscCommon"].loadFileContent = loadFileContent;
+  window["AscCommon"].getImageFromChanges = getImageFromChanges;
+  window["AscCommon"].openFileCommand = openFileCommand;
+  window["AscCommon"].sendCommand = sendCommand;
+  window["AscCommon"].mapAscServerErrorToAscError = mapAscServerErrorToAscError;
+  window["AscCommon"].joinUrls = joinUrls;
+  window["AscCommon"].getFullImageSrc2 = getFullImageSrc2;
+  window["AscCommon"].fSortAscending = fSortAscending;
+  window["AscCommon"].fSortDescending = fSortDescending;
+  window["AscCommon"].fOnlyUnique = fOnlyUnique;
+  window["AscCommon"].isLeadingSurrogateChar = isLeadingSurrogateChar;
+  window["AscCommon"].decodeSurrogateChar = decodeSurrogateChar;
+  window["AscCommon"].encodeSurrogateChar = encodeSurrogateChar;
+  window["AscCommon"].convertUnicodeToUTF16 = convertUnicodeToUTF16;
+  window["AscCommon"].convertUTF16toUnicode = convertUTF16toUnicode;
+  window["AscCommon"].build_local_rx = build_local_rx;
+  window["AscCommon"].changeFileExtention = changeFileExtention;
+  window["AscCommon"].getExtentionByFormat = getExtentionByFormat;
+  window["AscCommon"].InitOnMessage = InitOnMessage;
+  window["AscCommon"].ShowImageFileDialog = ShowImageFileDialog;
+  window["AscCommon"].InitDragAndDrop = InitDragAndDrop;
+  window["AscCommon"].UploadImageFiles = UploadImageFiles;
+  window["AscCommon"].CanDropFiles = CanDropFiles;
+  window["AscCommon"].getUrlType = getUrlType;
+  window["AscCommon"].prepareUrl = prepareUrl;
+  window["AscCommon"].extendClass = extendClass;
+  window["AscCommon"].getUserColorById = getUserColorById;
+
+  window["AscCommon"].DocumentUrls = DocumentUrls;
+  window["AscCommon"].CLock = CLock;
+  window["AscCommon"].CContentChanges = CContentChanges;
+  window["AscCommon"].CContentChangesElement = CContentChangesElement;
+
+  window["AscCommon"].g_oDocumentUrls = g_oDocumentUrls;
+  window["AscCommon"].FormulaTablePartInfo = FormulaTablePartInfo;
+  window["AscCommon"].cBoolLocal = cBoolLocal;
+  window["AscCommon"].cErrorOrigin = cErrorOrigin;
+  window["AscCommon"].cErrorLocal = cErrorLocal;
+  window["AscCommon"].FormulaSeparators = FormulaSeparators;
+  window["AscCommon"].rx_space_g = rx_space_g;
+  window["AscCommon"].rx_space = rx_space;
+  window["AscCommon"].rx_defName = rx_defName;
+
+  window["AscCommon"].kCurFormatPainterWord = kCurFormatPainterWord;
+  window["AscCommon"].parserHelp = parserHelp;
+  window["AscCommon"].g_oIdCounter = g_oIdCounter;
+  window["AscCommon"].g_oTableId = g_oTableId;
+})(window);

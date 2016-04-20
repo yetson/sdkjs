@@ -22,7 +22,13 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 
 var AscBrowser = {
     userAgent : "",
@@ -109,3 +115,8 @@ AscBrowser.checkZoom = function()
 AscBrowser.checkZoom();
 // detect retina (http://habrahabr.ru/post/159419/)
 AscBrowser.isRetina = (Math.abs(2 - (window.devicePixelRatio / AscBrowser.zoom)) < 0.01);
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].AscBrowser = AscBrowser; // ToDo убрать window['AscBrowser']
+})(window);

@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* CellTextRender.js
  *
@@ -69,7 +69,7 @@
 			return this;
 		}
 
-		asc.extendClass(CellTextRender, asc.StringRender);
+		AscCommon.extendClass(CellTextRender, asc.StringRender);
 
 		CellTextRender.prototype.getLinesCount = function () {
 			return this.lines.length;

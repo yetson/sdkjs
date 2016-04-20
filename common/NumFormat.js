@@ -24,6 +24,17 @@
 */
 "use strict";
 
+(/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function(window, undefined) {
+// Import
+var bDate1904 = AscCommon.bDate1904;
+var CellValueType = AscCommon.CellValueType;
+
+var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
+
 var gc_sFormatDecimalPoint = ".";
 var gc_sFormatThousandSeparator = ",";
 
@@ -53,9 +64,6 @@ var numFormat_DecimalPointText = 22;
 //Вспомогательные типы, которые заменятюся в _prepareFormat
 var numFormat_MonthMinute = 101;
 var numFormat_Percent = 102;
-
-//кеш структур по строке формата
-var oNumFormatCache;
 
 var FormatStates = {Decimal: 1, Frac: 2, Scientific: 3, Slash: 4};
 var SignType = {Positive: 1, Negative: 2, Null:3};
@@ -1059,7 +1067,7 @@ NumFormat.prototype =
             ttimes[i-1].val++;
         }
         var stDate, day, month, year, dayWeek;
-		if(g_bDate1904)
+		if(bDate1904)
 		{
 			stDate = new Date(Date.UTC(1904,0,1,0,0,0));
 			if(d.val)
@@ -1389,7 +1397,7 @@ NumFormat.prototype =
     },
     isInvalidDateValue : function(number)
     {
-        return (number == number - 0) && ((number < 0 && false == g_bDate1904) || number > 2958465.9999884);
+        return (number == number - 0) && ((number < 0 && false == bDate1904) || number > 2958465.9999884);
     },
     format: function (number, nValType, dDigitsCount, oAdditionalResult, cultureInfo, bChart)
     {
@@ -1745,7 +1753,7 @@ NumFormat.prototype =
 			if(elem.text)
 				nLen += elem.text.length;
 		}
-		if(nLen > c_oAscMaxColumnWidth){
+		if(nLen > Asc.c_oAscMaxColumnWidth){
 			var oNewFont = new NumFormatFont();
 			oNewFont.repeat = true;
 			res = [{text: "#", format: oNewFont}];
@@ -2008,7 +2016,8 @@ NumFormatCache.prototype =
         this.oNumFormats[format] = res;
     }
 };
-oNumFormatCache = new NumFormatCache();
+//кеш структур по строке формата
+var oNumFormatCache = new NumFormatCache();
 
 function CellFormat(format)
 {
@@ -3414,7 +3423,7 @@ FormatParser.prototype =
 				var nDay;
 				var nMounth;
 				var nYear;
-				if(g_bDate1904)
+				if(bDate1904)
 				{
 					nDay = 1;
 					nMounth = 0;
@@ -3482,7 +3491,7 @@ FormatParser.prototype =
 				}
 				if(true == bValidDate && (true == bDate || true == bTime))
 				{
-					if(g_bDate1904)
+					if(bDate1904)
 						dValue = (Date.UTC(nYear,nMounth,nDay,nHour,nMinute,nSecond) - Date.UTC(1904,0,1,0,0,0)) / (86400 * 1000);
 					else
 					{
@@ -3556,6 +3565,9 @@ FormatParser.prototype =
 var g_oFormatParser = new FormatParser();
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+}
+function setCurrentCultureInfo(val) {
+    AscCommon.g_oDefaultCultureInfo = g_oDefaultCultureInfo = g_aCultureInfos[val];
 }
 var g_aCultureInfos = {
     1: { LCID: 1, Name: "ar", CurrencyPositivePattern: 2, CurrencyNegativePattern: 3, CurrencySymbol: "ر.س.‏", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], AbbreviatedDayNames: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"], MonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], AbbreviatedMonthNames: ["محرم", "صفر", "ربيع الأول", "ربيع الثاني", "جمادى الأولى", "جمادى الثانية", "رجب", "شعبان", "رمضان", "شوال", "ذو القعدة", "ذو الحجة", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "ص", PMDesignator: "م", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" },
@@ -3912,3 +3924,20 @@ var g_aCultureInfos = {
     31848: { LCID: 31848, Name: "ha-Latn", CurrencyPositivePattern: 2, CurrencyNegativePattern: 2, CurrencySymbol: "N", NumberDecimalSeparator: ".", NumberGroupSeparator: ",", NumberGroupSizes: [3], DayNames: ["Lahadi", "Litinin", "Talata", "Laraba", "Alhamis", "Juma'a", "Asabar"], AbbreviatedDayNames: ["Lah", "Lit", "Tal", "Lar", "Alh", "Jum", "Asa"], MonthNames: ["Januwaru", "Febreru", "Maris", "Afrilu", "Mayu", "Yuni", "Yuli", "Agusta", "Satumba", "Oktocba", "Nuwamba", "Disamba", ""], AbbreviatedMonthNames: ["Jan", "Feb", "Mar", "Afr", "May", "Yun", "Yul", "Agu", "Sat", "Okt", "Nuw", "Dis", ""], MonthGenitiveNames: [], AbbreviatedMonthGenitiveNames: [], AMDesignator: "Safe", PMDesignator: "Yamma", DateSeparator: "/", TimeSeparator: ":", ShortDatePattern: "012" }
 };
 var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//basq//1069//ru-Ru//1049//hindi//1081
+
+    //---------------------------------------------------------export---------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window["AscCommon"].NumFormatFont = NumFormatFont;
+    window["AscCommon"].NumFormat = NumFormat;
+    window["AscCommon"].CellFormat = CellFormat;
+    window["AscCommon"].DecodeGeneralFormat = DecodeGeneralFormat;
+    window["AscCommon"].setCurrentCultureInfo = setCurrentCultureInfo;
+
+    window["AscCommon"].gc_nMaxDigCount = gc_nMaxDigCount;
+    window["AscCommon"].gc_nMaxDigCountView = gc_nMaxDigCountView;
+    window["AscCommon"].oNumFormatCache = oNumFormatCache;
+    window["AscCommon"].oGeneralEditFormatCache = oGeneralEditFormatCache;
+    window["AscCommon"].g_oFormatParser = g_oFormatParser;
+    window["AscCommon"].g_aCultureInfos = g_aCultureInfos;
+    window["AscCommon"].g_oDefaultCultureInfo = g_oDefaultCultureInfo;
+})(window);

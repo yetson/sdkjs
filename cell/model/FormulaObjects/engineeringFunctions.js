@@ -22,15 +22,35 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-/**
- * Created with JetBrains WebStorm.
- * User: Dmitry.Shahtanov
- * Date: 27.06.13
- * Time: 12:25
- * To change this template use File | Settings | File Templates.
- */
 
 "use strict";
+
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+    var cErrorType = AscCommonExcel.cErrorType;
+    var cNumber = AscCommonExcel.cNumber;
+    var cString = AscCommonExcel.cString;
+    var cError = AscCommonExcel.cError;
+    var cArea = AscCommonExcel.cArea;
+    var cArea3D = AscCommonExcel.cArea3D;
+    var cArray = AscCommonExcel.cArray;
+    var cUndefined = AscCommonExcel.cUndefined;
+    var cBaseFunction = AscCommonExcel.cBaseFunction;
+    var cFormulaFunctionGroup = AscCommonExcel.cFormulaFunctionGroup;
+
+    var rtl_math_erf = AscCommonExcel.rtl_math_erf;
+
+    var rg_validBINNumber = /^[01]{1,10}$/,
+      rg_validDEC2BINNumber = /^-?[0-9]{1,3}$/,
+      rg_validDEC2OCTNumber = /^-?[0-9]{1,9}$/,
+      rg_validDEC2HEXNumber = /^-?[0-9]{1,12}$/,
+      rg_validHEXNumber = /^[0-9A-F]{1,10}$/i,
+      rg_validOCTNumber = /^[0-7]{1,10}$/,
+      rg_complex_number = new XRegExp( "^(?<real>[-+]?(?:\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?))?(?<img>([-+]?(\\d*(?:\\.\\d+)?(?:[Ee][+-]?\\d+)?)?[ij])?)", "g" );
 
 var NumberBase = {
     BIN:2,
@@ -941,7 +961,8 @@ Complex.prototype = {
 
 };
 
-cFormulaFunctionGroup['Engineering'] = [
+cFormulaFunctionGroup['Engineering'] = cFormulaFunctionGroup['Engineering'] || [];
+cFormulaFunctionGroup['Engineering'].push(
     cBESSELI,
     cBESSELJ,
     cBESSELK,
@@ -980,25 +1001,8 @@ cFormulaFunctionGroup['Engineering'] = [
     cIMSUM,
     cOCT2BIN,
     cOCT2DEC,
-    cOCT2HEX,
-
-    /*new funcions with _xlnf-prefix*/
-    cBITAND,
-    cBITLSHIFT,
-    cBITOR,
-    cBITRSHIFT,
-    cBITXOR,
-    cERF_PRECISE,
-    cERFC_PRECISE,
-    cIMCOSH,
-    cIMCOT,
-    cIMCSC,
-    cIMCSCH,
-    cIMSEC,
-    cIMSECH,
-    cIMSINH,
-    cIMTAN
-];
+    cOCT2HEX
+);
 
 function cBESSELI() {
     cBaseFunction.call( this, "BESSELI", 2, 2 );
@@ -1249,7 +1253,7 @@ cCOMPLEX.prototype.Calculate = function ( arg ) {
 
     var real = arg[0],
         img = arg[1],
-        suf = !arg[2] || arg[2] instanceof cEmpty ? new cString( "i" ) : arg[2];
+        suf = !arg[2] || arg[2] instanceof AscCommonExcel.cEmpty ? new cString( "i" ) : arg[2];
     if ( real instanceof cArea || img instanceof cArea3D ) {
         real = real.cross( arguments[1].first );
     }
@@ -1598,7 +1602,7 @@ cERFC.prototype.Calculate = function ( arg ) {
 
     a = a.getValue();
 
-    this.value = new cNumber( rtl_math_erfc( a ) );
+    this.value = new cNumber( AscCommonExcel.rtl_math_erfc( a ) );
 
     return this.value;
 
@@ -2835,3 +2839,4 @@ cOCT2HEX.prototype.getInfo = function () {
         args:"( number [ , num-hex-digits ] )"
     };
 }
+})(window);

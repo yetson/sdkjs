@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 //величина символа "сигма" не меняется в зависимости от аргумента
@@ -158,7 +134,7 @@ function CNary(props)
 {
     CNary.superclass.constructor.call(this);
 
-	this.Id = g_oIdCounter.Get_NewId();
+	this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Pr = new CMathNaryPr();
 
@@ -173,9 +149,9 @@ function CNary(props)
     if(props !== null && props !== undefined)
         this.init(props);
 
-	g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CNary, CMathBase);
+AscCommon.extendClass(CNary, CMathBase);
 
 CNary.prototype.ClassType = historyitem_type_nary;
 CNary.prototype.kind      = MATH_NARY;
@@ -329,12 +305,14 @@ CNary.prototype.private_GetLimLoc = function()
 };
 CNary.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsInfo)
 {
-    var NewRPI = RPI.Copy();
+    var bNaryInline = RPI.bNaryInline;
 
     if(RPI.bInline || RPI.bDecreasedComp)
-        NewRPI.bNaryInline = true;
+        RPI.bNaryInline = true;
 
-    CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, NewRPI, GapsInfo);
+    CNary.superclass.PreRecalc.call(this, Parent, ParaMath, ArgSize, RPI, GapsInfo);
+
+    RPI.bNaryInline = bNaryInline;
 };
 CNary.prototype.getSign = function(chrCode, chrType)
 {    
@@ -840,7 +818,7 @@ function CMathMenuNary(Nary)
         this.bCanChangeLimLoc 	= false;
     }
 }
-Asc.extendClass(CMathMenuNary, CMathMenuBase);
+AscCommon.extendClass(CMathMenuNary, CMathMenuBase);
 CMathMenuNary.prototype.can_ChangeLimitLocation = function(){ return this.bCanChangeLimLoc;};
 CMathMenuNary.prototype.get_LimitLocation       = function(){return this.LimLoc;};
 CMathMenuNary.prototype.put_LimitLocation       = function(LimLoc){this.LimLoc = LimLoc;};
@@ -871,7 +849,7 @@ function CNaryUnd(bInside)
     this.setDimension(2, 1);
     //this.init();
 }
-Asc.extendClass(CNaryUnd, CMathBase);
+AscCommon.extendClass(CNaryUnd, CMathBase);
 CNaryUnd.prototype.setDistance = function()
 {
     var zetta = this.Get_TxtPrControlLetter().FontSize*25.4/96;
@@ -895,11 +873,14 @@ CNaryUnd.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzUnd = ArgSize.Copy();
     ArgSzUnd.Decrease();
 
-    var RPIUnd = RPI.Copy();
-    RPIUnd.bDecreasedComp = true;
-
-    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPIUnd);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzUnd, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryUnd.prototype.setBase = function(base)
 {
@@ -922,7 +903,7 @@ function CNaryOvr(bInside)
 
     this.setDimension(2, 1);
 }
-Asc.extendClass(CNaryOvr, CMathBase);
+AscCommon.extendClass(CNaryOvr, CMathBase);
 CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -933,11 +914,14 @@ CNaryOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzOvr = ArgSize.Copy();
     ArgSzOvr.Decrease();
 
-    var RPIOvr = RPI.Copy();
-    RPIOvr.bDecreasedComp = true;
-
     this.elements[0][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
-    this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPIOvr);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[1][0].PreRecalc(this, ParaMath, ArgSzOvr, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryOvr.prototype.recalculateSize = function()
 {
@@ -989,7 +973,7 @@ function CNaryUndOvr(bInside)
 
     this.setDimension(3,1);
 }
-Asc.extendClass(CNaryUndOvr, CMathBase);
+AscCommon.extendClass(CNaryUndOvr, CMathBase);
 CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
     this.Parent = Parent;
@@ -1000,13 +984,16 @@ CNaryUndOvr.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
     var ArgSzIter = ArgSize.Copy();
     ArgSzIter.Decrease();
 
-    var RPI_Iter = RPI.Copy();
-    RPI_Iter.bDecreasedComp = true;
-
-
-    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
     this.elements[1][0].PreRecalc(this, ParaMath, ArgSize,  RPI);
-    this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI_Iter);
+
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.elements[0][0].PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    this.elements[2][0].PreRecalc(this, ParaMath, ArgSzIter, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CNaryUndOvr.prototype.recalculateSize = function()
 {
@@ -1216,7 +1203,7 @@ function CSigma()
 {
     CNaryOperator.call(this);
 }
-Asc.extendClass(CSigma, CNaryOperator);
+AscCommon.extendClass(CSigma, CNaryOperator);
 CSigma.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1423,7 +1410,7 @@ function CProduct(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-Asc.extendClass(CProduct, CNaryOperator);
+AscCommon.extendClass(CProduct, CNaryOperator);
 CProduct.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1594,7 +1581,7 @@ function CUnion(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-Asc.extendClass(CUnion, CNaryOperator);
+AscCommon.extendClass(CUnion, CNaryOperator);
 CUnion.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1669,7 +1656,7 @@ function CLogicalOr(bFlip)
 {
     CNaryOperator.call(this, bFlip);
 }
-Asc.extendClass(CLogicalOr, CNaryOperator);
+AscCommon.extendClass(CLogicalOr, CNaryOperator);
 CLogicalOr.prototype.drawPath = function(pGraphics, XX, YY)
 {
     pGraphics._m(XX[0], YY[0]);
@@ -1751,7 +1738,7 @@ function CIntegral()
 {
     CNaryOperator.call(this);
 }
-Asc.extendClass(CIntegral, CNaryOperator);
+AscCommon.extendClass(CIntegral, CNaryOperator);
 CIntegral.prototype.getCoord = function()
 {
     var X = [],
@@ -1886,7 +1873,7 @@ function CDoubleIntegral()
 {
     CIntegral.call(this);
 }
-Asc.extendClass(CDoubleIntegral, CIntegral);
+AscCommon.extendClass(CDoubleIntegral, CIntegral);
 CDoubleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
     var XX2 = [],
@@ -1932,7 +1919,7 @@ function CTripleIntegral()
 {
     CIntegral.call(this);
 }
-Asc.extendClass(CTripleIntegral, CIntegral);
+AscCommon.extendClass(CTripleIntegral, CIntegral);
 CTripleIntegral.prototype.drawPath = function(pGraphics, XX, YY, Width)
 {
     var XX2 = [],
@@ -2246,7 +2233,7 @@ function CClosedPathIntegral()
 {
     CNaryOperator.call(this);
 }
-Asc.extendClass(CClosedPathIntegral, CNaryOperator);
+AscCommon.extendClass(CClosedPathIntegral, CNaryOperator);
 CClosedPathIntegral.prototype.drawGlyph = function(parameters)
 {
     var x           = parameters.x,
@@ -2467,7 +2454,7 @@ function CContourIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-Asc.extendClass(CContourIntegral, CClosedPathIntegral);
+AscCommon.extendClass(CContourIntegral, CClosedPathIntegral);
 CContourIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =
@@ -2506,7 +2493,7 @@ function CSurfaceIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-Asc.extendClass(CSurfaceIntegral, CClosedPathIntegral);
+AscCommon.extendClass(CSurfaceIntegral, CClosedPathIntegral);
 CSurfaceIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =
@@ -2545,7 +2532,7 @@ function CVolumeIntegral()
 {
     CClosedPathIntegral.call(this);
 }
-Asc.extendClass(CVolumeIntegral, CClosedPathIntegral);
+AscCommon.extendClass(CVolumeIntegral, CClosedPathIntegral);
 CVolumeIntegral.prototype.drawGlyph = function(x, y, pGraphics, PDSE)
 {
     var parameters =

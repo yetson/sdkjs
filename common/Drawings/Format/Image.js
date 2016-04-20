@@ -54,10 +54,10 @@ function CImageShape()
     this.snapArrayY = [];
 
     this.setRecalculateInfo();
-    this.Lock = new CLock();
+    this.Lock = new AscCommon.CLock();
 
-    this.Id = g_oIdCounter.Get_NewId();
-    g_oTableId.Add( this, this.Id );
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
 
 CImageShape.prototype =
@@ -607,7 +607,7 @@ CImageShape.prototype =
             {
                 oLock = this.Lock;
             }
-            if(oLock && locktype_None != oLock.Get_Type())
+            if(oLock && AscCommon.locktype_None != oLock.Get_Type())
             {
                 graphics.transform3(_transform);
                 graphics.DrawLockObjectRect(oLock.Get_Type(), 0, 0, this.extX, this.extY);
@@ -690,7 +690,7 @@ CImageShape.prototype =
     {
         if(this.blipFill instanceof  CBlipFill && typeof this.blipFill.RasterImageId === "string")
         {
-            images[getFullImageSrc2(this.blipFill.RasterImageId)] = true;
+            images[AscCommon.getFullImageSrc2(this.blipFill.RasterImageId)] = true;
         }
     },
 
@@ -971,7 +971,7 @@ CImageShape.prototype =
                 var pos = readLong(r);
                 if(this.worksheet)
                 {
-                    pos = this.worksheet.contentChanges.Check(contentchanges_Add, pos);
+                    pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
                 addToDrawings(this.worksheet, this, pos);
                 break;
@@ -1008,7 +1008,7 @@ CImageShape.prototype =
                     {
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(getFullImageSrc2(this.blipFill.RasterImageId));
+							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
                         }
                     }
                 }

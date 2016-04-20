@@ -22,19 +22,18 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
-/* CellComment.js
-*
-* Author: Dmitry Vikulov
-* Date:   06/02/2013
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
 */
-
-//-----------------------------------------------------------------------------------
-// CommentCoords
-//-----------------------------------------------------------------------------------
-
-//{ ASC Classes
+function (window, undefined) {
+	// Import
+	var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
+	var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;
+	
 /** @constructor */
 function asc_CCommentCoords(obj) {
 
@@ -92,8 +91,6 @@ function asc_CCommentCoords(obj) {
 		this.bSizeWithCells = obj.bSizeWithCells;
 	}
 }
-
-// Prototype
 asc_CCommentCoords.prototype = {
 
 	asc_setRow: function(val) { this.nRow = val; },
@@ -160,30 +157,24 @@ asc_CCommentCoords.prototype = {
 	asc_getSizeWithCells: function() { return this.bSizeWithCells; }
 };
 
-window["Asc"]["asc_CCommentCoords"] = window["Asc"].asc_CCommentCoords = asc_CCommentCoords;
-
-//-----------------------------------------------------------------------------------
-// CommentData
-//-----------------------------------------------------------------------------------
-var g_oCCommentDataProperties = {
-	wsId: 0,
-	nCol: 1,
-	nRow: 2,
-	nId: 3,
-	nLevel: 5,
-	sText: 6,
-	sQuoteText: 7,
-	sTime: 8,
-	sUserId: 9,
-	sUserName: 10,
-	bDocument: 11,
-	bSolved: 12,
-	aReplies: 13,
-	bHidden: 14
-};
 /** @constructor */
 function asc_CCommentData(obj) {
-	this.Properties = g_oCCommentDataProperties;
+	this.Properties = {
+		wsId: 0,
+		nCol: 1,
+		nRow: 2,
+		nId: 3,
+		nLevel: 5,
+		sText: 6,
+		sQuoteText: 7,
+		sTime: 8,
+		sUserId: 9,
+		sUserName: 10,
+		bDocument: 11,
+		bSolved: 12,
+		aReplies: 13,
+		bHidden: 14
+	};
 
 	this.bHidden = false;
 	this.wsId = null;
@@ -228,8 +219,6 @@ function asc_CCommentData(obj) {
 		}
 	}
 }
-
-// Prototype
 asc_CCommentData.prototype = {
 	guid: function () {
 		function S4() {
@@ -262,7 +251,7 @@ asc_CCommentData.prototype = {
 	asc_putParent: function(obj) { this.oParent = obj; },
 	asc_getParent: function() { return this.oParent; },
 
-	asc_putText: function(val) { this.sText = val ? val.slice(0, c_oAscMaxCellOrCommentLength) : val; },
+	asc_putText: function(val) { this.sText = val ? val.slice(0, Asc.c_oAscMaxCellOrCommentLength) : val; },
 	asc_getText: function() { return this.sText; },
 
 	asc_putTime: function(val) { this.sTime = val; },
@@ -306,7 +295,7 @@ asc_CCommentData.prototype = {
 
 	//	For collaborative editing
 	getType: function() {
-		return UndoRedoDataTypes.CommentData;
+		return AscCommonExcel.UndoRedoDataTypes.CommentData;
 	},
 
 	getProperties: function() {
@@ -360,75 +349,19 @@ asc_CCommentData.prototype = {
 	}
 };
 
-window["Asc"]["asc_CCommentData"] = window["Asc"].asc_CCommentData = asc_CCommentData;
-prot = asc_CCommentData.prototype;
-
-prot["asc_putRow"] = prot.asc_putRow;
-prot["asc_getRow"] = prot.asc_getRow;
-
-prot["asc_putCol"] = prot.asc_putCol;
-prot["asc_getCol"] = prot.asc_getCol;
-
-prot["asc_putId"] = prot.asc_putId;
-prot["asc_getId"] = prot.asc_getId;
-
-prot["asc_putLevel"] = prot.asc_putLevel;
-prot["asc_getLevel"] = prot.asc_getLevel;
-
-prot["asc_putParent"] = prot.asc_putParent;
-prot["asc_getParent"] = prot.asc_getParent;
-
-prot["asc_putText"] = prot.asc_putText;
-prot["asc_getText"] = prot.asc_getText;
-
-prot["asc_putQuoteText"] = prot.asc_putQuoteText;
-prot["asc_getQuoteText"] = prot.asc_getQuoteText;
-
-prot["asc_putTime"] = prot.asc_putTime;
-prot["asc_getTime"] = prot.asc_getTime;
-
-prot["asc_putUserId"] = prot.asc_putUserId;
-prot["asc_getUserId"] = prot.asc_getUserId;
-
-prot["asc_putUserName"] = prot.asc_putUserName;
-prot["asc_getUserName"] = prot.asc_getUserName;
-
-prot["asc_putDocumentFlag"] = prot.asc_putDocumentFlag;
-prot["asc_getDocumentFlag"] = prot.asc_getDocumentFlag;
-
-prot["asc_putHiddenFlag"] = prot.asc_putHiddenFlag;
-prot["asc_getHiddenFlag"] = prot.asc_getHiddenFlag;
-
-prot["asc_putSolved"] = prot.asc_putSolved;
-prot["asc_getSolved"] = prot.asc_getSolved;
-
-prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
-prot["asc_getReply"] = prot.asc_getReply;
-
-prot["asc_addReply"] = prot.asc_addReply;
-
-prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
-
-//}
-
-//-----------------------------------------------------------------------------------
-// CompositeCommentData
-//-----------------------------------------------------------------------------------
-var g_oCompositeCommentDataProperties = {
-		commentBefore: 0,
-		commentAfter: 1
-	};
 function CompositeCommentData() {
 	this.commentBefore = null;
 	this.commentAfter = null;
 
-	this.Properties = g_oCompositeCommentDataProperties;
+	this.Properties = {
+		commentBefore: 0,
+		commentAfter: 1
+	};
 }
-
 CompositeCommentData.prototype = {
 	//	For collaborative editing
 	getType: function() {
-		return UndoRedoDataTypes.CompositeCommentData;
+		return AscCommonExcel.UndoRedoDataTypes.CompositeCommentData;
 	},
 
 	getProperties: function() {
@@ -451,9 +384,6 @@ CompositeCommentData.prototype = {
 	}
 };
 
-//-----------------------------------------------------------------------------------
-// CellCommentator
-//-----------------------------------------------------------------------------------
 /** @constructor */
 function CCellCommentator(currentSheet) {
 	this.worksheet = currentSheet;
@@ -462,8 +392,8 @@ function CCellCommentator(currentSheet) {
 
 	// Drawing settings
 	this.bShow = true;
-	this.commentIconColor = new CColor(255, 144, 0);
-	this.commentFillColor = new CColor(255, 255, 0);
+	this.commentIconColor = new AscCommon.CColor(255, 144, 0);
+	this.commentFillColor = new AscCommon.CColor(255, 255, 0);
 	this.commentPadding = 4; 	// px
 	this.minAreaWidth = 160; 	// px
 	this.minAreaHeight = 80; 	// px
@@ -491,7 +421,7 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 		if (!oComment.bDocument)
 			sheetId += this.worksheet.model.getId();
 
-		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(c_oAscLockTypeElem.Object, /*subType*/null,
+		var lockInfo = this.worksheet.collaborativeEditing.getLockInfo(AscCommonExcel.c_oAscLockTypeElem.Object, /*subType*/null,
 			sheetId, objectGuid);
 
 		if (false === this.worksheet.collaborativeEditing.getCollaborativeEditing()) {
@@ -500,12 +430,12 @@ CCellCommentator.prototype.isLockedComment = function(oComment, callbackFunc) {
 			callbackFunc = undefined;
 		}
 		if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
+				AscCommon.c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
 			// Редактируем сами
 			Asc.applyFunction(callbackFunc, true);
 			return;
 		} else if (false !== this.worksheet.collaborativeEditing.getLockIntersection(lockInfo,
-			c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
+				AscCommon.c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
 			// Уже ячейку кто-то редактирует
 			Asc.applyFunction(callbackFunc, false);
 			return;
@@ -544,7 +474,7 @@ CCellCommentator.prototype.moveRangeComments = function(rangeFrom, rangeTo) {
 				compositeComment.commentAfter = commentAfter;
 
 				History.Create_NewPoint();
-				History.Add(g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
+				History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, this.worksheet.model.getId(), null, compositeComment);
 			}
 		}
 	}
@@ -996,7 +926,7 @@ CCellCommentator.prototype.getCommentsCoords = function(comments) {
 		coords.dHeightPX += this.commentPadding * 2;
 		coords.dHeightMM = this.pxToMm(coords.dHeightPX);
 
-    if (AscBrowser.isRetina) {
+    if (AscCommon.AscBrowser.isRetina) {
       coords.dWidthPX >>= 1;
       coords.dHeightPX >>= 1;
       coords.dLeftPX >>= 1;
@@ -1218,7 +1148,7 @@ CCellCommentator.prototype.changeComment = function(id, oComment, bChangeCoords,
 			compositeComment.commentAfter = commentAfter;
 
 			History.Create_NewPoint();
-			History.Add(g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
+			History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Change, t.worksheet.model.getId(), null, compositeComment);
 		}
 
 		if (!bNoDraw)
@@ -1325,7 +1255,7 @@ CCellCommentator.prototype._addComment = function (oComment, bChange, bIsNotUpda
 	// Add new comment
 	if (!bChange) {
 		History.Create_NewPoint();
-		History.Add(g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
+		History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Add, this.worksheet.model.getId(), null, new asc_CCommentData(oComment));
 
 		this.aComments.push(oComment);
 
@@ -1346,7 +1276,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(comment.oParent.aReplies[i]));
 				}
 
 				comment.oParent.aReplies.splice(i, 1);
@@ -1359,7 +1289,7 @@ CCellCommentator.prototype._removeComment = function (comment, bNoEvent, isDraw)
 
 				if (this.bSaveHistory) {
 					History.Create_NewPoint();
-					History.Add(g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
+					History.Add(AscCommonExcel.g_oUndoRedoComment, historyitem_Comment_Remove, this.worksheet.model.getId(), null, new asc_CCommentData(this.aComments[i]));
 				}
 
 				this.aComments.splice(i, 1);
@@ -1540,3 +1470,44 @@ CCellCommentator.prototype.Redo = function(type, data) {
 			break;
 	}
 };
+
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window["AscCommonExcel"].asc_CCommentCoords = asc_CCommentCoords;
+	window["AscCommonExcel"].CompositeCommentData = CompositeCommentData;
+	window["AscCommonExcel"].CCellCommentator = CCellCommentator;
+
+	window['Asc'] = window['Asc'] || {};
+	window["Asc"]["asc_CCommentData"] = window["Asc"].asc_CCommentData = asc_CCommentData;
+	prot = asc_CCommentData.prototype;
+	prot["asc_putRow"] = prot.asc_putRow;
+	prot["asc_getRow"] = prot.asc_getRow;
+	prot["asc_putCol"] = prot.asc_putCol;
+	prot["asc_getCol"] = prot.asc_getCol;
+	prot["asc_putId"] = prot.asc_putId;
+	prot["asc_getId"] = prot.asc_getId;
+	prot["asc_putLevel"] = prot.asc_putLevel;
+	prot["asc_getLevel"] = prot.asc_getLevel;
+	prot["asc_putParent"] = prot.asc_putParent;
+	prot["asc_getParent"] = prot.asc_getParent;
+	prot["asc_putText"] = prot.asc_putText;
+	prot["asc_getText"] = prot.asc_getText;
+	prot["asc_putQuoteText"] = prot.asc_putQuoteText;
+	prot["asc_getQuoteText"] = prot.asc_getQuoteText;
+	prot["asc_putTime"] = prot.asc_putTime;
+	prot["asc_getTime"] = prot.asc_getTime;
+	prot["asc_putUserId"] = prot.asc_putUserId;
+	prot["asc_getUserId"] = prot.asc_getUserId;
+	prot["asc_putUserName"] = prot.asc_putUserName;
+	prot["asc_getUserName"] = prot.asc_getUserName;
+	prot["asc_putDocumentFlag"] = prot.asc_putDocumentFlag;
+	prot["asc_getDocumentFlag"] = prot.asc_getDocumentFlag;
+	prot["asc_putHiddenFlag"] = prot.asc_putHiddenFlag;
+	prot["asc_getHiddenFlag"] = prot.asc_getHiddenFlag;
+	prot["asc_putSolved"] = prot.asc_putSolved;
+	prot["asc_getSolved"] = prot.asc_getSolved;
+	prot["asc_getRepliesCount"] = prot.asc_getRepliesCount;
+	prot["asc_getReply"] = prot.asc_getReply;
+	prot["asc_addReply"] = prot.asc_addReply;
+	prot["asc_getMasterCommentId"] = prot.asc_getMasterCommentId;
+})(window);

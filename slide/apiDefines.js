@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var c_oAscZoomType = {
   Current: 0,
@@ -33,36 +33,6 @@ var c_oAscZoomType = {
 var c_oAscCollaborativeMarksShowType = {
   All: 0,
   LastChanges: 1
-};
-
-var c_oAscHAnchor = {
-  Margin: 0x00,
-  Page: 0x01,
-  Text: 0x02,
-
-  PageInternal: 0xFF // только для внутреннего использования
-};
-var c_oAscXAlign = {
-  Center: 0x00,
-  Inside: 0x01,
-  Left: 0x02,
-  Outside: 0x03,
-  Right: 0x04
-};
-
-var c_oAscYAlign = {
-  Bottom: 0x00,
-  Center: 0x01,
-  Inline: 0x02,
-  Inside: 0x03,
-  Outside: 0x04,
-  Top: 0x05
-};
-
-var c_oAscVAnchor = {
-  Margin: 0x00,
-  Page: 0x01,
-  Text: 0x02
 };
 
 var c_oAscVertAlignJc = {
@@ -82,51 +52,6 @@ var c_oAscAlignType = {
   BOTTOM: 6
 };
 
-// image wrap style
-var c_oAscWrapStyle = {
-  Inline: 0,
-  Flow: 1
-};
-
-/*Error level & ID*/
-var c_oAscError = {
-  Level: {
-    Critical: -1,
-    NoCritical: 0
-  },
-  ID: {
-    ServerSaveComplete: 3,
-    ConvertationProgress: 2,
-    DownloadProgress: 1,
-    No: 0,
-    Unknown: -1,
-    ConvertationTimeout: -2,
-    ConvertationError: -3,
-    DownloadError: -4,
-    UnexpectedGuid: -5,
-    Database: -6,
-    FileRequest: -7,
-    FileVKey: -8,
-    UplImageSize: -9,
-    UplImageExt: -10,
-    UplImageFileCount: -11,
-    NoSupportClipdoard: -12,
-    StockChartError: -16,
-    CoAuthoringDisconnect: -18,
-    ConvertationPassword: -19,
-    VKeyEncrypt: -20,
-    KeyExpire: -21,
-    UserCountExceed: -22,
-    SplitCellMaxRows: -23,
-    SplitCellMaxCols: -24,
-    SplitCellRowsDivider: -25,
-
-    UserDrop: -100,
-    Warning: -101
-  }
-};
-
-
 var c_oAscContextMenuTypes = {
   Main: 0,
   Thumbnails: 1
@@ -136,10 +61,6 @@ var THEME_THUMBNAIL_WIDTH = 180;
 var THEME_THUMBNAIL_HEIGHT = 135;
 var LAYOUT_THUMBNAIL_WIDTH = 180;
 var LAYOUT_THUMBNAIL_HEIGHT = 135;
-
-
-var hdrftr_Header = 0x01;
-var hdrftr_Footer = 0x02;
 
 var c_oAscTableSelectionType = {
   Cell: 0,
@@ -161,12 +82,6 @@ var c_oAscAlignShapeType = {
 var c_oAscTableLayout = {
   AutoFit: 0x00,
   Fixed: 0x01
-};
-
-var c_oAscMouseMoveDataTypes = {
-  Common: 0,
-  Hyperlink: 1,
-  LockedObject: 2
 };
 
 var c_oAscSlideTransitionTypes = {
@@ -216,3 +131,13 @@ var c_oAscLockTypeElemPresentation = {
 
 var TABLE_STYLE_WIDTH_PIX = 70;
 var TABLE_STYLE_HEIGHT_PIX = 50;
+
+//------------------------------------------------------------export---------------------------------------------------
+window['Asc'] = window['Asc'] || {};
+window['Asc']['c_oAscCollaborativeMarksShowType'] = c_oAscCollaborativeMarksShowType;
+window['Asc']['c_oAscVertAlignJc'] = c_oAscVertAlignJc;
+window['Asc']['c_oAscTableLayout'] = c_oAscTableLayout;
+window['Asc']['c_oAscContextMenuTypes'] = c_oAscContextMenuTypes;
+window['Asc']['c_oAscAlignShapeType'] = c_oAscAlignShapeType;
+window['Asc']['c_oAscSlideTransitionTypes'] = c_oAscSlideTransitionTypes;
+window['Asc']['c_oAscSlideTransitionParams'] = c_oAscSlideTransitionParams;

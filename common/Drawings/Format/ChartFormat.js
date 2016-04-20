@@ -24,6 +24,21 @@
 */
 "use strict";
 
+// Import
+var g_oIdCounter = AscCommon.g_oIdCounter;
+var g_oTableId = AscCommon.g_oTableId;
+
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscValAxisRule = Asc.c_oAscValAxisRule;
+var c_oAscValAxUnits = Asc.c_oAscValAxUnits;
+var c_oAscTickMark = Asc.c_oAscTickMark;
+var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
+var c_oAscCrossesRule = Asc.c_oAscCrossesRule;
+var c_oAscBetweenLabelsRule = Asc.c_oAscBetweenLabelsRule;
+var c_oAscLabelsPosition = Asc.c_oAscLabelsPosition;
+var c_oAscAxisType = Asc.c_oAscAxisType;
+
 
 var GLOBAL_AX_ID_COUNTER = 1000;
 
@@ -629,11 +644,11 @@ CDLbl.prototype =
             }
 
             var para_pr = new CParaPr();
-            para_pr.Jc = align_Center;
+            para_pr.Jc = AscCommon.align_Center;
             para_pr.Spacing.Before = 0.0;
             para_pr.Spacing.After = 0.0;
             para_pr.Spacing.Line = 1;
-            para_pr.Spacing.LineRule = linerule_Auto;
+            para_pr.Spacing.LineRule = Asc.linerule_Auto;
             style.ParaPr = para_pr;
             text_pr.RFonts.Set_FromObject(
                 {
@@ -820,7 +835,7 @@ CDLbl.prototype =
         {
             if(compiled_string.length > 0)
                 compiled_string += separator;
-            var num_format = oNumFormatCache.get(this.series.getFormatCode());
+            var num_format = AscCommon.oNumFormatCache.get(this.series.getFormatCode());
             compiled_string += num_format.formatToChart(this.series.getValByIndex(this.pt.idx));
         }
         if(this.showPercent)
@@ -4417,7 +4432,7 @@ CCatAx.prototype =
 
     getMenuProps: function()
     {
-        var ret = new asc_CatAxisSettings();
+        var ret = new AscCommon.asc_CatAxisSettings();
 
         if(isRealNumber(this.tickMarkSkip))
             ret.putIntervalBetweenTick(this.tickMarkSkip);
@@ -8765,7 +8780,7 @@ CValAx.prototype =
 
     getMenuProps: function()
     {
-        var ret = new asc_ValAxisSettings();
+        var ret = new AscCommon.asc_ValAxisSettings();
         var scaling = this.scaling;
 
         //настройки логарифмической шкалы

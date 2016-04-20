@@ -22,14 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 /* DrawingContext.js
  *
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(function (/** jQuery */$, /** Window */window, undefined) {
+(function (/** Window */window, undefined) {
 
 	/*
 	 * Import
@@ -72,17 +72,17 @@
 			}
 			if(bTheme)
 			{
-				oRes = new asc_CColor();
+				oRes = new Asc.asc_CColor();
 				oRes.r = r;
 				oRes.g = g;
 				oRes.b = b;
 				oRes.a = 255;
-				oRes.type = c_oAscColor.COLOR_TYPE_SCHEME;
+				oRes.type = Asc.c_oAscColor.COLOR_TYPE_SCHEME;
 				oRes.value = themePresentation;
 			}
 		}
 		if(false == bTheme)
-			oRes = CreateAscColorCustom(r, g, b);
+			oRes = AscCommon.CreateAscColorCustom(r, g, b);
 		return oRes;
 	}
 
@@ -420,7 +420,7 @@
 		this.ppiX = 96;
 		this.ppiY = 96;
 
-		if (AscBrowser.isRetina) {
+		if (AscCommon.AscBrowser.isRetina) {
 			this.ppiX <<= 1;
 			this.ppiY <<= 1;
 		}
@@ -449,8 +449,8 @@
 			throw "Can not set font in DrawingContext";
 		}
 
-		// CColor
-		this.fillColor = new CColor(255, 255, 255);
+		// AscCommon.CColor
+		this.fillColor = new AscCommon.CColor(255, 255, 255);
 		return this;
 	}
 
@@ -735,7 +735,7 @@
 	};
 
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setFillStyle = function (val) {
@@ -743,7 +743,7 @@
 		var _g = val.getG();
 		var _b = val.getB();
 		var _a = val.getA();
-		this.fillColor = new CColor(_r, _g, _b, _a);
+		this.fillColor = new AscCommon.CColor(_r, _g, _b, _a);
 		this.ctx.fillStyle = "rgba(" + _r + "," + _g + "," + _b + "," + _a + ")";
 		return this;
 	};
@@ -754,7 +754,7 @@
 	};
 
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setStrokeStyle = function (val) {
@@ -931,13 +931,15 @@
 		var _g = this.fillColor.g;
 		var _b = this.fillColor.b;
 
-		if (AscBrowser.isMobileVersion) {
+		if (AscCommon.AscBrowser.isMobileVersion) {
 			// Special for iPad (5.1)
 
 			if (!_r && !_g && !_b) {
 				this.ctx.drawImage(pGlyph.oBitmap.oGlyphData.m_oCanvas, 0, 0, nW, nH, nX, nY, nW, nH);
 			} else {
-				var canvD = $("<canvas width='"+nW+"' height='"+nH+"'/>")[0];
+				var canvD = document.createElement('canvas');
+				canvD.width = nW;
+				canvD.height = nH;
 				var ctxD = canvD.getContext("2d");
 				var pixDst = ctxD.getImageData(0, 0, nW, nH);
 				var dstP = pixDst.data;
@@ -1050,7 +1052,7 @@
 	};
 
 	DrawingContext.prototype.dashLineCleverHor = function (x1, y, x2) {
-		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+		var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
 		var _x1 = this._mct.transformPointX(x1, y);
 		var _y  = this._mct.transformPointY(x1, y) - 1;
 		var _x2 = this._mct.transformPointX(x2, y);
@@ -1071,7 +1073,7 @@
 		}
 	};
 	DrawingContext.prototype.dashLineCleverVer = function (x, y1, y2) {
-		var w_dot = c_oAscCoAuthoringDottedWidth, w_dist = c_oAscCoAuthoringDottedDistance;
+		var w_dot = AscCommonExcel.c_oAscCoAuthoringDottedWidth, w_dist = AscCommonExcel.c_oAscCoAuthoringDottedDistance;
 		var _y1 = this._mct.transformPointY(x, y1);
 		var _x  = this._mct.transformPointX(x, y1) - 1;
 		var _y2 = this._mct.transformPointY(x, y2);
@@ -1271,4 +1273,4 @@
 	window["Asc"].DrawingContext   = DrawingContext;
 	window["Asc"].Matrix           = Matrix;
 
-})(jQuery, window);
+})(window);

@@ -24,6 +24,13 @@
 */
 "use strict";
 
+// Import
+var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
+var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var g_oTableId = AscCommon.g_oTableId;
+
+var asc_CImgProperty = Asc.asc_CImgProperty;
+
 function CBoundsRectForMath(oDrawing)
 {
     this.L = 0;
@@ -163,8 +170,8 @@ function CGraphicObjects(document, drawingDocument, api)
     this.nullState = new NullState(this);
     this.bNoCheckChartTextSelection = false;
 
-    this.Id = g_oIdCounter.Get_NewId();
-    this.Lock = new CLock();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
+    this.Lock = new AscCommon.CLock();
     g_oTableId.Add( this, this.Id );
 }
 
@@ -317,6 +324,30 @@ CGraphicObjects.prototype =
         return;
     },
 
+    createWatermarkImage: DrawingObjectsController.prototype.createWatermarkImage,
+
+
+
+    getTrialImage: function(sImageUrl)
+    {
+        return ExecuteNoHistory(function(){
+            var oParaDrawing = new ParaDrawing();
+            oParaDrawing.Set_PositionH(Asc.c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
+            oParaDrawing.Set_PositionV(Asc.c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
+            oParaDrawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            oParaDrawing.Set_BehindDoc( false );
+            oParaDrawing.Set_Distance( 3.2, 0, 3.2, 0 );
+            oParaDrawing.Set_DrawingType(drawing_Anchor);
+            var oShape = this.createWatermarkImage(sImageUrl);
+            oParaDrawing.Extent.W = oShape.spPr.xfrm.extX;
+            oParaDrawing.Extent.H = oShape.spPr.xfrm.extY;
+            oShape.setParent(oParaDrawing);
+            oParaDrawing.Set_GraphicObject(oShape);
+            return oParaDrawing;
+        }, this, []);
+
+    },
+	
     recalculate_: function(data)
     {
         if(data.All)
@@ -471,7 +502,7 @@ CGraphicObjects.prototype =
         if(props_by_types.shapeProps)
         {
             var pr = props_by_types.shapeProps;
-            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == FILL_TYPE_BLIP)
+            if (pr.fill != null && pr.fill.fill != null && pr.fill.fill.type == Asc.c_oAscFill.FILL_TYPE_BLIP)
             {
                 this.drawingDocument.DrawImageTextureFillShape(pr.fill.fill.RasterImageId);
             }
@@ -511,7 +542,7 @@ CGraphicObjects.prototype =
         {
             this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        if(isRealNumber(oProps.Width) && isRealNumber(oProps.Height))
+        if(isRealNumber(oProps.Width) || isRealNumber(oProps.Height))
         {
             oApplyProps = oProps;
         }
@@ -520,7 +551,7 @@ CGraphicObjects.prototype =
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
         }
         this.applyDrawingProps(oApplyProps);
-        if(isRealNumber(oApplyProps.Width) && isRealNumber(oApplyProps.Height))
+        if(isRealNumber(oApplyProps.Width) || isRealNumber(oApplyProps.Height))
         {
             /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
             var aSelectedObjects = this.selectedObjects;
@@ -720,7 +751,7 @@ CGraphicObjects.prototype =
                 }
             }
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
-            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
                 History.Create_NewPoint(historydescription_Document_GrObjectsBringForward);
                 this.applyZIndex(oCheckObject);
@@ -754,7 +785,7 @@ CGraphicObjects.prototype =
             }
             this.insertBetween(aSelect, aDrawings, 0, oDrawingsMap);
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
-            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
                 History.Create_NewPoint(historydescription_Document_GrObjectsSendToBack);
                 this.applyZIndex(oCheckObject);
@@ -768,7 +799,7 @@ CGraphicObjects.prototype =
     {
         if(this.selection.groupSelection)
         {
-            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : changestype_Paragraph_Content}))
+            if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : AscCommon.changestype_Paragraph_Content}))
             {
                 History.Create_NewPoint(historydescription_Document_GrObjectsBringBackwardGroup);
                 this.selection.groupSelection.bringBackward();
@@ -809,7 +840,7 @@ CGraphicObjects.prototype =
                 }
             }
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
-            if(false === this.document.Document_Is_SelectionLocked(changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
+            if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
                 History.Create_NewPoint(historydescription_Document_GrObjectsBringBackward);
                 this.applyZIndex(oCheckObject);
@@ -2354,7 +2385,7 @@ CGraphicObjects.prototype =
             {
                 PositionH:
                 {
-                    RelativeFrom: c_oAscRelativeFromH.Page,
+                    RelativeFrom: Asc.c_oAscRelativeFromH.Page,
                     UseAlign : false,
                     Align    : undefined,
                     Value    : common_bounds.minX
@@ -2362,7 +2393,7 @@ CGraphicObjects.prototype =
 
                 PositionV:
                 {
-                    RelativeFrom: c_oAscRelativeFromV.Page,
+                    RelativeFrom: Asc.c_oAscRelativeFromV.Page,
                     UseAlign    : false,
                     Align       : undefined,
                     Value       : common_bounds.minY
@@ -2436,7 +2467,7 @@ CGraphicObjects.prototype =
                     {
                         PositionH:
                         {
-                            RelativeFrom: c_oAscRelativeFromH.Page,
+                            RelativeFrom: Asc.c_oAscRelativeFromH.Page,
                             UseAlign : false,
                             Align    : undefined,
                             Value    : a_objects[i].posX
@@ -2444,7 +2475,7 @@ CGraphicObjects.prototype =
 
                         PositionV:
                         {
-                            RelativeFrom: c_oAscRelativeFromV.Page,
+                            RelativeFrom: Asc.c_oAscRelativeFromV.Page,
                             UseAlign    : false,
                             Align       : undefined,
                             Value       : a_objects[i].posY
@@ -2841,7 +2872,7 @@ CGraphicObjects.prototype =
         {
             if(this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_THROUGH && this.selectedObjects[0].parent.wrappingType !== WRAPPING_TYPE_TIGHT)
             {
-                if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : changestype_Paragraph_Content} ))
+                if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content} ))
                 {
                     History.Create_NewPoint(historydescription_Document_GrObjectsChangeWrapPolygon);
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);

@@ -1,18 +1,18 @@
 GRUNT = grunt
-GRUNT_FLAGS = --no-color -v
+GRUNT_FLAGS = --no-color -v 
 
-OUTPUT_DIR = build
+OUTPUT_DIR = deploy
 OUTPUT = $(OUTPUT_DIR)
 
 WEBAPPS_DIR = web-apps
 WEBAPPS = $(OUTPUT)/$(WEBAPPS_DIR)
-GRUNT_FILES = build/deploy/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
+GRUNT_FILES = build/Gruntfile.js.out ../web-apps/build/Gruntfile.js.out
 
 all: $(WEBAPPS)
 
 $(WEBAPPS): $(GRUNT_FILES)
 	mkdir -p $(OUTPUT)/$(WEBAPPS_DIR) && \
-		cp -r -t $(OUTPUT)/$(WEBAPPS_DIR) $(WEBAPPS_DIR)/deploy/** 
+		cp -r -t $(OUTPUT)/$(WEBAPPS_DIR) ../$(WEBAPPS_DIR)/deploy/** 
 
 $(GRUNT_FILES):
 	cd $(@D) && \

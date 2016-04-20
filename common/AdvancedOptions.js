@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (
 	/**
@@ -40,11 +40,11 @@
 			this.options = null;
 
 			switch(id){
-				case c_oAscAdvancedOptionsID.CSV:
+				case Asc.c_oAscAdvancedOptionsID.CSV:
 					this.optionId = id;
 					this.options = new asc_CCSVOptions(opt);
 					break;
-				case c_oAscAdvancedOptionsID.TXT:
+				case Asc.c_oAscAdvancedOptionsID.TXT:
 					this.optionId = id;
 					this.options = new asc_CTXTOptions(opt);
 					break;
@@ -69,7 +69,7 @@
 				}
 				return arr;
 			}();
-			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], /*opt["delimiter"]*/c_oAscCsvDelimiter.Comma); // ToDo разделитель пока только "," http://bugzserver/show_bug.cgi?id=31009
+			this.recommendedSettings = new asc_CCSVAdvancedOptions (opt["codepage"], /*opt["delimiter"]*/AscCommon.c_oAscCsvDelimiter.Comma); // ToDo разделитель пока только "," http://bugzserver/show_bug.cgi?id=31009
 		}
 		asc_CCSVOptions.prototype.asc_getCodePages = function(){ return this.codePages;};
 		asc_CCSVOptions.prototype.asc_getRecommendedSettings = function () { return this.recommendedSettings; };
@@ -207,7 +207,7 @@
 			this.arg = o.args;
 		}
 		asc_CFormula.prototype.asc_getName = function () {
-			return cFormulaFunctionToLocale ? cFormulaFunctionToLocale[this.name] : this.name;
+			return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[this.name] : this.name;
 		};
 		asc_CFormula.prototype.asc_getArguments = function () {
 			return this.arg;

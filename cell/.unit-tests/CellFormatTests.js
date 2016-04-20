@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿$(function () {
+$(function () {
 
 	var ver = 2;
 
@@ -75,7 +75,7 @@
 				break;
 
 			case 2:
-				expr = new CellFormat(fmtStr);
+				expr = new AscCommon.CellFormat(fmtStr);
 				for (i = 0; i < nArr.length; ++i) {
 					var aFormated = expr.format(nArr[i]);
 					var text = "";

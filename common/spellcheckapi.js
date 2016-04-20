@@ -24,7 +24,7 @@
 */
 "use strict";
 
-(function(global) {
+(function(window) {
   'use strict';
 
   // Класс надстройка, для online и offline работы
@@ -235,7 +235,9 @@
     this.sockjs_url = this._url + '/doc/' + docid + '/c';
     this.sockjs = initSocksJs(this.sockjs_url, this);
   };
-  global["CSpellCheckApi"] = CSpellCheckApi;
 
+  //-----------------------------------------------------------export---------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window["AscCommon"].CSpellCheckApi = CSpellCheckApi;
 })(window);
 

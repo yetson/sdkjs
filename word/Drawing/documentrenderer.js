@@ -700,7 +700,7 @@ function CDocMeta()
 
                     if (2 == _type)
                     {
-                        var _src = g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".svg");
+                        var _src = AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".svg");
 
                         obj.StreamPos = s.pos;
 
@@ -744,7 +744,7 @@ function CDocMeta()
                         return;
                     }
 
-                    var _src = (0 == _type || 10 == _type) ? g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".jpg") : g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".png");
+                    var _src = (0 == _type || 10 == _type) ? AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".jpg") : AscCommon.g_oDocumentUrls.getImageUrl("image" + s.GetLong() + ".png");
 
                     var __x = s.GetDouble();
                     var __y = s.GetDouble();
@@ -3195,7 +3195,7 @@ function CDocMeta()
         }
 		else if ( e.KeyCode == 80 && true === e.CtrlKey ) // Ctrl + P + ...
         {
-            editor.asc_Print();
+            editor.onPrint();
             bRetValue = true;
         }
         else if ( e.KeyCode == 83 && true === e.CtrlKey ) // Ctrl + S + ...

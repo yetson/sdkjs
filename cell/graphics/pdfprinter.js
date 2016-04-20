@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 function _rect()
 {
@@ -174,7 +174,7 @@ CPdfPrinter.prototype =
         return "miter";
     },
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setFillStyle : function(val)
@@ -193,7 +193,7 @@ CPdfPrinter.prototype =
         return this;
     },
 	/**
-	 * @param {RgbColor || ThemeColor || CColor} val
+	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setStrokeStyle : function(val)
@@ -382,7 +382,7 @@ CPdfPrinter.prototype =
     {
         if (this.bIsSimpleCommands)
             return this.DocumentRenderer.drawImage(_src, sx, sy, sw, sh, dx, dy);
-        var srcLocal = g_oDocumentUrls.getLocal(_src);
+        var srcLocal = AscCommon.g_oDocumentUrls.getLocal(_src);
         if (srcLocal){
             _src = srcLocal;
         }

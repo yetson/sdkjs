@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 var historyitem_ChartFormatSetChart = 1001;
 var historyitem_AutoShapes_SetDrawingBaseCoors = 1000;
@@ -496,6 +496,8 @@ var historyitem_SpPr_SetParent        = 2462;
 var historyitem_ClrScheme_AddClr      = 2462;
 var historyitem_ClrScheme_SetName     = 2463;
 var historyitem_ClrMap_SetClr         = 2464;
+
+var historyitem_Common_AddWatermark   = 100390;
 
 var historyitem_ExtraClrScheme_SetClrScheme  = 2465;
 var historyitem_ExtraClrScheme_SetClrMap     = 2466;
@@ -1036,7 +1038,8 @@ var historyitem_Drawing_SetEffectExtent   = 17;// Устанавливаем Eff
 var historyitem_Drawing_SetParent         = 18;// Устанавливаем Parent
 var historyitem_Drawing_SetParaMath       = 19; // Добавляем новую формулу для конвертации старого формата в новый
 var historyitem_Drawing_LayoutInCell      = 20; // Устанавливаем параметр расположения в таблице
-
+var historyitem_Drawing_SetSizeRelH       = 21;//Ширина объекта в процентах
+var historyitem_Drawing_SetSizeRelV       = 22;//Высота объекта в процентах
 
 
 
@@ -1132,6 +1135,7 @@ var historyitem_HdrFtr_BoundY2 = 1; // Изменяем отступ колон�
 // Типы изменений в классе CAbstractNum
 var historyitem_AbstractNum_LvlChange    = 1; // Изменили заданный уровень
 var historyitem_AbstractNum_TextPrChange = 2; // Изменили текстовую настройку у заданного уровня
+var historyitem_AbstractNum_ParaPrChange = 3; // Изменили настройку параграфа у заданного уровня
 
 // Типы изменений в классе CTableId
 var historyitem_TableId_Add         = 1;      // Добавили новую ссылку в глобальную таблицу
@@ -1212,8 +1216,10 @@ var historyitem_Style_UnhideWhenUsed  = 109; // Изменяем UnhideWhenUsed
 var historyitem_Style_Link            = 110; // Изменяем Link
 
 // Типы изменений в классе CStyles
-var historyitem_Styles_Add    = 1; // Добавляем стиль
-var historyitem_Styles_Remove = 2; // Удаляем стиль
+var historyitem_Styles_Add                 = 1; // Добавляем стиль
+var historyitem_Styles_Remove              = 2; // Удаляем стиль
+var historyitem_Styles_ChangeDefaultTextPr = 3; // Изменяем настройки текста по умолчанию
+var historyitem_Styles_ChangeDefaultParaPr = 4; // Изменяем настройки параграфа по умолчанию
 
 // Тип изменений в классе CSectionPr
 var historyitem_Section_PageSize_Orient    = 1; // Меняем ориентацию страницы

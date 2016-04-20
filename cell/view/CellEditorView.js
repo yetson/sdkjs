@@ -42,6 +42,12 @@
 	 * -----------------------------------------------------------------------------
 	 */
 	var asc = window["Asc"];
+	
+	var AscBrowser = AscCommon.AscBrowser;
+	
+	var cElementType = AscCommonExcel.cElementType;
+	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;
+	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
 
 	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
@@ -167,7 +173,7 @@
 		this.reFormula = new XRegExp( "^([\\p{L}][\\p{L}0-9_]*)", "i" );
 
 		this.defaults = {
-			padding: -1, selectColor: new CColor( 190, 190, 255, 0.5 ),
+			padding: -1, selectColor: new AscCommon.CColor( 190, 190, 255, 0.5 ),
 
 			canvasZIndex: 500, blinkInterval: 500, cursorShape: "text"
 		};
@@ -447,7 +453,7 @@
 
 	CellEditor.prototype.empty = function ( options ) {
 		// Чистка для редактирования только All
-		if ( c_oAscCleanOptions.All !== options ) {
+		if ( Asc.c_oAscCleanOptions.All !== options ) {
 			return;
 		}
 
@@ -710,11 +716,10 @@
 	};
 
 	CellEditor.prototype.formulaIsOperator = function () {
+		var elem;
 		return this.isFormula() &&
-			this._formula &&
-			( this._formula.f.length > 0 && this._formula.f[this._formula.f.length - 1].type == cElementType.operator ||
-				this._formula.f.length == 0 ||
-				this._formula.operand_expected );
+			(null !== (elem = this._formula.getElementByPos(this.cursorPos - 1)) && elem.type === cElementType.operator ||
+			null === elem || this._formula.operand_expected);
 	};
 
 	CellEditor.prototype.insertFormula = function ( functionName, isDefName ) {
@@ -818,7 +823,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == c_oAscNumFormatType.Text ) {
+		if ( s.length < 1 || s.charAt( 0 ) !== "=" || this.options.cellNumFormat == Asc.c_oAscNumFormatType.Text ) {
 			return ret;
 		}
 
@@ -842,7 +847,7 @@
 //             var __e__ = new Date().getTime();
 //             console.log("e-s "+ (__e__ - __s__));
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		var r, offset, _e, _s, wsName = null, refStr, isName = false,
@@ -903,7 +908,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if( nameRef instanceof cError ) continue;
+						if( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :{
@@ -967,7 +972,7 @@
 			wsOPEN = this.handlers.trigger( "getCellFormulaEnterWSOpen" ),
 			ws = wsOPEN ? wsOPEN.model : this.handlers.trigger( "getActiveWS" );
 
-		this._formula = new parserFormula( s.substr( 1 ), this.options.cellName, ws );
+		this._formula = new AscCommonExcel.parserFormula( s.substr( 1 ), this.options.cellName, ws );
 		this._formula.parse();
 
 		if ( this._formula.RefPos && this._formula.RefPos.length > 0 ) {
@@ -1022,7 +1027,7 @@
 					case cElementType.name          :
 					{
 						var nameRef = r.oper.toRef();
-						if ( nameRef instanceof cError ) continue;
+						if ( nameRef instanceof AscCommonExcel.cError ) continue;
 						switch ( nameRef.type ) {
 
 							case cElementType.cellsRange3D          :
@@ -1108,7 +1113,7 @@
 				for ( i = 0; i < opt.fragments.length; ++i )
 					fragments.push( opt.fragments[i].clone() );
 
-				lengthColors = c_oAscFormulaRangeBorderColor.length;
+				lengthColors = AscCommonExcel.c_oAscFormulaRangeBorderColor.length;
 				tmpColors = [];
 				uniqueColorIndex = 0;
 				for ( i = 0; i < arrRanges.length; ++i ) {
@@ -1126,7 +1131,7 @@
 					last = this._findFragment( val.cursorePos + val.formulaRangeLength - 1, fragments );
 					if ( first && last ) {
 						for ( j = first.index; j <= last.index; ++j )
-							fragments[j].format.c = c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
+							fragments[j].format.c = AscCommonExcel.c_oAscFormulaRangeBorderColor[colorIndex % lengthColors];
 					}
 				}
 			}
@@ -2174,7 +2179,7 @@
 		result.strikeout = tmp.s;
 		result.subscript = tmp.va === "subscript";
 		result.superscript = tmp.va === "superscript";
-		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new asc_CColor( this.options.textColor ));
+		result.color = (tmp.c ? asc.colorObjToAscColor( tmp.c ) : new Asc.asc_CColor( this.options.textColor ));
 
 		this.handlers.trigger( "updateEditorSelectionInfo", result );
 	};
@@ -2182,14 +2187,14 @@
 	CellEditor.prototype._checkMaxCellLength = function ( length ) {
 		var newLength = this._getFragmentsLength( this.options.fragments ) + length;
 		// Ограничение на ввод
-		if ( newLength > c_oAscMaxCellOrCommentLength ) {
+		if ( newLength > Asc.c_oAscMaxCellOrCommentLength ) {
 			if ( this.selectionBegin === this.selectionEnd ) {
 				return false;
 			}
 
 			var b = Math.min( this.selectionBegin, this.selectionEnd );
 			var e = Math.max( this.selectionBegin, this.selectionEnd );
-			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > c_oAscMaxCellOrCommentLength ) {
+			if ( newLength - this._getFragmentsLength( this._getFragments( b, e - b ) ) > Asc.c_oAscMaxCellOrCommentLength ) {
 				return false;
 			}
 		}

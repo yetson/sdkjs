@@ -30,13 +30,16 @@
  * Time: 10:38
  */
 
+// Import
+var g_oTableId = AscCommon.g_oTableId;
+
 var comments_NoComment        = 0;
 var comments_NonActiveComment = 1;
 var comments_ActiveComment    = 2;
 
 function ParaComment(Start, Id)
 {
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Paragraph = null;
 
@@ -820,7 +823,7 @@ var comment_type_HdrFtr = 2; // Комментарий к колонтитулу
 
 function CComment(Parent, Data)
 {
-    this.Id     = g_oIdCounter.Get_NewId();
+    this.Id     = AscCommon.g_oIdCounter.Get_NewId();
 
     this.Parent = Parent;
     this.Data   = Data;
@@ -852,10 +855,10 @@ function CComment(Parent, Data)
         ParaId  : null
     };
 
-    this.Lock = new CLock(); // Зажат ли комментарий другим пользователем
-    if ( false === g_oIdCounter.m_bLoad )
+    this.Lock = new AscCommon.CLock(); // Зажат ли комментарий другим пользователем
+    if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
-        this.Lock.Set_Type( locktype_Mine, false );
+        this.Lock.Set_Type( AscCommon.locktype_Mine, false );
         CollaborativeEditing.Add_Unlock2( this );
     }
 

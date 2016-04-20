@@ -1,27 +1,3 @@
-/*
- *
- * (c) Copyright Ascensio System Limited 2010-2016
- *
- * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
- * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
- * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
- * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
- *
- * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
- * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
- *
- * You can contact Ascensio System SIA by email at sales@onlyoffice.com
- *
- * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
- * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
- *
- * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
- * relevant author attributions when distributing the software. If the display of the logo in its graphic 
- * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
- * in every copy of the program you distribute. 
- * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
- *
-*/
 "use strict";
 
 function CMathDegreePr()
@@ -80,7 +56,7 @@ function CDegreeBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-Asc.extendClass(CDegreeBase, CMathBase);
+AscCommon.extendClass(CDegreeBase, CMathBase);
 CDegreeBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -109,12 +85,14 @@ CDegreeBase.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsI
     var ArgSzDegr = ArgSize.Copy();
     ArgSzDegr.Decrease();
 
-    var RPIDegr = RPI.Copy();
-    RPIDegr.bDecreasedComp = true;
-
     this.bNaryInline = RPI.bNaryInline;
 
-    this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPIDegr);
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
+
+    this.iterContent.PreRecalc(this, ParaMath, ArgSzDegr, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CDegreeBase.prototype.Resize = function(oMeasure, RPI)
 {
@@ -429,14 +407,14 @@ function CDegree(props, bInside)
 {
     CDegree.superclass.constructor.call(this, props, bInside);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDegree, CDegreeBase);
+AscCommon.extendClass(CDegree, CDegreeBase);
 CDegree.prototype.ClassType = historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
 CDegree.prototype.init = function(props)
@@ -541,7 +519,7 @@ function CIterators(iterUp, iterDn)
     this.iterUp = iterUp;
     this.iterDn = iterDn;
 }
-Asc.extendClass(CIterators, CMathBase);
+AscCommon.extendClass(CIterators, CMathBase);
 CIterators.prototype.init = function()
 {
     this.setDimension(2, 1);
@@ -560,11 +538,13 @@ CIterators.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI, GapsIn
 
     this.Set_CompiledCtrPrp(Parent, ParaMath, RPI);
 
-    var RPI_ITER = RPI.Copy();
-    RPI_ITER.bDecreasedComp = true;
+    var bDecreasedComp = RPI.bDecreasedComp;
+    RPI.bDecreasedComp = true;
 
-    this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
-    this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI_ITER);
+    this.iterUp.PreRecalc(this, ParaMath, ArgSzIters, RPI);
+    this.iterDn.PreRecalc(this, ParaMath, ArgSzIters, RPI);
+
+    RPI.bDecreasedComp = bDecreasedComp;
 };
 CIterators.prototype.recalculateSize = function(oMeasure, dH, ascent)
 {
@@ -690,7 +670,7 @@ function CDegreeSubSupBase(props, bInside)
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 }
-Asc.extendClass(CDegreeSubSupBase, CMathBase);
+AscCommon.extendClass(CDegreeSubSupBase, CMathBase);
 CDegreeSubSupBase.prototype.init = function(props)
 {
     this.setProperties(props);
@@ -883,14 +863,14 @@ function CDegreeSubSup(props, bInside)
 {
     CDegreeSubSup.superclass.constructor.call(this, props, bInside);
 
-    this.Id = g_oIdCounter.Get_NewId();
+    this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
     if(props !== null && typeof(props) !== "undefined")
         this.init(props);
 
-    g_oTableId.Add( this, this.Id );
+    AscCommon.g_oTableId.Add( this, this.Id );
 }
-Asc.extendClass(CDegreeSubSup, CDegreeSubSupBase);
+AscCommon.extendClass(CDegreeSubSup, CDegreeSubSupBase);
 CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
 CDegreeSubSup.prototype.init = function(props)
@@ -1193,7 +1173,7 @@ function CMathMenuScript(Script, Type)
     else
         this.ScriptType = undefined;
 }
-Asc.extendClass(CMathMenuScript, CMathMenuBase);
+AscCommon.extendClass(CMathMenuScript, CMathMenuBase);
 
 CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
 CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};

@@ -37,7 +37,7 @@ function CCollaborativeEditing()
     CCollaborativeEditing.superclass.constructor.call(this);
 }
 
-Asc.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
 
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {

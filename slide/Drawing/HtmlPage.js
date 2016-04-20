@@ -30,7 +30,7 @@ var g_dDpiY = 96.0;
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
-var g_bIsMobile = AscBrowser.isMobile;
+var g_bIsMobile = AscCommon.AscBrowser.isMobile;
 var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 297;
@@ -234,7 +234,7 @@ function CEditorPage(api)
 
     this.ZoomFreePageNum = -1;
 
-    this.m_bIsIE = AscBrowser.isIE;
+    this.m_bIsIE = AscCommon.AscBrowser.isIE;
 
     // сплиттеры (для табнейлов и для заметок)
     this.Splitter1Pos = 0;
@@ -536,7 +536,7 @@ function CEditorPage(api)
         var old = this.bIsRetinaSupport;
         if (!this.bIsRetinaNoSupportAttack)
         {
-			this.bIsRetinaSupport = AscBrowser.isRetina;
+			this.bIsRetinaSupport = AscCommon.AscBrowser.isRetina;
             this.m_oOverlayApi.IsRetina = this.bIsRetinaSupport;
         }
         else
@@ -2394,7 +2394,7 @@ function CEditorPage(api)
 
     this.OnResize = function(isAttack)
     {
-        AscBrowser.checkZoom();
+        AscCommon.AscBrowser.checkZoom();
 
         var isNewSize = this.checkBodySize();
         if (!isNewSize && false === isAttack)
@@ -3077,7 +3077,7 @@ function CEditorPage(api)
         var oWordControl = oThis;
         oWordControl.m_nTimeDrawingLast = new Date().getTime();
 		
-		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !window.USER_AGENT_SAFARI_MACOS)
+		if (oWordControl.IsFocus && oWordControl.TextBoxInputMode && oWordControl.TextBoxInput && !AscCommon.AscBrowser.isSafariMacOs)
         {
             if (!oWordControl.m_oApi.isLongAction() && !window.GlobalCopyFlag)
                 oWordControl.TextBoxInput.focus();
@@ -3217,26 +3217,26 @@ function CEditorPage(api)
         this.m_oApi.sync_currentPageCallback(drDoc.m_lCurrentPage);
     }
 
-    this.UpdateHorRulerBack = function()
+    this.UpdateHorRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
-            this.CreateBackgroundHorRuler();
+            this.CreateBackgroundHorRuler(undefined, isattack);
         }
         this.UpdateHorRuler();
     }
-    this.UpdateVerRulerBack = function()
+    this.UpdateVerRulerBack = function(isattack)
     {
         var drDoc = this.m_oDrawingDocument;
         if (0 <= drDoc.SlideCurrent && drDoc.SlideCurrent < drDoc.SlidesCount)
         {
-            this.CreateBackgroundVerRuler();
+            this.CreateBackgroundVerRuler(undefined, isattack);
         }
         this.UpdateVerRuler();
     }
 
-    this.CreateBackgroundHorRuler = function(margins)
+    this.CreateBackgroundHorRuler = function(margins, isattack)
     {
         var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
@@ -3257,9 +3257,9 @@ function CEditorPage(api)
             cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
         }
 
-        this.m_oHorRuler.CreateBackground(cachedPage);
+        this.m_oHorRuler.CreateBackground(cachedPage, isattack);
     }
-    this.CreateBackgroundVerRuler = function(margins)
+    this.CreateBackgroundVerRuler = function(margins, isattack)
     {
         var cachedPage = {};
         cachedPage.width_mm = this.m_oLogicDocument.Width;
@@ -3280,7 +3280,7 @@ function CEditorPage(api)
             cachedPage.margin_bottom  = this.m_oLogicDocument.Height;
         }
 
-        this.m_oVerRuler.CreateBackground(cachedPage);
+        this.m_oVerRuler.CreateBackground(cachedPage, isattack);
     }
 
     this.ThemeGenerateThumbnails = function(_master)

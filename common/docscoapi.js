@@ -22,13 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 (function(window, undefined) {
   'use strict';
 
-  var asc = window["Asc"];
   var asc_coAuthV = '3.0.9';
+  var ConnectionState = AscCommon.ConnectionState;
+  var c_oEditorId = AscCommon.c_oEditorId;
 
   // Класс надстройка, для online и offline работы
   function CDocsCoApi(options) {
@@ -149,7 +150,7 @@
       this._CoAuthoringApi.auth(isViewer);
     } else {
       // Фиктивные вызовы
-      this.callback_OnSpellCheckInit(window['g_cAscSpellCheckUrl'] ? window['g_cAscSpellCheckUrl'] : '');
+      this.callback_OnSpellCheckInit('');
       this.callback_OnSetIndexUser('123');
       this.onFirstLoadChangesEnd();
     }
@@ -200,6 +201,12 @@
   CDocsCoApi.prototype.sendCursor = function(cursor) {
     if (this._CoAuthoringApi && this._onlineWork) {
       this._CoAuthoringApi.sendCursor(cursor);
+    }
+  };
+
+  CDocsCoApi.prototype.sendChangesError = function(data) {
+    if (this._CoAuthoringApi && this._onlineWork) {
+      this._CoAuthoringApi.sendChangesError(data);
     }
   };
 
@@ -610,7 +617,7 @@
     }
 
     // Проверим состояние, если мы не подсоединились, то сразу отправим ошибку
-    if (ConnectionState.Reconnect === this._state) {
+    if (ConnectionState.Authorized !== this._state) {
       this.saveLockCallbackErrorTimeOutId = window.setTimeout(function() {
         if (callback && _.isFunction(callback)) {
           // Фиктивные вызовы
@@ -710,7 +717,6 @@
 
   DocsCoApi.prototype.disconnect = function() {
     // Отключаемся сами
-    clearInterval(this.pingIntervalID);
     this.isCloseCoAuthoring = true;
     this._send({"type": "close"});
     this._state = ConnectionState.ClosedCoAuth;
@@ -740,8 +746,10 @@
     }
   };
 
-  DocsCoApi.prototype.ping = function() {
-    this._send({'type': 'ping'});
+  DocsCoApi.prototype.sendChangesError = function(data) {
+    if (typeof data === 'string') {
+      this._send({'type': 'changesError', 'stack': data});
+    }
   };
 
   DocsCoApi.prototype._sendPrebuffered = function() {
@@ -1012,7 +1020,7 @@
     if (participants) {
       var tmpUser;
       for (var i = 0; i < participants.length; ++i) {
-        tmpUser = new asc.asc_CUser(participants[i]);
+        tmpUser = new AscCommon.asc_CUser(participants[i]);
         this._participants[tmpUser.asc_getId()] = tmpUser;
         // Считаем только число редакторов
         if (!tmpUser.asc_getView()) {
@@ -1037,7 +1045,7 @@
   DocsCoApi.prototype._onConnectionStateChanged = function(data) {
     var userStateChanged = null, userId, stateChanged = false, isEditUser = true;
     if (this.onConnectionStateChanged) {
-      userStateChanged = new asc.asc_CUser(data['user']);
+      userStateChanged = new AscCommon.asc_CUser(data['user']);
       userStateChanged.setState(data["state"]);
 
       userId = userStateChanged.asc_getId();
@@ -1107,7 +1115,7 @@
 
       if (this._isReSaveAfterAuth) {
         var callbackAskSaveChanges = function(e) {
-          if (false == e["saveLock"]) {
+          if (false === e["saveLock"]) {
             t._reSaveChanges();
           } else {
             setTimeout(function() {
@@ -1154,8 +1162,6 @@
 
       //Send prebuffered
       this._sendPrebuffered();
-
-      this.pingIntervalID = setInterval(function() {t.ping();}, this.pingInterval);
     }
     //TODO: Add errors
   };
@@ -1172,9 +1178,6 @@
     this._isPresentation = c_oEditorId.Presentation === editorType;
     this._isAuth = false;
     this._documentFormatSave = documentFormatSave;
-
-    this.pingInterval = 60 * 1000;
-    this.pingIntervalID = null;
 
     this._initSocksJs();
   };
@@ -1300,7 +1303,7 @@
         }
       }
       t._state = ConnectionState.Reconnect;
-      var bIsDisconnectAtAll = t.attemptCount >= t.maxAttemptCount;
+      var bIsDisconnectAtAll = (4001 === evt.code || t.attemptCount >= t.maxAttemptCount);
       if (bIsDisconnectAtAll) {
         t._state = ConnectionState.ClosedAll;
       }
@@ -1308,7 +1311,7 @@
         t.onDisconnect(evt.reason, bIsDisconnectAtAll, t.isCloseCoAuthoring);
       }
       //Try reconect
-      if (t.attemptCount < t.maxAttemptCount) {
+      if (!bIsDisconnectAtAll) {
         t._tryReconnect();
       }
     };
@@ -1334,5 +1337,7 @@
     return window['SockJS'] ? window['SockJS'] : require('sockjs');
   };
 
-  window["CDocsCoApi"] = CDocsCoApi;
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].CDocsCoApi = CDocsCoApi;
 })(window);

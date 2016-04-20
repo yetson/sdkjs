@@ -24,6 +24,26 @@
 */
 "use strict";
 
+// Import
+var CellValueType = AscCommon.CellValueType;
+var c_oAscBorderWidth = AscCommon.c_oAscBorderWidth;
+var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+var FormulaTablePartInfo = AscCommon.FormulaTablePartInfo;
+var cBoolLocal = AscCommon.cBoolLocal;
+var cErrorOrigin = AscCommon.cErrorOrigin;
+var cErrorLocal = AscCommon.cErrorLocal;
+var parserHelp = AscCommon.parserHelp;
+var oNumFormatCache = AscCommon.oNumFormatCache;
+var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
+
+var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
+var UndoRedoData_CellSimpleData = AscCommonExcel.UndoRedoData_CellSimpleData;
+var UndoRedoData_IndexSimpleProp = AscCommonExcel.UndoRedoData_IndexSimpleProp;
+
+var c_oAscCustomAutoFilter = Asc.c_oAscCustomAutoFilter;
+var c_oAscAutoFilterTypes = Asc.c_oAscAutoFilterTypes;
+var c_oAscNumFormatType = Asc.c_oAscNumFormatType;
+
 var g_oColorManager = null;
 var g_nNumsMaxId = 160;
 var g_oDefaultXfId = null;
@@ -45,15 +65,6 @@ var g_nColorHyperlinkVisited = 11;
 var g_nFiltersType = {
 	autoFilter: 1, 
 	tablePart: 2
-};
-
-var g_nFormulaTablePartInfo = {
-	all: 1, 
-	data: 2,
-	headers: 3,
-	totals: 4,
-	thisRow: 5,
-	columns: 6
 };
 
 var g_oThemeColorsDefaultModsSpreadsheet = [
@@ -325,7 +336,7 @@ function CorrectAscColor(asc_color)
 	var _type = asc_color.asc_getType();
 	switch (_type)
 	{
-		case c_oAscColor.COLOR_TYPE_SCHEME:
+		case Asc.c_oAscColor.COLOR_TYPE_SCHEME:
 		{
 			// тут выставляется ТОЛЬКО из меню. поэтому:
 			var _index = asc_color.asc_getValue() >> 0;
@@ -2117,7 +2128,7 @@ Hyperlink.prototype = {
 		return this.bVisited;
 	},
 	getHyperlinkType : function () {
-		return null !== this.Hyperlink ? c_oAscHyperlinkType.WebLink : c_oAscHyperlinkType.RangeLink;
+		return null !== this.Hyperlink ? Asc.c_oAscHyperlinkType.WebLink : Asc.c_oAscHyperlinkType.RangeLink;
 	},
 	getType : function () {
 		return UndoRedoDataTypes.Hyperlink;
@@ -2234,7 +2245,7 @@ Col.prototype =
     },
 	getWidthProp : function()
 	{
-		return new UndoRedoData_ColProp(this);
+		return new AscCommonExcel.UndoRedoData_ColProp(this);
 	},
 	setWidthProp : function(prop)
 	{
@@ -2284,7 +2295,7 @@ Col.prototype =
 				oldVal = oldVal.clone();
 			if(null != newVal)
 				newVal = newVal.clone();
-			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+			History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setCellStyle : function(val)
@@ -2293,7 +2304,7 @@ Col.prototype =
 		var oRes = this.ws.workbook.oStyleManager.setCellStyle(this, newVal);
 		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.ws.workbook.CellStyles.getStyleNameByXfId(oRes.oldVal);
-			History.Add(g_oUndoRedoCol, historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
+			History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.ws.workbook.CellStyles.getStyleByXfId(oRes.newVal);
@@ -2311,7 +2322,7 @@ Col.prototype =
 	{
 		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2324,74 +2335,74 @@ Col.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setFontname : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontname(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontsize : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontcolor : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setBold : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setItalic : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setUnderline : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setStrikeout : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFontAlign : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setAlignVertical : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setAlignHorizontal : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setFill : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setBorder : function(val)
 	{
@@ -2404,32 +2415,32 @@ Col.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oldVal, newVal));
 		}
 	},
 	setShrinkToFit : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
 	setWrap : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	},
     setAngle : function(val)
     {
         var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
     },
 	setVerticalText : function(val)
 	{
         var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoCol, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, false, oRes.oldVal, oRes.newVal));
 	}
 };
 var g_nRowFlag_empty = 0;
@@ -2507,7 +2518,7 @@ Row.prototype =
 	},
 	getHeightProp : function()
 	{
-		return new UndoRedoData_RowProp(this);
+		return new AscCommonExcel.UndoRedoData_RowProp(this);
 	},
 	setHeightProp : function(prop)
 	{
@@ -2562,7 +2573,7 @@ Row.prototype =
 				oldVal = oldVal.clone();
 			if(null != newVal)
 				newVal = newVal.clone();
-			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+			History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_SetStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setCellStyle : function(val)
@@ -2571,7 +2582,7 @@ Row.prototype =
 		var oRes = this.ws.workbook.oStyleManager.setCellStyle(this, newVal);
 		if(History.Is_On() && oRes.oldVal != oRes.newVal) {
 			var oldStyleName = this.ws.workbook.CellStyles.getStyleNameByXfId(oRes.oldVal);
-			History.Add(g_oUndoRedoRow, historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
+			History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_SetCellStyle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldStyleName, val));
 
 			// Выставляем стиль
 			var oStyle = this.ws.workbook.CellStyles.getStyleByXfId(oRes.newVal);
@@ -2589,7 +2600,7 @@ Row.prototype =
 	{
 		var oRes = this.ws.workbook.oStyleManager.setNumFormat(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_NumFormat, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFont : function(val)
     {
@@ -2602,74 +2613,74 @@ Row.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_SetFont, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setFontname : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontname(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Fontname, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontsize : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontsize(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Fontsize, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontcolor : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontcolor(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Fontcolor, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setBold : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setBold(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Bold, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setItalic : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setItalic(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Italic, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setUnderline : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setUnderline(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Underline, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setStrikeout : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setStrikeout(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Strikeout, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFontAlign : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFontAlign(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_FontAlign, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setAlignVertical : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setAlignVertical(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_AlignVertical, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setAlignHorizontal : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setAlignHorizontal(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_AlignHorizontal, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setFill : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setFill(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Fill, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setBorder : function(val)
 	{
@@ -2682,32 +2693,32 @@ Row.prototype =
 			var newVal = null;
 			if(null != oRes.newVal)
 				newVal = oRes.newVal.clone();
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Border, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oldVal, newVal));
 		}
 	},
 	setShrinkToFit : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_ShrinkToFit, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
 	setWrap : function(val)
 	{
 		var oRes = this.ws.workbook.oStyleManager.setShrinkToFit(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Wrap, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	},
     setAngle: function(val)
     {
         var oRes = this.ws.workbook.oStyleManager.setAngle(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
     },
 	setVerticalText : function(val)
 	{
         var oRes = this.ws.workbook.oStyleManager.setVerticalText(this, val);
         if(History.Is_On() && oRes.oldVal != oRes.newVal)
-            History.Add(g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
+            History.Add(AscCommonExcel.g_oUndoRedoRow, historyitem_RowCol_Angle, this.ws.getId(), this._getUpdateRange(), new UndoRedoData_IndexSimpleProp(this.index, true, oRes.oldVal, oRes.newVal));
 	}
 };
 var g_oCCellValueMultiTextProperties = {
@@ -2911,9 +2922,9 @@ CCellValue.prototype =
 			for(var i = 0, length = this.textValueForEdit2.length; i < length; ++i)
 				this.textValueForEdit += this.textValueForEdit2[i].text;
 		}
-		if( CellValueType.Error == this.type ){
-			return this._getValueTypeError(this.textValueForEdit);
-		}
+//		if( CellValueType.Error == this.type ){
+//			return this._getValueTypeError(this.textValueForEdit);
+//		}
 		return this.textValueForEdit;
 	},
 	getValue2 : function(cell, dDigitsCount, fIsFitMeasurer)
@@ -2975,7 +2986,7 @@ CCellValue.prototype =
 					while(nTempDigCount >= 1)
 					{
 						//Строим подходящий general format
-						var sGeneral = DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
+						var sGeneral = AscCommon.DecodeGeneralFormat(sOriginText, this.type, nTempDigCount);
 						if(null != sGeneral)
 							oNumFormat = oNumFormatCache.get(sGeneral);
 
@@ -3004,7 +3015,7 @@ CCellValue.prototype =
 						aRes = null;
 						sText = null;
 						if (dDigitsCount > 1){
-						    var oNumFormatFont = new NumFormatFont();
+						    var oNumFormatFont = new AscCommon.NumFormatFont();
 						    oNumFormatFont.repeat = true;
 						    aText = [{ text: "#", format: oNumFormatFont }];
 						}
@@ -3031,7 +3042,7 @@ CCellValue.prototype =
 				{
 					aRes = null;
 					sText = null;
-					var oNumFormatFont = new NumFormatFont();
+					var oNumFormatFont = new AscCommon.NumFormatFont();
 					oNumFormatFont.repeat = true;
 					aText = [{ text: "#", format: oNumFormatFont }];
 				}
@@ -3050,7 +3061,7 @@ CCellValue.prototype =
 	getValueForEdit2: function (cell, cultureInfo)
 	{
 	    if (null == cultureInfo)
-	        cultureInfo = g_oDefaultCultureInfo;
+	        cultureInfo = AscCommon.g_oDefaultCultureInfo;
 		if(null == this.textValueForEdit2)
 		{
 			//todo проблема точности. в excel у чисел только 15 значащих цифр у нас больше.
@@ -3059,7 +3070,7 @@ CCellValue.prototype =
 			var oValueArray = null;
 			var xfs = cell.getCompiledStyle();
 			if(cell.sFormula)
-				oValueText = "="+cell.formulaParsed.assembleLocale(cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
+				oValueText = "="+cell.formulaParsed.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale,true);	// ToDo если будет притормаживать, то завести переменную и не рассчитывать каждый раз!
 			else
 			{
 				if(null != this.text || null != this.number)
@@ -3086,7 +3097,7 @@ CCellValue.prototype =
 									if(1 == oTargetFormat.nPercent)
 									{
 										//prercent
-										oValueText = oGeneralEditFormatCache.format(nValue * 100) + "%";
+										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue * 100) + "%";
 									}
 									else if(oTargetFormat.bDateTime)
 									{
@@ -3124,16 +3135,16 @@ CCellValue.prototype =
 											else
 											    oNumFormat = oNumFormatCache.get(sDateFormat);
 											
-											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, gc_nMaxDigCount);
+											var aFormatedValue = oNumFormat.format(nValue, CellValueType.Number, AscCommon.gc_nMaxDigCount);
 											oValueText = "";
 											for(var i = 0, length = aFormatedValue.length; i < length; ++i)
 												oValueText += aFormatedValue[i].text;
 										}
 										else
-											oValueText = oGeneralEditFormatCache.format(nValue);
+											oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
 									}
 									else
-										oValueText = oGeneralEditFormatCache.format(nValue);
+										oValueText = AscCommon.oGeneralEditFormatCache.format(nValue);
 								}
 							}
 						}
@@ -3268,10 +3279,10 @@ CCellValue.prototype =
 		}
 		else
 		{
-		    if (g_oFormatParser.isLocaleNumber(val))
+		    if (AscCommon.g_oFormatParser.isLocaleNumber(val))
 			{
 				this.type = CellValueType.Number;
-				this.number = g_oFormatParser.parseLocaleNumber(val);
+				this.number = AscCommon.g_oFormatParser.parseLocaleNumber(val);
 			}
 			else
 			{
@@ -3291,7 +3302,7 @@ CCellValue.prototype =
 				else
 				{
 					//распознаем формат
-					var res = g_oFormatParser.parse(val);
+					var res = AscCommon.g_oFormatParser.parse(val);
 					if(null != res)
 					{
 						//Сравниваем с текущим форматом, если типы совпадают - меняем только значение ячейки
@@ -3321,9 +3332,9 @@ CCellValue.prototype =
     if (/(^(((http|https|ftp):\/\/)|(mailto:)|(www.)))|@/i.test(val)) {
       // Удаляем концевые пробелы и переводы строки перед проверкой гиперссылок
       val = val.replace(/\s+$/, '');
-      var typeHyp = getUrlType(val);
-      if (c_oAscUrlType.Invalid != typeHyp) {
-        val = prepareUrl(val, typeHyp);
+      var typeHyp = AscCommon.getUrlType(val);
+      if (AscCommon.c_oAscUrlType.Invalid != typeHyp) {
+        val = AscCommon.prepareUrl(val, typeHyp);
 
         var oNewHyperlink = new Hyperlink();
         oNewHyperlink.Ref = cell.ws.getCell3(cell.nRow, cell.nCol);
@@ -3476,12 +3487,12 @@ CCellValue.prototype =
 				if(this.miminizeMultiText(cell, false))
 				{
 					var DataNew = cell.getValueData();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
+					History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeValue, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow,cell.nCol, backupObj, DataNew));
 				}
 				else
 				{
 					var DataNew = this._cloneMultiText();
-					History.Add(g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow, cell.nCol, backupObj.value.multiText, DataNew));
+					History.Add(AscCommonExcel.g_oUndoRedoCell, historyitem_Cell_ChangeArrayValueFormat, cell.ws.getId(), new Asc.Range(cell.nCol, cell.nRow, cell.nCol, cell.nRow), new UndoRedoData_CellSimpleData(cell.nRow, cell.nCol, backupObj.value.multiText, DataNew));
 				}
 			}
 			bRes = true;
@@ -3620,7 +3631,7 @@ function IntervalTreeRBNode(low, high, storedValue){
 	this.maxHigh = this.high;
 	this.minLow = this.key;
 }
-Asc.extendClass(IntervalTreeRBNode, TreeRBNode);
+AscCommon.extendClass(IntervalTreeRBNode, TreeRBNode);
 IntervalTreeRBNode.prototype.isEqual = function (x) {
 	return this.key == x.key && this.high == x.high;
 };
@@ -3918,7 +3929,7 @@ TreeRB.prototype = {
 function IntervalTreeRB(){
 	IntervalTreeRB.superclass.constructor.call(this);
 }
-Asc.extendClass(IntervalTreeRB, TreeRB);
+AscCommon.extendClass(IntervalTreeRB, TreeRB);
 IntervalTreeRB.prototype._init = function (x) {
 	this.nil = new IntervalTreeRBNode();
 	this.nil.left = this.nil.right = this.nil.parent = this.nil;
@@ -4430,6 +4441,78 @@ CellArea.prototype = {
 	}
 };
 
+/** @constructor */
+function sparklineGroups() {
+	this.arrSparklineGroup = [];
+}
+/** @constructor */
+function sparklineGroup() {
+	// attributes
+	this.manualMax = undefined;
+	this.manualMin = undefined;
+	this.lineWeight = 0.75;
+	this.type = Asc.ESparklineType.Line;
+	this.dateAxis = false;
+	this.displayEmptyCellsAs = Asc.EDispBlanksAs.Zero;
+	this.markers = false;
+	this.high = false;
+	this.low = false;
+	this.first = false;
+	this.last = false;
+	this.negative = false;
+	this.displayXAxis = false;
+	this.displayHidden = false;
+	this.minAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.maxAxisType = Asc.SparklineAxisMinMax.Individual;
+	this.rightToLeft = false;
+
+	// elements
+	this.colorSeries = null;
+	this.colorNegative = null;
+	this.colorAxis = null;
+	this.colorMarkers = null;
+	this.colorFirst = null;
+	this.colorLast = null;
+	this.colorHigh = null;
+	this.colorLow = null;
+	this.f = null;
+	this.arrSparklines = [];
+	this.arrCachedSparklines = [];
+}
+sparklineGroup.prototype.clearCached = function() {
+	this.arrCachedSparklines.length = 0;
+};
+sparklineGroup.prototype.addView = function(oSparklineView, index) {
+	this.arrCachedSparklines[index] = oSparklineView;
+};
+sparklineGroup.prototype.draw = function(oDrawingContext) {
+	var graphics = new CGraphics();
+	graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
+		oDrawingContext.getWidth(3), oDrawingContext.getHeight(3));
+	graphics.m_oFontManager = g_fontManager;
+	for (var i = 0; i < this.arrCachedSparklines.length; ++i) {
+		this.arrCachedSparklines[i].draw(graphics);
+	}
+};
+sparklineGroup.prototype.updateCache = function(range) {
+	for (var i = 0; i < this.arrSparklines.length; ++i) {
+		if (range.intersectionSimple(this.arrSparklines[i].f)) {
+			this.arrCachedSparklines[i] = null;
+		}
+	}
+};
+/** @constructor */
+function sparkline() {
+	this.sqref = null;
+	this.f = null;
+}
+sparkline.prototype.setSqref = function(sqref) {
+	this.sqref = Asc.g_oRangeCache.getAscRange(sqref);
+};
+sparkline.prototype.checkInRange = function(range) {
+	return this.sqref ? range.isIntersect(this.sqref) : false;
+};
+
 // For Auto Filters
 /** @constructor */
 function TablePart(handlers) {
@@ -4502,6 +4585,47 @@ TablePart.prototype.changeRef = function(col, row, bIsFirst) {
 	if(this.AutoFilter)
 		this.AutoFilter.changeRef(col, row, bIsFirst);
 };
+TablePart.prototype.changeRefOnRange = function(range, autoFilters, generateNewTableColumns) {
+	if(!range)
+		return;
+	
+	//add table columns
+	if(generateNewTableColumns)
+	{
+		var newTableColumns = [];
+		var intersectionRanges = this.Ref.intersection(range);
+		for(var i = range.c1; i <= range.c2; i++)
+		{
+			var tableColumn;
+			if(i >= intersectionRanges.c1 && i <= intersectionRanges.c2)
+			{
+				var tableIndex = i - this.Ref.c1;
+				tableColumn = this.TableColumns[tableIndex];
+			}
+			else
+			{
+				tableColumn = new TableColumn();
+			}
+			
+			newTableColumns.push(tableColumn);
+		}
+		
+		for(var j = 0; j < newTableColumns.length; j++)
+		{
+			if(newTableColumns[j].Name === null)
+				newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
+		}
+		
+		this.TableColumns = newTableColumns;
+	}
+	
+	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+	//event
+	this.handlers.trigger("changeRefTablePart", this.DisplayName, this.Ref);
+	
+	if(this.AutoFilter)
+		this.AutoFilter.changeRefOnRange(range);
+};
 TablePart.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
@@ -4550,7 +4674,7 @@ TablePart.prototype.deleteTableColumns = function(activeRange)
 		this.TableColumns.splice(startCol, diff);
 };
 
-TablePart.prototype.addTableColumns = function(activeRange, aF)
+TablePart.prototype.addTableColumns = function(activeRange, autoFilters)
 {
 	var newTableColumns = [], num = 0;
 
@@ -4573,8 +4697,17 @@ TablePart.prototype.addTableColumns = function(activeRange, aF)
 	for(var j = 0; j < newTableColumns.length; j++)
 	{
 		if(newTableColumns[j].Name === null)
-			newTableColumns[j].Name = aF._generateColumnName2(newTableColumns, newTableColumns[j - 1].Name);
+			newTableColumns[j].Name = autoFilters._generateColumnName2(newTableColumns);
 	}
+	
+	this.TableColumns = newTableColumns;
+};
+
+TablePart.prototype.addTableLastColumn = function(activeRange, autoFilters, isAddLastColumn)
+{
+	var newTableColumns = this.TableColumns;
+	newTableColumns.push(new TableColumn());
+	newTableColumns[newTableColumns.length - 1].Name = autoFilters._generateColumnName2(newTableColumns);
 	
 	this.TableColumns = newTableColumns;
 };
@@ -4589,24 +4722,24 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 	var res = null;
 	switch(objectParam.param)
 	{
-		case g_nFormulaTablePartInfo.all: 
+		case FormulaTablePartInfo.all:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r2);
             //All поразному работает в случае если у таблицы есть или нет строки Totals
             //При наличии Totals All возвращает диапазон с учетом этой строки.
 			break;
 		}
-		case g_nFormulaTablePartInfo.data: 
+		case FormulaTablePartInfo.data:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1 + 1, this.Ref.c2, this.Ref.r2);
 			break;
 		}
-		case g_nFormulaTablePartInfo.headers: 
+		case FormulaTablePartInfo.headers:
 		{
 			res = new Asc.Range(this.Ref.c1, this.Ref.r1, this.Ref.c2, this.Ref.r1);
 			break;
 		}
-		case g_nFormulaTablePartInfo.totals: 
+		case FormulaTablePartInfo.totals:
 		{
 			if(this.TotalsRowCount && this.TotalsRowCount >= 1)
 			{
@@ -4615,14 +4748,14 @@ TablePart.prototype.getTableRangeForFormula = function(objectParam)
 			
 			break;
 		}
-		case g_nFormulaTablePartInfo.thisRow: 
+		case FormulaTablePartInfo.thisRow:
 		{
 //            if( this.Ref.containsRange( objectParam.cell ) ){
                 res = new Asc.Range( this.Ref.c1, objectParam.cell.r1, this.Ref.c2, objectParam.cell.r1 );
 //            }
 			break;
 		}
-		case g_nFormulaTablePartInfo.columns: 
+		case FormulaTablePartInfo.columns:
 		{
 			var startCol = this.getTableIndexColumnByName(objectParam.startCol);
 			var endCol = this.getTableIndexColumnByName(objectParam.endCol);
@@ -4679,6 +4812,54 @@ TablePart.prototype.getTableNameColumnByIndex = function(index)
 	return res;
 };
 
+TablePart.prototype.showButton = function(val)
+{
+	if(val === false)
+	{
+		if(!this.AutoFilter)
+		{
+			this.AutoFilter = new AutoFilter();
+			this.AutoFilter.Ref = this.Ref;
+		}
+		
+		this.AutoFilter.showButton(val);
+	}
+	else
+	{
+		if(this.AutoFilter && this.AutoFilter.FilterColumns && this.AutoFilter.FilterColumns.length)
+		{
+			this.AutoFilter.showButton(val);
+		}
+	}
+};
+
+TablePart.prototype.isShowButton = function()
+{
+	var res = true;
+	
+	if(this.AutoFilter)
+	{
+		res = this.AutoFilter.isShowButton();
+	}
+	
+	return res;
+};
+
+TablePart.prototype.generateTotalsRowLabel = function()
+{
+	if(!this.TableColumns)
+	{
+		return;
+	}
+	
+	this.TableColumns[0].generateTotalsRowLabel();
+};
+
+TablePart.prototype.changeDisplayName = function(newName)
+{
+	this.DisplayName = newName;
+}; 
+
 /** @constructor */
 function AutoFilter() {
 	this.Ref = null;
@@ -4733,6 +4914,15 @@ AutoFilter.prototype.changeRef = function(col, row, bIsFirst) {
 	
 	this.Ref = ref;
 };
+AutoFilter.prototype.changeRefOnRange = function(range) {
+	if(!range)
+		return;
+		
+	this.Ref = Asc.Range(range.c1, range.r1, range.c2, range.r2);
+	
+	if(this.AutoFilter)
+		this.AutoFilter.changeRefOnRange(range);
+};
 AutoFilter.prototype.isApplyAutoFilter = function() {
 	var res = false;
 	
@@ -4780,6 +4970,55 @@ AutoFilter.prototype.cleanFilters = function() {
 		}	
 	}
 };
+
+AutoFilter.prototype.showButton = function(val) {
+	
+	if(val === false)
+	{
+		if(this.FilterColumns === null)
+		{
+			this.FilterColumns = [];
+		}
+		
+		var columnsLength = this.Ref.c2 - this.Ref.c1 + 1;
+		for(var i = 0; i < columnsLength; i++)
+		{
+			this.FilterColumns[i] = new FilterColumn();
+			this.FilterColumns[i].ColId = i;
+			this.FilterColumns[i].ShowButton = false;
+		}
+	}
+	else
+	{
+		if(this.FilterColumns && this.FilterColumns.length)
+		{
+			for(var i = 0; i < this.FilterColumns.length; i++)
+			{
+				this.FilterColumns[i].ShowButton = true;
+			}
+		}
+	}
+};
+
+AutoFilter.prototype.isShowButton = function()
+{
+	var res = true;
+	
+	if(this.FilterColumns && this.FilterColumns.length)
+	{
+		for(var i = 0; i < this.FilterColumns.length; i++)
+		{
+			if(this.FilterColumns[i].ShowButton === false)
+			{
+				res = false;
+				break;
+			}
+		}
+	}
+	
+	return res;
+};
+
 
 function FilterColumns() {
 	this.ColId = null;
@@ -4831,6 +5070,14 @@ TableColumn.prototype.clone = function() {
 	res.CalculatedColumnFormula = this.CalculatedColumnFormula;
 	return res;
 };
+TableColumn.prototype.generateTotalsRowLabel = function(){
+	//TODO добавить в перевод
+	if(this.TotalsRowLabel === null)
+	{	
+		this.TotalsRowLabel = "Summary";
+	}
+};
+
 /** @constructor */
 function TableStyleInfo() {
 	this.Name = null;
@@ -5083,7 +5330,7 @@ DateGroupItem.prototype.clone = function() {
 	return res;
 };
 DateGroupItem.prototype.convertRangeToDateGroupItem = function(range) {
-	var startUtcDate = NumFormat.prototype.parseDate(range.start);
+	var startUtcDate = AscCommon.NumFormat.prototype.parseDate(range.start);
 	var year = startUtcDate.year;
 	var month = startUtcDate.month + 1;
 	var day = startUtcDate.d;

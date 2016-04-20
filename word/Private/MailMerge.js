@@ -29,13 +29,16 @@
  * Time: 12:01
  */
 
+// Import
+var c_oAscError = Asc.c_oAscError;
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
 asc_docs_api.prototype.asc_StartMailMerge = function(oData)
 {
     this.mailMergeFileData = oData;
-    this.asc_DownloadAs(c_oAscFileType.JSON);
+    this.asc_DownloadAs(Asc.c_oAscFileType.JSON);
 };
 asc_docs_api.prototype.asc_StartMailMergeByList = function(aList)
 {
@@ -138,12 +141,12 @@ asc_docs_api.prototype.asc_setMailMergeData = function(aList)
 };
 asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
 {
-    var actionType = c_oAscAsyncAction.SendMailMerge;
+    var actionType = Asc.c_oAscAsyncAction.SendMailMerge;
     oData.put_UserId(this.documentUserId);
     oData.put_RecordCount(oData.get_RecordTo() - oData.get_RecordFrom() + 1);
     var options = {oMailMergeSendData: oData, isNoCallback: true};
     var t = this;
-    _downloadAs(this, "sendmm", c_oAscFileType.TXT, actionType, options, function(input) {
+    _downloadAs(this, "sendmm", Asc.c_oAscFileType.TXT, actionType, options, function(input) {
         if (null != input && "sendmm" == input["type"])
         {
             if ("ok" == input["status"])
@@ -152,14 +155,14 @@ asc_docs_api.prototype.asc_sendMailMergeData = function(oData)
             }
             else
             {
-                t.asc_fireCallback("asc_onError", g_fMapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
+                t.asc_fireCallback("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.NoCritical);
             }
         }
         else
         {
             t.asc_fireCallback("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
         }
-        t.sync_EndAction(c_oAscAsyncActionType.BlockInteraction, actionType);
+        t.sync_EndAction(Asc.c_oAscAsyncActionType.BlockInteraction, actionType);
     });
 };
 asc_docs_api.prototype.asc_GetMailMergeFiledValue = function(nIndex, sName)
@@ -172,15 +175,33 @@ asc_docs_api.prototype.asc_DownloadAsMailMerge = function(typeFile, StartIndex, 
     if (null != oDocumentMailMerge)
     {
         var actionType = null;
-        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: DownloadType.MailMerge, errorDirect: c_oAscError.ID.MailMergeSaveFile};
+        var options = {oDocumentMailMerge: oDocumentMailMerge, downloadType: AscCommon.DownloadType.MailMerge, errorDirect: c_oAscError.ID.MailMergeSaveFile};
         if (bIsDownload) {
-            actionType = c_oAscAsyncAction.DownloadMerge;
-            options.downloadType = DownloadType.None;
+            actionType = Asc.c_oAscAsyncAction.DownloadMerge;
+            options.downloadType = AscCommon.DownloadType.None;
         }
         _downloadAs(this, "save", typeFile, actionType, options, null);
     }
     return null != oDocumentMailMerge ? true : false;
 };
+
+asc_docs_api.prototype['asc_StartMailMerge']              = asc_docs_api.prototype.asc_StartMailMerge;
+asc_docs_api.prototype['asc_StartMailMergeByList']        = asc_docs_api.prototype.asc_StartMailMergeByList;
+asc_docs_api.prototype['asc_GetReceptionsCount']          = asc_docs_api.prototype.asc_GetReceptionsCount;
+asc_docs_api.prototype['asc_GetMailMergeFieldsNameList']  = asc_docs_api.prototype.asc_GetMailMergeFieldsNameList;
+asc_docs_api.prototype['asc_AddMailMergeField']           = asc_docs_api.prototype.asc_AddMailMergeField;
+asc_docs_api.prototype['asc_SetHighlightMailMergeFields'] = asc_docs_api.prototype.asc_SetHighlightMailMergeFields;
+asc_docs_api.prototype['asc_PreviewMailMergeResult']      = asc_docs_api.prototype.asc_PreviewMailMergeResult;
+asc_docs_api.prototype['asc_EndPreviewMailMergeResult']   = asc_docs_api.prototype.asc_EndPreviewMailMergeResult;
+asc_docs_api.prototype['sync_StartMailMerge']             = asc_docs_api.prototype.sync_StartMailMerge;
+asc_docs_api.prototype['sync_PreviewMailMergeResult']     = asc_docs_api.prototype.sync_PreviewMailMergeResult;
+asc_docs_api.prototype['sync_EndPreviewMailMergeResult']  = asc_docs_api.prototype.sync_EndPreviewMailMergeResult;
+asc_docs_api.prototype['sync_HighlightMailMergeFields']   = asc_docs_api.prototype.sync_HighlightMailMergeFields;
+asc_docs_api.prototype['asc_getMailMergeData']            = asc_docs_api.prototype.asc_getMailMergeData;
+asc_docs_api.prototype['asc_setMailMergeData']            = asc_docs_api.prototype.asc_setMailMergeData;
+asc_docs_api.prototype['asc_sendMailMergeData']           = asc_docs_api.prototype.asc_sendMailMergeData;
+asc_docs_api.prototype['asc_GetMailMergeFiledValue']      = asc_docs_api.prototype.asc_GetMailMergeFiledValue;
+asc_docs_api.prototype['asc_DownloadAsMailMerge']         = asc_docs_api.prototype.asc_DownloadAsMailMerge;
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
@@ -216,7 +237,7 @@ CDocument.prototype.Get_MailMergeFieldsNameList = function()
 };
 CDocument.prototype.Add_MailMergeField = function(Name)
 {
-    if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
+    if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Content))
     {
         this.Create_NewHistoryPoint(historydescription_Document_AddMailMergeField);
 
@@ -324,7 +345,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
         return null;
 
     History.TurnOff();
-    g_oTableId.TurnOff();
+    AscCommon.g_oTableId.TurnOff();
 
     var LogicDocument = new CDocument(undefined, false);
     History.Document = this;
@@ -406,7 +427,7 @@ CDocument.prototype.Get_MailMergedDocument = function(_nStartIndex, _nEndIndex)
     }
 
     this.FieldsManager = FieldsManager;
-    g_oTableId.TurnOn();
+    AscCommon.g_oTableId.TurnOn();
     History.TurnOn();
 
     return LogicDocument;
