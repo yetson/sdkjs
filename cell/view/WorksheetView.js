@@ -2519,11 +2519,11 @@
 
     /** Рисует фон ячеек в строке */
     WorksheetView.prototype._drawRowBG = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY, oMergedCell ) {
+        var mergedCells = [];
         if ( this.rows[row].height < this.height_1px && null === oMergedCell ) {
-            return {};
+            return mergedCells;
         }
 
-        var mergedCells = [];
         var ctx = (undefined === drawingCtx) ? this.drawingCtx : drawingCtx;
         for ( var col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px && null === oMergedCell ) {
@@ -2599,11 +2599,12 @@
 
     /** Рисует текст ячеек в строке */
     WorksheetView.prototype._drawRowText = function ( drawingCtx, row, colStart, colEnd, offsetX, offsetY ) {
+        var mergedCells = [];
         if ( this.rows[row].height < this.height_1px ) {
-            return {};
+            return mergedCells;
         }
 
-        var dependentCells = {}, mergedCells = [], i, mc, col;
+        var dependentCells = {}, i, mc, col;
         // draw cells' text
         for ( col = colStart; col <= colEnd; ++col ) {
             if ( this.cols[col].width < this.width_1px ) {
@@ -13252,28 +13253,25 @@
 		
 		t._isLockedCells( range, null, callback );
 	};
-	
-	WorksheetView.prototype.af_checkChangeRange = function(range)
-    {	
-		var res = null;
-		var ws = this.model;
-		
-		var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
-		var tablePart = intersectionTables[0];
-		if(tablePart)
-		{
-			if(range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равно первой строке выделенного диапазона
-			{
-				res = c_oAscError.ID.FTChangeTableRangeError;
-			}
-			else if(intersectionTables.length !== 1)//выделено несколько таблиц
-			{
-				res = c_oAscError.ID.FTRangeIncludedOtherTables;
-			}
-		}
-		
-		return res;
-	};
+
+    WorksheetView.prototype.af_checkChangeRange = function(range) {
+        var res = null;
+        var intersectionTables = this.model.autoFilters.getTableIntersectionRange(range);
+        if (0 < intersectionTables.length) {
+            var tablePart = intersectionTables[0];
+            if (range.r1 !== tablePart.Ref.r1)//первая строка таблицы не равно первой строке выделенного диапазона
+            {
+                res = c_oAscError.ID.FTChangeTableRangeError;
+            } else if (intersectionTables.length !== 1)//выделено несколько таблиц
+            {
+                res = c_oAscError.ID.FTRangeIncludedOtherTables;
+            }
+        } else {
+            res = c_oAscError.ID.FTChangeTableRangeError;
+        }
+
+        return res;
+    };
     /*
      * Export
      * -----------------------------------------------------------------------------
