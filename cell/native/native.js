@@ -50,6 +50,12 @@ var Asc = window["Asc"];
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 
+window["AscDFH"] = {};
+var AscDFH = window["AscDFH"];
+
+window["AscCH"] = {};
+var AscCH = window["AscCH"];
+
 window["AscCommonExcel"] = {};
 var AscCommonExcel = window["AscCommonExcel"];
 
