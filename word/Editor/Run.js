@@ -229,7 +229,10 @@ ParaRun.prototype.Get_AllDrawingObjects = function(DrawingObjs)
         var Item = this.Content[Index];
 
         if ( para_Drawing === Item.Type )
+        {
             DrawingObjs.push(Item);
+            Item.Get_AllDrawingObjects(DrawingObjs);
+        }
     }
 };
 
