@@ -38,6 +38,9 @@
 		var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
 		var c_oAscMaxCellOrCommentLength = AscCommon.c_oAscMaxCellOrCommentLength;
 		var AscBrowser = AscCommon.AscBrowser;
+		var PasteElementsId = AscCommon.PasteElementsId;
+		var PASTE_EMPTY = AscCommon.PASTE_EMPTY;
+		var CopyPasteCorrectString = AscCommon.CopyPasteCorrectString;
 
 		var doc = window.document;
 		
@@ -54,7 +57,7 @@
 
 		if (AscBrowser.isSafariMacOs)
 		{
-			PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
+			PasteElementsId.PASTE_ELEMENT_ID = COPY_ELEMENT_ID2;
 		}
 
 		function number2color(n) {
@@ -112,7 +115,7 @@
 				}
 
 				t.element.id = COPY_ELEMENT_ID2;
-				t.element.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
+				t.element.setAttribute("class", PasteElementsId.COPYPASTE_ELEMENT_CLASS);
 				t.element.style.position = "absolute";
 				// Если сделать width маленьким, то параграф будет постоянно переноситься по span
 				// И например в таком случае пропадает пробел <span>1</span><span> </span><span>2</span>
@@ -127,7 +130,7 @@
 				t.element.style.height = '100px';
 				t.element.style.overflow = 'hidden';
 				t.element.style.zIndex = -1000;
-				t.element.style.display = ELEMENT_DISPAY_STYLE;
+				t.element.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 				t.element.setAttribute("contentEditable", true);
 				
 				//TODO - review later(commented for edge)
@@ -158,7 +161,7 @@
 					t.elementText.style.overflow = 'hidden';
 					t.elementText.style.zIndex = -1000;
 					//if(AscBrowser.isIE)
-						t.elementText.style.display = ELEMENT_DISPAY_STYLE;
+						t.elementText.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 					t.elementText.setAttribute("contentEditable", true);
 	
 					if (!foundText) {doc.body.appendChild(t.elementText);}
@@ -312,7 +315,7 @@
 				
 					wb.clipboard._bodyPaste(ws, e);
 					
-					ElemToSelect.style.display = ELEMENT_DISPAY_STYLE;
+					ElemToSelect.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 					document.body.style.MozUserSelect = "none";
 					document.body.style["-khtml-user-select"] = "none";
 					document.body.style["-o-user-select"] = "none";
@@ -946,14 +949,14 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE;
+							t.element.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
 							doc.body.style["user-select"] = "none";
 							doc.body.style["-webkit-user-select"] = "none";
 							
-							t.elementText.style.display = ELEMENT_DISPAY_STYLE;
+							t.elementText.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							var textInsert = t.elementText.value;
 							if(isOnlyLocalBufferSafari && navigator.userAgent.toLowerCase().indexOf('safari') > -1 && navigator.userAgent.toLowerCase().indexOf('mac') && t.lStorageText)
 								textInsert = t.lStorageText;
@@ -1103,7 +1106,7 @@
 				  //paste
 				var func_timeout = function() {
 
-					if (PASTE_EMPTY_USE && !isTruePaste)
+					if (PASTE_EMPTY.PASTE_EMPTY_USE && !isTruePaste)
 					{
 						// не править. это сделано для фаерфокса. ну не успевает он вставить
 						// в дивку контент. и получалось, что мы через раз вставляем пробел.
@@ -1111,8 +1114,8 @@
 						// но может с задержкой 1-2 секунды.
 						if (pastebin.innerHTML == "&nbsp;")
 						{
-							PASTE_EMPTY_COUNTER++;
-							if (PASTE_EMPTY_COUNTER < PASTE_EMPTY_COUNTER_MAX)
+							PASTE_EMPTY.PASTE_EMPTY_COUNTER++;
+							if (PASTE_EMPTY.PASTE_EMPTY_COUNTER < PASTE_EMPTY.PASTE_EMPTY_COUNTER_MAX)
 							{
 								window.setTimeout( func_timeout, 100 );
 								return;
@@ -1140,17 +1143,17 @@
 					if(!isTruePaste)
 						t._editorPasteExec(worksheet, pastebin);
 					
-					pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+					pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 						
 					if(AscBrowser.isIE)
-						pastebin.style.display  = ELEMENT_DISPAY_STYLE;
+						pastebin.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 					
 					if (callback && callback.call) {callback();}
 				};
 
 				var _interval_time = AscBrowser.isMacOs ? 200 : 100;
 
-				PASTE_EMPTY_COUNTER = 0;
+							PASTE_EMPTY.PASTE_EMPTY_COUNTER = 0;
 				window.setTimeout( func_timeout, _interval_time );
             },
             
@@ -1158,11 +1161,11 @@
             {
                 //var oWordControl = api.WordControl;
                 var t = this;
-                var pastebin = document.getElementById(PASTE_ELEMENT_ID);
+                var pastebin = document.getElementById(PasteElementsId.PASTE_ELEMENT_ID);
                 if(!pastebin){
                     pastebin = document.createElement("div");
-                    pastebin.setAttribute( 'id', PASTE_ELEMENT_ID );
-					pastebin.setAttribute( 'class', COPYPASTE_ELEMENT_CLASS );
+                    pastebin.setAttribute( 'id', PasteElementsId.PASTE_ELEMENT_ID );
+					pastebin.setAttribute( 'class', PasteElementsId.COPYPASTE_ELEMENT_CLASS );
                     pastebin.style.position = 'absolute';
                     pastebin.style.top = '100px';
                     pastebin.style.left = '0px';
@@ -1429,7 +1432,7 @@
 						
 						bExist = true;
 					}
-					ifr.style.display  = ELEMENT_DISPAY_STYLE;
+					ifr.style.display  = PasteElementsId.ELEMENT_DISPAY_STYLE;
 				}
 				if(bExist)
 				{
@@ -1768,9 +1771,9 @@
 			_pasteFromBinaryWord: function(worksheet, base64, isIntoShape)
 			{
 				var pasteData = this.ReadFromBinaryWord(base64, worksheet);
-				var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
-				
-				pasteFromBinaryWord._paste(worksheet, pasteData);
+				var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+
+				oPasteFromBinaryWord._paste(worksheet, pasteData);
 				
 				return true;
 			},
@@ -1798,9 +1801,9 @@
 						
 						//TODO вставка через бинарник требует переконвертировать контент в вордовский, либо сделать парсинг из презентационных параграфов
 						var docContent = this.ReadPresentationText(stream, worksheet);
-						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, worksheet);
-						
-						pasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, worksheet);
+
+						oPasteFromBinaryWord._paste(worksheet, {DocumentContent: docContent});
 						
 						return true;
 					}
@@ -1895,11 +1898,11 @@
 			{
 				var api = asc["editor"];
 				
-				var oObjectsForDownload = GetObjectsForImageDownload(aPastedImages);
+				var oObjectsForDownload = AscCommon.GetObjectsForImageDownload(aPastedImages);
 
-				sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
+				AscCommon.sendImgUrls(api, oObjectsForDownload.aUrls, function (data) {
 					var oImageMap = {};
-					ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
+					AscCommon.ResetNewUrls(data, oObjectsForDownload.aUrls, oObjectsForDownload.aBuilderImagesByUrl, oImageMap);
 
 					callback();
 				}, true);
@@ -1991,7 +1994,7 @@
 			{
 				targetDocContent.DrawingDocument.m_oLogicDocument = null;
 				
-				var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
+				var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: targetDocContent}, FontLoader: {}}, false, false, true, true);
 				oPasteProcessor.map_font_index = this.Api.FontLoader.map_font_index;
 				oPasteProcessor.bIsDoublePx = false;
 				
@@ -2151,15 +2154,15 @@
 					if ("undefined" != typeof editor)
 						oOldEditor = editor;
 					editor = {WordControl: oTempDrawingDocument, isDocumentEditor: true};
-					var oPasteProcessor = new PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
+					var oPasteProcessor = new AscCommon.PasteProcessor({WordControl:{m_oLogicDocument: newCDocument}, FontLoader: {}}, false, false);
 					oPasteProcessor._Prepeare_recursive(node, true, true)
 					oPasteProcessor._Execute(node, {}, true, true, false);
 					editor = oOldEditor;
 					
 					History.TurnOn();
 					
-					var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(t, worksheet);
-					pasteFromBinaryWord._paste(worksheet, {content: oPasteProcessor.aContent});
+					var oPasteFromBinaryWord = new pasteFromBinaryWord(t, worksheet);
+					oPasteFromBinaryWord._paste(worksheet, {content: oPasteProcessor.aContent});
 					window.GlobalPasteFlagCounter = 0;
 					window.GlobalPasteFlag = false;
 				};
@@ -2168,7 +2171,7 @@
 				if(aImagesToDownload !== null)//load to server
 				{
                     var api = asc["editor"];
-					sendImgUrls(api, aImagesToDownload, function (data) {
+					AscCommon.sendImgUrls(api, aImagesToDownload, function (data) {
                        for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) 
 					   {
 							var elem = data[i];
@@ -2444,7 +2447,7 @@
 				window.setTimeout(
 						function() {
 							// отменяем возможность выделения
-							t.element.style.display = ELEMENT_DISPAY_STYLE;
+							t.element.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 							doc.body.style.MozUserSelect = "none";
 							doc.body.style["-khtml-user-select"] = "none";
 							doc.body.style["-o-user-select"] = "none";
@@ -2616,9 +2619,9 @@
 				//если выделены графические объекты внутри группы
 				if(isIntoShape)//если курсор находится внутри шейпа
 				{
-					var CopyProcessor = new Asc.CopyProcessor();
+					var oCopyProcessor = new CopyProcessor();
 					var divContent = document.createElement('div');
-					CopyProcessor.CopyDocument(divContent, isIntoShape, true);
+					oCopyProcessor.CopyDocument(divContent, isIntoShape, true);
 					
 					var htmlInShape = "";
 					if(divContent)
@@ -3048,7 +3051,7 @@
 					if(data.Drawings.length === 1 && typeof CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof CGraphicFrame)
 					{
 						//вставляем табличку из презентаций
-						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
 						
 						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
@@ -3061,7 +3064,7 @@
 						oTempDrawingDocument.m_oLogicDocument = newCDocument;
 						
 						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
-						pasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
+						oPasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
 						
 						return;
 					}
@@ -3165,7 +3168,7 @@
 					if(a_drawings.length === 1 && typeof CGraphicFrame !== "undefined" && drawingObject.graphicObject instanceof CGraphicFrame)
 					{
 						//вставляем табличку из презентаций
-						var pasteFromBinaryWord = new Asc.pasteFromBinaryWord(this, ws);
+						var oPasteFromBinaryWord = new pasteFromBinaryWord(this, ws);
 						
 						var newCDocument = new CDocument(oTempDrawingDocument, false);
 						newCDocument.bFromDocument = true;
@@ -3178,7 +3181,7 @@
 						oTempDrawingDocument.m_oLogicDocument = newCDocument;
 						
 						drawingObject.graphicObject.graphicObject.Set_Parent(newCDocument);
-						pasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
+						oPasteFromBinaryWord._paste(ws, {DocumentContent: [drawingObject.graphicObject.graphicObject]});
 						
 						return;
 					}
@@ -3393,8 +3396,6 @@
 		
 		/** @constructor */
 		function pasteFromBinaryWord(clipboard, ws) {
-			if ( !(this instanceof pasteFromBinaryWord) ) {return new pasteFromBinaryWord();}
-
 			this.fontsNew = {};
 			this.aResult = [];
 			this.clipboard = clipboard;
@@ -3417,7 +3418,7 @@
 				if(!documentContent || (documentContent && !documentContent.length))
 					return;
 				
-				var documentContentBounds = new Asc.DocumentContentBounds();
+				var documentContentBounds = new DocumentContentBounds();
 				var coverDocument = documentContentBounds.getBounds(0,0, documentContent);
 				this._parseChildren(coverDocument, activeRange);
 				
@@ -4939,7 +4940,7 @@
 			{
 				this.oBinaryFileWriter.CopyStart();
 				var oDocument = this.oDocument;
-				if(g_bIsDocumentCopyPaste)
+				if(PasteElementsId.g_bIsDocumentCopyPaste)
 				{
 					if(!this.api.DocumentReaderMode)
 					{
@@ -5213,7 +5214,7 @@
 		{
 			var ElemToSelect = document.createElement("div");
 			ElemToSelect.id = COPY_ELEMENT_ID2;
-			ElemToSelect.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
+			ElemToSelect.setAttribute("class", PasteElementsId.COPYPASTE_ELEMENT_CLASS);
 
 			ElemToSelect.style.left = '0px';
 			ElemToSelect.style.top = '100px';
@@ -5313,9 +5314,9 @@
 			elementText.style.top = '100px';
 			elementText.style.overflow = 'hidden';
 			elementText.style.zIndex = -1000;
-			elementText.style.display = ELEMENT_DISPAY_STYLE;
+			elementText.style.display = PasteElementsId.ELEMENT_DISPAY_STYLE;
 			elementText.setAttribute("contentEditable", true);
-			elementText.setAttribute("class", COPYPASTE_ELEMENT_CLASS);
+			elementText.setAttribute("class", PasteElementsId.COPYPASTE_ELEMENT_CLASS);
 
 			elementText["onbeforecopy"] = function(e){
 				if((api.wb && api.wb.getWorksheet() && api.wb.getWorksheet().isCellEditMode))
@@ -5342,16 +5343,9 @@
 
 			document.body.appendChild(elementText);
 		}
-		
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"].CopyProcessor = CopyProcessor;
-		window["Asc"].Clipboard = Clipboard;
-		window["Asc"].pasteFromBinaryWord = pasteFromBinaryWord;
-		window["Asc"].DocumentContentBounds = DocumentContentBounds;
 
+		//---------------------------------------------------------export---------------------------------------------------
+		window["AscCommonExcel"].Clipboard = Clipboard;
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window["AscCommonExcel"].SafariIntervalFocus2 = SafariIntervalFocus2;
 	}

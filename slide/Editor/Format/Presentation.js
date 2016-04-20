@@ -30,6 +30,8 @@ var align_Justify = AscCommon.align_Justify;
 var vertalign_Baseline = AscCommon.vertalign_Baseline;
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var g_oTableId = AscCommon.g_oTableId;
+var Editor_Copy = AscCommon.Editor_Copy;
+var Editor_Paste = AscCommon.Editor_Paste;
 
 var History = null;
 var recalcSlideInterval = 30;
@@ -2398,7 +2400,7 @@ CPresentation.prototype =
                             {
                                 this.Create_NewHistoryPoint(historydescription_Document_ShiftInsertSafari);
 
-                                SafariIntervalFocus();
+                                AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
@@ -2685,7 +2687,7 @@ CPresentation.prototype =
                             {
                                 this.Create_NewHistoryPoint(historydescription_Document_PasteSafariHotKey);
 
-                                SafariIntervalFocus();
+                                AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
                                 editor.incrementCounterLongAction();
                                 Editor_Paste(this.DrawingDocument.m_oWordControl.m_oApi, true);
