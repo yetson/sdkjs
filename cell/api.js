@@ -783,7 +783,6 @@ var editor;
             "userid": this.documentUserId,
             "format": this.documentFormat,
             "vkey": this.documentVKey,
-            "editorid": this.editorId,
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
