@@ -3302,8 +3302,8 @@
 				var worksheet = this.worksheet, temp = {}, isDateTimeFormat, /*dataValue,*/ values = [];
 				
 				colId = this._getTrueColId(filter, colId);
-				
-				var currentElemArray = this._getFilterColumnNum(filterColumns, colId);//номер данного фильтра в массиве фильтров
+
+				var currentFilterColumn = this._getFilterColumn(filter, colId);
 				
 				var addValueToMenuObj = function(tempResult, count)
 				{
@@ -3343,10 +3343,8 @@
 				}
 				
 				var individualCount, count, tempResult;
-				var isCustomFilters = currentElemArray !== null && filterColumns[currentElemArray] && filterColumns[currentElemArray].CustomFiltersObj;
-				var isColorFilter = currentElemArray !== null && filterColumns[currentElemArray] && filterColumns[currentElemArray].ColorFilter;
-				if(currentElemArray === null || (filterColumns[currentElemArray] && (filterColumns[currentElemArray].Filters || filterColumns[currentElemArray].Top10 || filterColumns[currentElemArray].ShowButton === false) || isCustomFilters || isColorFilter))
-				{
+				// ToDo Нужно проверить, я не очень понял, зачем тут была проверка...
+				if (true) {
 					individualCount = 0;
 					count = 0;
 					for(var i = ref.r1 + 1; i <= maxFilterRow; i++)
@@ -3356,7 +3354,7 @@
 							break;
 						
 						//not apply filter by current button
-						if(currentElemArray === null && worksheet.getRowHidden(i) === true)
+						if(null === currentFilterColumn && worksheet.getRowHidden(i) === true)
 						{
 							individualCount++;
 							continue;
@@ -3376,7 +3374,7 @@
 							continue;
 						
 						//apply filter by current button
-						if(currentElemArray !== null)
+						if(null !== currentFilterColumn)
 						{
 							if(!this._hiddenAnotherFilter(filterColumns, colId, i, ref.c1))//filter another button
 							{
@@ -3387,7 +3385,8 @@
 								
 								//filter current button
 								var checkValue = isDateTimeFormat ? val : text;
-								if(!filterColumns[currentElemArray].Top10 && !isCustomFilters && !isColorFilter && !filterColumns[currentElemArray].isHideValue(checkValue, isDateTimeFormat))
+								if (!currentFilterColumn.Top10 && !currentFilterColumn.CustomFiltersObj &&
+									!currentFilterColumn.ColorFilter && !currentFilterColumn.isHideValue(checkValue, isDateTimeFormat))
 								{
 									if(isOpenHiddenRows)
 										worksheet.setRowHidden(false, i, i);
@@ -4286,6 +4285,7 @@
 			
 			_getFilterColumn: function(autoFilter, colId)
 			{
+				var res = null;
 				var filters;
 				if(autoFilter && autoFilter.FilterColumns)
 				{
@@ -4294,29 +4294,12 @@
 					{
 						if(filters[k].ColId == colId)
 						{
-							filters = filters[k];
+							res = filters[k];
 							break;
 						}
 					}
 				}
-				return filters;
-			},
-			
-			_getFilterColumnNum: function(filterColumns, colId)
-			{
-				var currentElemArray = null;
-				if(filterColumns && filterColumns.length)
-				{
-					for(var i = 0; i < filterColumns.length; i++)
-					{
-						if(colId === filterColumns[i].ColId)
-						{
-							currentElemArray = i;
-							break;
-						}
-					}
-				}
-				return currentElemArray;
+				return res;
 			},
 			
 			_isEmptyCellsUnderRange: function(range)
