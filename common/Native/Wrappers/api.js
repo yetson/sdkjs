@@ -5519,11 +5519,11 @@ window["NativeCorrectImageUrlOnCopy"] = function(url)
 };
 
 // chat styles
-ChartPreviewManager.prototype.clearPreviews = function()
+AscCommon.ChartPreviewManager.prototype.clearPreviews = function()
 {
     window["native"]["DD_ClearCacheChartStyles"]();
 };
-ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
+AscCommon.ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, styleIndex)
 {
     return ExecuteNoHistory(function(){
         if(!this.chartsByTypes[type])
@@ -5570,7 +5570,7 @@ ChartPreviewManager.prototype.createChartPreview = function(_graphics, type, sty
 
 };
 
-ChartPreviewManager.prototype.getChartPreviews = function(chartType)
+AscCommon.ChartPreviewManager.prototype.getChartPreviews = function(chartType)
 {
     if (isRealNumber(chartType))
     {
