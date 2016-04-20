@@ -2104,7 +2104,7 @@
 			getTableIntersectionRange: function(range)
 			{
 				var worksheet = this.worksheet;
-				var res = null;
+				var res = [];
 				
 				var tableParts = worksheet.TableParts; 
 				if(tableParts)
@@ -2113,11 +2113,6 @@
 					{
 						if(tableParts[i].Ref.intersection(range))
 						{
-							if(res === null)
-							{
-								res = [];
-							}
-							
 							res.push(worksheet.TableParts[i]);
 						}
 					}
