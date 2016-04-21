@@ -90,7 +90,7 @@ function CMobileTouchManager()
 
     this.longTapFlag = false;
     this.longTapTimer = -1;
-    this.mylatesttap = null
+    this.mylatesttap = null;
     this.zoomFactor = 1;
     this.wasZoom = false;
     this.canZoom = true;
@@ -99,7 +99,7 @@ function CMobileTouchManager()
 CMobileTouchManager.prototype.Init = function(ctrl)
 {
     this.ctrl = ctrl;
-    this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
+    this.iScroll = new AscCommonExcel.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
      param.api.MobileTouchManager.OnScrollAnimationEnd();
      } }*/);
 };

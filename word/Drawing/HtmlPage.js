@@ -2795,7 +2795,7 @@ function CEditorPage(api)
             if (this.m_oScrollHor_)
                 this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
             else {
-                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll", settings );
+                this.m_oScrollHor_ = new AscCommon.ScrollObject( "id_horizontal_scroll", settings );
 
 				this.m_oScrollHor_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);
@@ -2814,7 +2814,7 @@ function CEditorPage(api)
                 this.m_oScrollVer_.Repos(settings, undefined, true);
             }
             else {
-                this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll", settings );
+                this.m_oScrollVer_ = new AscCommon.ScrollObject( "id_vertical_scroll", settings );
 
 				this.m_oScrollVer_.onLockMouse = function(evt){
 					check_MouseDownEvent(evt, true);

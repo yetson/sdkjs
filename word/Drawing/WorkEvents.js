@@ -780,7 +780,7 @@ function CMobileTouchManager()
         this.LogicDocument = ctrl.m_oLogicDocument;
         this.DrawingDocument = ctrl.m_oDrawingDocument;
 
-        this.iScroll = new window.CTouchScroll(ctrl, { onAnimationEnd : function(param) {
+        this.iScroll = new AscCommon.CTouchScroll(ctrl, { onAnimationEnd : function(param) {
             param.api.MobileTouchManager.OnScrollAnimationEnd();
         } });
 
@@ -2720,7 +2720,7 @@ function CReaderTouchManager()
         this.LogicDocument = ctrl.m_oLogicDocument;
         this.DrawingDocument = ctrl.m_oDrawingDocument;
 
-        this.iScroll = new window.CTouchScroll(ctrl, {bounce : true}, this.HtmlPage.ReaderModeDiv);
+        this.iScroll = new AscCommon.CTouchScroll(ctrl, {bounce : true}, this.HtmlPage.ReaderModeDiv);
         this.HtmlPage.m_oApi.asc_fireCallback("asc_onHidePopMenu");
     }
 
