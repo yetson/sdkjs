@@ -3392,7 +3392,7 @@ function OfflineEditor () {
                     var cmd=path[j];
                     switch(cmd.id)
                     {
-                        case moveTo:
+                        case AscFormat.moveTo:
                         {
                             bIsDrawLast = true;
 
@@ -3406,7 +3406,7 @@ function OfflineEditor () {
                             _ctx.moveTo(_x, _y);
                             break;
                         }
-                        case lineTo:
+                        case AscFormat.lineTo:
                         {
                             bIsDrawLast = true;
 
@@ -3420,7 +3420,7 @@ function OfflineEditor () {
                             _ctx.lineTo(_x, _y);
                             break;
                         }
-                        case close:
+                        case AscFormat.close:
                         {
                             _ctx.closePath();
                             break;
@@ -3440,8 +3440,8 @@ function OfflineEditor () {
                     var cmd=path[j];
                     switch(cmd.id)
                     {
-                        case moveTo:
-                        case lineTo:
+                        case AscFormat.moveTo:
+                        case AscFormat.lineTo:
                         {
                             if (minX > cmd.X)
                                 minX = cmd.X;

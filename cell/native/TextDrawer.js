@@ -1376,7 +1376,7 @@ CTextDrawer.prototype =
             oLastObjectToDraw.Comment = this.m_oCurComment;
             if(oLastObjectToDraw.geometry.pathLst.length === 0 || bStart)
             {
-                oPath = new Path();
+                oPath = new AscFormat.Path();
                 oPath.setPathW(this.pathW);
                 oPath.setPathH(this.pathH);
                 oPath.setExtrusionOk(false);
@@ -1736,7 +1736,7 @@ CTextDrawer.prototype =
     checkCurveBezier: function(x0, y0, x1, y1, x2, y2, x3, y3, dEpsilon)
     {
         var _epsilon = dEpsilon ? dEpsilon : UNDERLINE_DIV_EPSILON;
-        var arr_point = partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, _epsilon), i, count = arr_point.length >> 2;
+        var arr_point = AscFormat.partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, _epsilon), i, count = arr_point.length >> 2;
         for(i = 0; i < count; ++i)
         {
             var k = 4*i;
@@ -2243,8 +2243,8 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                 oCommand = oPath.ArrPathCommand[j];
                 switch(oCommand.id)
                 {
-                    case moveTo:
-                    case lineTo:
+                    case AscFormat.moveTo:
+                    case AscFormat.lineTo:
                     {
                         oPoint = CheckPointByPaths(oCommand.X, oCommand.Y, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X = oPoint.x;
@@ -2252,7 +2252,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         break;
                     }
 
-                    case bezier3:
+                    case AscFormat.bezier3:
                     {
                         oPoint = CheckPointByPaths(oCommand.X0, oCommand.Y0, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X0 = oPoint.x;
@@ -2262,7 +2262,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         oCommand.Y1 = oPoint.y;
                         break;
                     }
-                    case bezier4:
+                    case AscFormat.bezier4:
                     {
                         oPoint = CheckPointByPaths(oCommand.X0, oCommand.Y0, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X0 = oPoint.x;
@@ -2275,11 +2275,11 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         oCommand.Y2 = oPoint.y;
                         break;
                     }
-                    case arcTo:
+                    case AscFormat.arcTo:
                     {
                         break;
                     }
-                    case close:
+                    case AscFormat.close:
                     {
                         break;
                     }
@@ -2310,8 +2310,8 @@ function TransformGeometry(oObjectToDraw, oTransform)
             oCommand = oPath.ArrPathCommand[j];
             switch(oCommand.id)
             {
-                case moveTo:
-                case lineTo:
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
                 {
                     oPoint = TransformPointGeometry(oCommand.X, oCommand.Y, oTransform);
                     oCommand.X = oPoint.x;
@@ -2319,7 +2319,7 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     break;
                 }
 
-                case bezier3:
+                case AscFormat.bezier3:
                 {
                     oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
@@ -2329,7 +2329,7 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
-                case bezier4:
+                case AscFormat.bezier4:
                 {
                     oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
@@ -2342,11 +2342,11 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     oCommand.Y2 = oPoint.y;
                     break;
                 }
-                case arcTo:
+                case AscFormat.arcTo:
                 {
                     break;
                 }
-                case close:
+                case AscFormat.close:
                 {
                     break;
                 }
@@ -2419,8 +2419,8 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
             oCommand = oPath.ArrPathCommand[j];
             switch(oCommand.id)
             {
-                case moveTo:
-                case lineTo:
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
                 {
                     oPoint = TransformPointPolygon(oCommand.X, oCommand.Y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X = oPoint.x;
@@ -2428,7 +2428,7 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     break;
                 }
 
-                case bezier3:
+                case AscFormat.bezier3:
                 {
                     oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X0 = oPoint.x;
@@ -2438,7 +2438,7 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
-                case bezier4:
+                case AscFormat.bezier4:
                 {
                     oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X0 = oPoint.x;
@@ -2451,11 +2451,11 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     oCommand.Y2 = oPoint.y;
                     break;
                 }
-                case arcTo:
+                case AscFormat.arcTo:
                 {
                     break;
                 }
-                case close:
+                case AscFormat.close:
                 {
                     break;
                 }

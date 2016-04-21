@@ -26,6 +26,7 @@
 
 // Import
 var cToDeg = AscFormat.cToDeg;
+var Path = AscFormat.Path;
 
 var global3DPersperctive = 30;
 var globalBasePercent = 100;
