@@ -4403,8 +4403,8 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
 
         if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
         {
-            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
-            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            AscFormat.G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
         }
         else
@@ -4416,8 +4416,8 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
     {
         if ( true === PDSE.VisitedHyperlink && ( undefined === this.Pr.Color && undefined === this.Pr.Unifill ) )
         {
-            G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
-            RGBA = G_O_VISITED_HLINK_COLOR.getRGBAColor();
+            AscFormat.G_O_VISITED_HLINK_COLOR.check(PDSE.Theme, PDSE.ColorMap);
+            RGBA = AscFormat.G_O_VISITED_HLINK_COLOR.getRGBAColor();
             pGraphics.b_color1( RGBA.R, RGBA.G, RGBA.B, RGBA.A );
         }
         else if ( true === CurTextPr.Color.Auto )
@@ -6444,7 +6444,7 @@ ParaRun.prototype.Apply_Pr = function(TextPr)
             else if(oCompiledPr.Color)
             {
                 oColor = oCompiledPr.Color;
-                oMergeUnifill = CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
+                oMergeUnifill = AscFormat.CreateUnfilFromRGB(oColor.r, oColor.g, oColor.b);
             }
             this.Set_Unifill(undefined);
             this.Set_Color(undefined);

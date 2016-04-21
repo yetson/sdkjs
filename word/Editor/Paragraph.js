@@ -5624,7 +5624,7 @@ Paragraph.prototype =
             TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
             if(!this.bFromDocument)
             {
-                TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
                 TextPr.Underline = true;
             }
             Hyperlink.Apply_TextPr( TextPr, undefined, false );
@@ -5672,7 +5672,7 @@ Paragraph.prototype =
             {
                 HyperRun.Set_Pr( TextPr.Copy() );
                 HyperRun.Set_Color( undefined );
-                HyperRun.Set_Unifill( CreateUniFillSchemeColorWidthTint(11, 0) );
+                HyperRun.Set_Unifill( AscFormat.CreateUniFillSchemeColorWidthTint(11, 0) );
                 HyperRun.Set_Underline( true );
             }
 
@@ -5778,7 +5778,7 @@ Paragraph.prototype =
                 {
                     HyperRun.Set_Pr( TextPr.Copy() );
                     HyperRun.Set_Color( undefined );
-                    HyperRun.Set_Unifill( CreateUniFillSchemeColorWidthTint(11, 0) );
+                    HyperRun.Set_Unifill( AscFormat.CreateUniFillSchemeColorWidthTint(11, 0) );
                     HyperRun.Set_Underline( true );
                 }
 

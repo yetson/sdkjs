@@ -26,6 +26,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CChartSpace = AscFormat.CChartSpace;
 
 function getChartTranslateManager()
 {
@@ -529,7 +530,7 @@ CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
                         for(var i = 0; i < series.length; ++i)
                         {
                             var ser = series[i];
-                            var pts = getPtsFromSeries(ser);
+                            var pts = AscFormat.getPtsFromSeries(ser);
                             for(var j = 0; j < pts.length; ++j)
                             {
                                 if(pts[j].compiledDlb)
@@ -614,13 +615,13 @@ function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
     unifill.fill.setColor(new AscFormat.CUniColor());
     unifill.fill.color.setColor(new AscFormat.CSchemeColor());
     unifill.fill.color.color.setId(colorId);
-    return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
+    return AscFormat.CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
 }
 
 function CreateNoFillLine()
 {
     var ret = new AscFormat.CLn();
-    ret.setFill(CreateNoFillUniFill());
+    ret.setFill(AscFormat.CreateNoFillUniFill());
     return ret;
 }
 
@@ -630,3 +631,7 @@ function CreateNoFillUniFill()
     ret.setFill(new AscFormat.CNoFill());
     return ret;
 }
+
+window['AscFormat'].CreateUnifillSolidFillSchemeColor = CreateUnifillSolidFillSchemeColor;
+window['AscFormat'].CreateNoFillLine = CreateNoFillLine;
+window['AscFormat'].CreateNoFillUniFill = CreateNoFillUniFill;

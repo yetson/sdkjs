@@ -29,6 +29,7 @@ var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 
 var CShape = AscFormat.CShape;
+var checkSpPrRasterImages = AscFormat.checkSpPrRasterImages;
 
 var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
@@ -614,11 +615,11 @@ CDLbl.prototype =
             text_pr.FontSize = 10;
             if(this.chart && AscFormat.isRealNumber(this.chart.style) && this.chart.style > 40)
             {
-                text_pr.Unifill = CreateUnfilFromRGB(255, 255, 255);
+                text_pr.Unifill = AscFormat.CreateUnfilFromRGB(255, 255, 255);
             }
             else
             {
-                text_pr.Unifill = CreateUnfilFromRGB(0,0,0);
+                text_pr.Unifill = AscFormat.CreateUnfilFromRGB(0,0,0);
             }
 
             var para_pr = new CParaPr();
@@ -21365,7 +21366,7 @@ CStockChart.prototype =
                 ser.setSpPr(new AscFormat.CSpPr());
                 ser.spPr.setLn(new AscFormat.CLn());
                 ser.spPr.ln.setW(28575);
-                ser.spPr.ln.setFill(CreateNoFillUniFill());
+                ser.spPr.ln.setFill(AscFormat.CreateNoFillUniFill());
                 ser.marker.setSymbol(SYMBOL_NONE);
                 ser.setSmooth(false);
                 this.addSer(ser);

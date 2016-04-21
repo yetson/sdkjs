@@ -26,6 +26,8 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CChartSpace = AscFormat.CChartSpace;
+var CreateUnifillSolidFillSchemeColor = AscFormat.CreateUnifillSolidFillSchemeColor;
 
 function getChartTranslateManager()
 {
@@ -67,7 +69,7 @@ CChartSpace.prototype.recalculatePlotAreaChartBrush = function()
             }
             else
             {
-                default_brush = CreateNoFillUniFill();
+                default_brush = AscFormat.CreateNoFillUniFill();
             }
         }
         else if(this.style >=33 && this.style <= 34)
@@ -100,7 +102,7 @@ CChartSpace.prototype.recalculateChartBrush = function()
         }
         else
         {
-            default_brush = CreateNoFillUniFill();
+            default_brush = AscFormat.CreateNoFillUniFill();
         }
     }
     else if(this.style >=33 && this.style <= 40)
@@ -138,7 +140,7 @@ CChartSpace.prototype.recalculateChartPen = function()
         }
         else
         {
-            fill = CreateNoFillUniFill();
+            fill = AscFormat.CreateNoFillUniFill();
         }
     }
     else if(this.style >= 33 && this.style <= 40)
@@ -151,7 +153,7 @@ CChartSpace.prototype.recalculateChartPen = function()
     var parents = this.getParentObjects();
     default_line.calculate(parents.theme, parents.slide, parents.layout, parents.master, {R: 0, G: 0, B: 0, A: 255});
     this.pen = default_line;
-    checkBlackUnifill(this.pen.Fill, true);
+    AscFormat.checkBlackUnifill(this.pen.Fill, true);
 };
 CChartSpace.prototype.recalcText = function()
 {
