@@ -68,7 +68,6 @@
         ApiParagraph.superclass.constructor.call(this, this, Paragraph.Pr.Copy());
         this.Paragraph = Paragraph;
     }
-
     AscCommon.extendClass(ApiParagraph, ApiParaPr);
 
     /**
@@ -112,7 +111,6 @@
         ApiRun.superclass.constructor.call(this, this, Run.Pr.Copy());
         this.Run = Run;
     }
-
     AscCommon.extendClass(ApiRun, ApiTextPr);
 
     /**
@@ -134,13 +132,25 @@
     }
 
     /**
+     * Class representing a table row properties.
+     * @constructor
+     */
+    function ApiTableRowPr(Parent, RowPr)
+    {
+        this.Parent = Parent;
+        this.RowPr  = RowPr;
+    }
+
+    /**
      * Class representing a table row.
      * @constructor
      */
     function ApiTableRow(Row)
     {
+        ApiTableRow.superclass.constructor.call(this, this, Row.Pr.Copy());
         this.Row = Row;
     }
+    AscCommon.extendClass(ApiTableRow, ApiTableRowPr);
 
     /**
      * Class representing a table cell.
@@ -962,16 +972,6 @@
             return null;
 
         return new ApiTableCell(this.Row.Content[nPos]);
-    };
-    /**
-     * Set the height of the current table row within the current table.
-     * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
-     * @param {twips} nValue
-     */
-    ApiTableRow.prototype.SetHeight = function(sHRule, nValue)
-    {
-        var HRule = ("auto" === sHRule ? Asc.linerule_Auto : Asc.linerule_AtLeast);
-        this.Row.Set_Height(private_Twips2MM(nValue), HRule);
     };
 
     //------------------------------------------------------------------------------------------------------------------
@@ -1990,6 +1990,37 @@
         this.private_OnChange();
     };
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiTableRowPr
+    //
+    //------------------------------------------------------------------------------------------------------------------
+    /**
+     * Set the height of the current table row within the current table.
+     * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
+     * @param {twips} [nValue] - This value will be ignored if <code>sHRule="auto"</code>.
+     */
+    ApiTableRowPr.prototype.SetHeight = function(sHRule, nValue)
+    {
+        if ("auto" === sHRule)
+            this.RowPr.Height = new CTableRowHeight(0, Asc.linerule_Auto);
+        else if ("atLeast" === sHRule)
+            this.RowPr.Height = new CTableRowHeight(private_Twips2MM(nValue), Asc.linerule_AtLeast);
+
+        this.private_OnChange();
+    };
+    /**
+     * Specifies that the current table row shall be repeated at the top of each new page on which part of this table
+     * is displayed. This gives this table row the behavior of a 'header' row on each of these pages. This element can
+     * be applied to any number of rows at the top of the table structure in order to generate multi-row table headers.
+     * @param {boolean} isHeader
+     */
+    ApiTableRowPr.prototype.SetTableHeader = function(isHeader)
+    {
+        this.RowPr.TableHeader = private_GetBoolean(isHeader);
+        this.private_OnChange();
+    };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2046,7 +2077,6 @@
 
     ApiTableRow.prototype["GetCellsCount"]           = ApiTableRow.prototype.GetCellsCount;
     ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
-    ApiTableRow.prototype["SetHeight"]               = ApiTableRow.prototype.SetHeight;
 
     ApiTableCell.prototype["GetContent"]             = ApiTableCell.prototype.GetContent;
     ApiTableCell.prototype["SetWidth"]               = ApiTableCell.prototype.SetWidth;
@@ -2131,6 +2161,8 @@
     ApiTablePr.prototype["SetWidth"]                 = ApiTablePr.prototype.SetWidth;
     ApiTablePr.prototype["SetTableLayout"]           = ApiTablePr.prototype.SetTableLayout;
 
+    ApiTableRowPr.prototype["SetHeight"]             = ApiTableRowPr.prototype.SetHeight;
+    ApiTableRowPr.prototype["SetTableHeader"]        = ApiTableRowPr.prototype.SetTableHeader;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Private area
@@ -2354,6 +2386,11 @@
         this.Num.Set_ParaPr(this.Lvl, oApiParaPr.ParaPr);
         oApiParaPr.ParaPr = this.Num.Lvl[this.Lvl].ParaPr.Copy();
     };
+    ApiTableRow.prototype.OnChangeTableRowPr = function(oApiTableRowPr)
+    {
+        this.Row.Set_Pr(oApiTableRowPr.RowPr);
+        oApiTableRowPr.RowPr = this.Row.Pr.Copy();
+    };
     ApiTextPr.prototype.private_OnChange = function()
     {
         this.Parent.OnChangeTextPr(this);
@@ -2365,6 +2402,10 @@
     ApiTablePr.prototype.private_OnChange = function()
     {
         this.Parent.OnChangeTablePr(this);
+    };
+    ApiTableRowPr.prototype.private_OnChange = function()
+    {
+        this.Parent.OnChangeTableRowPr(this);
     };
 
 }(window, null));
@@ -2880,6 +2921,10 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     var Api = editor;
     var oDocument  = Api.GetDocument();
+
+    //------------------------------------------------------------------------------------------------------------------
+    // TextPr
+    //------------------------------------------------------------------------------------------------------------------
     var oParagraph = Api.CreateParagraph();
     oDocument.Push(oParagraph);
 
@@ -2905,6 +2950,9 @@ function TEST_BUILDER2()
     oParagraph.AddText("Language Russia").SetLanguage("ru-RU");
     oParagraph.AddText("ShadeRed").SetShd("clear", 255, 0, 0);
 
+    //------------------------------------------------------------------------------------------------------------------
+    // ParaPr
+    //------------------------------------------------------------------------------------------------------------------
     oParagraph = Api.CreateParagraph();
     oParagraph.AddText("Normal paragraph");
     oDocument.Push(oParagraph);
@@ -3099,12 +3147,18 @@ function TEST_BUILDER2()
         oDocument.Push(oParagraph);
     }
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Header - Footer
+    //------------------------------------------------------------------------------------------------------------------
     var oSection = oDocument.GetFinalSection();
     var oHeader = oSection.GetHeader("default", true);
 
     oParagraph = oHeader.GetElement(0);
     oParagraph.AddText("I'm in default header");
 
+    //------------------------------------------------------------------------------------------------------------------
+    // TablePr
+    //------------------------------------------------------------------------------------------------------------------
     var oTable = Api.CreateTable(3, 3);
     oDocument.Push(oTable);
     oTable.SetJc("left");
@@ -3169,6 +3223,27 @@ function TEST_BUILDER2()
     oDocument.Push(oTable);
     oTable.SetTableLayout("fixed");
 
+    //------------------------------------------------------------------------------------------------------------------
+    // TableRowPr
+    //------------------------------------------------------------------------------------------------------------------
+    oTable = Api.CreateTable(3, 3);
+    oDocument.Push(oTable);
+    var oTableRow = oTable.GetRow(0);
+    oTableRow.SetHeight("auto");
+    oTableRow = oTable.GetRow(1);
+    oTableRow.SetHeight("atLeast", 1000);
+    oTableRow = oTable.GetRow(2);
+    oTableRow.SetHeight("atLeast", 2000);
+
+    oTable = Api.CreateTable(10, 40);
+    oDocument.Push(oTable);
+    oTable.SetStyle(oTableStyle);
+    oTable.GetRow(0).SetTableHeader(true);
+    oTable.GetRow(1).SetTableHeader(true);
+
+    //------------------------------------------------------------------------------------------------------------------
+    // TableCellPr
+    //------------------------------------------------------------------------------------------------------------------
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();

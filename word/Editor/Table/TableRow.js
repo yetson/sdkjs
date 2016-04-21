@@ -256,12 +256,14 @@ CTableRow.prototype =
 
         // Сначала возьмем настройки по умолчанию для строки
         var RowPr = TablePr.TableRowPr.Copy();
+        if (undefined !== TablePr.TablePr.TableCellSpacing)
+            RowPr.TableCellSpacing = TablePr.TablePr.TableCellSpacing;
 
         // Совместим настройки с настройками для групп строк
         if ( true === TableLook.Is_BandHor() )
         {
             var RowBandSize = TablePr.TablePr.TableStyleRowBandSize;
-            var _CurIndex   = ( true != TableLook.Is_FirstRow() ? CurIndex : CurIndex - 1 )
+            var _CurIndex   = ( true != TableLook.Is_FirstRow() ? CurIndex : CurIndex - 1 );
             var GroupIndex = ( 1 != RowBandSize ? Math.floor( _CurIndex / RowBandSize ) : _CurIndex );
             if ( 0 === GroupIndex % 2 )
                 RowPr.Merge(TablePr.TableBand1Horz.TableRowPr);
@@ -312,6 +314,7 @@ CTableRow.prototype =
     {
         History.Add( this, { Type : AscDFH.historyitem_TableRow_Pr, Old : this.Pr, New : RowPr } );
         this.Pr = RowPr;
+        this.Recalc_CompiledPr();
     },
 
     Get_Before : function()
@@ -424,8 +427,7 @@ CTableRow.prototype =
 
     Get_CellSpacing : function()
     {
-        var RowPr = this.Get_CompiledPr( false );
-        return RowPr.TableCellSpacing;
+        return this.Get_CompiledPr(false).TableCellSpacing;
     },
 
     Set_CellSpacing : function(Value)
