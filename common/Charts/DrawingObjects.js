@@ -1801,7 +1801,7 @@ function DrawingObjects() {
 
         if ( graphicObject && ctx ) {
             // Image
-            if ( graphicObject instanceof CImageShape )
+            if ( graphicObject instanceof AscFormat.CImageShape )
                 printImage(graphicObject, ctx, top, left);
             // Shape
             else if ( graphicObject instanceof AscFormat.CShape )
@@ -1817,7 +1817,7 @@ function DrawingObjects() {
         // Print functions
         function printImage(graphicObject, ctx, top, left) {
 
-            if ( (graphicObject instanceof CImageShape) && graphicObject && ctx ) {
+            if ( (graphicObject instanceof AscFormat.CImageShape) && graphicObject && ctx ) {
                 // Save
                 var tx = graphicObject.transform.tx;
                 var ty = graphicObject.transform.ty;
@@ -1896,7 +1896,7 @@ function DrawingObjects() {
                 for ( var i = 0; i < graphicObject.arrGraphicObjects.length; i++ ) {
                     var graphicItem = graphicObject.arrGraphicObjects[i];
 
-                    if ( graphicItem instanceof CImageShape )
+                    if ( graphicItem instanceof AscFormat.CImageShape )
                         printImage(graphicItem, ctx, top, left);
 
                     else if ( graphicItem instanceof AscFormat.CShape )

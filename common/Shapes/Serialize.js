@@ -5192,7 +5192,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var pic = new CImageShape(this.TempMainObject);
+        var pic = new AscFormat.CImageShape(this.TempMainObject);
 
         pic.setBDeleted(false);
 

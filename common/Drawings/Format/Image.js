@@ -24,6 +24,12 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 // Import
 var CShape = AscFormat.CShape;
 
@@ -1040,3 +1046,8 @@ CImageShape.prototype =
     {
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CImageShape = CImageShape;
+})(window);
