@@ -2983,7 +2983,7 @@
 						offX = 0;
 						offY = 0;
 						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
-						rot = normalizeRotate(rot);
+						rot = AscFormat.normalizeRotate(rot);
 						if (checkNormalRotate(rot))
 						{
 							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))
@@ -3267,7 +3267,7 @@
 						offX = 0;
 						offY = 0;
 						rot = AscFormat.isRealNumber(xfrm.rot) ? xfrm.rot : 0;
-						rot = normalizeRotate(rot);
+						rot = AscFormat.normalizeRotate(rot);
 						if (checkNormalRotate(rot))
 						{
 							if(AscFormat.isRealNumber(xfrm.offX) && AscFormat.isRealNumber(xfrm.offY))

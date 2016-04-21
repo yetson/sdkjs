@@ -26,6 +26,7 @@
 
 // Import
 var CShape = AscFormat.CShape;
+var CGroupShape = AscFormat.CGroupShape;
 
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;

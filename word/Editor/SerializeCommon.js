@@ -515,7 +515,7 @@ function CPPTXContentLoader()
     {
         var s = this.stream;
 
-        var shape = new CGroupShape();
+        var shape = new AscFormat.CGroupShape();
 
         shape.setBDeleted(false);
         shape.setParent(this.TempMainObject == null ? this.ParaDrawing : null);

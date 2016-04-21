@@ -250,7 +250,7 @@ Slide.prototype =
                     _index = _glyph.nvPicPr.nvPr.ph.idx;
                     _type = _glyph.nvPicPr.nvPr.ph.type;
                 }
-                if(_glyph instanceof  CGroupShape)
+                if(_glyph instanceof  AscFormat.CGroupShape)
                 {
                     _index = _glyph.nvGrpSpPr.nvPr.ph.idx;
                     _type = _glyph.nvGrpSpPr.nvPr.ph.type;
@@ -312,7 +312,7 @@ Slide.prototype =
                     {
                         _type = _glyph.nvPicPr.nvPr.ph.type;
                     }
-                    if(_glyph instanceof  CGroupShape)
+                    if(_glyph instanceof  AscFormat.CGroupShape)
                     {
                         _type = _glyph.nvGrpSpPr.nvPr.ph.type;
                     }

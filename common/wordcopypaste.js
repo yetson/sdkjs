@@ -2042,7 +2042,7 @@ CopyProcessor.prototype =
             {
                 this.oPresentationWriter.WriteImage(oGraphicObj);
             }
-            else if(oGraphicObj instanceof CGroupShape)
+            else if(oGraphicObj instanceof AscFormat.CGroupShape)
             {
                 this.oPresentationWriter.WriteGroupShape(oGraphicObj);
             }
