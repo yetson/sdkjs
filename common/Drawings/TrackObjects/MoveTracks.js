@@ -91,13 +91,13 @@ function MoveShapeImageTrack(originalObject)
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
         }
-        if(isRealNumber(pageIndex))
+        if(AscFormat.isRealNumber(pageIndex))
             this.pageIndex = pageIndex;
     };
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -196,7 +196,7 @@ function MoveShapeImageTrackInGroup(originalObject)
     this.inv.ty = 0;
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -303,7 +303,7 @@ function MoveGroupTrack(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }

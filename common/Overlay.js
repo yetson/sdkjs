@@ -978,8 +978,8 @@ CAutoshapeTrack.prototype =
 
         switch (type)
         {
-            case TYPE_TRACK_SHAPE:
-            case TYPE_TRACK_GROUP:
+            case AscFormat.TYPE_TRACK.SHAPE:
+            case AscFormat.TYPE_TRACK.GROUP:
             {
                 if (bIsClever)
                 {
@@ -1354,8 +1354,8 @@ CAutoshapeTrack.prototype =
 
                 break;
             }
-            case TYPE_TRACK_TEXT:
-            case TYPE_TRACK_GROUP_PASSIVE:
+            case AscFormat.TYPE_TRACK.TEXT:
+            case AscFormat.TYPE_TRACK.GROUP_PASSIVE:
             {
                 if (bIsClever)
                 {
@@ -1693,7 +1693,7 @@ CAutoshapeTrack.prototype =
 
                 break;
             }
-            case TYPE_TRACK_EMPTY_PH:
+            case AscFormat.TYPE_TRACK.EMPTY_PH:
             {
                 if (bIsClever)
                 {

@@ -46,6 +46,9 @@ var Asc = window["Asc"];
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 
+window["AscFormat"] = {};
+var AscFormat = window["AscFormat"];
+
 window["AscDFH"] = {};
 var AscDFH = window["AscDFH"];
 

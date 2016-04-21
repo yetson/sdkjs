@@ -159,7 +159,7 @@ CGroupShape.prototype.recalculate = function()
 
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if(this.recalcInfo.recalculateBrush)
         {

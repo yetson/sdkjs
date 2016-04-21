@@ -77,7 +77,7 @@ function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
             }
             else
             {
-                oPropsToSet = new CBodyPr();
+                oPropsToSet = new AscFormat.CBodyPr();
             }
         }
         else
@@ -90,21 +90,21 @@ function CheckShapeBodyAutoFitReset(oShape, bNoResetRelSize)
             }
             else
             {
-                oPropsToSet = new CBodyPr();
+                oPropsToSet = new AscFormat.CBodyPr();
             }
         }
         var oBodyPr = oShape.getBodyPr();
-        if(oBodyPr.textFit && oBodyPr.textFit.type === text_fit_Auto)
+        if(oBodyPr.textFit && oBodyPr.textFit.type === AscFormat.text_fit_Auto)
         {
             if(!oPropsToSet.textFit)
             {
-                oPropsToSet.textFit = new CTextFit();
+                oPropsToSet.textFit = new AscFormat.CTextFit();
             }
-            oPropsToSet.textFit.type = text_fit_No;
+            oPropsToSet.textFit.type = AscFormat.text_fit_No;
         }
-        if(oBodyPr.wrap === nTWTNone)
+        if(oBodyPr.wrap === AscFormat.nTWTNone)
         {
-            oPropsToSet.wrap = nTWTSquare;
+            oPropsToSet.wrap = AscFormat.nTWTSquare;
         }
         if(oShape.bWordShape)
         {
@@ -361,12 +361,12 @@ function CheckSpPrXfrm(object, bNoResetAutofit)
 {
     if(!object.spPr)
     {
-        object.setSpPr(new CSpPr());
+        object.setSpPr(new AscFormat.CSpPr());
         object.spPr.setParent(object);
     }
     if(!object.spPr.xfrm)
     {
-        object.spPr.setXfrm(new CXfrm());
+        object.spPr.setXfrm(new AscFormat.CXfrm());
         object.spPr.xfrm.setParent(object.spPr);
         object.spPr.xfrm.setOffX(object.x);
         object.spPr.xfrm.setOffY(object.y);
@@ -386,12 +386,12 @@ function CheckSpPrXfrm2(object)
         return;
     if(!object.spPr)
     {
-        object.spPr = new CSpPr();
+        object.spPr = new AscFormat.CSpPr();
         object.spPr.parent = object;
     }
     if(!object.spPr.xfrm)
     {
-        object.spPr.xfrm = new CXfrm();
+        object.spPr.xfrm = new AscFormat.CXfrm();
         object.spPr.xfrm.parent = object.spPr;
         object.spPr.xfrm.offX = 0;//object.x;
         object.spPr.xfrm.offY = 0;//object.y;
@@ -458,14 +458,14 @@ function getObjectsByTypesFromArr(arr, bGrouped)
 
 function CreateBlipFillUniFillFromUrl(url)
 {
-    var ret = new CUniFill();
+    var ret = new AscFormat.CUniFill();
     ret.setFill(CreateBlipFillRasterImageId(url));
     return ret;
 }
 
 function CreateBlipFillRasterImageId(url)
 {
-    var oBlipFill = new CBlipFill();
+    var oBlipFill = new AscFormat.CBlipFill();
     oBlipFill.setRasterImageId(url);
     return oBlipFill;
 }
@@ -820,7 +820,7 @@ DrawingObjectsController.prototype =
     checkSelectedObjectsForMove: function(group, pageIndex)
     {
         var selected_object = group ? group.selectedObjects : this.selectedObjects;
-        var b_check_page = isRealNumber(pageIndex);
+        var b_check_page = AscFormat.isRealNumber(pageIndex);
         for(var i = 0; i < selected_object.length; ++i)
         {
             if(selected_object[i].canMove() && (!b_check_page || selected_object[i].selectStartPage === pageIndex))
@@ -902,7 +902,7 @@ DrawingObjectsController.prototype =
                 if( this.document || (this.drawingObjects.cSld && !(this.noNeedUpdateCursorType === true)) )
                 {
                     var nPageIndex = pageIndex;
-                    if(this.drawingObjects.cSld && !( this.noNeedUpdateCursorType === true ) && isRealNumber(this.drawingObjects.num))
+                    if(this.drawingObjects.cSld && !( this.noNeedUpdateCursorType === true ) && AscFormat.isRealNumber(this.drawingObjects.num))
                     {
                         nPageIndex = this.drawingObjects.num;
                     }
@@ -972,7 +972,7 @@ DrawingObjectsController.prototype =
 	
 	createWatermarkImage: function(sImageUrl)
 	{
-        return ExecuteNoHistory(function(){
+        return AscFormat.ExecuteNoHistory(function(){
             return this.createImage(sImageUrl, 0, 0, 110, 61.875);
         }, this, []);
     },
@@ -1068,7 +1068,7 @@ DrawingObjectsController.prototype =
         {
             if(this.selection.textSelection.selectStartPage === pageIndex)
             {
-                drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, CheckObjectLine(this.selection.textSelection), this.selection.textSelection.canRotate());
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.textSelection.getTransformMatrix(), 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, CheckObjectLine(this.selection.textSelection), this.selection.textSelection.canRotate());
                 if(this.selection.textSelection.drawAdjustments)
                     this.selection.textSelection.drawAdjustments(drawingDocument);
             }
@@ -1077,49 +1077,49 @@ DrawingObjectsController.prototype =
         {
             if(this.selection.groupSelection.selectStartPage === pageIndex)
             {
-                drawingDocument.DrawTrack(TYPE_TRACK_GROUP_PASSIVE, this.selection.groupSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.extX, this.selection.groupSelection.extY, false, this.selection.groupSelection.canRotate());
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.GROUP_PASSIVE, this.selection.groupSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.extX, this.selection.groupSelection.extY, false, this.selection.groupSelection.canRotate());
                 if(this.selection.groupSelection.selection.textSelection)
                 {
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length ; ++i)
                     {
-                        drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
                     }
                 }
                 else if(this.selection.groupSelection.selection.chartSelection)
                 {
                     if(this.selection.groupSelection.selection.chartSelection.selectStartPage === pageIndex)
                     {
-                        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.selection.chartSelection.extX, this.selection.groupSelection.selection.chartSelection.extY, false, this.selection.groupSelection.selection.chartSelection.canRotate());
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.groupSelection.selection.chartSelection.extX, this.selection.groupSelection.selection.chartSelection.extY, false, this.selection.groupSelection.selection.chartSelection.canRotate());
                         if(this.selection.groupSelection.selection.chartSelection.selection.textSelection)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false, true);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.groupSelection.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extX, this.selection.groupSelection.selection.chartSelection.selection.textSelection.extY, false, false, true);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.title)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false, true);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.title.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.title.extX, this.selection.groupSelection.selection.chartSelection.selection.title.extY, false, false, true);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbls)
                         {
                             for(i = 0; i < this.selection.groupSelection.selection.chartSelection.selection.dataLbls.length; ++i)
                             {
-                                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extY, false, false);
+                                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbls[i].extY, false, false);
                             }
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.dataLbl)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extY, false, false);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extX, this.selection.groupSelection.selection.chartSelection.selection.dataLbl.extY, false, false);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.legend)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legend.extX, this.selection.groupSelection.selection.chartSelection.selection.legend.extY, false, false);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legend.extX, this.selection.groupSelection.selection.chartSelection.selection.legend.extY, false, false);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.legendEntry)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extX, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extY, false, false);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extX, this.selection.groupSelection.selection.chartSelection.selection.legendEntry.extY, false, false);
                         }
                         else if(this.selection.groupSelection.selection.chartSelection.selection.axisLbls)
                         {
-                            drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extX, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extY, false, false);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extX, this.selection.groupSelection.selection.chartSelection.selection.axisLbls.extY, false, false);
                         }
                     }
                 }
@@ -1127,7 +1127,7 @@ DrawingObjectsController.prototype =
                 {
                     for(i = 0; i < this.selection.groupSelection.selectedObjects.length ; ++i)
                     {
-                        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.groupSelection.selectedObjects[i].transform, 0, 0, this.selection.groupSelection.selectedObjects[i].extX, this.selection.groupSelection.selectedObjects[i].extY, CheckObjectLine(this.selection.groupSelection.selectedObjects[i]), this.selection.groupSelection.selectedObjects[i].canRotate());
                     }
                 }
 
@@ -1141,37 +1141,37 @@ DrawingObjectsController.prototype =
         {
             if(this.selection.chartSelection.selectStartPage === pageIndex)
             {
-                drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.chartSelection.extX, this.selection.chartSelection.extY, false, this.selection.chartSelection.canRotate());
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.getTransformMatrix(), 0, 0, this.selection.chartSelection.extX, this.selection.chartSelection.extY, false, this.selection.chartSelection.canRotate());
                 if(this.selection.chartSelection.selection.textSelection)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false, true);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.chartSelection.selection.textSelection.transform, 0, 0, this.selection.chartSelection.selection.textSelection.extX, this.selection.chartSelection.selection.textSelection.extY, false, false, true);
                 }
                 else if(this.selection.chartSelection.selection.title)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false, true);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.title.transform, 0, 0, this.selection.chartSelection.selection.title.extX, this.selection.chartSelection.selection.title.extY, false, false, true);
                 }
                 else if(this.selection.chartSelection.selection.dataLbls)
                 {
                     for(i = 0; i < this.selection.chartSelection.selection.dataLbls.length; ++i)
                     {
-                        drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.chartSelection.selection.dataLbls[i].extX, this.selection.chartSelection.selection.dataLbls[i].extY, false, false);
+                        drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.dataLbls[i].transform, 0, 0, this.selection.chartSelection.selection.dataLbls[i].extX, this.selection.chartSelection.selection.dataLbls[i].extY, false, false);
                     }
                 }
                 else if(this.selection.chartSelection.selection.dataLbl)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.chartSelection.selection.dataLbl.extX, this.selection.chartSelection.selection.dataLbl.extY, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.dataLbl.transform, 0, 0, this.selection.chartSelection.selection.dataLbl.extX, this.selection.chartSelection.selection.dataLbl.extY, false, false);
                 }
                 else if(this.selection.chartSelection.selection.legend)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.chartSelection.selection.legend.extX, this.selection.chartSelection.selection.legend.extY, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.legend.transform, 0, 0, this.selection.chartSelection.selection.legend.extX, this.selection.chartSelection.selection.legend.extY, false, false);
                 }
                 else if(this.selection.chartSelection.selection.legendEntry)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.chartSelection.selection.legendEntry.extX, this.selection.chartSelection.selection.legendEntry.extY, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.legendEntry.transform, 0, 0, this.selection.chartSelection.selection.legendEntry.extX, this.selection.chartSelection.selection.legendEntry.extY, false, false);
                 }
                 else if(this.selection.chartSelection.selection.axisLbls)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.chartSelection.selection.axisLbls.extX, this.selection.chartSelection.selection.axisLbls.extY, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.chartSelection.selection.axisLbls.transform, 0, 0, this.selection.chartSelection.selection.axisLbls.extX, this.selection.chartSelection.selection.axisLbls.extY, false, false);
                 }
             }
         }
@@ -1186,7 +1186,7 @@ DrawingObjectsController.prototype =
             {
                 if(this.selectedObjects[i].selectStartPage === pageIndex)
                 {
-                    drawingDocument.DrawTrack(TYPE_TRACK_SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selectedObjects[i].getTransformMatrix(), 0, 0, this.selectedObjects[i].extX, this.selectedObjects[i].extY, CheckObjectLine(this.selectedObjects[i]), this.selectedObjects[i].canRotate());
                 }
             }
             if(this.selectedObjects.length === 1 && this.selectedObjects[0].drawAdjustments && this.selectedObjects[0].selectStartPage === pageIndex)
@@ -1201,7 +1201,7 @@ DrawingObjectsController.prototype =
                 var anchor_pos;
                 if(this.arrTrackObjects.length === 1 && !(this.arrTrackObjects[0] instanceof TrackPointWrapPointWrapPolygon || this.arrTrackObjects[0] instanceof  TrackNewPointWrapPolygon))
                 {
-                    var page_index = isRealNumber(this.arrTrackObjects[0].pageIndex) ? this.arrTrackObjects[0].pageIndex : (isRealNumber(this.arrTrackObjects[0].selectStartPage) ? this.arrTrackObjects[0].selectStartPage : 0);
+                    var page_index = AscFormat.isRealNumber(this.arrTrackObjects[0].pageIndex) ? this.arrTrackObjects[0].pageIndex : (AscFormat.isRealNumber(this.arrTrackObjects[0].selectStartPage) ? this.arrTrackObjects[0].selectStartPage : 0);
                     if(page_index === pageIndex)
                     {
                         var bounds = this.arrTrackObjects[0].getBounds();
@@ -1745,9 +1745,9 @@ DrawingObjectsController.prototype =
         var oThis = this;
         var callBack = function()
         {
-            var unifill = new CUniFill();
-            unifill.setFill(new CSolidFill());
-            unifill.fill.setColor(CorrectUniColor(color, null));
+            var unifill = new AscFormat.CUniFill();
+            unifill.setFill(new AscFormat.CSolidFill());
+            unifill.fill.setColor(AscFormat.CorrectUniColor(color, null));
             oThis.paragraphAdd(new ParaTextPr({Unifill: unifill}));
         };
         this.checkSelectedObjectsAndCallback(callBack, [], false, AscDFH.historydescription_Spreadsheet_SetCellTextColor);
@@ -1782,12 +1782,12 @@ DrawingObjectsController.prototype =
             }
             case 90 :
             {
-                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: nVertTTvert}], false, AscDFH.historydescription_Spreadsheet_SetCellVertAlign);
+                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: AscFormat.nVertTTvert}], false, AscDFH.historydescription_Spreadsheet_SetCellVertAlign);
                 break;
             }
             case 270:
             {
-                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: nVertTTvert270}], false, AscDFH.historydescription_Spreadsheet_SetCellVertAlign);
+                this.checkSelectedObjectsAndCallback(this.applyDrawingProps, [{vert: AscFormat.nVertTTvert270}], false, AscDFH.historydescription_Spreadsheet_SetCellVertAlign);
                 break;
             }
         }
@@ -2104,7 +2104,7 @@ DrawingObjectsController.prototype =
     {
         var objects_by_type = this.getSelectedObjectsByTypes(true);
         var i;
-        if(isRealNumber(props.verticalTextAlign))
+        if(AscFormat.isRealNumber(props.verticalTextAlign))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
@@ -2117,11 +2117,11 @@ DrawingObjectsController.prototype =
             if(objects_by_type.tables.length == 1)
             {
                 var props2 = new CTableProp();
-                if(props.verticalTextAlign === VERTICAL_ANCHOR_TYPE_BOTTOM)
+                if(props.verticalTextAlign === AscFormat.VERTICAL_ANCHOR_TYPE_BOTTOM)
                 {
                     props2.put_CellsVAlign(vertalignjc_Bottom);
                 }
-                else if(props.verticalTextAlign === VERTICAL_ANCHOR_TYPE_CENTER)
+                else if(props.verticalTextAlign === AscFormat.VERTICAL_ANCHOR_TYPE_CENTER)
                 {
                     props2.put_CellsVAlign(vertalignjc_Center);
                 }
@@ -2143,7 +2143,7 @@ DrawingObjectsController.prototype =
                 editor.WordControl.m_oLogicDocument.Check_GraphicFrameRowHeight(objects_by_type.tables[0]);
             }
         }
-        if(isRealNumber(props.vert))
+        if(AscFormat.isRealNumber(props.vert))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
@@ -2222,12 +2222,12 @@ DrawingObjectsController.prototype =
         }
 
         var aGroups = [];
-        if(isRealNumber(props.Width) || isRealNumber(props.Height))
+        if(AscFormat.isRealNumber(props.Width) || AscFormat.isRealNumber(props.Height))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
                 CheckSpPrXfrm(objects_by_type.shapes[i]);
-                if(!props.SizeRelH && isRealNumber(props.Width))
+                if(!props.SizeRelH && AscFormat.isRealNumber(props.Width))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtX(props.Width);
                     if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
@@ -2235,7 +2235,7 @@ DrawingObjectsController.prototype =
                         objects_by_type.shapes[i].parent.SetSizeRelH({RelativeFrom: c_oAscSizeRelFromH.sizerelfromhPage, Percent: 0})
                     }
                 }
-                if(!props.SizeRelV && isRealNumber(props.Height))
+                if(!props.SizeRelV && AscFormat.isRealNumber(props.Height))
                 {
                     objects_by_type.shapes[i].spPr.xfrm.setExtY(props.Height);
                     if(objects_by_type.shapes[i].parent instanceof ParaDrawing)
@@ -2262,7 +2262,7 @@ DrawingObjectsController.prototype =
                 }
                 objects_by_type.shapes[i].checkDrawingBaseCoords();
             }
-            if(!props.SizeRelH && !props.SizeRelV && isRealNumber(props.Width) && isRealNumber(props.Height))
+            if(!props.SizeRelH && !props.SizeRelV && AscFormat.isRealNumber(props.Width) && AscFormat.isRealNumber(props.Height))
             {
                 for(i = 0; i < objects_by_type.images.length; ++i)
                 {
@@ -2289,7 +2289,7 @@ DrawingObjectsController.prototype =
             }
         }
 
-        if(isRealObject(props.Position) &&isRealNumber(props.Position.X) && isRealNumber(props.Position.Y))
+        if(isRealObject(props.Position) &&AscFormat.isRealNumber(props.Position.X) && AscFormat.isRealNumber(props.Position.Y))
         {
             for(i = 0; i < objects_by_type.shapes.length; ++i)
             {
@@ -2337,7 +2337,7 @@ DrawingObjectsController.prototype =
             var oParaTextPr;
             var nStyle = oAscTextArtProperties.asc_getStyle();
             var bWord = (typeof CGraphicObjects !== "undefined" &&  (this instanceof CGraphicObjects));
-            if(isRealNumber(nStyle))
+            if(AscFormat.isRealNumber(nStyle))
             {
                 var oPreviewManager = this.getTextArtPreviewManager();
                 var oStyleTextPr = oPreviewManager.getStylesToApply()[nStyle].Copy();
@@ -2491,7 +2491,7 @@ DrawingObjectsController.prototype =
             }
         }
 
-        if(isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
+        if(AscFormat.isRealNumber(style_index) && style_index > 0 && style_index < 49 && chart_space.style !== style_index)
         {
             if(!b_clear_formatting)
             {
@@ -2542,7 +2542,7 @@ DrawingObjectsController.prototype =
                 {
                     chart.setLegend(new CLegend());
                 }
-                if(isRealNumber(LEGEND_POS_MAP[legend_pos_settings]))
+                if(AscFormat.isRealNumber(LEGEND_POS_MAP[legend_pos_settings]))
                 {
                     if(chart.legend.legendPos !== LEGEND_POS_MAP[legend_pos_settings])
                         chart.legend.setLegendPos(LEGEND_POS_MAP[legend_pos_settings]);
@@ -2943,7 +2943,7 @@ DrawingObjectsController.prototype =
                         }
                     }
 
-                   // if((isRealBool(chart_type.marker) && chart_type.marker) !== b_marker)
+                   // if((AscFormat.isRealBool(chart_type.marker) && chart_type.marker) !== b_marker)
                    //     chart_type.setMarker(b_marker);
                 }
                 else
@@ -3167,11 +3167,11 @@ DrawingObjectsController.prototype =
                     replaceChart(plot_area, chart_type, new_chart_type);
                     checkSwapAxis(plot_area, chart_type, new_chart_type);
 
-                    new_chart_type.setHiLowLines(new CSpPr());
+                    new_chart_type.setHiLowLines(new AscFormat.CSpPr());
                     new_chart_type.setUpDownBars(new CUpDownBars());
                     new_chart_type.upDownBars.setGapWidth(150);
-                    new_chart_type.upDownBars.setUpBars(new CSpPr());
-                    new_chart_type.upDownBars.setDownBars(new CSpPr());
+                    new_chart_type.upDownBars.setUpBars(new AscFormat.CSpPr());
+                    new_chart_type.upDownBars.setDownBars(new AscFormat.CSpPr());
                     val_axis = new_chart_type.getAxisByTypes().valAx;
                     for(i = 0; i < val_axis.length; ++i)
                     {
@@ -3221,7 +3221,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!hor_axis.title.txPr.bodyPr)
                             {
-                                hor_axis.title.txPr.setBodyPr(new CBodyPr());
+                                hor_axis.title.txPr.setBodyPr(new AscFormat.CBodyPr());
                             }
                             if(!hor_axis.title.txPr.content)
                             {
@@ -3234,7 +3234,7 @@ DrawingObjectsController.prototype =
 
                         if(!_text_body.bodyPr || _text_body.bodyPr.isNotNull())
                         {
-                            _text_body.setBodyPr(new CBodyPr());
+                            _text_body.setBodyPr(new AscFormat.CBodyPr());
                         }
 
                         break;
@@ -3242,7 +3242,7 @@ DrawingObjectsController.prototype =
                 }
             }
             hor_axis.setMenuProps(chartSettings.getHorAxisProps());
-            if(isRealBool(chartSettings.getShowHorAxis())){
+            if(AscFormat.isRealBool(chartSettings.getShowHorAxis())){
                 hor_axis.setDelete(!chartSettings.getShowHorAxis());
             }
         }
@@ -3293,7 +3293,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!_text_body.bodyPr)
                             {
-                                _text_body.setBodyPr(new CBodyPr());
+                                _text_body.setBodyPr(new AscFormat.CBodyPr());
                             }
                             var _body_pr = _text_body.bodyPr.createDuplicate();
                             if(!_text_body.content)
@@ -3306,7 +3306,7 @@ DrawingObjectsController.prototype =
                             }
                             else
                             {
-                                _body_pr.setVert(nVertTThorz);
+                                _body_pr.setVert(AscFormat.nVertTThorz);
                                 _body_pr.setRot(0);
                             }
                             _text_body.setBodyPr(_body_pr);
@@ -3319,7 +3319,7 @@ DrawingObjectsController.prototype =
                 }
             }
             vert_axis.setMenuProps(chartSettings.getVertAxisProps());
-            if(isRealBool(chartSettings.getShowVerAxis())){
+            if(AscFormat.isRealBool(chartSettings.getShowVerAxis())){
                 vert_axis.setDelete(!chartSettings.getShowVerAxis());
             }
         }
@@ -3343,7 +3343,7 @@ DrawingObjectsController.prototype =
                     case c_oAscGridLinesSettings.major:
                     {
                         if(!axis.majorGridlines)
-                            axis.setMajorGridlines(new CSpPr());
+                            axis.setMajorGridlines(new AscFormat.CSpPr());
                         if(axis.minorGridlines)
                             axis.setMinorGridlines(null);
                         break;
@@ -3351,7 +3351,7 @@ DrawingObjectsController.prototype =
                     case c_oAscGridLinesSettings.minor:
                     {
                         if(!axis.minorGridlines)
-                            axis.setMinorGridlines(new CSpPr());
+                            axis.setMinorGridlines(new AscFormat.CSpPr());
                         if(axis.majorGridlines)
                             axis.setMajorGridlines(null);
                         break;
@@ -3359,9 +3359,9 @@ DrawingObjectsController.prototype =
                     case c_oAscGridLinesSettings.majorMinor:
                     {
                         if(!axis.minorGridlines)
-                            axis.setMinorGridlines(new CSpPr());
+                            axis.setMinorGridlines(new AscFormat.CSpPr());
                         if(!axis.majorGridlines)
-                            axis.setMajorGridlines(new CSpPr());
+                            axis.setMajorGridlines(new AscFormat.CSpPr());
                         break;
                     }
                 }
@@ -3374,7 +3374,7 @@ DrawingObjectsController.prototype =
         chart_type = plot_area.charts[0];
 
         var data_labels_pos_setting = chartSettings.getDataLabelsPos();
-        if(isRealNumber(data_labels_pos_setting))
+        if(AscFormat.isRealNumber(data_labels_pos_setting))
         {
             if(data_labels_pos_setting === c_oAscChartDataLabelsPos.none)
             {
@@ -3384,7 +3384,7 @@ DrawingObjectsController.prototype =
             }
             else
             {
-                if(isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
+                if(AscFormat.isRealNumber(DLBL_POS_DEFINES_MAP[data_labels_pos_setting]))
                 {
                     chart_type.removeDataLabels();
                     if(!chart_type.dLbls)
@@ -3477,7 +3477,7 @@ DrawingObjectsController.prototype =
             }
         }
         //подписи данных
-        if(typeof chart_type.setDLbls === "function" && isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
+        if(typeof chart_type.setDLbls === "function" && AscFormat.isRealNumber(chartSettings.getDataLabelsPos()) && chartSettings.getDataLabelsPos() !== c_oAscChartDataLabelsPos.none)
         {
             var checkDataLabels = function(chartType)
             {
@@ -3489,25 +3489,25 @@ DrawingObjectsController.prototype =
                 }
                 return chartType.dLbls;
             };
-            if(isRealBool(chartSettings.showCatName))
+            if(AscFormat.isRealBool(chartSettings.showCatName))
                 checkDataLabels(chart_type).setShowCatName(chartSettings.showCatName);
-            if(isRealBool(chartSettings.showSerName))
+            if(AscFormat.isRealBool(chartSettings.showSerName))
                 checkDataLabels(chart_type).setShowSerName(chartSettings.showSerName);
-            if(isRealBool(chartSettings.showVal))
+            if(AscFormat.isRealBool(chartSettings.showVal))
                 checkDataLabels(chart_type).setShowVal(chartSettings.showVal);
 
             var d_lbls2 = chart_type.dLbls;
             if(d_lbls2)
             {
-                if(!isRealBool(d_lbls2.showLegendKey) || d_lbls2.showLegendKey === true)
+                if(!AscFormat.isRealBool(d_lbls2.showLegendKey) || d_lbls2.showLegendKey === true)
                 {
                     d_lbls2.setShowLegendKey(false);
                 }
-                if(!isRealBool(d_lbls2.showPercent) || d_lbls2.showPercent === true)
+                if(!AscFormat.isRealBool(d_lbls2.showPercent) || d_lbls2.showPercent === true)
                 {
                     d_lbls2.setShowPercent(false);
                 }
-                if(!isRealBool(d_lbls2.showBubbleSize) || d_lbls2.showBubbleSize === true)
+                if(!AscFormat.isRealBool(d_lbls2.showBubbleSize) || d_lbls2.showBubbleSize === true)
                 {
                     d_lbls2.setShowBubbleSize(false);
                 }
@@ -3518,11 +3518,11 @@ DrawingObjectsController.prototype =
 
         if(chart_type.getObjectType() === AscDFH.historyitem_type_LineChart )
         {
-            if(!isRealBool(chartSettings.showMarker) || chart.view3D)
+            if(!AscFormat.isRealBool(chartSettings.showMarker) || chart.view3D)
             {
                 chartSettings.showMarker = false;
             }
-            if(!isRealBool(chartSettings.bLine) || chart.view3D)
+            if(!AscFormat.isRealBool(chartSettings.bLine) || chart.view3D)
             {
                 chartSettings.bLine = true;
             }
@@ -3566,10 +3566,10 @@ DrawingObjectsController.prototype =
                     removeDPtsFromSeries(chart_type.series[j]);
                     if(!chart_type.series[j].spPr)
                     {
-                        chart_type.series[j].setSpPr(new CSpPr());
+                        chart_type.series[j].setSpPr(new AscFormat.CSpPr());
                     }
 
-                    if(isRealBool(chart_type.series[j].smooth))
+                    if(AscFormat.isRealBool(chart_type.series[j].smooth))
                     {
                         chart_type.series[j].setSmooth(null);
                     }
@@ -3605,11 +3605,11 @@ DrawingObjectsController.prototype =
         }
         if(chart_type.getObjectType() === AscDFH.historyitem_type_ScatterChart)
         {
-            if(!isRealBool(chartSettings.showMarker))
+            if(!AscFormat.isRealBool(chartSettings.showMarker))
             {
                 chartSettings.showMarker = true;
             }
-            if(!isRealBool(chartSettings.bLine))
+            if(!AscFormat.isRealBool(chartSettings.bLine))
             {
                 chartSettings.bLine = false;
             }
@@ -3620,7 +3620,7 @@ DrawingObjectsController.prototype =
                 {
                     chart_type.series[i].setMarker(null);
                 }
-                if(isRealBool(chart_type.series[i].smooth))
+                if(AscFormat.isRealBool(chart_type.series[i].smooth))
                 {
                     chart_type.series[i].setSmooth(null);
                 }
@@ -3700,7 +3700,7 @@ DrawingObjectsController.prototype =
                     removeDPtsFromSeries(chart_type.series[j]);
                     if(!chart_type.series[j].spPr)
                     {
-                        chart_type.series[j].setSpPr(new CSpPr());
+                        chart_type.series[j].setSpPr(new AscFormat.CSpPr());
                     }
                     chart_type.series[j].spPr.setLn(CreateNoFillLine());
                 }
@@ -3757,7 +3757,7 @@ DrawingObjectsController.prototype =
                 ret.putInColumns(!range_obj.bVert);
             }
         }
-        ret.putStyle(isRealNumber(chart_space.style) ? chart_space.style : null);
+        ret.putStyle(AscFormat.isRealNumber(chart_space.style) ? chart_space.style : null);
         ret.putTitle(isRealObject(chart.title) ? (chart.title.overlay ? c_oAscChartTitleShowSettings.overlay : c_oAscChartTitleShowSettings.noOverlay) : c_oAscChartTitleShowSettings.none);
         var hor_axis = plot_area.getHorizontalAxis();
         var vert_axis = plot_area.getVerticalAxis();
@@ -3787,7 +3787,7 @@ DrawingObjectsController.prototype =
         {
             ret.putShowVerAxis(!vert_axis.bDelete);
             ret.putVertAxisProps(vert_axis.getMenuProps());
-            if(chart_type.getObjectType() === AscDFH.historyitem_type_AreaChart && !isRealNumber(vert_axis.crossBetween))
+            if(chart_type.getObjectType() === AscDFH.historyitem_type_AreaChart && !AscFormat.isRealNumber(vert_axis.crossBetween))
             {
                 if(ret.horAxisProps)
                 {
@@ -3817,7 +3817,7 @@ DrawingObjectsController.prototype =
             if(tx_body)
             {
                 var oBodyPr = vert_axis.title.getBodyPr();
-                if(oBodyPr && oBodyPr.vert === nVertTThorz)
+                if(oBodyPr && oBodyPr.vert === AscFormat.nVertTThorz)
                 {
                     _label = c_oAscChartVertAxisLabelShowSettings.horizontal;
                 }
@@ -3844,7 +3844,7 @@ DrawingObjectsController.prototype =
             ret.putShowCatName(data_labels.showCatName === true);
             ret.putShowVal(data_labels.showVal === true);
             ret.putSeparator(data_labels.separator);
-            ret.putDataLabelsPos(isRealNumber(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]) ? REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos] :  c_oAscChartDataLabelsPos.none);
+            ret.putDataLabelsPos(AscFormat.isRealNumber(REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos]) ? REV_DLBL_POS_DEFINES_MAP[data_labels.dLblPos] :  c_oAscChartDataLabelsPos.none);
         }
         else
         {
@@ -3857,7 +3857,7 @@ DrawingObjectsController.prototype =
 
         if(chart.legend)
         {
-            if(isRealNumber(chart.legend.legendPos))
+            if(AscFormat.isRealNumber(chart.legend.legendPos))
             {
                 if(chart.legend.legendPos === LEGEND_POS_L)
                 {
@@ -4252,9 +4252,9 @@ DrawingObjectsController.prototype =
             ret = DrawingObjectsController.prototype._getChartSpace.call(this, chart, options, true);
             ret.setBDeleted(false);
             ret.setStyle(2);
-            ret.setSpPr(new CSpPr());
+            ret.setSpPr(new AscFormat.CSpPr());
             ret.spPr.setParent(ret);
-            ret.spPr.setXfrm(new CXfrm());
+            ret.spPr.setXfrm(new AscFormat.CXfrm());
             ret.spPr.xfrm.setParent(ret.spPr);
             ret.spPr.xfrm.setOffX(0);
             ret.spPr.xfrm.setOffY(0);
@@ -5511,7 +5511,7 @@ DrawingObjectsController.prototype =
     {
         if(null != type)
         {
-            return ExecuteNoHistory(function()
+            return AscFormat.ExecuteNoHistory(function()
             {
                 var options = new AscCommon.asc_ChartSettings();
                 options.type = type;
@@ -5556,7 +5556,7 @@ DrawingObjectsController.prototype =
             {
                 by_types.charts[0].theme = this.getTheme();
                 by_types.charts[0].colorMapOverride = this.getColorMapOverride();
-                ExecuteNoHistory(function()
+                AscFormat.ExecuteNoHistory(function()
                 {
                     CheckSpPrXfrm2(by_types.charts[0]);
                 }, this, []);
@@ -5666,7 +5666,7 @@ DrawingObjectsController.prototype =
                 {
                     oTargetTextObject.recalcInfo.recalcTitle = null;
                     oTargetTextObject.recalcInfo.bRecalculatedTitle = false;
-                    ExecuteNoHistory(function()
+                    AscFormat.ExecuteNoHistory(function()
                     {
                         if(oTargetTextObject.bWordShape)
                         {
@@ -5709,7 +5709,7 @@ DrawingObjectsController.prototype =
 
         }
 
-        if(isRealNumber(nPageNum1))
+        if(AscFormat.isRealNumber(nPageNum1))
         {
             bRet = true;
             if(this.document)
@@ -5730,7 +5730,7 @@ DrawingObjectsController.prototype =
                 this.drawingObjects.showDrawingObjects(true);
             }
         }
-        if(isRealNumber(nPageNum2) && nPageNum2 !== nPageNum1)
+        if(AscFormat.isRealNumber(nPageNum2) && nPageNum2 !== nPageNum1)
         {
 
             bRet = true;
@@ -5896,9 +5896,9 @@ DrawingObjectsController.prototype =
         var min_x = bounds.minX;
         var min_y = bounds.minY;
         var group = new CGroupShape();
-        group.setSpPr(new CSpPr());
+        group.setSpPr(new AscFormat.CSpPr());
         group.spPr.setParent(group);
-        group.spPr.setXfrm(new CXfrm());
+        group.spPr.setXfrm(new AscFormat.CXfrm());
         var xfrm = group.spPr.xfrm;
         xfrm.setParent(group.spPr);
         xfrm.setOffX(min_x);
@@ -6097,7 +6097,7 @@ DrawingObjectsController.prototype =
 
     setSelectionState: function( state, stateIndex )
     {
-        var _state_index = isRealNumber(stateIndex) ? stateIndex : state.length-1;
+        var _state_index = AscFormat.isRealNumber(stateIndex) ? stateIndex : state.length-1;
         var selection_state = state[_state_index];
         this.clearPreTrackObjects();
         this.clearTrackObjects();
@@ -6217,7 +6217,7 @@ DrawingObjectsController.prototype =
     {
         var bDocument = isRealObject(this.document), bNeedRecalculateCurPos = false;
         var nPageIndex = 0;
-        if(isRealNumber(PageIndex)){
+        if(AscFormat.isRealNumber(PageIndex)){
             nPageIndex = PageIndex;
         }
         else if(!bDocument)
@@ -6444,7 +6444,7 @@ DrawingObjectsController.prototype =
                         shape_props = new_shape_props;
                     else
                     {
-                        shape_props = CompareShapeProperties(shape_props, new_shape_props);
+                        shape_props = AscFormat.CompareShapeProperties(shape_props, new_shape_props);
                     }
                     break;
                 }
@@ -6541,7 +6541,7 @@ DrawingObjectsController.prototype =
                         shape_props = new_shape_props;
                     else
                     {
-                        shape_props = CompareShapeProperties(shape_props, new_shape_props);
+                        shape_props = AscFormat.CompareShapeProperties(shape_props, new_shape_props);
                     }
 
                     if(!shape_chart_props)
@@ -6550,7 +6550,7 @@ DrawingObjectsController.prototype =
                     }
                     else
                     {
-                        shape_chart_props = CompareShapeProperties(shape_chart_props, new_shape_props);
+                        shape_chart_props = AscFormat.CompareShapeProperties(shape_chart_props, new_shape_props);
                     }
                     break;
                 }
@@ -6616,7 +6616,7 @@ DrawingObjectsController.prototype =
                             shape_props = group_drawing_props.shapeProps;
                         else
                         {
-                            shape_props = CompareShapeProperties(shape_props, group_drawing_props.shapeProps);
+                            shape_props = AscFormat.CompareShapeProperties(shape_props, group_drawing_props.shapeProps);
                         }
                     }
 
@@ -6628,7 +6628,7 @@ DrawingObjectsController.prototype =
                         }
                         else
                         {
-                            shape_chart_props = CompareShapeProperties(shape_chart_props, group_drawing_props.shapeChartProps);
+                            shape_chart_props = AscFormat.CompareShapeProperties(shape_chart_props, group_drawing_props.shapeChartProps);
                         }
                     }
                     if(group_drawing_props.imageProps)
@@ -6813,8 +6813,8 @@ DrawingObjectsController.prototype =
                 }
 
             }
-            shape_props.ShapeProperties.fill = CreateAscFill(shape_props.ShapeProperties.fill);
-            shape_props.ShapeProperties.stroke = CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
+            shape_props.ShapeProperties.fill = AscFormat.CreateAscFill(shape_props.ShapeProperties.fill);
+            shape_props.ShapeProperties.stroke = AscFormat.CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
             shape_props.ShapeProperties.stroke.canChangeArrows = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeChartProps.locked === true;
 
@@ -6830,7 +6830,7 @@ DrawingObjectsController.prototype =
             shape_props.ShapeProperties.stroke = props.shapeProps.stroke;
             shape_props.ShapeProperties.canChangeArrows = props.shapeProps.canChangeArrows;
             shape_props.ShapeProperties.bFromChart = props.shapeProps.bFromChart;
-            shape_props.ShapeProperties.textArtProperties = CreateAscTextArtProps(props.shapeProps.textArtProperties);
+            shape_props.ShapeProperties.textArtProperties = AscFormat.CreateAscTextArtProps(props.shapeProps.textArtProperties);
 
             if(props.shapeProps.textArtProperties)
             {
@@ -6871,8 +6871,8 @@ DrawingObjectsController.prototype =
                     this.drawingObjects.drawingDocument.InitGuiCanvasShape(api.shapeElementId);
                 this.drawingObjects.drawingDocument.DrawImageTextureFillShape(null);
             }
-            shape_props.ShapeProperties.fill = CreateAscFill(shape_props.ShapeProperties.fill);
-            shape_props.ShapeProperties.stroke = CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
+            shape_props.ShapeProperties.fill = AscFormat.CreateAscFill(shape_props.ShapeProperties.fill);
+            shape_props.ShapeProperties.stroke = AscFormat.CreateAscStroke(shape_props.ShapeProperties.stroke, shape_props.ShapeProperties.canChangeArrows === true);
             shape_props.ShapeProperties.stroke.canChangeArrows  = shape_props.ShapeProperties.canChangeArrows === true;
             shape_props.Locked = props.shapeProps.locked === true;
 
@@ -7001,21 +7001,21 @@ DrawingObjectsController.prototype =
     createImage: function(rasterImageId, x, y, extX, extY)
     {
         var image = new CImageShape();
-        image.setSpPr(new CSpPr());
+        image.setSpPr(new AscFormat.CSpPr());
         image.spPr.setParent(image);
         image.spPr.setGeometry(CreateGeometry("rect"));
-        image.spPr.setXfrm(new CXfrm());
+        image.spPr.setXfrm(new AscFormat.CXfrm());
         image.spPr.xfrm.setParent(image.spPr);
         image.spPr.xfrm.setOffX(x);
         image.spPr.xfrm.setOffY(y);
         image.spPr.xfrm.setExtX(extX);
         image.spPr.xfrm.setExtY(extY);
 
-        var blip_fill = new CBlipFill();
+        var blip_fill = new AscFormat.CBlipFill();
         blip_fill.setRasterImageId(rasterImageId);
         blip_fill.setStretch(true);
         image.setBlipFill(blip_fill);
-        image.setNvPicPr(new UniNvPr());
+        image.setNvPicPr(new AscFormat.UniNvPr());
         image.setBDeleted(false);
         return image;
     },
@@ -7044,8 +7044,8 @@ DrawingObjectsController.prototype =
             nFontSize = 54;
             oShape.createTextBody();
         }
-        var oSpPr = new CSpPr();
-        var oXfrm = new CXfrm();
+        var oSpPr = new AscFormat.CSpPr();
+        var oXfrm = new AscFormat.CXfrm();
         oXfrm.setOffX(0);
         oXfrm.setOffY(0);
         oXfrm.setExtX(1828800/36000);
@@ -7142,10 +7142,10 @@ DrawingObjectsController.prototype =
         var oBodyPr = oShape.getBodyPr().createDuplicate();
         oBodyPr.rot = 0;
         oBodyPr.spcFirstLastPara = false;
-        oBodyPr.vertOverflow = nOTOwerflow;
-        oBodyPr.horzOverflow = nOTOwerflow;
-        oBodyPr.vert = nVertTThorz;
-        oBodyPr.wrap = nTWTNone;
+        oBodyPr.vertOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.horzOverflow = AscFormat.nOTOwerflow;
+        oBodyPr.vert = AscFormat.nVertTThorz;
+        oBodyPr.wrap = AscFormat.nTWTNone;
         oBodyPr.lIns = 2.54;
         oBodyPr.tIns = 1.27;
         oBodyPr.rIns = 2.54;
@@ -7158,9 +7158,9 @@ DrawingObjectsController.prototype =
         oBodyPr.anchorCtr = false;
         oBodyPr.forceAA = false;
         oBodyPr.compatLnSpc = true;
-        oBodyPr.prstTxWarp = ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry("textNoShape");}, this, []);
-        oBodyPr.textFit = new CTextFit();
-        oBodyPr.textFit.type = text_fit_Auto;
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry("textNoShape");}, this, []);
+        oBodyPr.textFit = new AscFormat.CTextFit();
+        oBodyPr.textFit.type = AscFormat.text_fit_Auto;
         if(bWord)
         {
             oShape.setBodyPr(oBodyPr);
@@ -7280,7 +7280,7 @@ DrawingObjectsController.prototype =
         {
             if(bLock)
             {
-                var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
+                var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
                 History.Create_NewPoint(nPointType);
                 if(bSync !== true)
                 {
@@ -7303,7 +7303,7 @@ DrawingObjectsController.prototype =
 
     checkSelectedObjectsAndCallbackNoCheckLock: function(callback, args, bNoSendProps, nHistoryPointType)
     {
-        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
+        var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);
 
         callback.apply(this, args);
@@ -7343,7 +7343,7 @@ DrawingObjectsController.prototype =
     setGraphicObjectPropsCallBack: function(props)
     {
         var apply_props;
-        if(isRealNumber(props.Width) && isRealNumber(props.Height))
+        if(AscFormat.isRealNumber(props.Width) && AscFormat.isRealNumber(props.Height))
         {
             apply_props = props;
         }
@@ -7387,27 +7387,27 @@ DrawingObjectsController.prototype =
             {
                 if(Props.Brd.Left && Props.Brd.Left.Color)
                 {
-                    Props.Brd.Left.Unifill = CreateUnifillFromAscColor(Props.Brd.Left.Color);
+                    Props.Brd.Left.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Left.Color);
                 }
                 if(Props.Brd.Top && Props.Brd.Top.Color)
                 {
-                    Props.Brd.Top.Unifill = CreateUnifillFromAscColor(Props.Brd.Top.Color);
+                    Props.Brd.Top.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Top.Color);
                 }
                 if(Props.Brd.Right && Props.Brd.Right.Color)
                 {
-                    Props.Brd.Right.Unifill = CreateUnifillFromAscColor(Props.Brd.Right.Color);
+                    Props.Brd.Right.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Right.Color);
                 }
                 if(Props.Brd.Bottom && Props.Brd.Bottom.Color)
                 {
-                    Props.Brd.Bottom.Unifill = CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
+                    Props.Brd.Bottom.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.Bottom.Color);
                 }
                 if(Props.Brd.InsideH && Props.Brd.InsideH.Color)
                 {
-                    Props.Brd.InsideH.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
+                    Props.Brd.InsideH.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideH.Color);
                 }
                 if(Props.Brd.InsideV && Props.Brd.InsideV.Color)
                 {
-                    Props.Brd.InsideV.Unifill = CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
+                    Props.Brd.InsideV.Unifill = AscFormat.CreateUnifillFromAscColor(Props.Brd.InsideV.Color);
                 }
 
                 this.setParagraphBorders( Props.Brd );

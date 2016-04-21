@@ -1083,8 +1083,8 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 
     if (typeof CGraphicObjects !== "undefined")
         this.DrawingObjects = new CGraphicObjects(this, this.DrawingDocument, this.Api);
-    this.theme          = GenerateDefaultTheme(this);
-    this.clrSchemeMap   = GenerateDefaultColorMap();
+    this.theme          = AscFormat.GenerateDefaultTheme(this);
+    this.clrSchemeMap   = AscFormat.GenerateDefaultColorMap();
 
     // Класс для работы с поиском и заменой в документе
     this.SearchEngine = null;
@@ -12822,7 +12822,7 @@ CDocument.prototype =
                     this.DrawingObjects.documentCreateFontMap( ++CurPage, FontMap );
             }
         }
-        checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
+        AscFormat.checkThemeFonts(FontMap, this.theme.themeElements.fontScheme);
         return FontMap;
     },
 
@@ -12854,7 +12854,7 @@ CDocument.prototype =
             var Element = this.Content[Index];
             Element.Document_Get_AllFontNames( AllFonts );
         }
-        checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
+        AscFormat.checkThemeFonts(AllFonts, this.theme.themeElements.fontScheme);
         return AllFonts;
     },
 

@@ -27,7 +27,7 @@
 function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
 
         this.drawingObjects = drawingObjects;
         this.arrPoint = [];
@@ -35,7 +35,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         this.TransformMatrix = new CMatrixL();
 
         this.pageIndex = pageIndex;
-        this.style  = CreateDefaultShapeStyle();
+        this.style  = AscFormat.CreateDefaultShapeStyle();
         var style = this.style;
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
@@ -65,7 +65,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
     };
     this.draw = function(g)
     {
-        if(isRealNumber(this.pageIndex) && g.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && g.SetCurrentPage)
         {
             g.SetCurrentPage(this.pageIndex);
         }
@@ -152,9 +152,9 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
      //      shape.setWorksheet(drawingObjects.getWorksheetModel());
      //      shape.addToDrawingObjects();
      //  }
-        shape.setSpPr(new CSpPr());
+        shape.setSpPr(new AscFormat.CSpPr());
         shape.spPr.setParent(shape);
-        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.setXfrm(new AscFormat.CXfrm());
         shape.spPr.xfrm.setParent(shape.spPr);
         if(!bWord)
         {
@@ -169,7 +169,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         }
         shape.spPr.xfrm.setExtX(xMax-xMin);
         shape.spPr.xfrm.setExtY(yMax - yMin);
-        shape.setStyle(CreateDefaultShapeStyle());
+        shape.setStyle(AscFormat.CreateDefaultShapeStyle());
         var geometry = new Geometry();
 
 

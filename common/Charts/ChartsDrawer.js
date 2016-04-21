@@ -3155,14 +3155,14 @@ drawBarChart.prototype =
 		{
 			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new CColorMod;
+			var cColorMod = new AscFormat.CColorMod;
 			if(k == 1 || k == 4)
 				cColorMod.val = 45000;
 			else
 				cColorMod.val = 35000;
 			cColorMod.name = "shade";
 			duplicateBrush.addColorMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			
 			pen.setFill(duplicateBrush);
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
@@ -3314,7 +3314,7 @@ drawLineChart.prototype =
 				
 				idxPoint = this.cChartDrawer.getIdxPoint(seria, n);
 				compiledMarkerSize = idxPoint && idxPoint.compiledMarker && idxPoint.compiledMarker.size ? idxPoint.compiledMarker.size : null;
-				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker && isRealNumber(idxPoint.compiledMarker.symbol) ? idxPoint.compiledMarker.symbol : null;
+				compiledMarkerSymbol = idxPoint && idxPoint.compiledMarker && AscFormat.isRealNumber(idxPoint.compiledMarker.symbol) ? idxPoint.compiledMarker.symbol : null;
 				
 				if(val != null)
 				{
@@ -3745,14 +3745,14 @@ drawLineChart.prototype =
 		{
 			var props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new CColorMod;
+			var cColorMod = new AscFormat.CColorMod;
 			if(k == 1 || k == 4)
 				cColorMod.val = 45000;
 			else
 				cColorMod.val = 35000;
 			cColorMod.name = "shade";
 			duplicateBrush.fill.color.Mods.addMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			pen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0.1);
 			//pen.setFill(duplicateBrush);
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
@@ -4327,14 +4327,14 @@ drawAreaChart.prototype =
 		{
 			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new CColorMod;
+			var cColorMod = new AscFormat.CColorMod;
 			if(k == 1 || k == 4)
 				cColorMod.val = 45000;
 			else
 				cColorMod.val = 35000;
 			cColorMod.name = "shade";
 			duplicateBrush.fill.color.Mods.addMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			
 			pen.setFill(duplicateBrush);
 			if(path && path.length)
@@ -6523,14 +6523,14 @@ drawHBarChart.prototype =
 		{
 			var  props = this.cChartSpace.getParentObjects();
 			var duplicateBrush = brush.createDuplicate();
-			var cColorMod = new CColorMod;
+			var cColorMod = new AscFormat.CColorMod;
 			if(k == 1 || k == 4)
 				cColorMod.val = 45000;
 			else
 				cColorMod.val = 35000;
 			cColorMod.name = "shade";
 			duplicateBrush.addColorMod(cColorMod);
-			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+			duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 			
 			pen.setFill(duplicateBrush);
 			this.cChartDrawer.drawPath(path, pen, duplicateBrush);
@@ -6628,7 +6628,7 @@ drawPieChart.prototype =
 				if(n !== this.paths.series.length - 1)
 				{
 					var duplicateBrush = brush.createDuplicate();
-					var cColorMod = new CColorMod;
+					var cColorMod = new AscFormat.CColorMod;
 					
 					cColorMod.val = 35000;
 					cColorMod.name = "shade";
@@ -6636,7 +6636,7 @@ drawPieChart.prototype =
 					if(duplicateBrush.fill.color)
 						duplicateBrush.fill.color.Mods.addMod(cColorMod);	
 					
-					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+					duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 				}
 				
 				this.cChartDrawer.drawPath(path, pen, duplicateBrush);
@@ -7261,7 +7261,7 @@ drawPieChart.prototype =
 					{
 						var  props = this.cChartSpace.getParentObjects();
 						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new CColorMod;
+						var cColorMod = new AscFormat.CColorMod;
 						
 						cColorMod.val = 35000;
 						cColorMod.name = "shade";
@@ -7269,7 +7269,7 @@ drawPieChart.prototype =
 						if(duplicateBrush.fill.color)
 							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
 						
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 						var upPen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
 						var frontPen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
 						//pen.setFill(duplicateBrush);
@@ -7298,7 +7298,7 @@ drawPieChart.prototype =
 					{
 						var  props = this.cChartSpace.getParentObjects();
 						var duplicateBrush = brush.createDuplicate();
-						var cColorMod = new CColorMod;
+						var cColorMod = new AscFormat.CColorMod;
 						
 						cColorMod.val = 35000;
 						cColorMod.name = "shade";
@@ -7306,7 +7306,7 @@ drawPieChart.prototype =
 						if(duplicateBrush.fill.color)
 							duplicateBrush.fill.color.Mods.addMod(cColorMod);	
 						
-						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new CUniColor().RGBA);
+						duplicateBrush.calculate(props.theme, props.slide, props.layout, props.master, new AscFormat.CUniColor().RGBA);
 						var upPen = CreatePenFromParams(brush, undefined, undefined, undefined, undefined, 0);
 						var frontPen = CreatePenFromParams(duplicateBrush, undefined, undefined, undefined, undefined, 0);
 						//pen.setFill(duplicateBrush);

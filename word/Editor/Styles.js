@@ -5227,7 +5227,7 @@ CDocumentShd.prototype =
 
                 case c_oAscShdClear:
                 {
-                    return this.Color.Compare( Shd.Color ) && CompareUnifillBool(this.Unifill, Shd.Unifill);
+                    return this.Color.Compare( Shd.Color ) && AscFormat.CompareUnifillBool(this.Unifill, Shd.Unifill);
                 }
             }
         }
@@ -5371,12 +5371,12 @@ CDocumentShd.prototype =
             this.Color.Read_FromBinary(Reader);
             if(Reader.GetBool())
             {
-                this.Unifill = new CUniFill();
+                this.Unifill = new AscFormat.CUniFill();
                 this.Unifill.Read_FromBinary(Reader);
             }
             if(Reader.GetBool())
             {
-                this.FillRef = new StyleRef();
+                this.FillRef = new AscFormat.StyleRef();
                 this.FillRef.Read_FromBinary(Reader);
             }
         }
@@ -5443,7 +5443,7 @@ CDocumentBorder.prototype =
         if ( false === this.Color.Compare(Border.Color) )
             return false;
 
-        if(CompareUnifillBool(this.Unifill, Border.Unifill) === false)
+        if(AscFormat.CompareUnifillBool(this.Unifill, Border.Unifill) === false)
             return false;
 
         if(this.LineRef !== undefined && Border.LineRef === undefined || Border.LineRef !== undefined && this.LineRef === undefined)
@@ -5510,7 +5510,7 @@ CDocumentBorder.prototype =
 
             this.Unifill = pen.Fill;
             this.LineRef = undefined;
-            this.Size = isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
+            this.Size = AscFormat.isRealNumber(pen.w) ? pen.w / 36000 : 12700 /36000;
         }
         if(!this.Unifill || !this.Unifill.fill || this.Unifill.fill.type === Asc.c_oAscFill.FILL_TYPE_NOFILL)
         {
@@ -5592,12 +5592,12 @@ CDocumentBorder.prototype =
         this.Color.Read_FromBinary( Reader );
         if(Reader.GetBool())
         {
-            this.Unifill = new CUniFill();
+            this.Unifill = new AscFormat.CUniFill();
             this.Unifill.Read_FromBinary(Reader);
         }
         if(Reader.GetBool())
         {
-            this.LineRef = new StyleRef();
+            this.LineRef = new AscFormat.StyleRef();
             this.LineRef.Read_FromBinary(Reader);
         }
     }
@@ -7758,7 +7758,7 @@ CTextPr.prototype =
         if(this.FontRef && !this.Unifill)
         {
             var prefix;
-            if(this.FontRef.idx === fntStyleInd_minor)
+            if(this.FontRef.idx === AscFormat.fntStyleInd_minor)
             {
                 prefix = "+mn-";
             }
@@ -7888,7 +7888,7 @@ CTextPr.prototype =
 
         if(undefined !== this.Unifill && !this.Unifill.IsIdentical(TextPr.Unifill))
         {
-            this.Unifill = CompareUniFill(this.Unifill, TextPr.Unifill);
+            this.Unifill = AscFormat.CompareUniFill(this.Unifill, TextPr.Unifill);
             if(null === this.Unifill){
                 this.Unifill = undefined;
             }
@@ -7901,7 +7901,7 @@ CTextPr.prototype =
         {
             this.Unifill = undefined;
             this.Color = undefined;
-            this.TextFill = CompareUniFill(this.TextFill, TextPr.TextFill);
+            this.TextFill = AscFormat.CompareUniFill(this.TextFill, TextPr.TextFill);
             if(null === this.TextFill){
                 this.TextFill = undefined;
             }
@@ -8223,7 +8223,7 @@ CTextPr.prototype =
         // Unifill
         if ( Flags & 4194304 )
         {
-            this.Unifill = new CUniFill()
+            this.Unifill = new AscFormat.CUniFill()
             this.Unifill.Read_FromBinary( Reader );
         }
         
@@ -8240,7 +8240,7 @@ CTextPr.prototype =
 
         if ( Flags & 33554432 )
         {
-            this.FontRef = new FontRef();
+            this.FontRef = new AscFormat.FontRef();
             this.FontRef.Read_FromBinary(Reader);
         }
 
@@ -8252,13 +8252,13 @@ CTextPr.prototype =
 
         if(Flags & 134217728)
         {
-            this.TextOutline = new CLn();
+            this.TextOutline = new AscFormat.CLn();
             this.TextOutline.Read_FromBinary(Reader);
         }
 
         if(Flags & 268435456)
         {
-            this.TextFill = new CUniFill();
+            this.TextFill = new AscFormat.CUniFill();
             this.TextFill.Read_FromBinary(Reader);
         }
 
@@ -10020,7 +10020,7 @@ CParaPr.prototype =
 
         if( undefined != ParaPr.Bullet )
         {
-            this.Bullet = new CBullet();
+            this.Bullet = new AscFormat.CBullet();
             this.Bullet.Set_FromObject(ParaPr.Bullet);
         }
     },
@@ -10128,7 +10128,7 @@ CParaPr.prototype =
             Result_ParaPr.FramePr = this.FramePr;
 
         if(undefined != this.Bullet && undefined != ParaPr.Bullet )
-            Result_ParaPr.Bullet = CompareBullets(ParaPr.Bullet, this.Bullet);
+            Result_ParaPr.Bullet = AscFormat.CompareBullets(ParaPr.Bullet, this.Bullet);
 
         if(undefined != this.DefaultRunPr && undefined != ParaPr.DefaultRunPr)
             Result_ParaPr.DefaultRunPr = this.DefaultRunPr.Compare(ParaPr.DefaultRunPr);
@@ -10377,7 +10377,7 @@ CParaPr.prototype =
 
         if(Flags & 524288)
         {
-            this.Bullet = new CBullet();
+            this.Bullet = new AscFormat.CBullet();
             this.Bullet.Read_FromBinary(Reader);
         }
 
@@ -10444,7 +10444,7 @@ CParaPr.prototype =
         {
             switch(this.Bullet.bulletType.type)
             {
-                case BULLET_TYPE_BULLET_CHAR:
+                case AscFormat.BULLET_TYPE_BULLET_CHAR:
                 {
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     if(typeof this.Bullet.bulletType.Char === "string" && this.Bullet.bulletType.Char.length > 0)
@@ -10455,7 +10455,7 @@ CParaPr.prototype =
                     {
                         Bullet.m_sChar = "•";
                     }
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
                     {
                         Bullet.m_bFontTx = false;
                         Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
@@ -10463,22 +10463,22 @@ CParaPr.prototype =
                     break;
                 }
 
-                case BULLET_TYPE_BULLET_AUTONUM :
+                case AscFormat.BULLET_TYPE_BULLET_AUTONUM :
                 {
                     Bullet.m_nType = g_NumberingArr[this.Bullet.bulletType.AutoNumType];
                     Bullet.m_nStartAt = this.Bullet.bulletType.startAt;
-                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                    if(this.Bullet.bulletTypeface && this.Bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
                     {
                         Bullet.m_bFontTx = false;
                         Bullet.m_sFont = this.Bullet.bulletTypeface.typeface;
                     }
                     break;
                 }
-                case BULLET_TYPE_BULLET_NONE :
+                case AscFormat.BULLET_TYPE_BULLET_NONE :
                 {
                     break;
                 }
-                case BULLET_TYPE_BULLET_BLIP :
+                case AscFormat.BULLET_TYPE_BULLET_BLIP :
                 {
                     Bullet.m_nType = numbering_presentationnumfrmt_Char;
                     Bullet.m_sChar = "•";

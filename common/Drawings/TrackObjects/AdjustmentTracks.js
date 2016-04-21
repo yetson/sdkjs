@@ -26,7 +26,7 @@
 
 function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
 
         var oPen, oBrush;
@@ -134,7 +134,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
@@ -220,7 +220,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         {
             var new_body_pr = this.originalShape.getBodyPr();
             if (new_body_pr) {
-                oGeometryToSet = ExecuteNoHistory(function(){
+                oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
                     var oGeom = this.geometry.createDuplicate();
                     if(this.xFlag)
                     {
@@ -286,7 +286,7 @@ XYAdjustmentTrack.prototype.getBounds = function()
 
 function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
 
 
@@ -374,7 +374,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
     this.draw = function(overlay)
     {
-        if(this.originalShape.parent && isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
+        if(this.originalShape.parent && AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
@@ -455,7 +455,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         {
             var new_body_pr = this.originalShape.getBodyPr();
             if (new_body_pr) {
-                oGeometryToSet = ExecuteNoHistory(function(){
+                oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
                     var oGeom = this.geometry.createDuplicate();
                     if(this.radiusFlag)
                     {

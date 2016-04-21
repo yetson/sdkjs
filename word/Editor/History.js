@@ -193,7 +193,7 @@ CHistory.prototype =
         {
             var aItems = oPoint.Items;
             var _bottomIndex;
-            if(isRealNumber(nBottomIndex))
+            if(AscFormat.isRealNumber(nBottomIndex))
             {
                 _bottomIndex = nBottomIndex - 1;
             }
@@ -451,7 +451,7 @@ CHistory.prototype =
             else
                 this.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, Data.Pos, Count);
         }
-        if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof CXfrm)
+        if(this.CollaborativeEditing.AddPosExtChanges && Class instanceof AscFormat.CXfrm)
         {
             if(AscDFH.historyitem_Xfrm_SetOffX  === Data.Type ||
                 AscDFH.historyitem_Xfrm_SetOffY === Data.Type ||

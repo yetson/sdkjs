@@ -826,16 +826,16 @@ function BinaryPPTYLoader()
         {
             if (this.presentation.themes.length == 0)
             {
-                this.presentation.themes[0] = GenerateDefaultTheme(this.presentation);
+                this.presentation.themes[0] = AscFormat.GenerateDefaultTheme(this.presentation);
             }
             if (this.presentation.slideMasters.length == 0)
             {
-                this.presentation.slideMasters[0] = GenerateDefaultMasterSlide(this.presentation.themes[0]);
+                this.presentation.slideMasters[0] = AscFormat.GenerateDefaultMasterSlide(this.presentation.themes[0]);
                 this.presentation.slideLayouts[0] = this.presentation.slideMasters[0].sldLayoutLst[0];
             }
             if (this.presentation.Slides.length == 0)
             {
-                this.presentation.Slides[0] = GenerateDefaultSlide(this.presentation.slideLayouts[0]);
+                this.presentation.Slides[0] = AscFormat.GenerateDefaultSlide(this.presentation.slideLayouts[0]);
             }
 
             //var _editor = this.Api;
@@ -1504,8 +1504,8 @@ function BinaryPPTYLoader()
                                 var _Unicolor = this.ReadUniColor();
                                 if(_Unicolor.color)
                                 {
-                                    _part.TextPr.Unifill = new CUniFill();
-                                    _part.TextPr.Unifill.fill = new CSolidFill();
+                                    _part.TextPr.Unifill = new AscFormat.CUniFill();
+                                    _part.TextPr.Unifill.fill = new AscFormat.CSolidFill();
                                     _part.TextPr.Unifill.fill.color = _Unicolor;
                                 }
                                 break;
@@ -1698,7 +1698,7 @@ function BinaryPPTYLoader()
         var read_start = s.cur;
         var read_end = read_start + _len;
 
-        var uni_color = new CUniColor();
+        var uni_color = new AscFormat.CUniColor();
 
         if (s.cur < read_end)
         {
@@ -1711,7 +1711,7 @@ function BinaryPPTYLoader()
                 case c_oAscColor.COLOR_TYPE_PRST:
                 {
                     s.Skip2(2);
-                    uni_color.setColor(new CPrstColor());
+                    uni_color.setColor(new AscFormat.CPrstColor());
                     uni_color.color.setId(s.GetString2());
                     s.Skip2(1);
 
@@ -1728,7 +1728,7 @@ function BinaryPPTYLoader()
                 case c_oAscColor.COLOR_TYPE_SCHEME:
                 {
                     s.Skip2(2);
-                    uni_color.setColor(new CSchemeColor());
+                    uni_color.setColor(new AscFormat.CSchemeColor());
                     uni_color.color.setId(s.GetUChar());
                     s.Skip2(1);
 
@@ -1746,7 +1746,7 @@ function BinaryPPTYLoader()
                 {
                     var r, g, b;
                     s.Skip2(1);
-                    uni_color.setColor(new CRGBColor());
+                    uni_color.setColor(new AscFormat.CRGBColor());
                     s.Skip2(1);
                     r = s.GetUChar();
                     s.Skip2(1);
@@ -1768,7 +1768,7 @@ function BinaryPPTYLoader()
                 case c_oAscColor.COLOR_TYPE_SYS:
                 {
                     s.Skip2(1);
-                    uni_color.setColor(new CSysColor());
+                    uni_color.setColor(new AscFormat.CSysColor());
 
                     while (true)
                     {
@@ -1822,7 +1822,7 @@ function BinaryPPTYLoader()
 
     this.ReadColorMods = function()
     {
-        var ret = new CColorModifiers();
+        var ret = new AscFormat.CColorModifiers();
         var _mods = this.ReadColorModifiers();
         for(var i = 0; i < _mods.length; ++i)
             ret.addMod(_mods[i]);
@@ -1855,7 +1855,7 @@ function BinaryPPTYLoader()
                 if (null == _ret)
                     _ret = [];
 
-                var _mod = new CColorMod();
+                var _mod = new AscFormat.CColorMod();
                 _ret[_ret.length] = _mod;
 
                 while (true)
@@ -1973,14 +1973,14 @@ function BinaryPPTYLoader()
             _ret.t = _ret.b;
             _ret.b = tmp;
         }
-        var ret = new CSrcRect();
+        var ret = new AscFormat.CSrcRect();
         ret.setLTRB(_ret.l, _ret.t, _ret.r, _ret.b);
         return ret;
     }
 
     this.ReadGradLin = function()
     {
-        var _lin = new GradLin();
+        var _lin = new AscFormat.GradLin();
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -2016,7 +2016,7 @@ function BinaryPPTYLoader()
 
     this.ReadGradPath = function()
     {
-        var _path = new GradPath();
+        var _path = new AscFormat.GradPath();
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -2052,7 +2052,7 @@ function BinaryPPTYLoader()
         var read_start = s.cur;
         var read_end = read_start + s.GetULong() + 4;
 
-        var uni_fill = new CUniFill();
+        var uni_fill = new AscFormat.CUniFill();
 
         if (s.cur < read_end)
         {
@@ -2065,7 +2065,7 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(1);
 
-                    uni_fill.setFill(new CBlipFill());
+                    uni_fill.setFill(new AscFormat.CBlipFill());
 
                     while (true)
                     {
@@ -2225,7 +2225,7 @@ function BinaryPPTYLoader()
                             }
                             case 2:
                             {
-                                var oBlipTile = new CBlipFillTile();
+                                var oBlipTile = new AscFormat.CBlipFillTile();
 
 
                                 var s = this.stream;
@@ -2340,7 +2340,7 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(1);
 
-                    uni_fill.setFill(new CGradFill());
+                    uni_fill.setFill(new AscFormat.CGradFill());
 
                     while (true)
                     {
@@ -2382,7 +2382,7 @@ function BinaryPPTYLoader()
                                     s.Skip2(1); // type
                                     s.Skip2(4); // len
 
-                                    var _gs = new CGs();
+                                    var _gs = new AscFormat.CGs();
 
                                     s.Skip2(1); // start attr
                                     s.Skip2(1); // pos type
@@ -2438,13 +2438,13 @@ function BinaryPPTYLoader()
                             if(uni_fill.fill.colors.length === 1)
                             {
                                 var oUniColor = uni_fill.fill.colors[0].color;
-                                uni_fill.fill = new CSolidFill();
+                                uni_fill.fill = new AscFormat.CSolidFill();
                                 uni_fill.fill.color = oUniColor;
                             }
                             else
                             {
-                                uni_fill.fill = new CSolidFill();
-                                uni_fill.fill.color =  CreateUniColorRGB(0, 0, 0);
+                                uni_fill.fill = new AscFormat.CSolidFill();
+                                uni_fill.fill.color =  AscFormat.CreateUniColorRGB(0, 0, 0);
                             }
                         }
                     }
@@ -2453,7 +2453,7 @@ function BinaryPPTYLoader()
                 }
                 case c_oAscFill.FILL_TYPE_PATT:
                 {
-                    uni_fill.setFill(new CPattFill());
+                    uni_fill.setFill(new AscFormat.CPattFill());
 
                     s.Skip2(1);
                     while (true)
@@ -2504,10 +2504,10 @@ function BinaryPPTYLoader()
                 {
                     s.Skip2(1); // type + len
 
-                    uni_fill.setFill(new CSolidFill());
+                    uni_fill.setFill(new AscFormat.CSolidFill());
                     uni_fill.fill.setColor(this.ReadUniColor());
 
-//                    uni_fill.fill.color.Mods = new CColorModifiers();
+//                    uni_fill.fill.color.Mods = new AscFormat.CColorModifiers();
                     if(uni_fill.fill
                         && uni_fill.fill.color
                         && uni_fill.fill.color.Mods
@@ -2527,13 +2527,13 @@ function BinaryPPTYLoader()
                     }
                     else
                     {
-                        uni_fill.fill.color.setMods(new CColorModifiers());
+                        uni_fill.fill.color.setMods(new AscFormat.CColorModifiers());
                     }
                     break;
                 }
                 case c_oAscFill.FILL_TYPE_NOFILL:
                 {
-                    uni_fill.setFill(new CNoFill());
+                    uni_fill.setFill(new AscFormat.CNoFill());
                     break;
                 }
             }
@@ -2549,7 +2549,7 @@ function BinaryPPTYLoader()
 
     this.ReadExtraColorScheme = function()
     {
-        var extra = new ExtraClrScheme();
+        var extra = new AscFormat.ExtraClrScheme();
 
         var s = this.stream;
         var _e = s.cur + s.GetULong() + 4;
@@ -2562,13 +2562,13 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    extra.setClrScheme(new ClrScheme());
+                    extra.setClrScheme(new AscFormat.ClrScheme());
                     this.ReadClrScheme(extra.clrScheme);
                     break;
                 }
                 case 1:
                 {
-                    extra.setClrMap(new ClrMap());
+                    extra.setClrMap(new AscFormat.ClrMap());
                     this.ReadClrMap(extra.clrMap);
                     break;
                 }
@@ -2635,7 +2635,7 @@ function BinaryPPTYLoader()
         var clr_map = null;
         if (s.cur < _e)
         {
-            clr_map = new ClrMap();
+            clr_map = new AscFormat.ClrMap();
             s.Skip2(1); // "0"-rectype
             this.ReadClrMap(clr_map);
         }
@@ -2650,7 +2650,7 @@ function BinaryPPTYLoader()
 
     this.ReadLn = function(spPr)
     {
-        var ln = new CLn();
+        var ln = new AscFormat.CLn();
 
         var s = this.stream;
 
@@ -2740,7 +2740,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetLong() + 4;
 
-        var endL = new EndArrow();
+        var endL = new AscFormat.EndArrow();
 
         s.Skip2(1); // start attributes
 
@@ -2783,7 +2783,7 @@ function BinaryPPTYLoader()
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetLong() + 4;
 
-        var join = new LineJoin();
+        var join = new AscFormat.LineJoin();
 
         s.Skip2(1); // start attributes
 
@@ -2855,7 +2855,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    var cSld = new CSld();
+                    var cSld = new AscFormat.CSld();
                     this.ReadCSld(cSld);
                     for(var i = 0; i < cSld.spTree.length; ++i)
                     {
@@ -2870,7 +2870,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var clrMap = new ClrMap();
+                    var clrMap = new AscFormat.ClrMap();
                     this.ReadClrMap(clrMap);
                     master.setClMapOverride(clrMap);
                     break;
@@ -2905,7 +2905,7 @@ function BinaryPPTYLoader()
 
     this.ReadTxStyles = function()
     {
-        var txStyles = new CTextStyles();
+        var txStyles = new AscFormat.CTextStyles();
 
         var s = this.stream;
         var end = s.cur + s.GetULong() + 4;
@@ -3006,7 +3006,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    var cSld = new CSld();
+                    var cSld = new AscFormat.CSld();
                     this.ReadCSld(cSld);
                     for(var i = 0; i < cSld.spTree.length; ++i)
                     {
@@ -3080,7 +3080,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    var cSld = new CSld();
+                    var cSld = new AscFormat.CSld();
                     this.ReadCSld(cSld);
                     for(var i = 0; i < cSld.spTree.length; ++i)
                     {
@@ -3485,7 +3485,7 @@ function BinaryPPTYLoader()
 
     this.ReadHF = function()
     {
-        var hf = new HF();
+        var hf = new AscFormat.HF();
 
         var s = this.stream;
         var _e = s.cur + s.GetULong() + 4;
@@ -3572,7 +3572,7 @@ function BinaryPPTYLoader()
 
     this.ReadBg = function()
     {
-        var bg = new CBg();
+        var bg = new AscFormat.CBg();
 
         var s = this.stream;
 
@@ -3620,7 +3620,7 @@ function BinaryPPTYLoader()
 
     this.ReadBgPr = function()
     {
-        var bgpr = new CBgPr();
+        var bgpr = new AscFormat.CBgPr();
 
         var s = this.stream;
         var _end_rec = s.cur + s.GetULong() + 4;
@@ -3667,7 +3667,7 @@ function BinaryPPTYLoader()
 
     this.ReadStyleRef = function()
     {
-        var ref = new StyleRef();
+        var ref = new AscFormat.StyleRef();
 
         var s = this.stream;
 
@@ -3710,7 +3710,7 @@ function BinaryPPTYLoader()
 
     this.ReadFontRef = function()
     {
-        var ref = new FontRef();
+        var ref = new AscFormat.FontRef();
 
         var s = this.stream;
 
@@ -3755,7 +3755,7 @@ function BinaryPPTYLoader()
 
     this.ReadTheme = function()
     {
-        var theme = new CTheme();
+        var theme = new AscFormat.CTheme();
         theme.presentation = this.presentation;
 
         var s = this.stream;
@@ -3789,7 +3789,7 @@ function BinaryPPTYLoader()
                 case 0:
                 {
                     // themeElements
-                    var themeElements = new ThemeElements();
+                    var themeElements = new AscFormat.ThemeElements();
                     this.ReadThemeElements(themeElements);
                     theme.setFontScheme(themeElements.fontScheme);
                     theme.setFormatScheme(themeElements.fmtScheme);
@@ -4080,7 +4080,7 @@ function BinaryPPTYLoader()
 
     this.ReadDefaultShapeProperties = function()
     {
-        var def = new DefaultShapeDefinition();
+        var def = new AscFormat.DefaultShapeDefinition();
 
         var s = this.stream;
 
@@ -4263,7 +4263,7 @@ function BinaryPPTYLoader()
 
     this.ReadXfrm = function()
     {
-        var ret = new CXfrm();
+        var ret = new AscFormat.CXfrm();
 
         var s = this.stream;
 
@@ -4346,7 +4346,7 @@ function BinaryPPTYLoader()
 
     this.ReadShapeStyle = function()
     {
-        var def = new CShapeStyle();
+        var def = new AscFormat.CShapeStyle();
 
         var s = this.stream;
 
@@ -4930,7 +4930,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var sp_pr = new CSpPr();
+                    var sp_pr = new AscFormat.CSpPr();
                     this.ReadSpPr(sp_pr);
                     shape.setSpPr(sp_pr);
                     sp_pr.setParent(shape);
@@ -4981,7 +4981,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     this.ReadGrSpPr(spPr);
                     shape.setSpPr(spPr);
                     spPr.setParent(shape);
@@ -5217,7 +5217,7 @@ function BinaryPPTYLoader()
                 case 2:
                 {
 
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     spPr.setParent(pic);
                     this.ReadSpPr(spPr);
                     pic.setSpPr(spPr);
@@ -5260,7 +5260,7 @@ function BinaryPPTYLoader()
                 }
                 case 1:
                 {
-                    var spPr = new CSpPr();
+                    var spPr = new AscFormat.CSpPr();
                     spPr.setParent(shape);
                     this.ReadSpPr(spPr);
                     shape.setSpPr(spPr);
@@ -5357,7 +5357,7 @@ function BinaryPPTYLoader()
                     {
                         if(!_chart.spPr)
                         {
-                            _chart.setSpPr(new CSpPr());
+                            _chart.setSpPr(new AscFormat.CSpPr());
                             _chart.spPr.setParent(_chart);
                         }
 
@@ -5480,7 +5480,7 @@ function BinaryPPTYLoader()
         {
             if(!_graphic_frame.spPr)
             {
-                _graphic_frame.setSpPr(new CSpPr());
+                _graphic_frame.setSpPr(new AscFormat.CSpPr());
                 _graphic_frame.spPr.setParent(_graphic_frame);
             }
             _graphic_frame.spPr.setXfrm(_xfrm);
@@ -5494,7 +5494,7 @@ function BinaryPPTYLoader()
         {
             if(!_chart.spPr)
             {
-                _chart.setSpPr(new CSpPr());
+                _chart.setSpPr(new AscFormat.CSpPr());
                 _chart.spPr.setParent(_chart);
             }
             _chart.spPr.setXfrm(_xfrm);
@@ -5507,7 +5507,7 @@ function BinaryPPTYLoader()
 
     this.ReadNvUniProp = function()
     {
-        var prop = new UniNvPr();
+        var prop = new AscFormat.UniNvPr();
 
         var s = this.stream;
 
@@ -6218,7 +6218,7 @@ function BinaryPPTYLoader()
 
     this.ReadPH = function()
     {
-        var ph = new Ph();
+        var ph = new AscFormat.Ph();
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -6498,7 +6498,7 @@ function BinaryPPTYLoader()
 
     this.ReadHyperlink = function()
     {
-        var hyper = new CHyperlink();
+        var hyper = new AscFormat.CHyperlink();
 
         var s = this.stream;
         var _end_rec = s.cur + s.GetULong() + 4;
@@ -6710,8 +6710,8 @@ function BinaryPPTYLoader()
                 case 17:
                 {
                     bodyPr.vert = s.GetUChar();
-                    if(bodyPr.vert === nVertTTwordArtVert)
-                        bodyPr.vert = nVertTTvert;
+                    if(bodyPr.vert === AscFormat.nVertTTwordArtVert)
+                        bodyPr.vert = AscFormat.nVertTTvert;
                     break;
                 }
                 case 18:
@@ -6747,7 +6747,7 @@ function BinaryPPTYLoader()
                             case 0:
                             {
                                 var sPrst = s.GetUChar();
-                                bodyPr.prstTxWarp = ExecuteNoHistory(function () {
+                                bodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function () {
                                     return CreatePrstTxWarpGeometry(getPrstByNumber(sPrst));
                                 }, this, []);
                                 break;
@@ -6777,7 +6777,7 @@ function BinaryPPTYLoader()
 
                     s.Skip2(1); // start attributes
 
-                    var txFit = new CTextFit();
+                    var txFit = new AscFormat.CTextFit();
                     txFit.type = -1;
 
                     while (true)
@@ -6826,7 +6826,7 @@ function BinaryPPTYLoader()
 
     this.ReadBodyPr = function()
     {
-        var bodyPr = new CBodyPr();
+        var bodyPr = new AscFormat.CBodyPr();
         this.CorrectBodyPr(bodyPr);
         return bodyPr;
     }
@@ -6921,7 +6921,7 @@ function BinaryPPTYLoader()
             }
         }
 
-        var bullet = new CBullet();
+        var bullet = new AscFormat.CBullet();
         var b_bullet = false;
 
         while (s.cur < _end_rec)
@@ -7039,7 +7039,7 @@ function BinaryPPTYLoader()
                 case 3:
                 {
                     b_bullet = true;
-                    bullet.bulletColor = new CBulletColor();
+                    bullet.bulletColor = new AscFormat.CBulletColor();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
@@ -7047,7 +7047,7 @@ function BinaryPPTYLoader()
                     {
                         bullet.bulletColor.type = s.GetUChar();
 
-                        if (bullet.bulletColor.type == BULLET_TYPE_COLOR_CLRTX)
+                        if (bullet.bulletColor.type == AscFormat.BULLET_TYPE_COLOR_CLRTX)
                         {
                             s.SkipRecord();
                         }
@@ -7064,7 +7064,7 @@ function BinaryPPTYLoader()
                 case 4:
                 {
                     b_bullet = true;
-                    bullet.bulletSize = new CBulletSize();
+                    bullet.bulletSize = new AscFormat.CBulletSize();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
@@ -7072,7 +7072,7 @@ function BinaryPPTYLoader()
                     {
                         bullet.bulletSize.type = s.GetUChar();
 
-                        if (bullet.bulletSize.type == BULLET_TYPE_SIZE_TX)
+                        if (bullet.bulletSize.type == AscFormat.BULLET_TYPE_SIZE_TX)
                         {
                             s.SkipRecord();
                         }
@@ -7090,7 +7090,7 @@ function BinaryPPTYLoader()
                 case 5:
                 {
                     b_bullet = true;
-                    bullet.bulletTypeface = new CBulletTypeface();
+                    bullet.bulletTypeface = new AscFormat.CBulletTypeface();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
@@ -7098,7 +7098,7 @@ function BinaryPPTYLoader()
                     {
                         bullet.bulletTypeface.type = s.GetUChar();
 
-                        if (bullet.bulletTypeface.type == BULLET_TYPE_TYPEFACE_BUFONT)
+                        if (bullet.bulletTypeface.type == AscFormat.BULLET_TYPE_TYPEFACE_BUFONT)
                         {
                             bullet.bulletTypeface.typeface = this.ReadTextFontTypeface();
                         }
@@ -7113,7 +7113,7 @@ function BinaryPPTYLoader()
                 case 6:
                 {
                     b_bullet = true;
-                    bullet.bulletType = new CBulletType();
+                    bullet.bulletType = new AscFormat.CBulletType();
 
                     var cur_pos = s.cur;
                     var _len = s.GetULong();
@@ -7121,15 +7121,15 @@ function BinaryPPTYLoader()
                     {
                         bullet.bulletType.type = s.GetUChar();
 
-                        if (bullet.bulletType.type == BULLET_TYPE_BULLET_NONE)
+                        if (bullet.bulletType.type == AscFormat.BULLET_TYPE_BULLET_NONE)
                         {
                             s.SkipRecord();
                         }
-                        else if (bullet.bulletType.type == BULLET_TYPE_BULLET_BLIP)
+                        else if (bullet.bulletType.type == AscFormat.BULLET_TYPE_BULLET_BLIP)
                         {
                             s.SkipRecord();
                         }
-                        else if (bullet.bulletType.type == BULLET_TYPE_BULLET_AUTONUM)
+                        else if (bullet.bulletType.type == AscFormat.BULLET_TYPE_BULLET_AUTONUM)
                         {
                             s.Skip2(5); // len + type + start attr
 
@@ -7156,7 +7156,7 @@ function BinaryPPTYLoader()
                                 }
                             }
                         }
-                        else if (bullet.bulletType.type == BULLET_TYPE_BULLET_CHAR)
+                        else if (bullet.bulletType.type == AscFormat.BULLET_TYPE_BULLET_CHAR)
                         {
                             s.Skip2(6);
                             bullet.bulletType.Char = s.GetString2();
@@ -7269,7 +7269,7 @@ function BinaryPPTYLoader()
 
     this.ReadTextListStyle = function()
     {
-        var styles = new TextListStyle();
+        var styles = new AscFormat.TextListStyle();
         var s = this.stream;
 
         var _rec_start = s.cur;
@@ -7350,9 +7350,9 @@ function BinaryPPTYLoader()
                             _last_field_type = true;
                         }
                     }
-                    if(shape && (this.TempMainObject && typeof Slide !== "undefined" && this.TempMainObject instanceof  Slide && shape.isPlaceholder && shape.isPlaceholder() && (shape.getPlaceholderType() === phType_sldNum || shape.getPlaceholderType() === phType_dt)) && _last_field_type)
+                    if(shape && (this.TempMainObject && typeof Slide !== "undefined" && this.TempMainObject instanceof  Slide && shape.isPlaceholder && shape.isPlaceholder() && (shape.getPlaceholderType() === AscFormat.phType_sldNum || shape.getPlaceholderType() === AscFormat.phType_dt)) && _last_field_type)
                     {
-                        var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject, (this.presentation && this.presentation.pres && isRealNumber(this.presentation.pres.attrFirstSlideNum)) ? this.presentation.pres.attrFirstSlideNum : 1);
+                        var str_field = txbody.getFieldText(_last_field_type, this.TempMainObject, (this.presentation && this.presentation.pres && AscFormat.isRealNumber(this.presentation.pres.attrFirstSlideNum)) ? this.presentation.pres.attrFirstSlideNum : 1);
                         if(str_field.length > 0)
                         {
                             txbody.content.Internal_Content_RemoveAll();
@@ -7589,7 +7589,7 @@ function BinaryPPTYLoader()
 
                         switch (_type)
                         {
-                            case PARRUN_TYPE_RUN:
+                            case AscFormat.PARRUN_TYPE_RUN:
                             {
                                 var _end = s.cur + s.GetULong() + 4;
 
@@ -7701,7 +7701,7 @@ function BinaryPPTYLoader()
 
                                 break;
                             }
-                            case PARRUN_TYPE_FLD:
+                            case AscFormat.PARRUN_TYPE_FLD:
                             {
                                 var _end = s.cur + s.GetULong() + 4;
 
@@ -7753,7 +7753,7 @@ function BinaryPPTYLoader()
                                 s.Seek2(_end);
                                 break;
                             }
-                            case PARRUN_TYPE_BR:
+                            case AscFormat.PARRUN_TYPE_BR:
                             {
                                 var _end = s.cur + s.GetULong() + 4;
 

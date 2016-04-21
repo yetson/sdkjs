@@ -27,9 +27,9 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
     {
-        case LineEndType.None:
+        case AscFormat.LineEndType.None:
             break;
-        case LineEndType.Arrow:
+        case AscFormat.LineEndType.Arrow:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -58,7 +58,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Diamond:
+        case AscFormat.LineEndType.Diamond:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -101,7 +101,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Oval:
+        case AscFormat.LineEndType.Oval:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -155,7 +155,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
             drawer._e();
             break;
         }
-        case LineEndType.Stealth:
+        case AscFormat.LineEndType.Stealth:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -198,7 +198,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Triangle:
+        case AscFormat.LineEndType.Triangle:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -247,7 +247,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
     cos=Math.cos(angle);
     switch(type)
     {
-        case ar_arrow:
+        case AscFormat.ar_arrow:
         {
             var xb, yb, xc, yc;
             xb=-length;
@@ -264,7 +264,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
 
             break;
         }
-        case ar_diamond:
+        case AscFormat.ar_diamond:
         {
             var xd, yd;
             xb=-length*0.5;
@@ -287,16 +287,16 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
 
             break;
         }
-        case ar_none:
+        case AscFormat.ar_none:
         {
             break;
         }
-        case ar_oval:
+        case AscFormat.ar_oval:
         {
             EllipseN(graphics, x, y, length*0.5, width*0.5, angle);
             break;
         }
-        case ar_stealth:
+        case AscFormat.ar_stealth:
         {
             xb=-length;
             yb=-width*0.5;
@@ -317,7 +317,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
             graphics.df();
             break;
         }
-        case ar_triangle:
+        case AscFormat.ar_triangle:
         {
             xb=-length;
             yb=-width*0.5;
@@ -346,7 +346,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
     cos=Math.cos(angle);
     switch(type)
     {
-        case ar_arrow:
+        case AscFormat.ar_arrow:
         {
             var xb, yb, xc, yc;
             xb=length;
@@ -363,7 +363,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
 
             break;
         }
-        case ar_diamond:
+        case AscFormat.ar_diamond:
         {
             var xd, yd;
             xb=length*0.5;
@@ -386,16 +386,16 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
 
             break;
         }
-        case ar_none:
+        case AscFormat.ar_none:
         {
             break;
         }
-        case ar_oval:
+        case AscFormat.ar_oval:
         {
             Ellipse2(graphics, x, y, length*0.5, width*0.5, angle);
             break;
         }
-        case ar_stealth:
+        case AscFormat.ar_stealth:
         {
             xb=length;
             yb=-width*0.5;
@@ -416,7 +416,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
             graphics.df();
             break;
         }
-        case ar_triangle:
+        case AscFormat.ar_triangle:
         {
             xb=length;
             yb=-width*0.5;
@@ -602,7 +602,7 @@ CShapeDrawer.prototype =
             {
                 case Asc.c_oAscFill.FILL_TYPE_BLIP:
                 {
-                    this.StrokeUniColor = new CUniColor().RGBA;
+                    this.StrokeUniColor = new AscFormat.CUniColor().RGBA;
                     break;
                 }
                 case Asc.c_oAscFill.FILL_TYPE_SOLID:
@@ -614,7 +614,7 @@ CShapeDrawer.prototype =
                 {
                     var _c = _fill.colors;
                     if (_c == 0)
-                        this.StrokeUniColor = new CUniColor().RGBA;
+                        this.StrokeUniColor = new AscFormat.CUniColor().RGBA;
                     else
                         this.StrokeUniColor = _fill.colors[0].color.RGBA;
 
@@ -963,22 +963,22 @@ CShapeDrawer.prototype =
         {
             switch (this.Ln.Join.type)
             {
-                case LineJoinType.Round:
+                case AscFormat.LineJoinType.Round:
                 {
                     this.NativeGraphics["PD_lineJoin"]("round");
                     break;
                 }
-                case LineJoinType.Bevel:
+                case AscFormat.LineJoinType.Bevel:
                 {
                     this.NativeGraphics["PD_lineJoin"]("bevel");
                     break;
                 }
-                case LineJoinType.Empty:
+                case AscFormat.LineJoinType.Empty:
                 {
                     this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
                 }
-                case LineJoinType.Miter:
+                case AscFormat.LineJoinType.Miter:
                 {
                     this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
@@ -1128,7 +1128,7 @@ CShapeDrawer.prototype =
         {
             if (null != this.OldLineJoin && !this.IsArrowsDrawing)
             {
-                this.Graphics.put_PenLineJoin(ConvertJoinAggType(this.Ln.Join.type));
+                this.Graphics.put_PenLineJoin(AscFormat.ConvertJoinAggType(this.Ln.Join.type));
             }
 
             var rgba = this.StrokeUniColor;

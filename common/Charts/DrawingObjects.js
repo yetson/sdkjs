@@ -238,7 +238,7 @@ asc_CChartBinary.prototype = {
             oBinaryReader.stream.pos    = stream.pos;
             oBinaryReader.stream.cur    = stream.cur;
             var _rec = oBinaryReader.stream.GetUChar();
-            var ret = new ClrMap();
+            var ret = new AscFormat.ClrMap();
             oBinaryReader.ReadClrMap(ret);
             return ret;
         }
@@ -350,7 +350,7 @@ function CreateSparklineMarker(oUniFill)
     var oMarker = new CMarker();
     oMarker.symbol = SYMBOL_DIAMOND;
     oMarker.size = 10;
-    oMarker.spPr = new CSpPr();
+    oMarker.spPr = new AscFormat.CSpPr();
     oMarker.spPr.Fill = oUniFill;
     oMarker.spPr.ln = CreateNoFillLine();
     return oMarker;
@@ -367,8 +367,8 @@ function CreateUniFillFromExcelColor(oExcelColor)
         {
             var unicolor = oUnifill.fill.color;
             if(!unicolor.Mods)
-                unicolor.setMods(new CColorModifiers());
-            var mod = new CColorMod();
+                unicolor.setMods(new AscFormat.CColorModifiers());
+            var mod = new AscFormat.CColorMod();
             if(oExcelColor.tint > 0)
             {
                 mod.setName("wordTint");
@@ -393,7 +393,7 @@ function CreateUniFillFromExcelColor(oExcelColor)
 
 CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGroup, worksheetView)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.ws = worksheetView;
         var settings = new AscCommon.asc_ChartSettings();
         switch(oSparklineGroup.type)
@@ -425,7 +425,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         chart_space.displayEmptyCellsAs = oSparklineGroup.displayEmptyCellsAs;
 
 
-        if(isRealNumber(oSparklineGroup.displayEmptyCellsAs))
+        if(AscFormat.isRealNumber(oSparklineGroup.displayEmptyCellsAs))
         {
             switch(oSparklineGroup.displayEmptyCellsAs)
             {
@@ -515,15 +515,15 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
         var i;
         if(!chart_space.spPr)
-            chart_space.setSpPr(new CSpPr());
+            chart_space.setSpPr(new AscFormat.CSpPr());
 
-        var new_line = new CLn();
+        var new_line = new AscFormat.CLn();
         new_line.setFill(CreateNoFillUniFill());
         chart_space.spPr.setLn(new_line);
         chart_space.spPr.setFill(CreateNoFillUniFill());
         if(!chart_space.chart.plotArea.spPr)
         {
-            chart_space.chart.plotArea.setSpPr(new CSpPr());
+            chart_space.chart.plotArea.setSpPr(new AscFormat.CSpPr());
             chart_space.chart.plotArea.spPr.setFill(CreateNoFillUniFill());
         }
         var oAxis = chart_space.chart.plotArea.getAxisByTypes();
@@ -532,14 +532,14 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
         var oSerie = chart_space.chart.plotArea.charts[0].series[0];
         if(!oSerie.spPr)
         {
-            oSerie.setSpPr(new CSpPr());
+            oSerie.setSpPr(new AscFormat.CSpPr());
         }
         chart_space.recalculateReferences();
         chart_space.recalcInfo.recalculateReferences = false;
         var fCallbackSeries = null;
         if(oSparklineGroup.type === Asc.ESparklineType.Line)
         {
-            var oLn = new CLn();
+            var oLn = new AscFormat.CLn();
             oLn.setW(36000*nSparklineMultiplier*25.4*(oSparklineGroup.lineWidth != null ? oSparklineGroup.lineWidth : 0.75)/72);
             oSerie.spPr.setLn(oLn);
             if(oSparklineGroup.markers && oSparklineGroup.colorMarkers)
@@ -585,7 +585,7 @@ CSparklineView.prototype.initFromSparkline = function(oSparkline, oSparklineGrou
                 }
                 var oDPt = new CDPt();
                 oDPt.idx = nIdx;
-                oDPt.spPr = new CSpPr();
+                oDPt.spPr = new AscFormat.CSpPr();
                 oDPt.spPr.Fill = CreateUniFillFromExcelColor(oExcelColor);
                 oSeries.addDPt(oDPt);
             }
@@ -754,7 +754,7 @@ CSparklineView.prototype.draw = function(graphics, offX, offY)
     var bPosition = Math.abs(this.x - x) > 0.01 || Math.abs(this.y - y) > 0.01;
     if(bExtent || bPosition)
     {
-        ExecuteNoHistory(function(){
+        AscFormat.ExecuteNoHistory(function(){
             if(bPosition)
             {
                 this.chartSpace.spPr.xfrm.setOffX(x*nSparklineMultiplier);
@@ -1114,7 +1114,7 @@ function DrawingObjects() {
 
         if ( _t.isGraphicObject() ) {
 
-            var rot = isRealNumber(_t.graphicObject.rot) ? _t.graphicObject.rot : 0;
+            var rot = AscFormat.isRealNumber(_t.graphicObject.rot) ? _t.graphicObject.rot : 0;
             rot = normalizeRotate(rot);
 
             var fromX, fromY, toX, toY;
@@ -1396,7 +1396,7 @@ function DrawingObjects() {
 
     _this.createDrawingObject = function(type) {
         var drawingBase = new DrawingBase(worksheet);
-        if(isRealNumber(type))
+        if(AscFormat.isRealNumber(type))
         {
             drawingBase.Type = type;
         }
@@ -2229,7 +2229,7 @@ function DrawingObjects() {
             var colorMapOverride = asc_chart_binary.getColorMap();
             if(colorMapOverride)
             {
-                DEFAULT_COLOR_MAP = colorMapOverride;
+                AscFormat.DEFAULT_COLOR_MAP = colorMapOverride;
             }
 
             if(typeof chart["urls"] === "string") {
@@ -2237,7 +2237,7 @@ function DrawingObjects() {
             }
             var font_map = {};
             oNewChartSpace.documentGetAllFontNames(font_map);
-            checkThemeFonts(font_map, worksheet.model.workbook.theme.themeElements.fontScheme);
+            AscFormat.checkThemeFonts(font_map, worksheet.model.workbook.theme.themeElements.fontScheme);
             window["Asc"]["editor"]._loadFonts(font_map,
                 function()
                 {
@@ -2612,7 +2612,7 @@ function DrawingObjects() {
     {
         if(!worksheet)
             return;
-        ExecuteNoHistory(function(){
+        AscFormat.ExecuteNoHistory(function(){
             var i;
             var wsViews = Asc["editor"].wb.wsViews;
             var changedArr = [];
@@ -2890,7 +2890,7 @@ function DrawingObjects() {
                         var coords = _this.coordsManager.calculateCoords(metrics.from);
 
 
-                        var rot = isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
+                        var rot = AscFormat.isRealNumber(obj.graphicObject.spPr.xfrm.rot) ? obj.graphicObject.spPr.xfrm.rot : 0;
                         rot = normalizeRotate(rot);
                         if (checkNormalRotate(rot))
                         {
@@ -3041,7 +3041,7 @@ function DrawingObjects() {
 
     _this.updateChartReferences = function(oldWorksheet, newWorksheet, bNoRedraw)
     {
-        ExecuteNoHistory(function(){
+        AscFormat.ExecuteNoHistory(function(){
             for (var i = 0; i < aObjects.length; i++) {
                 var graphicObject = aObjects[i].graphicObject;
                 if ( graphicObject.updateChartReferences )
@@ -3075,7 +3075,7 @@ function DrawingObjects() {
         graphic.setDrawingBase(drawingObject);
 
         var ret;
-        if (isRealNumber(position)) {
+        if (AscFormat.isRealNumber(position)) {
             aObjects.splice(position, 0, drawingObject);
             ret = position;
         }
@@ -3678,7 +3678,7 @@ function DrawingObjects() {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
-                    var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
                     if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
@@ -3699,7 +3699,7 @@ function DrawingObjects() {
                     coords = _this.coordsManager.calculateCoords(drawingObject.from);
                     CheckSpPrXfrm(drawingObject.graphicObject);
 
-                    var rot = isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
+                    var rot = AscFormat.isRealNumber(drawingObject.graphicObject.spPr.xfrm.rot) ? drawingObject.graphicObject.spPr.xfrm.rot : 0;
                     rot = normalizeRotate(rot);
                     if (checkNormalRotate(rot)) {
                         drawingObject.graphicObject.spPr.xfrm.setOffX(pxToMm(coords.x));
