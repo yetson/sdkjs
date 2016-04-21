@@ -127,7 +127,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.localTransform = new CMatrix();
     this.snapArrayX = [];
     this.snapArrayY = [];
-    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.bNeedUpdatePosition = true;
 };
 CChartSpace.prototype.recalcTransform = function()

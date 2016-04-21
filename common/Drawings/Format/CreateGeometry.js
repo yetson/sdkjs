@@ -24,6 +24,13 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 function CreateGeometry(prst){
     var f = new Geometry();
     switch(prst){
@@ -10281,3 +10288,11 @@ function CreatePrstTxWarpGeometry(prst)
     }
     return f;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CreateGeometry = CreateGeometry;
+    window['AscFormat'].getPrstByNumber = getPrstByNumber;
+    window['AscFormat'].getNumByTxPrst = getNumByTxPrst;
+    window['AscFormat'].CreatePrstTxWarpGeometry = CreatePrstTxWarpGeometry;
+})(window);

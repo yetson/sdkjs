@@ -4458,7 +4458,7 @@ CShape.prototype =
     applyTextArtForm: function(sPreset)
     {
         var oBodyPr = this.getBodyPr().createDuplicate();
-        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return CreatePrstTxWarpGeometry(sPreset)}, this, []);
+        oBodyPr.prstTxWarp = AscFormat.ExecuteNoHistory(function(){return AscFormat.CreatePrstTxWarpGeometry(sPreset)}, this, []);
         if(this.bWordShape)
         {
             this.setBodyPr(oBodyPr);
@@ -4538,7 +4538,7 @@ CShape.prototype =
 
         if(sPreset === "textRect")
         {
-            this.spPr.setGeometry(CreateGeometry("rect"));
+            this.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
             this.spPr.geometry.setParent(this.spPr);
             this.setStyle(AscFormat.CreateDefaultTextRectStyle());
             var fill = new AscFormat.CUniFill();
@@ -4717,7 +4717,7 @@ CShape.prototype =
             }
         }
         if (_final_preset != null) {
-            this.spPr.setGeometry(CreateGeometry(_final_preset));
+            this.spPr.setGeometry(AscFormat.CreateGeometry(_final_preset));
             if(this.spPr.geometry)
             {
                 this.spPr.geometry.setParent(this.spPr);

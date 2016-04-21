@@ -1023,7 +1023,7 @@ function CPPTXContentWriter()
         if (image.spPr.Geometry === undefined || image.spPr.Geometry == null)
         {
             // powerpoint!
-            image.spPr.Geometry = CreateGeometry("rect");
+            image.spPr.Geometry = AscFormat.CreateGeometry("rect");
         }
 
         var _unifill = null;
@@ -1066,7 +1066,7 @@ function CPPTXContentWriter()
         spPr.WriteXfrm.extX = w;
         spPr.WriteXfrm.extY = h;
 
-        spPr.Geometry = CreateGeometry("rect");
+        spPr.Geometry = AscFormat.CreateGeometry("rect");
 
         var _unifill = new AscFormat.CUniFill();
         _unifill.fill = new AscFormat.CBlipFill();
