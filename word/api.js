@@ -4705,7 +4705,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
     /*проверка корректности данных для биржевой диаграммы*/
     if(obj.ChartProperties && obj.ChartProperties.type === Asc.c_oAscChartTypeSettings.stock)
     {
-        if(!CheckStockChart(this.WordControl.m_oLogicDocument.DrawingObjects, this))
+        if(!AscFormat.CheckStockChart(this.WordControl.m_oLogicDocument.DrawingObjects, this))
         {
             return;
         }
@@ -4744,7 +4744,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
     for(i = 0; i < aSelectedObjects.length; ++i)
     {
         oParentParagraph = aSelectedObjects[i].parent.Get_ParentParagraph();
-        checkObjectInArray(aParagraphs, oParentParagraph);
+      AscFormat.checkObjectInArray(aParagraphs, oParentParagraph);
     }
 
 

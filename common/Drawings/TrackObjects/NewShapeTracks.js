@@ -514,7 +514,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];

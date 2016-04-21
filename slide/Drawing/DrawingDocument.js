@@ -5490,7 +5490,7 @@ function CSlideDrawer()
     this.CachedCanvas       = null;
     this.CachedCanvasCtx    = null;
 
-    this.BoundsChecker      = new CSlideBoundsChecker();
+    this.BoundsChecker      = new AscFormat.CSlideBoundsChecker();
 
     this.bIsEmptyPresentation = false;
     this.IsRecalculateSlide = false;

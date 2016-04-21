@@ -870,7 +870,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         this.getBounds = function()
         {
-            var boundsChecker = new  CSlideBoundsChecker();
+            var boundsChecker = new  AscFormat.CSlideBoundsChecker();
             var tr = null;
             if(this.originalObject && this.originalObject.parent)
             {
@@ -933,7 +933,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     this.resizedPosY = 0;
                 }
             }
-            CheckSpPrXfrm(this.originalObject);
+            AscFormat.CheckSpPrXfrm(this.originalObject);
             var xfrm = this.originalObject.spPr.xfrm;
             xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
@@ -945,7 +945,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                 xfrm.setFlipV(this.resizedflipV);
             }
 
-            CheckShapeBodyAutoFitReset(this.originalObject);
+            AscFormat.CheckShapeBodyAutoFitReset(this.originalObject);
             this.originalObject.checkDrawingBaseCoords();
         };
     }, this, []);
@@ -974,7 +974,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(checkNormalRotate(this.rot));
+        this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.childs = [];
         var a = originalObject.spTree;
         for(var i = 0; i < a.length; ++i)
@@ -1543,7 +1543,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         };
         this.getBounds = function()
         {
-            var boundsChecker = new  CSlideBoundsChecker();
+            var boundsChecker = new  AscFormat.CSlideBoundsChecker();
             this.draw(boundsChecker);
             var tr = this.transform;
             var arr_p_x = [];
@@ -1616,7 +1616,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             }
             this.original.checkDrawingBaseCoords();
 
-            CheckShapeBodyAutoFitReset(this.original);
+            AscFormat.CheckShapeBodyAutoFitReset(this.original);
 
 
         };
@@ -1639,7 +1639,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(checkNormalRotate(this.rot));
+        this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
         this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
@@ -1697,7 +1697,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
         this.getBounds = function()
         {
-            var bounds_checker = new  CSlideBoundsChecker();
+            var bounds_checker = new  AscFormat.CSlideBoundsChecker();
             bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
             this.draw(bounds_checker);
             return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
@@ -1717,7 +1717,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
             xfrm.setExtX(this.extX);
             xfrm.setExtY(this.extY);
 
-            CheckShapeBodyAutoFitReset(this.originalObject);
+            AscFormat.CheckShapeBodyAutoFitReset(this.originalObject);
         };
 
         this.updateTransform = function()

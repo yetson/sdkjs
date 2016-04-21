@@ -4241,7 +4241,7 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     if(this.copyParams)
                     {
                         AscFormat.ExecuteNoHistory(function(){
-                            CheckSpPrXfrm2(item.GraphicObj);
+                          AscFormat.CheckSpPrXfrm2(item.GraphicObj);
                         }, this, []);
                     }
 					

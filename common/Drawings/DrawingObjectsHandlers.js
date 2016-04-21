@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+
 function CheckCoordsNeedPage(x, y, pageIndex, needPageIndex, drawingDocument)
 {
     if(pageIndex === needPageIndex)
@@ -343,7 +346,7 @@ function handleChart(drawing, drawingObjectsController, e, x, y, group, pageInde
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    var oTargetTextObject = getTargetTextObject(drawingObjectsController);
+                    var oTargetTextObject = AscFormat.getTargetTextObject(drawingObjectsController);
                     if(title !== oTargetTextObject)
                     {
                         drawingObjectsController.checkChartTextSelection();

@@ -112,7 +112,7 @@ function MoveShapeImageTrack(originalObject)
                 this.originalObject.selectStartPage = this.pageIndex;
         }
         var scale_coefficients, ch_off_x, ch_off_y;
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         if(this.originalObject.group)
         {
             scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
@@ -143,7 +143,7 @@ function MoveShapeImageTrack(originalObject)
 
 MoveShapeImageTrack.prototype.getBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     var tr = this.transform;
     var arr_p_x = [];
@@ -240,7 +240,7 @@ function MoveShapeImageTrackInGroup(originalObject)
         var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
         var xfrm = this.originalObject.group.spPr.xfrm;
 
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         var shape_xfrm = this.originalObject.spPr.xfrm;
         shape_xfrm.setOffX(this.x/scale_scale_coefficients.cx + xfrm.chOffX);
         shape_xfrm.setOffY(this.y/scale_scale_coefficients.cy + xfrm.chOffY);
@@ -315,7 +315,7 @@ function MoveGroupTrack(originalObject)
 
     this.getBounds = function()
     {
-        var bounds_checker = new CSlideBoundsChecker();
+        var bounds_checker = new AscFormat.CSlideBoundsChecker();
         for(var i = 0; i < this.overlayObjects.length; ++i)
         {
             this.overlayObjects[i].draw(bounds_checker);
@@ -334,7 +334,7 @@ function MoveGroupTrack(originalObject)
             this.x = 0;
             this.y = 0;
         }
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         var xfrm = this.originalObject.spPr.xfrm;
         xfrm.setOffX(this.x);
         xfrm.setOffY(this.y);

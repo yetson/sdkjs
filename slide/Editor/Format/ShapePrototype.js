@@ -521,7 +521,7 @@ CShape.prototype.recalculate = function ()
 };
 CShape.prototype.recalculateBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     boundsChecker.CorrectBounds();
 
@@ -641,7 +641,7 @@ CShape.prototype.recalculateContent2 = function()
                 else
                 {
                     var _full_rotate = this.getFullRotate();
-                    if(checkNormalRotate(_full_rotate))
+                    if(AscFormat.checkNormalRotate(_full_rotate))
                     {
                         if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                         {

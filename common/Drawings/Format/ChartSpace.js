@@ -666,7 +666,7 @@ CChartSpace.prototype =
         this.selection.plotArea = null;
     },
 
-    recalculateCurPos: DrawingObjectsController.prototype.recalculateCurPos,
+    recalculateCurPos: AscFormat.DrawingObjectsController.prototype.recalculateCurPos,
 
     documentUpdateSelectionState: function()
     {

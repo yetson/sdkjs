@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
 var AscBrowser = AscCommon.AscBrowser;
@@ -139,7 +139,7 @@ function CEditorPage(api)
     this.m_bDocumentPlaceChangedEnabled = false;
 
     this.m_nZoomValue       = 100;
-    this.m_oBoundsController = new CBoundsController();
+    this.m_oBoundsController = new AscFormat.CBoundsController();
     this.m_nTabsType        = 0;
 
     this.m_dScrollY         = 0;
