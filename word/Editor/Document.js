@@ -180,7 +180,7 @@ CSelectedContent.prototype =
             var DrawingObj = this.DrawingObjects[Pos];
             var ShapeType = DrawingObj.GraphicObj.getObjectType();
 
-            if ( historyitem_type_Shape === ShapeType || historyitem_type_GroupShape === ShapeType )
+            if ( AscDFH.historyitem_type_Shape === ShapeType || AscDFH.historyitem_type_GroupShape === ShapeType )
             {
                 this.HaveShape = true;
                 break;
@@ -902,7 +902,7 @@ CDocumentFieldsManager.prototype.Restore_MailMergeTemplate = function()
         var LogicDocument = (ParagrapsToRestore.length > 0 ? ParagrapsToRestore[0].LogicDocument : null);
         if (LogicDocument && false === LogicDocument.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : ParagrapsToRestore, CheckType : changestype_Paragraph_Content }))
         {
-            History.Create_NewPoint(historydescription_Document_RestoreFieldTemplateText);
+            History.Create_NewPoint(AscDFH.historydescription_Document_RestoreFieldTemplateText);
             for (var nIndex = 0, nCount = FieldsToRestore.length; nIndex < nCount; nIndex++)
             {
                 var oField = FieldsToRestore[nIndex];
@@ -3599,7 +3599,7 @@ CDocument.prototype =
         var LastPara = this.Content[this.Content.length - 1];
         var LastPara2 = LastPara;
 
-        this.Create_NewHistoryPoint(historydescription_Document_DocumentExtendToPos);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DocumentExtendToPos);
         this.History.Set_Additional_ExtendDocumentToPos();
 
         while ( true )
@@ -3978,7 +3978,7 @@ CDocument.prototype =
 
         if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_Element_and_Type, Element : OldParagraph, CheckType : changestype_Paragraph_Content } ) )
         {
-            this.Create_NewHistoryPoint(historydescription_Document_AddDropCap);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddDropCap);
 
             var NewParagraph = new Paragraph( this.DrawingDocument, this, 0, 0, 0, 0, 0 );
 
@@ -4052,7 +4052,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveDropCap);
                 var Count = FrameParas.length;
                 for ( var Index = 0; Index < Count; Index++ )
                 {
@@ -4083,7 +4083,7 @@ CDocument.prototype =
                 FrameParas.push(Next);
                 if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveDropCap);
 
                     // Удалим ненужный элемент
                     FrameParas.splice( FrameParas.length - 1, 1 );
@@ -4122,7 +4122,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked( changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : changestype_Paragraph_Content } ) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_RemoveDropCap);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RemoveDropCap);
                     var Count = FrameParas.length;
                     for ( var Index = 0; Index < Count; Index++ )
                     {
@@ -8182,7 +8182,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight);
 
                 if (false === IsColor)
                     this.Paragraph_Add( new ParaTextPr( { HighLight : highlight_None  } ) );
@@ -8673,7 +8673,7 @@ CDocument.prototype =
 
     Set_DocumentDefaultTab : function(DTab)
     {
-        this.History.Add( this, { Type : historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
+        this.History.Add( this, { Type : AscDFH.historyitem_Document_DefaultTab, Old : Default_Tab_Stop, New : DTab } );
         Default_Tab_Stop = DTab;
     },
     
@@ -8681,7 +8681,7 @@ CDocument.prototype =
     {
         if ( Value !== EvenAndOddHeaders )
         {
-            this.History.Add( this, { Type : historyitem_Document_EvenAndOddHeaders, Old : EvenAndOddHeaders, New : Value } );
+            this.History.Add( this, { Type : AscDFH.historyitem_Document_EvenAndOddHeaders, Old : EvenAndOddHeaders, New : Value } );
             EvenAndOddHeaders = Value;
         }
     },
@@ -9839,7 +9839,7 @@ CDocument.prototype =
             // Создаем сразу точку в истории, т.к. при выполнении функции Get_SelectedContent нам надо, чтобы данная
             // точка уже набивалась изменениями. Если из-за совместного редактирования действие сделать невозможно будет,
             // тогда последнюю точку удаляем.
-            History.Create_NewPoint(historydescription_Document_DragText);
+            History.Create_NewPoint(AscDFH.historydescription_Document_DragText);
 
             NearPos.Paragraph.Check_NearestPos( NearPos );
 
@@ -10409,7 +10409,7 @@ CDocument.prototype =
         {
             if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Remove, null, true))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_BackSpaceButton);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_BackSpaceButton);
                 this.Remove(-1, true);
             }
             bRetValue = keydownresult_PreventAll;
@@ -10424,7 +10424,7 @@ CDocument.prototype =
                 var Paragraph = ParaMath.Get_Paragraph();
                 if (Paragraph && false === this.Document_Is_SelectionLocked(changestype_None, {Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : changestype_Paragraph_Content}))
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_AddTabToMath);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTabToMath);
                     ParaMath.Handle_Tab(!e.ShiftKey);
                     this.Recalculate();
                 }
@@ -10454,7 +10454,7 @@ CDocument.prototype =
                     {
                         if ( false === this.Document_Is_SelectionLocked(changestype_None, { Type : changestype_2_Element_and_Type, Element : Paragraph, CheckType : AscCommon.changestype_Paragraph_Properties } ) )
                         {
-                            this.Create_NewHistoryPoint(historydescription_Document_MoveParagraphByTab);
+                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_MoveParagraphByTab);
                             Paragraph.Add_Tab(e.ShiftKey);
                             this.Recalculate();
 
@@ -10464,7 +10464,7 @@ CDocument.prototype =
                     }
                     else if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                     {
-                        this.Create_NewHistoryPoint(historydescription_Document_AddTab);
+                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTab);
                         this.Paragraph_Add( new ParaTab() );
                     }
                 }
@@ -10490,7 +10490,7 @@ CDocument.prototype =
                     var CheckType = ( e.ShiftKey || e.CtrlKey ? changestype_Paragraph_Content : AscCommon.changestype_Document_Content_Add );
                     if (false === this.Document_Is_SelectionLocked(CheckType))
                     {
-                        this.Create_NewHistoryPoint(historydescription_Document_EnterButton);
+                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_EnterButton);
 
                         var oSelectedInfo = this.Get_SelectedElementsInfo();
                         var oMath = oSelectedInfo.Get_Math();
@@ -10572,7 +10572,7 @@ CDocument.prototype =
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SpaceButton);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SpaceButton);
 
                 // Если мы находимся в формуле, тогда пытаемся выполнить автозамену
 
@@ -10914,7 +10914,7 @@ CDocument.prototype =
                     {
                         if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
-                            this.Create_NewHistoryPoint(historydescription_Document_ShiftInsert);
+                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsert);
 
                             window.GlobalPasteFlag = true;
                             editor.incrementCounterLongAction();
@@ -10925,7 +10925,7 @@ CDocument.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint(historydescription_Document_ShiftInsertSafari);
+                                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_ShiftInsertSafari);
 
                                 AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -10944,7 +10944,7 @@ CDocument.prototype =
             {
                 if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Delete, null, true))
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_DeleteButton);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_DeleteButton);
                     this.Remove( 1, true );
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -10962,7 +10962,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading1);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetStyleHeading1);
                 this.Set_ParagraphStyle( "Heading 1" );
                 this.Document_UpdateInterfaceState();
             }
@@ -10972,7 +10972,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading2);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetStyleHeading2);
                 this.Set_ParagraphStyle( "Heading 2" );
                 this.Document_UpdateInterfaceState();
             }
@@ -10982,7 +10982,7 @@ CDocument.prototype =
         {
             if ( false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetStyleHeading3);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetStyleHeading3);
                 this.Set_ParagraphStyle( "Heading 3" );
                 this.Document_UpdateInterfaceState();
             }
@@ -10995,7 +10995,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextStrikeoutHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextStrikeoutHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Strikeout : TextPr.Strikeout === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11015,7 +11015,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextBoldHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextBoldHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Bold : TextPr.Bold === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11046,7 +11046,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_AddEuroLetter);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddEuroLetter);
 
                     this.DrawingDocument.TargetStart();
                     this.DrawingDocument.TargetShow();
@@ -11062,7 +11062,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextItalicHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextItalicHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Italic : TextPr.Italic === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11087,7 +11087,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetParagraphNumberingHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphNumberingHotKey);
                     this.Set_ParagraphNumbering( { Type : 0, SubType : 1 } );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11114,7 +11114,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_AddPageNumHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddPageNumHotKey);
                     this.Paragraph_Add( new ParaPageNum() );
                 }
                 bRetValue = keydownresult_PreventAll;
@@ -11145,7 +11145,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextUnderlineHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextUnderlineHotKey);
                     this.Paragraph_Add( new ParaTextPr( { Underline : TextPr.Underline === true ? false : true } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11158,7 +11158,7 @@ CDocument.prototype =
             {
                 if ( true === e.ShiftKey ) // Ctrl + Shift + V - вставляем по образцу
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_FormatPasteHotKey);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_FormatPasteHotKey);
                     this.Document_Format_Paste();
                     bRetValue = keydownresult_PreventAll;
                 }
@@ -11168,7 +11168,7 @@ CDocument.prototype =
                     {
                         if (!AscCommon.AscBrowser.isSafariMacOs)
                         {
-                            this.Create_NewHistoryPoint(historydescription_Document_PasteHotKey);
+                            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteHotKey);
 
                             window.GlobalPasteFlag = true;
                             editor.incrementCounterLongAction();
@@ -11179,7 +11179,7 @@ CDocument.prototype =
                         {
                             if (0 === window.GlobalPasteFlagCounter)
                             {
-                                this.Create_NewHistoryPoint(historydescription_Document_PasteSafariHotKey);
+                                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_PasteSafariHotKey);
 
                                 AscCommon.SafariIntervalFocus();
                                 window.GlobalPasteFlag = true;
@@ -11276,7 +11276,7 @@ CDocument.prototype =
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                     {
-                        this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey);
+                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey);
                         if (true === e.ShiftKey)
                             this.Paragraph_Add(new ParaTextPr({ VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript }));
                         else
@@ -11294,7 +11294,7 @@ CDocument.prototype =
                 {
                     if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
                     {
-                        this.Create_NewHistoryPoint(historydescription_Document_AddMathHotKey);
+                        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddMathHotKey);
                         this.Paragraph_Add(new MathMenu (-1));
                         bRetValue = keydownresult_PreventAll;
                     }
@@ -11308,7 +11308,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey2);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey2);
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === AscCommon.vertalign_SuperScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SuperScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11319,7 +11319,7 @@ CDocument.prototype =
         {
             if (true === e.CtrlKey && true === e.ShiftKey && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_MinusButton);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_MinusButton);
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
@@ -11338,7 +11338,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextVertAlignHotKey3);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextVertAlignHotKey3);
                     this.Paragraph_Add( new ParaTextPr( { VertAlign : TextPr.VertAlign === AscCommon.vertalign_SubScript ? AscCommon.vertalign_Baseline : AscCommon.vertalign_SubScript } ) );
                     this.Document_UpdateInterfaceState();
                 }
@@ -11387,7 +11387,7 @@ CDocument.prototype =
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content, null, true))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_AddLetter);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddLetter);
 
                 this.DrawingDocument.TargetStart();
                 this.DrawingDocument.TargetShow();
@@ -11614,7 +11614,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_FormatPasteHotKey2);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_FormatPasteHotKey2);
                     this.Document_Format_Paste();
                 }
                 
@@ -11626,7 +11626,7 @@ CDocument.prototype =
             {
                 if ( false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content) )
                 {
-                    this.Create_NewHistoryPoint(historydescription_Document_SetTextHighlight2);
+                    this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlight2);
                     var ParaItem = null;
                     if ( this.HighlightColor != highlight_None )
                     {
@@ -11820,7 +11820,7 @@ CDocument.prototype =
             NextObj = null;
 
         this.private_RecalculateNumbering([NewObject]);
-        this.History.Add( this, { Type : historyitem_Document_AddItem, Pos : Position, Item : NewObject } );
+        this.History.Add( this, { Type : AscDFH.historyitem_Document_AddItem, Pos : Position, Item : NewObject } );
         this.Content.splice( Position, 0, NewObject );
         NewObject.Set_Parent( this );
         NewObject.Set_DocumentNext( NextObj );
@@ -11867,7 +11867,7 @@ CDocument.prototype =
             this.Content[Position + Index].PreDelete();
         }
 
-        this.History.Add( this, { Type : historyitem_Document_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
+        this.History.Add( this, { Type : AscDFH.historyitem_Document_RemoveItem, Pos : Position, Items : this.Content.slice( Position, Position + Count ) } );
         var Elements = this.Content.splice( Position, Count );
         this.private_RecalculateNumbering(Elements);
 
@@ -13587,7 +13587,7 @@ CDocument.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Document_AddItem:
+            case  AscDFH.historyitem_Document_AddItem:
             {
                 var Pos = Data.Pos;
                 var Elements = this.Content.splice(Pos, 1);
@@ -13599,7 +13599,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 var Pos = Data.Pos;
 
@@ -13615,26 +13615,26 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_DefaultTab:
+            case AscDFH.historyitem_Document_DefaultTab:
             {
                 Default_Tab_Stop = Data.Old;
 
                 break;
             }
                 
-            case historyitem_Document_EvenAndOddHeaders:
+            case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
                 EvenAndOddHeaders = Data.Old;
                 break;
             }
                 
-            case historyitem_Document_DefaultLanguage:
+            case AscDFH.historyitem_Document_DefaultLanguage:
             {
                 this.Styles.Default.TextPr.Lang.Val = Data.Old;
                 this.Restart_CheckSpelling();
                 break;
             }
-            case historyitem_Document_MathSettings:
+            case AscDFH.historyitem_Document_MathSettings:
             {
                 this.Settings.MathSettings.SetPr(Data.OldPr);
                 break;
@@ -13649,7 +13649,7 @@ CDocument.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Document_AddItem:
+            case  AscDFH.historyitem_Document_AddItem:
             {
                 var Pos = Data.Pos;
                 this.Content.splice( Pos, 0, Data.Item );
@@ -13662,7 +13662,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 var Elements = this.Content.splice(Data.Pos, Data.Items.length);
                 this.private_RecalculateNumbering(Elements);
@@ -13673,27 +13673,27 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_DefaultTab:
+            case AscDFH.historyitem_Document_DefaultTab:
             {
                 Default_Tab_Stop = Data.New;
 
                 break;
             }
 
-            case historyitem_Document_EvenAndOddHeaders:
+            case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
                 EvenAndOddHeaders = Data.New;
                 break;
             }
 
-            case historyitem_Document_DefaultLanguage:
+            case AscDFH.historyitem_Document_DefaultLanguage:
             {
                 this.Styles.Default.TextPr.Lang.Val = Data.New;
                 this.Restart_CheckSpelling();
                 break;
             }
 
-            case historyitem_Document_MathSettings:
+            case AscDFH.historyitem_Document_MathSettings:
             {
                 this.Settings.MathSettings.SetPr(Data.NewPr);
                 break;
@@ -13704,7 +13704,7 @@ CDocument.prototype =
 
     Get_ParentObject_or_DocumentPos : function(Index)
     {
-        return { Type : historyrecalctype_Inline, Data : Index };
+        return { Type : AscDFH.historyitem_recalctype_Inline, Data : Index };
     },
 
     Refresh_RecalcData : function(Data)
@@ -13716,16 +13716,16 @@ CDocument.prototype =
 
         switch ( Type )
         {
-            case historyitem_Document_AddItem:
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_AddItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 ChangePos = Data.Pos;
                 break;
             }
 
-            case historyitem_Document_DefaultTab:
-            case historyitem_Document_EvenAndOddHeaders:
-            case historyitem_Document_MathSettings:
+            case AscDFH.historyitem_Document_DefaultTab:
+            case AscDFH.historyitem_Document_EvenAndOddHeaders:
+            case AscDFH.historyitem_Document_MathSettings:
             {
                 ChangePos = 0;
                 break;
@@ -13733,12 +13733,12 @@ CDocument.prototype =
         }
 
         if ( -1 != ChangePos )
-            this.History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : ChangePos, PageNum : 0 } } );
+            this.History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : ChangePos, PageNum : 0 } } );
     },
 
     Refresh_RecalcData2 : function(Index, Page_rel)
     {
-        this.History.RecalcData_Add( { Type : historyrecalctype_Inline, Data : { Pos : Index, PageNum : Page_rel } } );
+        this.History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Inline, Data : { Pos : Index, PageNum : Page_rel } } );
     },
 //-----------------------------------------------------------------------------------
 // Функции для работы с гиперссылками
@@ -13907,7 +13907,7 @@ CDocument.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Document );
+        Writer.WriteLong( AscDFH.historyitem_type_Document );
 
         var Type = Data.Type;
 
@@ -13916,7 +13916,7 @@ CDocument.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Document_AddItem:
+            case  AscDFH.historyitem_Document_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -13943,7 +13943,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -13976,7 +13976,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_DefaultTab:
+            case AscDFH.historyitem_Document_DefaultTab:
             {
                 // Double : Default Tab
 
@@ -13985,20 +13985,20 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_EvenAndOddHeaders:
+            case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
                 // Bool : EvenAndOddHeaders
                 Writer.WriteBool( Data.New );
                 break;
             }
 
-            case historyitem_Document_DefaultLanguage:
+            case AscDFH.historyitem_Document_DefaultLanguage:
             {
                 // Long : LanguageId
                 Writer.WriteLong( Data.New );
                 break;
             }
-            case historyitem_Document_MathSettings:
+            case AscDFH.historyitem_Document_MathSettings:
             {
                 this.Settings.MathSettings.Write_ToBinary(Writer);
                 break;
@@ -14014,12 +14014,12 @@ CDocument.prototype =
         var Type = Data.Type;
         switch ( Type )
         {
-            case  historyitem_Document_AddItem:
+            case  AscDFH.historyitem_Document_AddItem:
             {
                 break;
             }
 
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 break;
             }
@@ -14035,14 +14035,14 @@ CDocument.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Document != ClassType )
+        if ( AscDFH.historyitem_type_Document != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case  historyitem_Document_AddItem:
+            case  AscDFH.historyitem_Document_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -14094,7 +14094,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_RemoveItem:
+            case AscDFH.historyitem_Document_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -14140,7 +14140,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_DefaultTab:
+            case AscDFH.historyitem_Document_DefaultTab:
             {
                 // Double : Default Tab
 
@@ -14149,7 +14149,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_EvenAndOddHeaders:
+            case AscDFH.historyitem_Document_EvenAndOddHeaders:
             {
                 // Bool : EvenAndOddHeaders
                 
@@ -14158,7 +14158,7 @@ CDocument.prototype =
                 break;
             }
 
-            case historyitem_Document_DefaultLanguage:
+            case AscDFH.historyitem_Document_DefaultLanguage:
             {
                 // Long : LanguageId
                 this.Styles.Default.TextPr.Lang.Val = Reader.GetLong();
@@ -14168,7 +14168,7 @@ CDocument.prototype =
 
                 break;
             }
-            case historyitem_Document_MathSettings:
+            case AscDFH.historyitem_Document_MathSettings:
             {
                 this.Settings.MathSettings.Read_FromBinary(Reader);
                 break;
@@ -14537,7 +14537,7 @@ CDocument.prototype =
     {
         if (true !== this.Api.isViewMode && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
         {
-            this.Create_NewHistoryPoint(historydescription_Document_AddTextFromTextBox);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AddTextFromTextBox);
 
             // Отключаем пересчет, включим перед последним добавлением. Поскольку,
             // у нас все добавляется в 1 параграф, так можно делать.
@@ -16081,7 +16081,7 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
         {
             if (false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
                 Math.Set_Align(Align);
                 this.Recalculate();
                 this.Document_UpdateInterfaceState();
@@ -16095,7 +16095,7 @@ CDocument.prototype.private_ToggleParagraphAlignByHotkey = function(Align)
         {
             if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties))
             {
-                this.Create_NewHistoryPoint(historydescription_Document_SetParagraphAlignHotKey);
+                this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphAlignHotKey);
                 this.Set_ParagraphAlign(ParaPr.Jc === Align ? (Align === align_Left ? AscCommon.align_Justify : align_Left) : Align);
                 this.Document_UpdateInterfaceState();
             }
@@ -16260,7 +16260,7 @@ CDocument.prototype.Update_ColumnsMarkupFromRuler = function(NewMarkup)
 
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_SetColumnsFromRuler);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetColumnsFromRuler);
 
         SectPr.Set_Columns_EqualWidth(NewMarkup.EqualWidth);
         SectPr.Set_PageMargins(NewMarkup.X, undefined, SectPr.Get_PageWidth() - NewMarkup.R, undefined);
@@ -16293,7 +16293,7 @@ CDocument.prototype.Set_ColumnsProps = function(ColumnsProps)
 
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_SetColumnsProps);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetColumnsProps);
 
         var EqualWidth = ColumnsProps.get_EqualWidth();
         SectPr.Set_Columns_EqualWidth(ColumnsProps.get_EqualWidth());
@@ -16402,7 +16402,7 @@ CDocument.prototype.Set_SectionProps = function(Props)
 
     if (SectPr && false === this.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_SetSectionProps);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetSectionProps);
 
         if (undefined !== Props.get_W() || undefined !== Props.get_H())
         {
@@ -16477,7 +16477,7 @@ CDocument.prototype.Set_MathProps = function(MathProps)
     var SelectedInfo = this.Get_SelectedElementsInfo();
     if (null !== SelectedInfo.Get_Math() && false === this.Document_Is_SelectionLocked(changestype_Paragraph_Content))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_SetMathProps);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetMathProps);
 
         var ParaMath  = SelectedInfo.Get_Math();
         ParaMath.Set_MenuProps(MathProps);

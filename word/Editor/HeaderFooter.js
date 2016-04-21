@@ -1063,7 +1063,7 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------    
     Get_ParentObject_or_DocumentPos : function()
     {
-        return { Type : historyrecalctype_HdrFtr, Data : this };
+        return { Type : AscDFH.historyitem_recalctype_HdrFtr, Data : this };
     },
 
     Refresh_RecalcData : function(Data)
@@ -1078,7 +1078,7 @@ CHeaderFooter.prototype =
         this.RecalcInfo.SectPr     = {};
         this.RecalcInfo.CurPage    = -1;
         
-        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this } );
+        History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_HdrFtr, Data : this } );
     },
     
     Refresh_RecalcData_BySection : function(SectPr)
@@ -1152,7 +1152,7 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_HdrFtr );
+        Writer.WriteLong( AscDFH.historyitem_type_HdrFtr );
 
         // String   : Id
         // Long     : Type
@@ -2074,7 +2074,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint(historydescription_Document_AddHeader);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
                     this.LogicDocument.Recalculate();
@@ -2093,7 +2093,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint(historydescription_Document_AddFooter);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
                     this.LogicDocument.Recalculate();

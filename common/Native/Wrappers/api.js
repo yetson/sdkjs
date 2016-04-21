@@ -2131,7 +2131,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             {
                 if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
                 {
-                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
                         this.WordControl.m_oLogicDocument.Table_AddCol(!_is_above);
                     else
@@ -2142,7 +2142,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
             {
                 if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
                 {
-                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_TableAddColumnLeft);
+                    this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_TableAddColumnLeft);
                     if (_is_add)
                         this.WordControl.m_oLogicDocument.Table_AddRow(!_is_above);
                     else
@@ -4477,7 +4477,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
         if(selectedObjectsByType.charts[0])
         {
             var chartSpace = selectedObjectsByType.charts[0];
-            if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== historyitem_type_StockChart)
+            if(chartSpace && chartSpace.chart && chartSpace.chart.plotArea && chartSpace.chart.plotArea.charts[0] && chartSpace.chart.plotArea.charts[0].getObjectType() !== AscDFH.historyitem_type_StockChart)
             {
                 if(chartSpace.chart.plotArea.charts[0].series.length !== 4)
                 {
@@ -5216,7 +5216,7 @@ CStylesPainter.prototype =
             var brdL = new CDocumentBorder();
             brdL.Set_FromObject(_brdL);
             brdL.Space = 0;
-            par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
+            par.Set_Border(brdL, AscDFH.historyitem_Paragraph_Borders_Left);
         }
 
         var _brdT = style.ParaPr.Brd.Top;
@@ -5225,7 +5225,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdT);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Top);
         }
 
         var _brdB = style.ParaPr.Brd.Bottom;
@@ -5234,7 +5234,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdB);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Bottom);
         }
 
         var _brdR = style.ParaPr.Brd.Right;
@@ -5243,7 +5243,7 @@ CStylesPainter.prototype =
             var brd = new CDocumentBorder();
             brd.Set_FromObject(_brdR);
             brd.Space = 0;
-            par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
+            par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Right);
         }
 
         var _ind = new CParaInd();
@@ -5504,7 +5504,7 @@ asc_docs_api.prototype.Call_Menu_Context_SelectAll = function()
 };
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
-    History.Create_NewPoint(historydescription_PasteNative);
+    History.Create_NewPoint(AscDFH.historydescription_PasteNative);
     callback();
 };
 /************************************************************************/

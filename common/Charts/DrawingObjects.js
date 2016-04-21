@@ -163,7 +163,7 @@ prot["asc_setSeries"] = prot.asc_setSeries;
 function asc_CChartBinary(chart) {
 
     this["binary"] = null;
-    if (chart && chart.getObjectType() === historyitem_type_ChartSpace)
+    if (chart && chart.getObjectType() === AscDFH.historyitem_type_ChartSpace)
     {
         var writer = new BinaryChartWriter(new CMemory(false)), pptx_writer;
         writer.WriteCT_ChartSpace(chart);
@@ -2918,7 +2918,7 @@ function DrawingObjects() {
         {
             var selected_objects = _this.controller.selection.groupSelection ? _this.controller.selection.groupSelection.selectedObjects : _this.controller.selectedObjects;
             var chart;
-            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+            if(selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace)
             {
                 chart = selected_objects[0];
             }
@@ -3019,7 +3019,7 @@ function DrawingObjects() {
                 var callbackCheck = function (result) {
                     if(result)
                     {
-                        History.Create_NewPoint(historydescription_ChartDrawingObjects);
+                        History.Create_NewPoint(AscDFH.historydescription_ChartDrawingObjects);
                         editChart(chart);
                         _this.showDrawingObjects(true);
                     }
@@ -3097,7 +3097,7 @@ function DrawingObjects() {
     _this.groupGraphicObjects = function() {
 
         if ( _this.controller.canGroup() ) {
-            _this.controller.checkSelectedObjectsAndCallback(_this.controller.createGroup, [], false, historydescription_Spreadsheet_CreateGroup);
+            _this.controller.checkSelectedObjectsAndCallback(_this.controller.createGroup, [], false, AscDFH.historydescription_Spreadsheet_CreateGroup);
             worksheet.setSelectionShape(true);
         }
     };
@@ -3618,10 +3618,10 @@ function DrawingObjects() {
         }
         if(selected_objects[0] )
         {
-            if(selected_objects[0].getObjectType() === historyitem_type_ChartSpace && selected_objects.length === 1)
+            if(selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace && selected_objects.length === 1)
                 return c_oAscSelectionType.RangeChart;
 
-            if(selected_objects[0].getObjectType() === historyitem_type_ImageShape)
+            if(selected_objects[0].getObjectType() === AscDFH.historyitem_type_ImageShape)
                 return c_oAscSelectionType.RangeImage;
 
             return c_oAscSelectionType.RangeShape;

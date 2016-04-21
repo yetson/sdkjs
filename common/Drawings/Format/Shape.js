@@ -658,11 +658,11 @@ CShape.prototype =
     },
 
     getObjectType: function () {
-        return historyitem_type_Shape;
+        return AscDFH.historyitem_type_Shape;
     },
 
     Write_ToBinary2: function (w) {
-        w.WriteLong(historyitem_type_Shape);
+        w.WriteLong(AscDFH.historyitem_type_Shape);
         w.WriteString2(this.Id);
     },
 
@@ -791,22 +791,22 @@ CShape.prototype =
     },
 
     setBDeleted: function (pr) {
-        History.Add(this, {Type: historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetBDeleted, oldPr: this.bDeleted, newPr: pr});
         this.bDeleted = pr;
     },
 
     setNvSpPr: function (pr) {
-        History.Add(this, {Type: historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetNvSpPr, oldPr: this.nvSpPr, newPr: pr});
         this.nvSpPr = pr;
     },
 
     setSpPr: function (spPr) {
-        History.Add(this, {Type: historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetSpPr, oldPr: this.spPr, newPr: spPr});
         this.spPr = spPr;
     },
 
     setStyle: function (style) {
-        History.Add(this, {Type: historyitem_ShapeSetStyle, oldPr: this.style, newPr: style});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetStyle, oldPr: this.style, newPr: style});
         this.style = style;
         var content = this.getDocContent();
 
@@ -819,13 +819,13 @@ CShape.prototype =
     },
 
     setTxBody: function (txBody) {
-        History.Add(this, {Type: historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetTxBody, oldPr: this.txBody, newPr: txBody});
         this.txBody = txBody;
     },
 
     setTextBoxContent: function (textBoxContent) {
         History.Add(this, {
-            Type: historyitem_ShapeSetTextBoxContent,
+            Type: AscDFH.historyitem_ShapeSetTextBoxContent,
             oldPr: this.textBoxContent,
             newPr: textBoxContent
         });
@@ -833,7 +833,7 @@ CShape.prototype =
     },
 
     setBodyPr: function (pr) {
-        History.Add(this, {Type: historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetBodyPr, oldPr: this.bodyPr, newPr: pr});
         this.bodyPr = pr;
         this.recalcInfo.recalcContent = true;
         this.recalcInfo.recalcTransformText = true;
@@ -912,7 +912,7 @@ CShape.prototype =
 
     setBFromSerialize: function(bVal)
     {
-        History.Add(this, {Type: historyitem_AutoShapes_SetBFromSerialize, oldPr: this.fromSerialize, newPr: bVal});
+        History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetBFromSerialize, oldPr: this.fromSerialize, newPr: bVal});
         this.fromSerialize = bVal;
     },
 
@@ -1055,12 +1055,12 @@ CShape.prototype =
     },
 
     setParent: function (parent) {
-        History.Add(this, {Type: historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetParent, oldPr: this.parent, newPr: parent});
         this.parent = parent;
     },
 
     setGroup: function (group) {
-        History.Add(this, {Type: historyitem_ShapeSetGroup, oldPr: this.group, newPr: group});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetGroup, oldPr: this.group, newPr: group});
         this.group = group;
     },
 
@@ -2103,7 +2103,7 @@ CShape.prototype =
     },
 
     setWordShape: function (pr) {
-        History.Add(this, {Type: historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeSetWordShape, oldPr: this.bWordShape, newPr: pr});
         this.bWordShape = pr;
     },
 
@@ -3396,7 +3396,7 @@ CShape.prototype =
             this.extX = oldExtX;
             this.extY = oldExtY;
             var from = this.drawingBase.from, to = this.drawingBase.to;
-            History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
+            History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors,
                 fromCol       : from.col,
                 fromColOff    : from.colOff,
                 fromRow       : from.row,
@@ -3430,7 +3430,7 @@ CShape.prototype =
     {
         if(this.drawingBase)
         {
-            History.Add(this, {Type: historyitem_AutoShapes_SetDrawingBaseCoors,
+            History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors,
                 fromCol:    fromCol,
                 fromColOff: fromColOff,
                 fromRow   : fromRow,
@@ -3660,7 +3660,7 @@ CShape.prototype =
 
     checkHitToBounds: function(x, y)
     {
-        if(this.parent  &&(this.getObjectType() === historyitem_type_ImageShape && this.parent.isShapeChild && this.parent.isShapeChild()
+        if(this.parent  &&(this.getObjectType() === AscDFH.historyitem_type_ImageShape && this.parent.isShapeChild && this.parent.isShapeChild()
             || this.parent.Get_ParentTextTransform  && this.parent.Get_ParentTextTransform()))
         {
             return true;
@@ -4874,12 +4874,12 @@ CShape.prototype =
     },
 
     hitInInnerArea: function (x, y) {
-        if ((this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
+        if ((this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_ChartSpace) || this.brush != null && this.brush.fill != null
             && this.brush.fill.type != c_oAscFill.FILL_TYPE_NOFILL && this.checkHitToBounds(x, y)) {
             var invert_transform = this.getInvertTransform();
             var x_t = invert_transform.TransformPointX(x, y);
             var y_t = invert_transform.TransformPointY(x, y);
-            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry) && this.spPr.geometry.pathLst.length > 0 && !(this.getObjectType && this.getObjectType() === historyitem_type_ChartSpace))
+            if (isRealObject(this.spPr) && isRealObject(this.spPr.geometry) && this.spPr.geometry.pathLst.length > 0 && !(this.getObjectType && this.getObjectType() === AscDFH.historyitem_type_ChartSpace))
                 return this.spPr.geometry.hitInInnerArea(this.getCanvasContext(), x_t, y_t);
             return x_t > 0 && x_t < this.extX && y_t > 0 && y_t < this.extY;
         }
@@ -4957,60 +4957,60 @@ CShape.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
             }
 
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 break;
             }
-            case historyitem_ShapeSetNvSpPr:
+            case AscDFH.historyitem_ShapeSetNvSpPr:
             {
                 break;
             }
-            case historyitem_ShapeSetSpPr:
+            case AscDFH.historyitem_ShapeSetSpPr:
             {
                 break;
             }
-            case historyitem_ShapeSetStyle:
+            case AscDFH.historyitem_ShapeSetStyle:
             {
                 break;
             }
-            case historyitem_ShapeSetTxBody:
+            case AscDFH.historyitem_ShapeSetTxBody:
             {
                 break;
             }
-            case historyitem_ShapeSetTextBoxContent:
+            case AscDFH.historyitem_ShapeSetTextBoxContent:
             {
                 break;
             }
-            case historyitem_ShapeSetParent:
+            case AscDFH.historyitem_ShapeSetParent:
             {
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case AscDFH.historyitem_ShapeSetGroup:
             {
                 break;
             }
-            case historyitem_ShapeSetBodyPr:
+            case AscDFH.historyitem_ShapeSetBodyPr:
             {
                 break;
             }
-            case historyitem_ShapeSetWordShape:
+            case AscDFH.historyitem_ShapeSetWordShape:
             {
                 break;
             }
@@ -5039,12 +5039,12 @@ CShape.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.oldPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -5063,38 +5063,38 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
 
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetNvSpPr:
+            case AscDFH.historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetSpPr:
+            case AscDFH.historyitem_ShapeSetSpPr:
             {
                 this.spPr = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetStyle:
+            case AscDFH.historyitem_ShapeSetStyle:
             {
                 this.style = data.oldPr;
 
@@ -5109,32 +5109,32 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeSetTxBody:
+            case AscDFH.historyitem_ShapeSetTxBody:
             {
                 this.txBody = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetTextBoxContent:
+            case AscDFH.historyitem_ShapeSetTextBoxContent:
             {
                 this.textBoxContent = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetParent:
+            case AscDFH.historyitem_ShapeSetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case AscDFH.historyitem_ShapeSetGroup:
             {
                 this.group = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetBodyPr:
+            case AscDFH.historyitem_ShapeSetBodyPr:
             {
                 this.bodyPr = data.oldPr;
                 break;
             }
-            case historyitem_ShapeSetWordShape:
+            case AscDFH.historyitem_ShapeSetWordShape:
             {
                 this.bWordShape = data.oldPr;
                 break;
@@ -5146,12 +5146,12 @@ CShape.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 this.fromSerialize = data.newPr;
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 if(this.drawingBase)
                 {
@@ -5170,37 +5170,37 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 this.worksheet = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 this.bDeleted = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetNvSpPr:
+            case AscDFH.historyitem_ShapeSetNvSpPr:
             {
                 this.nvSpPr = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetSpPr:
+            case AscDFH.historyitem_ShapeSetSpPr:
             {
                 this.spPr = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetStyle:
+            case AscDFH.historyitem_ShapeSetStyle:
             {
                 this.style = data.newPr;
                 var content = this.getDocContent();
@@ -5214,32 +5214,32 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeSetTxBody:
+            case AscDFH.historyitem_ShapeSetTxBody:
             {
                 this.txBody = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetTextBoxContent:
+            case AscDFH.historyitem_ShapeSetTextBoxContent:
             {
                 this.textBoxContent = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetParent:
+            case AscDFH.historyitem_ShapeSetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetGroup:
+            case AscDFH.historyitem_ShapeSetGroup:
             {
                 this.group = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetBodyPr:
+            case AscDFH.historyitem_ShapeSetBodyPr:
             {
                 this.bodyPr = data.newPr;
                 break;
             }
-            case historyitem_ShapeSetWordShape:
+            case AscDFH.historyitem_ShapeSetWordShape:
             {
                 this.bWordShape = data.newPr;
                 break;
@@ -5253,12 +5253,12 @@ CShape.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_AutoShapes_SetBFromSerialize:
+            case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_AutoShapes_SetDrawingBaseCoors:
+            case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
             {
                 writeDouble(w, data.fromCol   );
                 writeDouble(w, data.fromColOff);
@@ -5276,17 +5276,17 @@ CShape.prototype =
 
                 break;
             }
-            case historyitem_AutoShapes_RemoveFromDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
                 break;
             }
-            case historyitem_AutoShapes_AddToDrawingObjects:
+            case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
                 var Pos = data.UseArray ? data.PosArray[0] : data.Pos;
                 writeLong(w, Pos);
                 break;
             }
-            case historyitem_AutoShapes_SetWorksheet:
+            case AscDFH.historyitem_AutoShapes_SetWorksheet:
             {
                 writeBool(w, isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -5295,18 +5295,18 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeSetNvSpPr:
-            case historyitem_ShapeSetSpPr:
-            case historyitem_ShapeSetStyle:
-            case historyitem_ShapeSetTxBody:
-            case historyitem_ShapeSetTextBoxContent:
-            case historyitem_ShapeSetParent:
-            case historyitem_ShapeSetGroup:
+            case AscDFH.historyitem_ShapeSetNvSpPr:
+            case AscDFH.historyitem_ShapeSetSpPr:
+            case AscDFH.historyitem_ShapeSetStyle:
+            case AscDFH.historyitem_ShapeSetTxBody:
+            case AscDFH.historyitem_ShapeSetTextBoxContent:
+            case AscDFH.historyitem_ShapeSetParent:
+            case AscDFH.historyitem_ShapeSetGroup:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_ShapeSetBodyPr:
+            case AscDFH.historyitem_ShapeSetBodyPr:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -5315,9 +5315,9 @@ CShape.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeSetWordShape:
+            case AscDFH.historyitem_ShapeSetWordShape:
 
-            case historyitem_ShapeSetBDeleted:
+            case AscDFH.historyitem_ShapeSetBDeleted:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -5332,12 +5332,12 @@ CShape.prototype =
             var type = r.GetLong();
             switch (type)
             {
-                case historyitem_AutoShapes_SetBFromSerialize:
+                case AscDFH.historyitem_AutoShapes_SetBFromSerialize:
                 {
                     this.fromSerialize = readBool(r);
                     break;
                 }
-                case historyitem_AutoShapes_SetDrawingBaseCoors:
+                case AscDFH.historyitem_AutoShapes_SetDrawingBaseCoors:
                 {
                     if(this.drawingBase)
                     {
@@ -5358,12 +5358,12 @@ CShape.prototype =
                     }
                     break;
                 }
-                case historyitem_AutoShapes_RemoveFromDrawingObjects:
+                case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
                 {
                     deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                     break;
                 }
-                case historyitem_AutoShapes_AddToDrawingObjects:
+                case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
                 {
                     var pos = readLong(r);
                     if(this.worksheet)
@@ -5373,27 +5373,27 @@ CShape.prototype =
                     addToDrawings(this.worksheet, this, pos);
                     break;
                 }
-                case historyitem_AutoShapes_SetWorksheet:
+                case AscDFH.historyitem_AutoShapes_SetWorksheet:
                 {
                     ReadWBModel(this, r);
                     break;
                 }
-                case historyitem_ShapeSetBDeleted:
+                case AscDFH.historyitem_ShapeSetBDeleted:
                 {
                     this.bDeleted = readBool(r);
                     break;
                 }
-                case historyitem_ShapeSetNvSpPr:
+                case AscDFH.historyitem_ShapeSetNvSpPr:
                 {
                     this.nvSpPr = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetSpPr:
+                case AscDFH.historyitem_ShapeSetSpPr:
                 {
                     this.spPr = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetStyle:
+                case AscDFH.historyitem_ShapeSetStyle:
                 {
                     this.style = readObject(r);
                     var content = this.getDocContent();
@@ -5407,27 +5407,27 @@ CShape.prototype =
                     }
                     break;
                 }
-                case historyitem_ShapeSetTxBody:
+                case AscDFH.historyitem_ShapeSetTxBody:
                 {
                     this.txBody = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetTextBoxContent:
+                case AscDFH.historyitem_ShapeSetTextBoxContent:
                 {
                     this.textBoxContent = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetParent:
+                case AscDFH.historyitem_ShapeSetParent:
                 {
                     this.parent = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetGroup:
+                case AscDFH.historyitem_ShapeSetGroup:
                 {
                     this.group = readObject(r);
                     break;
                 }
-                case historyitem_ShapeSetBodyPr:
+                case AscDFH.historyitem_ShapeSetBodyPr:
                 {
                     if(r.GetBool())
                     {
@@ -5440,7 +5440,7 @@ CShape.prototype =
                     }
                     break;
                 }
-                case historyitem_ShapeSetWordShape:
+                case AscDFH.historyitem_ShapeSetWordShape:
                 {
                     this.bWordShape = readBool(r);
                     break;

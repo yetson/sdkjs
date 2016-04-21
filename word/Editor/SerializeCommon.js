@@ -901,7 +901,7 @@ function CPPTXContentWriter()
         this.BinaryFileWriter.StartRecord(1);
         switch(grObject.getObjectType())
         {
-            case historyitem_type_Shape:
+            case AscDFH.historyitem_type_Shape:
             {
                 if(grObject.bWordShape)
                 {
@@ -913,12 +913,12 @@ function CPPTXContentWriter()
                 }
                 break;
             }
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 this.WriteImage(grObject);
                 break;
             }
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 this.WriteGroup(grObject, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                 break;
@@ -1121,7 +1121,7 @@ function CPPTXContentWriter()
                 var elem = spTree[i];
                 switch(elem.getObjectType())
                 {
-                    case historyitem_type_Shape:
+                    case AscDFH.historyitem_type_Shape:
                     {
                         if(elem.bWordShape)
                         {
@@ -1133,17 +1133,17 @@ function CPPTXContentWriter()
                         }
                         break;
                     }
-                    case historyitem_type_ImageShape:
+                    case AscDFH.historyitem_type_ImageShape:
                     {
                         this.WriteImage(elem);
                         break;
                     }
-                    case historyitem_type_GroupShape:
+                    case AscDFH.historyitem_type_GroupShape:
                     {
                         this.WriteGroup(elem, Document, oMapCommentId, oNumIdMap, copyParams, saveParams);
                         break;
                     }
-                    case historyitem_type_ChartSpace:
+                    case AscDFH.historyitem_type_ChartSpace:
                     {
                         this.BinaryFileWriter.WriteChart(elem);
                         break;

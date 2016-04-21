@@ -407,7 +407,7 @@ Geometry.prototype=
 
     getObjectType: function()
     {
-        return historyitem_type_Geometry;
+        return AscDFH.historyitem_type_Geometry;
     },
 
     Write_ToBinary2: function(w)
@@ -481,19 +481,19 @@ Geometry.prototype=
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_GeometrySetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GeometrySetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setPreset: function(preset)
     {
-        History.Add(this, {Type: historyitem_GeometrySetPreset, oldPr: this.preset, newPr: preset});
+        History.Add(this, {Type: AscDFH.historyitem_GeometrySetPreset, oldPr: this.preset, newPr: preset});
         this.preset = preset;
     },
 
     AddAdj: function(name, formula, x, y, z)
     {
-        History.Add(this, {Type: historyitem_GeometryAddAdj, name:name, oldVal:this.gdLst[name], newVal:x, oldAvVal: this.avLst[name]});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddAdj, name:name, oldVal:this.gdLst[name], newVal:x, oldAvVal: this.avLst[name]});
         var dVal = parseInt(x);
         if(isNaN(dVal))
         {
@@ -521,7 +521,7 @@ Geometry.prototype=
 
     AddGuide: function(name, formula, x, y, z)
     {
-        History.Add(this, {Type: historyitem_GeometryAddGuide, name: name, formula: formula, x: x, y: y, z: z});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddGuide, name: name, formula: formula, x: x, y: y, z: z});
         this.gdLstInfo.push(
             {
                 name: name,
@@ -534,7 +534,7 @@ Geometry.prototype=
 
     AddCnx: function(ang, x, y)
     {
-        History.Add(this, {Type: historyitem_GeometryAddCnx, ang: ang, x: x, y: y});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddCnx, ang: ang, x: x, y: y});
         this.cnxLstInfo.push(
             {
                 ang:ang,
@@ -545,7 +545,7 @@ Geometry.prototype=
 
     AddHandleXY: function(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
     {
-        History.Add(this, {Type: historyitem_GeometryAddHandleXY,
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddHandleXY,
             gdRefX:gdRefX, minX:minX, maxX:maxX, gdRefY:gdRefY, minY:minY, maxY:maxY, posX:posX, posY:posY});
         this.ahXYLstInfo.push(
             {
@@ -564,7 +564,7 @@ Geometry.prototype=
 
     AddHandlePolar: function(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)
     {
-        History.Add(this, {Type: historyitem_GeometryAddHandlePolar,
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddHandlePolar,
             gdRefAng:gdRefAng, minAng:minAng, maxAng:maxAng, gdRefR:gdRefR, minR:minR, maxR:maxR, posX:posX, posY:posY});
         this.ahPolarLstInfo.push(
             {
@@ -583,7 +583,7 @@ Geometry.prototype=
 
     AddPath: function(pr)
     {
-        History.Add(this, {Type: historyitem_GeometryAddPath, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddPath, newPr: pr});
         this.pathLst.push(pr);
     },
 
@@ -637,7 +637,7 @@ Geometry.prototype=
 
     AddRect: function(l, t, r, b)
     {
-        History.Add(this, {Type: historyitem_GeometryAddRect, l: l, t: t, r: r, b: b});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddRect, l: l, t: t, r: r, b: b});
         this.rectS = {};
         this.rectS.l = l;
         this.rectS.t = t;
@@ -649,12 +649,12 @@ Geometry.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = data.oldVal;
                 this.avLst[data.name] = data.oldAvVal;
@@ -665,7 +665,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 for(var i = this.gdLstInfo.length - 1; i >-1; --i)
                 {
@@ -681,7 +681,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 for(var i = this.cnxLstInfo.length - 1; i >-1; --i)
                 {
@@ -695,7 +695,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 for(var i = this.ahXYLstInfo.length-1; i > -1; --i)
                 {
@@ -714,7 +714,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 for(var i = this.ahPolarLstInfo.length-1; i > -1; --i)
                 {
@@ -733,7 +733,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 for(var i = this.pathLst.length; i > -1; --i)
                 {
@@ -745,12 +745,12 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = null;
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 this.preset = data.oldPr;
                 break;
@@ -762,12 +762,12 @@ Geometry.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = parseInt(data.newVal);
                 this.avLst[data.name] = true;
@@ -777,17 +777,17 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 this.gdLstInfo.push({name: data.name, formula: data.formula, x: data.x, y: data.y, z: data.z});
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 this.cnxLstInfo.push({ang: data.ang, x: data.x, y: data.y});
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 this.ahXYLstInfo.push(
                     {gdRefX: data.gdRefX,
@@ -800,7 +800,7 @@ Geometry.prototype=
                     posY: data.posY});
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 this.ahPolarLstInfo.push(
                     {
@@ -816,17 +816,17 @@ Geometry.prototype=
                 );
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 this.pathLst.push(data.newPr);
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = {l: data.l, t: data.t, r: data.r, b: data.b};
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 this.preset = data.newPr;
                 break;
@@ -839,19 +839,19 @@ Geometry.prototype=
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 writeString(w, data.name);
                 writeString(w, data.newVal);
                 writeBool(w, data.oldAvVal);
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 writeString(w, data.name);
                 writeLong(w, data.formula);
@@ -860,14 +860,14 @@ Geometry.prototype=
                 writeString(w, data.z);
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 writeString(w, data.ang);
                 writeString(w, data.x);
                 writeString(w, data.y);
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 writeString(w, data.gdRefX);
                 writeString(w, data.minX);
@@ -879,7 +879,7 @@ Geometry.prototype=
                 writeString(w, data.posY);
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 writeString(w, data.gdRefAng);
                 writeString(w, data.minAng);
@@ -891,12 +891,12 @@ Geometry.prototype=
                 writeString(w, data.posY);
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 writeString(w, data.l);
                 writeString(w, data.t);
@@ -904,7 +904,7 @@ Geometry.prototype=
                 writeString(w, data.b);
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 writeString(w, data.newPr);
                 break;
@@ -917,12 +917,12 @@ Geometry.prototype=
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 var name = readString(r);
                 var val = readString(r);
@@ -941,7 +941,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 var name = readString(r);
                 var formula = readLong(r);
@@ -951,7 +951,7 @@ Geometry.prototype=
                 this.gdLstInfo.push({name: name, formula:formula, x: x, y: y, z: z});
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 var ang = readString(r);
                 var x = readString(r);
@@ -959,7 +959,7 @@ Geometry.prototype=
                 this.cnxLstInfo.push({ang: ang, x: x, y: y});
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 var gdRefX = readString(r);
                 var minX = readString(r);
@@ -972,7 +972,7 @@ Geometry.prototype=
                 this.ahXYLstInfo.push({gdRefX: gdRefX, minX: minX, maxX: maxX, gdRefY: gdRefY, minY: minY, maxY: maxY, posX:posX,posY: posY});
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 var gdRefAng = readString(r);
                 var minAng = readString(r);
@@ -995,12 +995,12 @@ Geometry.prototype=
                     });
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 this.pathLst.push(readObject(r));
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = {};
                 this.rectS.l = readString(r);
@@ -1009,7 +1009,7 @@ Geometry.prototype=
                 this.rectS.b = readString(r);
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 this.preset = readString(r);
                 break;

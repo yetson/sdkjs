@@ -1023,7 +1023,7 @@ CTableCell.prototype =
 
     Set_Pr : function(CellPr)
     {
-        History.Add( this, { Type : historyitem_TableCell_Pr, Old : this.Pr, New : CellPr } );
+        History.Add( this, { Type : AscDFH.historyitem_TableCell_Pr, Old : this.Pr, New : CellPr } );
         this.Pr = CellPr;
         this.Recalc_CompiledPr();
     },
@@ -1160,12 +1160,12 @@ CTableCell.prototype =
     {
         if ( undefined === CellW )
         {
-            History.Add( this, { Type : historyitem_TableCell_W, Old : this.Pr.TableCellW, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_W, Old : this.Pr.TableCellW, New : undefined } );
             this.Pr.TableCellW = undefined;
         }
         else
         {
-            History.Add( this, { Type : historyitem_TableCell_W, Old : this.Pr.TableCellW, New : CellW } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_W, Old : this.Pr.TableCellW, New : CellW } );
             this.Pr.TableCellW = CellW;
         }
 
@@ -1185,14 +1185,14 @@ CTableCell.prototype =
 
         if ( undefined === Value && undefined != this.Pr.GridSpan )
         {
-            History.Add( this, { Type : historyitem_TableCell_GridSpan, Old : this.Pr.GridSpan, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_GridSpan, Old : this.Pr.GridSpan, New : undefined } );
             this.Pr.GridSpan = undefined;
 
             this.Recalc_CompiledPr();
         }
         else if ( Value != this.Pr.GridSpan )
         {
-            History.Add( this, { Type : historyitem_TableCell_GridSpan, Old : ( undefined === this.Pr.GridSpan ? undefined : this.Pr.GridSpan ), New : Value } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_GridSpan, Old : ( undefined === this.Pr.GridSpan ? undefined : this.Pr.GridSpan ), New : Value } );
             this.Pr.GridSpan = Value;
 
             this.Recalc_CompiledPr();
@@ -1241,7 +1241,7 @@ CTableCell.prototype =
         {
             if ( undefined != this.Pr.TableCellMar )
             {
-                History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : undefined } );
+                History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : undefined } );
                 this.Pr.TableCellMar = undefined;
 
                 this.Recalc_CompiledPr();
@@ -1254,7 +1254,7 @@ CTableCell.prototype =
         {
             if ( null != this.Pr.TableCellMar )
             {
-                History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : null } );
+                History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : null } );
                 this.Pr.TableCellMar = null;
 
                 this.Recalc_CompiledPr();
@@ -1337,7 +1337,7 @@ CTableCell.prototype =
 
         if ( true === bNeedChange )
         {
-            History.Add( this, { Type : historyitem_TableCell_Margins, Old : OldValue, New : Margins_new } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_Margins, Old : OldValue, New : Margins_new } );
             this.Pr.TableCellMar = Margins_new;
 
             this.Recalc_CompiledPr();
@@ -1357,7 +1357,7 @@ CTableCell.prototype =
 
         if ( undefined === Shd )
         {
-            History.Add( this, { Type : historyitem_TableCell_Shd, Old : this.Pr.Shd, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_Shd, Old : this.Pr.Shd, New : undefined } );
             this.Pr.Shd = undefined;
 
             this.Recalc_CompiledPr();
@@ -1366,7 +1366,7 @@ CTableCell.prototype =
         {
             var _Shd = new CDocumentShd();
             _Shd.Set_FromObject( Shd );
-            History.Add( this, { Type : historyitem_TableCell_Shd, Old : ( undefined === this.Pr.Shd ? undefined : this.Pr.Shd ), New : _Shd } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_Shd, Old : ( undefined === this.Pr.Shd ? undefined : this.Pr.Shd ), New : _Shd } );
             this.Pr.Shd = _Shd;
 
             this.Recalc_CompiledPr();
@@ -1386,13 +1386,13 @@ CTableCell.prototype =
 
         if ( undefined === Value )
         {
-            History.Add( this, { Type : historyitem_TableCell_VMerge, Old : this.Pr.VMerge, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_VMerge, Old : this.Pr.VMerge, New : undefined } );
             this.Pr.VMerge = undefined;
             this.Recalc_CompiledPr();
         }
         else if ( Value != this.Pr.VMerge )
         {
-            History.Add( this, { Type : historyitem_TableCell_VMerge, Old : ( undefined === this.Pr.VMerge ? undefined : this.Pr.VMerge ), New : Value } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_VMerge, Old : ( undefined === this.Pr.VMerge ? undefined : this.Pr.VMerge ), New : Value } );
             this.Pr.VMerge = Value;
             this.Recalc_CompiledPr();
         }
@@ -1411,13 +1411,13 @@ CTableCell.prototype =
 
         if ( undefined === Value )
         {
-            History.Add( this, { Type : historyitem_TableCell_VAlign, Old : this.Pr.VAlign, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_VAlign, Old : this.Pr.VAlign, New : undefined } );
             this.Pr.VMerge = undefined;
             this.Recalc_CompiledPr();
         }
         else if ( Value != this.Pr.VAlign )
         {
-            History.Add( this, { Type : historyitem_TableCell_VAlign, Old : ( undefined === this.Pr.VAlign ? undefined : this.Pr.VAlign ), New : Value } );
+            History.Add( this, { Type : AscDFH.historyitem_TableCell_VAlign, Old : ( undefined === this.Pr.VAlign ? undefined : this.Pr.VAlign ), New : Value } );
             this.Pr.VAlign = Value;
             this.Recalc_CompiledPr();
         }
@@ -1432,7 +1432,7 @@ CTableCell.prototype =
     {
         if (this.Pr.NoWrap !== Value)
         {
-            History.Add(this, {Type : historyitem_TableCell_NoWrap, Old : this.Pr.NoWrap, New : Value});
+            History.Add(this, {Type : AscDFH.historyitem_TableCell_NoWrap, Old : this.Pr.NoWrap, New : Value});
             this.Pr.NoWrap = Value;
             this.Recalc_CompiledPr();
         }
@@ -1456,7 +1456,7 @@ CTableCell.prototype =
     {
         if (Value !== this.Pr.TextDirection)
         {
-            History.Add(this, {Type : historyitem_TableCell_TextDirection, Old : this.Pr.TextDirection, New : Value});
+            History.Add(this, {Type : AscDFH.historyitem_TableCell_TextDirection, Old : this.Pr.TextDirection, New : Value});
             this.Pr.TextDirection = Value;
             this.Recalc_CompiledPr();
         }
@@ -1574,13 +1574,13 @@ CTableCell.prototype =
     Set_Border : function(Border, Type)
     {
         var DstBorder   = this.Pr.TableCellBorders.Top;
-        var HistoryType = historyitem_TableCell_Border_Left;
+        var HistoryType = AscDFH.historyitem_TableCell_Border_Left;
         switch (Type)
         {
-            case 0 : DstBorder = this.Pr.TableCellBorders.Top;    HistoryType = historyitem_TableCell_Border_Top;    break;
-            case 1 : DstBorder = this.Pr.TableCellBorders.Right;  HistoryType = historyitem_TableCell_Border_Right;  break;
-            case 2 : DstBorder = this.Pr.TableCellBorders.Bottom; HistoryType = historyitem_TableCell_Border_Bottom; break;
-            case 3 : DstBorder = this.Pr.TableCellBorders.Left;   HistoryType = historyitem_TableCell_Border_Left;   break;
+            case 0 : DstBorder = this.Pr.TableCellBorders.Top;    HistoryType = AscDFH.historyitem_TableCell_Border_Top;    break;
+            case 1 : DstBorder = this.Pr.TableCellBorders.Right;  HistoryType = AscDFH.historyitem_TableCell_Border_Right;  break;
+            case 2 : DstBorder = this.Pr.TableCellBorders.Bottom; HistoryType = AscDFH.historyitem_TableCell_Border_Bottom; break;
+            case 3 : DstBorder = this.Pr.TableCellBorders.Left;   HistoryType = AscDFH.historyitem_TableCell_Border_Left;   break;
         }
 
         if ( undefined === Border )
@@ -1710,7 +1710,7 @@ CTableCell.prototype =
 
         switch ( Type )
         {
-            case historyitem_TableCell_GridSpan:
+            case AscDFH.historyitem_TableCell_GridSpan:
             {
                 if ( undefined === Data.Old )
                     this.Pr.GridSpan = undefined;
@@ -1721,7 +1721,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Margins:
+            case AscDFH.historyitem_TableCell_Margins:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellMar = undefined;
@@ -1732,7 +1732,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Shd:
+            case AscDFH.historyitem_TableCell_Shd:
             {
                 if ( undefined === Data.Old )
                     this.Pr.Shd = undefined;
@@ -1743,7 +1743,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VMerge:
+            case AscDFH.historyitem_TableCell_VMerge:
             {
                 if ( undefined === Data.Old )
                     this.Pr.VMerge = undefined;
@@ -1754,7 +1754,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Left:
+            case AscDFH.historyitem_TableCell_Border_Left:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellBorders.Left = undefined;
@@ -1765,7 +1765,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Right:
+            case AscDFH.historyitem_TableCell_Border_Right:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellBorders.Right = undefined;
@@ -1776,7 +1776,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Top:
+            case AscDFH.historyitem_TableCell_Border_Top:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellBorders.Top = undefined;
@@ -1787,7 +1787,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Bottom:
+            case AscDFH.historyitem_TableCell_Border_Bottom:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellBorders.Bottom = undefined;
@@ -1798,7 +1798,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VAlign:
+            case AscDFH.historyitem_TableCell_VAlign:
             {
                 if ( undefined === Data.Old )
                     this.Pr.VAlign = undefined;
@@ -1809,7 +1809,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_W:
+            case AscDFH.historyitem_TableCell_W:
             {
                 if ( undefined === Data.Old )
                     this.Pr.TableCellW = undefined;
@@ -1820,21 +1820,21 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Pr:
+            case AscDFH.historyitem_TableCell_Pr:
             {
                 this.Pr = Data.Old;
                 this.Recalc_CompiledPr();
                 break;
             }
 
-            case historyitem_TableCell_TextDirection:
+            case AscDFH.historyitem_TableCell_TextDirection:
             {
                 this.Pr.TextDirection = Data.Old;
                 this.Recalc_CompiledPr();
                 break;
             }
 
-            case historyitem_TableCell_NoWrap:
+            case AscDFH.historyitem_TableCell_NoWrap:
             {
                 this.Pr.NoWrap = Data.Old;
                 this.Recalc_CompiledPr();
@@ -1849,7 +1849,7 @@ CTableCell.prototype =
 
         switch ( Type )
         {
-            case historyitem_TableCell_GridSpan:
+            case AscDFH.historyitem_TableCell_GridSpan:
             {
                 if ( undefined === Data.New )
                     this.Pr.GridSpan = undefined;
@@ -1860,7 +1860,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Margins:
+            case AscDFH.historyitem_TableCell_Margins:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellMar = undefined;
@@ -1871,7 +1871,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Shd:
+            case AscDFH.historyitem_TableCell_Shd:
             {
                 if ( undefined === Data.New )
                     this.Pr.Shd = undefined;
@@ -1882,7 +1882,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VMerge:
+            case AscDFH.historyitem_TableCell_VMerge:
             {
                 if ( undefined === Data.New )
                     this.Pr.VMerge = undefined;
@@ -1893,7 +1893,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Left:
+            case AscDFH.historyitem_TableCell_Border_Left:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellBorders.Left = undefined;
@@ -1904,7 +1904,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Right:
+            case AscDFH.historyitem_TableCell_Border_Right:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellBorders.Right = undefined;
@@ -1915,7 +1915,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Top:
+            case AscDFH.historyitem_TableCell_Border_Top:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellBorders.Top = undefined;
@@ -1926,7 +1926,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Bottom:
+            case AscDFH.historyitem_TableCell_Border_Bottom:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellBorders.Bottom = undefined;
@@ -1937,7 +1937,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VAlign:
+            case AscDFH.historyitem_TableCell_VAlign:
             {
                 if ( undefined === Data.New )
                     this.Pr.VAlign = undefined;
@@ -1948,7 +1948,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_W:
+            case AscDFH.historyitem_TableCell_W:
             {
                 if ( undefined === Data.New )
                     this.Pr.TableCellW = undefined;
@@ -1959,19 +1959,19 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Pr:
+            case AscDFH.historyitem_TableCell_Pr:
             {
                 this.Pr = Data.New;
                 this.Recalc_CompiledPr();
                 break;
             }
-            case historyitem_TableCell_TextDirection:
+            case AscDFH.historyitem_TableCell_TextDirection:
             {
                 this.Pr.TextDirection = Data.New;
                 this.Recalc_CompiledPr();
                 break;
             }
-            case historyitem_TableCell_NoWrap:
+            case AscDFH.historyitem_TableCell_NoWrap:
             {
                 this.Pr.NoWrap = Data.New;
                 this.Recalc_CompiledPr();
@@ -1992,23 +1992,23 @@ CTableCell.prototype =
         var Type = Data.Type;
         switch ( Type )
         {
-            case historyitem_TableCell_GridSpan:
-            case historyitem_TableCell_Margins:
-            case historyitem_TableCell_VMerge:
-            case historyitem_TableCell_Border_Left:
-            case historyitem_TableCell_Border_Right:
-            case historyitem_TableCell_Border_Top:
-            case historyitem_TableCell_Border_Bottom:
-            case historyitem_TableCell_VAlign:
-            case historyitem_TableCell_W:
-            case historyitem_TableCell_Pr:
-            case historyitem_TableCell_TextDirection:
-            case historyitem_TableCell_NoWrap:
+            case AscDFH.historyitem_TableCell_GridSpan:
+            case AscDFH.historyitem_TableCell_Margins:
+            case AscDFH.historyitem_TableCell_VMerge:
+            case AscDFH.historyitem_TableCell_Border_Left:
+            case AscDFH.historyitem_TableCell_Border_Right:
+            case AscDFH.historyitem_TableCell_Border_Top:
+            case AscDFH.historyitem_TableCell_Border_Bottom:
+            case AscDFH.historyitem_TableCell_VAlign:
+            case AscDFH.historyitem_TableCell_W:
+            case AscDFH.historyitem_TableCell_Pr:
+            case AscDFH.historyitem_TableCell_TextDirection:
+            case AscDFH.historyitem_TableCell_NoWrap:
             {
                 bNeedRecalc = true;
                 break;
             }
-            case historyitem_TableCell_Shd:
+            case AscDFH.historyitem_TableCell_Shd:
             {
                 // Пересчитывать этот элемент не надо при таких изменениях
                 break;
@@ -2049,7 +2049,7 @@ CTableCell.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_TableCell );
+        Writer.WriteLong( AscDFH.historyitem_type_TableCell );
 
         var Type = Data.Type;
 
@@ -2058,7 +2058,7 @@ CTableCell.prototype =
 
         switch ( Type )
         {
-            case historyitem_TableCell_GridSpan:
+            case AscDFH.historyitem_TableCell_GridSpan:
             {
                 // Bool : Is undefined
                 // Если false
@@ -2075,7 +2075,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Margins:
+            case AscDFH.historyitem_TableCell_Margins:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2109,7 +2109,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Shd:
+            case AscDFH.historyitem_TableCell_Shd:
             {
                 // Bool : IsUndefined
                 // Если  false
@@ -2126,7 +2126,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VMerge:
+            case AscDFH.historyitem_TableCell_VMerge:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2144,10 +2144,10 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Left:
-            case historyitem_TableCell_Border_Right:
-            case historyitem_TableCell_Border_Top:
-            case historyitem_TableCell_Border_Bottom:
+            case AscDFH.historyitem_TableCell_Border_Left:
+            case AscDFH.historyitem_TableCell_Border_Right:
+            case AscDFH.historyitem_TableCell_Border_Top:
+            case AscDFH.historyitem_TableCell_Border_Bottom:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2173,7 +2173,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VAlign:
+            case AscDFH.historyitem_TableCell_VAlign:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2191,7 +2191,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_W:
+            case AscDFH.historyitem_TableCell_W:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2208,14 +2208,14 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Pr:
+            case AscDFH.historyitem_TableCell_Pr:
             {
                 // CTableCellPr
                 Data.New.Write_ToBinary( Writer );
                 break;
             }
 
-            case historyitem_TableCell_TextDirection:
+            case AscDFH.historyitem_TableCell_TextDirection:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2229,7 +2229,7 @@ CTableCell.prototype =
                 }
             }
 
-            case historyitem_TableCell_NoWrap:
+            case AscDFH.historyitem_TableCell_NoWrap:
             {
                 // Bool : IsUndefined
                 // false - > Bool : NoWrap
@@ -2262,14 +2262,14 @@ CTableCell.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_TableCell != ClassType )
+        if ( AscDFH.historyitem_type_TableCell != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_TableCell_GridSpan:
+            case AscDFH.historyitem_TableCell_GridSpan:
             {
                 // Bool : Is undefined
                 // Если false
@@ -2285,7 +2285,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Margins:
+            case AscDFH.historyitem_TableCell_Margins:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2329,7 +2329,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Shd:
+            case AscDFH.historyitem_TableCell_Shd:
             {
                 // Bool : IsUndefined
                 // Если  false
@@ -2348,7 +2348,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VMerge:
+            case AscDFH.historyitem_TableCell_VMerge:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2364,7 +2364,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Left:
+            case AscDFH.historyitem_TableCell_Border_Left:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2392,7 +2392,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Right:
+            case AscDFH.historyitem_TableCell_Border_Right:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2420,7 +2420,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Top:
+            case AscDFH.historyitem_TableCell_Border_Top:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2448,7 +2448,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Border_Bottom:
+            case AscDFH.historyitem_TableCell_Border_Bottom:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2476,7 +2476,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_VAlign:
+            case AscDFH.historyitem_TableCell_VAlign:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2492,7 +2492,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_W:
+            case AscDFH.historyitem_TableCell_W:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2510,7 +2510,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_Pr:
+            case AscDFH.historyitem_TableCell_Pr:
             {
                 // CTableCellPr
 
@@ -2521,7 +2521,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_TextDirection:
+            case AscDFH.historyitem_TableCell_TextDirection:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2535,7 +2535,7 @@ CTableCell.prototype =
                 break;
             }
 
-            case historyitem_TableCell_NoWrap:
+            case AscDFH.historyitem_TableCell_NoWrap:
             {
                 // Bool : IsUndefined
                 // false - > Bool : NoWrap
@@ -2553,7 +2553,7 @@ CTableCell.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_TableCell );
+        Writer.WriteLong( AscDFH.historyitem_type_TableCell );
 
         // String   : Id ячейки
         // Variable : TableCell.Pr

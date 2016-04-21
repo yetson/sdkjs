@@ -838,7 +838,7 @@ ParaTextPr.prototype =
         var OldValue = ( undefined != this.Value[Prop] ? this.Value[Prop] : undefined );
         this.Value[Prop] = Value;
 
-        History.Add( this, { Type : historyitem_TextPr_Change, Prop : Prop, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Change, Prop : Prop, New : Value, Old : OldValue } );
     },
 
     Delete_Prop : function(Prop)
@@ -850,7 +850,7 @@ ParaTextPr.prototype =
 
         this.Value[Prop] = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Change, Prop : Prop, New : null, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Change, Prop : Prop, New : null, Old : OldValue } );
     },
 
     Set_Bold : function(Value)
@@ -862,7 +862,7 @@ ParaTextPr.prototype =
         else
             this.Value.Bold = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Bold, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Bold, New : Value, Old : OldValue } );
     },
 
     Set_Italic : function(Value)
@@ -874,7 +874,7 @@ ParaTextPr.prototype =
         else
             this.Value.Italic = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Italic, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Italic, New : Value, Old : OldValue } );
     },
 
     Set_Strikeout : function(Value)
@@ -886,7 +886,7 @@ ParaTextPr.prototype =
         else
             this.Value.Strikeout = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Strikeout, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Strikeout, New : Value, Old : OldValue } );
     },
 
     Set_Underline : function(Value)
@@ -898,7 +898,7 @@ ParaTextPr.prototype =
         else
             this.Value.Underline = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Underline, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Underline, New : Value, Old : OldValue } );
     },
 
     Set_FontFamily : function(Value)
@@ -910,7 +910,7 @@ ParaTextPr.prototype =
         else
             this.Value.FontFamily = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_FontFamily, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_FontFamily, New : Value, Old : OldValue } );
     },
 
     Set_FontSize : function(Value)
@@ -922,7 +922,7 @@ ParaTextPr.prototype =
         else
             this.Value.FontSize = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_FontSize, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_FontSize, New : Value, Old : OldValue } );
     },
     
     Set_FontSizeCS : function(Value)
@@ -934,7 +934,7 @@ ParaTextPr.prototype =
         else
             this.Value.FontSizeCS = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_FontSizeCS, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_FontSizeCS, New : Value, Old : OldValue } );
     },
 
     Set_Color : function(Value)
@@ -946,7 +946,7 @@ ParaTextPr.prototype =
         else
             this.Value.Color = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Color, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Color, New : Value, Old : OldValue } );
     },
 
     Set_VertAlign : function(Value)
@@ -958,7 +958,7 @@ ParaTextPr.prototype =
         else
             this.Value.VertAlign = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_VertAlign, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_VertAlign, New : Value, Old : OldValue } );
     },
 
     Set_HighLight : function(Value)
@@ -970,7 +970,7 @@ ParaTextPr.prototype =
         else
             this.Value.HighLight = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_HighLight, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_HighLight, New : Value, Old : OldValue } );
     },
 
     Set_RStyle : function(Value)
@@ -982,7 +982,7 @@ ParaTextPr.prototype =
         else
             this.Value.RStyle = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RStyle, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RStyle, New : Value, Old : OldValue } );
     },
 
     Set_Spacing : function(Value)
@@ -994,7 +994,7 @@ ParaTextPr.prototype =
         else
             this.Value.Spacing = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Spacing, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Spacing, New : Value, Old : OldValue } );
     },
 
     Set_DStrikeout : function(Value)
@@ -1006,7 +1006,7 @@ ParaTextPr.prototype =
         else
             this.Value.DStrikeout = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_DStrikeout, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_DStrikeout, New : Value, Old : OldValue } );
     },
 
     Set_Caps : function(Value)
@@ -1018,7 +1018,7 @@ ParaTextPr.prototype =
         else
             this.Value.Caps = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Caps, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Caps, New : Value, Old : OldValue } );
     },
 
     Set_SmallCaps : function(Value)
@@ -1030,7 +1030,7 @@ ParaTextPr.prototype =
         else
             this.Value.SmallCaps = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_SmallCaps, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_SmallCaps, New : Value, Old : OldValue } );
     },
 
     Set_Position : function(Value)
@@ -1042,7 +1042,7 @@ ParaTextPr.prototype =
         else
             this.Value.Position = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Position, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Position, New : Value, Old : OldValue } );
     },
 
     Set_Value : function(Value)
@@ -1050,7 +1050,7 @@ ParaTextPr.prototype =
         var OldValue = this.Value;
         this.Value = Value;
 
-        History.Add( this, { Type : historyitem_TextPr_Value, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Value, New : Value, Old : OldValue } );
     },
 
     Set_RFonts : function(Value)
@@ -1061,7 +1061,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts = new CRFonts();
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts, New : Value, Old : OldValue } );
     },
 
     Set_RFonts2 : function(RFonts)
@@ -1094,7 +1094,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts.Ascii = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts_Ascii, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts_Ascii, New : Value, Old : OldValue } );
     },
 
     Set_RFonts_HAnsi : function(Value)
@@ -1106,7 +1106,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts.HAnsi = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts_HAnsi, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts_HAnsi, New : Value, Old : OldValue } );
     },
 
     Set_RFonts_CS : function(Value)
@@ -1118,7 +1118,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts.CS = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts_CS, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts_CS, New : Value, Old : OldValue } );
     },
 
     Set_RFonts_EastAsia : function(Value)
@@ -1130,7 +1130,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts.EastAsia = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts_EastAsia, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts_EastAsia, New : Value, Old : OldValue } );
     },
 
     Set_RFonts_Hint : function(Value)
@@ -1142,7 +1142,7 @@ ParaTextPr.prototype =
         else
             this.Value.RFonts.Hint = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_RFonts_Hint, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_RFonts_Hint, New : Value, Old : OldValue } );
     },
 
     Set_Lang : function(Value)
@@ -1155,7 +1155,7 @@ ParaTextPr.prototype =
 
         this.Value.Lang = NewValue;
 
-        History.Add( this, { Type : historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Lang, New : NewValue, Old : OldValue } );
     },
 
     Set_Lang_Bidi : function(Value)
@@ -1167,7 +1167,7 @@ ParaTextPr.prototype =
         else
             this.Value.Lang.Bidi = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Lang_Bidi, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Lang_Bidi, New : Value, Old : OldValue } );
     },
 
     Set_Lang_EastAsia : function(Value)
@@ -1179,7 +1179,7 @@ ParaTextPr.prototype =
         else
             this.Value.Lang.EastAsia = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Lang_EastAsia, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Lang_EastAsia, New : Value, Old : OldValue } );
     },
 
     Set_Lang_Val : function(Value)
@@ -1191,7 +1191,7 @@ ParaTextPr.prototype =
         else
             this.Value.Lang.Val = undefined;
 
-        History.Add( this, { Type : historyitem_TextPr_Lang_Val, New : Value, Old : OldValue } );
+        History.Add( this, { Type : AscDFH.historyitem_TextPr_Lang_Val, New : Value, Old : OldValue } );
     },
 
 
@@ -1203,7 +1203,7 @@ ParaTextPr.prototype =
             this.Value.Unifill = Value;
         else
             this.Value.Unifill = undefined;
-        History.Add(this, {Type: historyitem_TextPr_Unifill, New: Value, Old: OldValue});
+        History.Add(this, {Type: AscDFH.historyitem_TextPr_Unifill, New: Value, Old: OldValue});
     },
 
     Set_TextOutline : function(Value)
@@ -1214,7 +1214,7 @@ ParaTextPr.prototype =
             this.Value.TextOutline = Value;
         else
             this.Value.TextOutline = undefined;
-        History.Add(this, {Type: historyitem_TextPr_Outline, New: Value, Old: OldValue});
+        History.Add(this, {Type: AscDFH.historyitem_TextPr_Outline, New: Value, Old: OldValue});
     },
 
     Set_TextFill : function(Value)
@@ -1225,7 +1225,7 @@ ParaTextPr.prototype =
             this.Value.TextFill = Value;
         else
             this.Value.TextFill = undefined;
-        History.Add(this, {Type: historyitem_TextPr_Fill, New: Value, Old: OldValue});
+        History.Add(this, {Type: AscDFH.historyitem_TextPr_Fill, New: Value, Old: OldValue});
     },
 //-----------------------------------------------------------------------------------
 // Undo/Redo функции
@@ -1236,7 +1236,7 @@ ParaTextPr.prototype =
 
         switch ( Type )
         {
-            case historyitem_TextPr_Change:
+            case AscDFH.historyitem_TextPr_Change:
             {
                 if ( undefined != Data.Old )
                     this.Value[Data.Prop] = Data.Old;
@@ -1246,7 +1246,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Bold:
+            case AscDFH.historyitem_TextPr_Bold:
             {
                 if ( undefined != Data.Old )
                     this.Value.Bold = Data.Old;
@@ -1256,7 +1256,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Italic:
+            case AscDFH.historyitem_TextPr_Italic:
             {
                 if ( undefined != Data.Old )
                     this.Value.Italic = Data.Old;
@@ -1266,7 +1266,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Strikeout:
+            case AscDFH.historyitem_TextPr_Strikeout:
             {
                 if ( undefined != Data.Old )
                     this.Value.Strikeout = Data.Old;
@@ -1276,7 +1276,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Underline:
+            case AscDFH.historyitem_TextPr_Underline:
             {
                 if ( undefined != Data.Old )
                     this.Value.Underline = Data.Old;
@@ -1286,7 +1286,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontFamily:
+            case AscDFH.historyitem_TextPr_FontFamily:
             {
                 if ( undefined != Data.Old )
                     this.Value.FontFamily = Data.Old;
@@ -1296,7 +1296,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSize:
+            case AscDFH.historyitem_TextPr_FontSize:
             {
                 if ( undefined != Data.Old )
                     this.Value.FontSize = Data.Old;
@@ -1306,7 +1306,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSizeCS:
+            case AscDFH.historyitem_TextPr_FontSizeCS:
             {
                 if ( undefined != Data.Old )
                     this.Value.FontSizeCS = Data.Old;
@@ -1316,7 +1316,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Color:
+            case AscDFH.historyitem_TextPr_Color:
             {
                 if ( undefined != Data.Old )
                     this.Value.Color = Data.Old;
@@ -1326,7 +1326,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_VertAlign:
+            case AscDFH.historyitem_TextPr_VertAlign:
             {
                 if ( undefined != Data.Old )
                     this.Value.VertAlign = Data.Old;
@@ -1336,7 +1336,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_HighLight:
+            case AscDFH.historyitem_TextPr_HighLight:
             {
                 if ( undefined != Data.Old )
                     this.Value.HighLight = Data.Old;
@@ -1346,7 +1346,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RStyle:
+            case AscDFH.historyitem_TextPr_RStyle:
             {
                 if ( undefined != Data.Old )
                     this.Value.RStyle = Data.Old;
@@ -1356,7 +1356,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Spacing:
+            case AscDFH.historyitem_TextPr_Spacing:
             {
                 if ( undefined != Data.Old )
                     this.Value.Spacing = Data.Old;
@@ -1365,7 +1365,7 @@ ParaTextPr.prototype =
 
                 break;
             }
-            case historyitem_TextPr_DStrikeout:
+            case AscDFH.historyitem_TextPr_DStrikeout:
             {
                 if ( undefined != Data.Old )
                     this.Value.DStrikeout = Data.Old;
@@ -1374,7 +1374,7 @@ ParaTextPr.prototype =
 
                 break;
             }
-            case historyitem_TextPr_Caps:
+            case AscDFH.historyitem_TextPr_Caps:
             {
                 if ( undefined != Data.Old )
                     this.Value.Caps = Data.Old;
@@ -1383,7 +1383,7 @@ ParaTextPr.prototype =
 
                 break;
             }
-            case historyitem_TextPr_SmallCaps:
+            case AscDFH.historyitem_TextPr_SmallCaps:
             {
                 if ( undefined != Data.Old )
                     this.Value.SmallCaps = Data.Old;
@@ -1393,7 +1393,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Position:
+            case AscDFH.historyitem_TextPr_Position:
             {
                 if ( undefined != Data.Old )
                     this.Value.Position = Data.Old;
@@ -1403,14 +1403,14 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Value:
+            case AscDFH.historyitem_TextPr_Value:
             {
                 this.Value = Data.Old;
 
                 break;
             }
 
-            case historyitem_TextPr_RFonts:
+            case AscDFH.historyitem_TextPr_RFonts:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts = Data.Old;
@@ -1420,7 +1420,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang:
+            case AscDFH.historyitem_TextPr_Lang:
             {
                 if ( undefined != Data.Old )
                     this.Value.Lang = Data.Old;
@@ -1430,7 +1430,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Ascii:
+            case AscDFH.historyitem_TextPr_RFonts_Ascii:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts.Ascii = Data.Old;
@@ -1439,7 +1439,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_HAnsi:
+            case AscDFH.historyitem_TextPr_RFonts_HAnsi:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts.Ascii = Data.Old;
@@ -1448,7 +1448,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_CS:
+            case AscDFH.historyitem_TextPr_RFonts_CS:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts.Ascii = Data.Old;
@@ -1457,7 +1457,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_EastAsia:
+            case AscDFH.historyitem_TextPr_RFonts_EastAsia:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts.Ascii = Data.Old;
@@ -1466,7 +1466,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Hint:
+            case AscDFH.historyitem_TextPr_RFonts_Hint:
             {
                 if ( undefined != Data.Old )
                     this.Value.RFonts.Ascii = Data.Old;
@@ -1475,7 +1475,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Bidi:
+            case AscDFH.historyitem_TextPr_Lang_Bidi:
             {
                 if ( undefined != Data.Old )
                     this.Value.Lang.Bidi = Data.Old;
@@ -1485,7 +1485,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_EastAsia:
+            case AscDFH.historyitem_TextPr_Lang_EastAsia:
             {
                 if ( undefined != Data.Old )
                     this.Value.Lang.EastAsia = Data.Old;
@@ -1495,7 +1495,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Val:
+            case AscDFH.historyitem_TextPr_Lang_Val:
             {
                 if ( undefined != Data.Old )
                     this.Value.Lang.Val = Data.Old;
@@ -1505,7 +1505,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Unifill:
+            case AscDFH.historyitem_TextPr_Unifill:
             {
                 if ( undefined != Data.Old )
                     this.Value.Unifill = Data.Old;
@@ -1513,7 +1513,7 @@ ParaTextPr.prototype =
                     this.Value.Unifill = undefined;
                 break;
             }
-            case historyitem_TextPr_Outline:
+            case AscDFH.historyitem_TextPr_Outline:
             {
                 if ( undefined != Data.Old )
                     this.Value.TextOutline = Data.Old;
@@ -1521,7 +1521,7 @@ ParaTextPr.prototype =
                     this.Value.TextOutline = undefined;
                 break;
             }
-            case historyitem_TextPr_Fill:
+            case AscDFH.historyitem_TextPr_Fill:
             {
                 if ( undefined != Data.Old )
                     this.Value.TextFill = Data.Old;
@@ -1539,7 +1539,7 @@ ParaTextPr.prototype =
         switch ( Type )
         {
 
-            case historyitem_TextPr_Change:
+            case AscDFH.historyitem_TextPr_Change:
             {
                 if ( undefined != Data.New )
                     this.Value[Data.Prop] = Data.New;
@@ -1549,7 +1549,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Bold:
+            case AscDFH.historyitem_TextPr_Bold:
             {
                 if ( undefined != Data.New )
                     this.Value.Bold = Data.New;
@@ -1559,7 +1559,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Italic:
+            case AscDFH.historyitem_TextPr_Italic:
             {
                 if ( undefined != Data.New )
                     this.Value.Italic = Data.New;
@@ -1569,7 +1569,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Strikeout:
+            case AscDFH.historyitem_TextPr_Strikeout:
             {
                 if ( undefined != Data.New )
                     this.Value.Strikeout = Data.New;
@@ -1579,7 +1579,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Underline:
+            case AscDFH.historyitem_TextPr_Underline:
             {
                 if ( undefined != Data.New )
                     this.Value.Underline = Data.New;
@@ -1589,7 +1589,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontFamily:
+            case AscDFH.historyitem_TextPr_FontFamily:
             {
                 if ( undefined != Data.New )
                     this.Value.FontFamily = Data.New;
@@ -1599,7 +1599,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSize:
+            case AscDFH.historyitem_TextPr_FontSize:
             {
                 if ( undefined != Data.New )
                     this.Value.FontSize = Data.New;
@@ -1609,7 +1609,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSizeCS:
+            case AscDFH.historyitem_TextPr_FontSizeCS:
             {
                 if ( undefined != Data.New )
                     this.Value.FontSizeCS = Data.New;
@@ -1619,7 +1619,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Color:
+            case AscDFH.historyitem_TextPr_Color:
             {
                 if ( undefined != Data.New )
                     this.Value.Color = Data.New;
@@ -1629,7 +1629,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_VertAlign:
+            case AscDFH.historyitem_TextPr_VertAlign:
             {
                 if ( undefined != Data.New )
                     this.Value.VertAlign = Data.New;
@@ -1639,7 +1639,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_HighLight:
+            case AscDFH.historyitem_TextPr_HighLight:
             {
                 if ( undefined != Data.New )
                     this.Value.HighLight = Data.New;
@@ -1649,7 +1649,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RStyle:
+            case AscDFH.historyitem_TextPr_RStyle:
             {
                 if ( undefined != Data.New )
                     this.Value.RStyle = Data.New;
@@ -1659,7 +1659,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Spacing:
+            case AscDFH.historyitem_TextPr_Spacing:
             {
                 if ( undefined != Data.New )
                     this.Value.Spacing = Data.New;
@@ -1669,7 +1669,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_DStrikeout:
+            case AscDFH.historyitem_TextPr_DStrikeout:
             {
                 if ( undefined != Data.New )
                     this.Value.DStrikeout = Data.New;
@@ -1679,7 +1679,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Caps:
+            case AscDFH.historyitem_TextPr_Caps:
             {
                 if ( undefined != Data.New )
                     this.Value.Caps = Data.New;
@@ -1689,7 +1689,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_SmallCaps:
+            case AscDFH.historyitem_TextPr_SmallCaps:
             {
                 if ( undefined != Data.New )
                     this.Value.SmallCaps = Data.New;
@@ -1699,7 +1699,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Position:
+            case AscDFH.historyitem_TextPr_Position:
             {
                 if ( undefined != Data.New )
                     this.Value.Position = Data.New;
@@ -1709,14 +1709,14 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Value:
+            case AscDFH.historyitem_TextPr_Value:
             {
                 this.Value = Data.New;
 
                 break;
             }
 
-            case historyitem_TextPr_RFonts:
+            case AscDFH.historyitem_TextPr_RFonts:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts = Data.New;
@@ -1726,7 +1726,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang:
+            case AscDFH.historyitem_TextPr_Lang:
             {
                 if ( undefined != Data.New )
                     this.Value.Lang = Data.New;
@@ -1736,7 +1736,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Ascii:
+            case AscDFH.historyitem_TextPr_RFonts_Ascii:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts.Ascii = Data.New;
@@ -1746,7 +1746,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_HAnsi:
+            case AscDFH.historyitem_TextPr_RFonts_HAnsi:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts.Ascii = Data.New;
@@ -1756,7 +1756,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_CS:
+            case AscDFH.historyitem_TextPr_RFonts_CS:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts.Ascii = Data.New;
@@ -1766,7 +1766,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_EastAsia:
+            case AscDFH.historyitem_TextPr_RFonts_EastAsia:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts.Ascii = Data.New;
@@ -1776,7 +1776,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Hint:
+            case AscDFH.historyitem_TextPr_RFonts_Hint:
             {
                 if ( undefined != Data.New )
                     this.Value.RFonts.Ascii = Data.New;
@@ -1786,7 +1786,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Bidi:
+            case AscDFH.historyitem_TextPr_Lang_Bidi:
             {
                 if ( undefined != Data.New )
                     this.Value.Lang.Bidi = Data.New;
@@ -1796,7 +1796,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_EastAsia:
+            case AscDFH.historyitem_TextPr_Lang_EastAsia:
             {
                 if ( undefined != Data.New )
                     this.Value.Lang.EastAsia = Data.New;
@@ -1806,7 +1806,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Val:
+            case AscDFH.historyitem_TextPr_Lang_Val:
             {
                 if ( undefined != Data.New )
                     this.Value.Lang.Val = Data.New;
@@ -1815,7 +1815,7 @@ ParaTextPr.prototype =
 
                 break;
             }
-            case historyitem_TextPr_Unifill:
+            case AscDFH.historyitem_TextPr_Unifill:
             {
                 if ( undefined != Data.New )
                     this.Value.Unifill = Data.New;
@@ -1824,7 +1824,7 @@ ParaTextPr.prototype =
 
                 break;
             }
-            case historyitem_TextPr_Outline:
+            case AscDFH.historyitem_TextPr_Outline:
             {
                 if ( undefined != Data.New )
                     this.Value.TextOutline = Data.New;
@@ -1832,7 +1832,7 @@ ParaTextPr.prototype =
                     this.Value.TextOutline = undefined;
                 break;
             }
-            case historyitem_TextPr_Fill:
+            case AscDFH.historyitem_TextPr_Fill:
             {
                 if ( undefined != Data.New )
                     this.Value.TextFill = Data.New;
@@ -1868,7 +1868,7 @@ ParaTextPr.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_TextPr );
+        Writer.WriteLong( AscDFH.historyitem_type_TextPr );
 
         // Long   : Type
         // String : Id
@@ -1894,7 +1894,7 @@ ParaTextPr.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_TextPr );
+        Writer.WriteLong( AscDFH.historyitem_type_TextPr );
 
         var Type = Data.Type;
 
@@ -1903,7 +1903,7 @@ ParaTextPr.prototype =
 
         switch ( Type )
         {
-            case historyitem_TextPr_Change:
+            case AscDFH.historyitem_TextPr_Change:
             {
                 // Variable : TextPr
 
@@ -1914,10 +1914,10 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Bold:
-            case historyitem_TextPr_Italic:
-            case historyitem_TextPr_Strikeout:
-            case historyitem_TextPr_Underline:
+            case AscDFH.historyitem_TextPr_Bold:
+            case AscDFH.historyitem_TextPr_Italic:
+            case AscDFH.historyitem_TextPr_Strikeout:
+            case AscDFH.historyitem_TextPr_Underline:
             {
                 // Bool : IsUndefined
                 // Bool : Value
@@ -1933,7 +1933,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontFamily:
+            case AscDFH.historyitem_TextPr_FontFamily:
             {
                 // Bool   : IsUndefined
                 // String : FontName
@@ -1949,8 +1949,8 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSize:
-            case historyitem_TextPr_FontSizeCS:
+            case AscDFH.historyitem_TextPr_FontSize:
+            case AscDFH.historyitem_TextPr_FontSizeCS:
             {
                 // Bool   : IsUndefined
                 // Double : FontSize
@@ -1966,10 +1966,10 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Color:
-            case historyitem_TextPr_Unifill:
-            case historyitem_TextPr_Outline:
-            case historyitem_TextPr_Fill   :
+            case AscDFH.historyitem_TextPr_Color:
+            case AscDFH.historyitem_TextPr_Unifill:
+            case AscDFH.historyitem_TextPr_Outline:
+            case AscDFH.historyitem_TextPr_Fill   :
             {
                 // Bool     : IsUndefined
                 // Variable : Color (CDocumentColor)
@@ -1985,7 +1985,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_VertAlign:
+            case AscDFH.historyitem_TextPr_VertAlign:
             {
                 // Bool  : IsUndefined
                 // Long  : VertAlign
@@ -2001,7 +2001,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_HighLight:
+            case AscDFH.historyitem_TextPr_HighLight:
             {
                 // Bool  : IsUndefined
                 // Если false
@@ -2026,7 +2026,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RStyle:
+            case AscDFH.historyitem_TextPr_RStyle:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2043,8 +2043,8 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Spacing:
-            case historyitem_TextPr_Position:
+            case AscDFH.historyitem_TextPr_Spacing:
+            case AscDFH.historyitem_TextPr_Position:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2061,9 +2061,9 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_DStrikeout:
-            case historyitem_TextPr_Caps:
-            case historyitem_TextPr_SmallCaps:
+            case AscDFH.historyitem_TextPr_DStrikeout:
+            case AscDFH.historyitem_TextPr_Caps:
+            case AscDFH.historyitem_TextPr_SmallCaps:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2080,7 +2080,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Value:
+            case AscDFH.historyitem_TextPr_Value:
             {
                 // CTextPr
                 Data.New.Write_ToBinary(Writer);
@@ -2088,7 +2088,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts:
+            case AscDFH.historyitem_TextPr_RFonts:
             {
                 // Bool : undefined ?
                 // false -> CRFonts
@@ -2103,7 +2103,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang:
+            case AscDFH.historyitem_TextPr_Lang:
             {
                 // Bool : undefined ?
                 // false -> CLang
@@ -2118,10 +2118,10 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Ascii:
-            case historyitem_TextPr_RFonts_HAnsi:
-            case historyitem_TextPr_RFonts_CS:
-            case historyitem_TextPr_RFonts_EastAsia:
+            case AscDFH.historyitem_TextPr_RFonts_Ascii:
+            case AscDFH.historyitem_TextPr_RFonts_HAnsi:
+            case AscDFH.historyitem_TextPr_RFonts_CS:
+            case AscDFH.historyitem_TextPr_RFonts_EastAsia:
             {
                 // Bool : undefined?
                 // false -> String
@@ -2137,7 +2137,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Hint:
+            case AscDFH.historyitem_TextPr_RFonts_Hint:
             {
                 // Bool : undefined?
                 // false -> Long
@@ -2153,9 +2153,9 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Bidi:
-            case historyitem_TextPr_Lang_EastAsia:
-            case historyitem_TextPr_Lang_Val:
+            case AscDFH.historyitem_TextPr_Lang_Bidi:
+            case AscDFH.historyitem_TextPr_Lang_EastAsia:
+            case AscDFH.historyitem_TextPr_Lang_Val:
             {
                 // Bool : undefined ?
                 // false -> Long
@@ -2181,14 +2181,14 @@ ParaTextPr.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_TextPr != ClassType )
+        if ( AscDFH.historyitem_type_TextPr != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_TextPr_Change:
+            case AscDFH.historyitem_TextPr_Change:
             {
                 // Variable : TextPr
 
@@ -2199,7 +2199,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Bold:
+            case AscDFH.historyitem_TextPr_Bold:
             {
                 // Bool : IsUndefined
                 // Bool : Bold
@@ -2212,7 +2212,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Italic:
+            case AscDFH.historyitem_TextPr_Italic:
             {
                 // Bool : IsUndefined
                 // Bool : Italic
@@ -2225,7 +2225,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Strikeout:
+            case AscDFH.historyitem_TextPr_Strikeout:
             {
                 // Bool : IsUndefined
                 // Bool : Strikeout
@@ -2238,7 +2238,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Underline:
+            case AscDFH.historyitem_TextPr_Underline:
             {
                 // Bool   : IsUndefined?
                 // Bool   : Underline
@@ -2251,7 +2251,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontFamily:
+            case AscDFH.historyitem_TextPr_FontFamily:
             {
                 // Bool   : IsUndefined
                 // String : FontName
@@ -2270,7 +2270,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSize:
+            case AscDFH.historyitem_TextPr_FontSize:
             {
                 // Bool   : IsUndefined
                 // Double : FontSize
@@ -2283,7 +2283,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_FontSizeCS:
+            case AscDFH.historyitem_TextPr_FontSizeCS:
             {
                 // Bool   : IsUndefined
                 // Double : FontSize
@@ -2296,7 +2296,7 @@ ParaTextPr.prototype =
                 break;
             }                
 
-            case historyitem_TextPr_Color:
+            case AscDFH.historyitem_TextPr_Color:
             {
                 // Bool     : IsUndefined
                 // Variable : Color (CDocumentColor)
@@ -2314,7 +2314,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Unifill:
+            case AscDFH.historyitem_TextPr_Unifill:
             {
                 if ( true != Reader.GetBool() )
                 {
@@ -2334,7 +2334,7 @@ ParaTextPr.prototype =
                     this.Value.Unifill = undefined;
                 break;
             }
-            case historyitem_TextPr_Fill:
+            case AscDFH.historyitem_TextPr_Fill:
             {
                 if ( true != Reader.GetBool() )
                 {
@@ -2346,7 +2346,7 @@ ParaTextPr.prototype =
                     this.Value.TextFill = undefined;
                 break;
             }
-            case historyitem_TextPr_Outline:
+            case AscDFH.historyitem_TextPr_Outline:
             {
                 if ( true != Reader.GetBool() )
                 {
@@ -2359,7 +2359,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_VertAlign:
+            case AscDFH.historyitem_TextPr_VertAlign:
             {
                 // Bool  : IsUndefined
                 // Long  : VertAlign
@@ -2372,7 +2372,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_HighLight:
+            case AscDFH.historyitem_TextPr_HighLight:
             {
                 // Bool  : IsUndefined
                 // Если false
@@ -2396,7 +2396,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RStyle:
+            case AscDFH.historyitem_TextPr_RStyle:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2410,7 +2410,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Spacing:
+            case AscDFH.historyitem_TextPr_Spacing:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2424,7 +2424,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_DStrikeout:
+            case AscDFH.historyitem_TextPr_DStrikeout:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2438,7 +2438,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Caps:
+            case AscDFH.historyitem_TextPr_Caps:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2452,7 +2452,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_SmallCaps:
+            case AscDFH.historyitem_TextPr_SmallCaps:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2466,7 +2466,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Position:
+            case AscDFH.historyitem_TextPr_Position:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -2480,7 +2480,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Value:
+            case AscDFH.historyitem_TextPr_Value:
             {
                 // CTextPr
                 this.Value = new CTextPr();
@@ -2489,7 +2489,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts:
+            case AscDFH.historyitem_TextPr_RFonts:
             {
                 // Bool : undefined ?
                 // false -> CRFonts
@@ -2504,7 +2504,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang:
+            case AscDFH.historyitem_TextPr_Lang:
             {
                 // Bool : undefined ?
                 // false -> Lang
@@ -2519,7 +2519,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Ascii:
+            case AscDFH.historyitem_TextPr_RFonts_Ascii:
             {
                 // Bool : undefined ?
                 // false -> String
@@ -2537,7 +2537,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_HAnsi:
+            case AscDFH.historyitem_TextPr_RFonts_HAnsi:
             {
                 // Bool : undefined ?
                 // false -> String
@@ -2555,7 +2555,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_CS:
+            case AscDFH.historyitem_TextPr_RFonts_CS:
             {
                 // Bool : undefined ?
                 // false -> String
@@ -2573,7 +2573,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_EastAsia:
+            case AscDFH.historyitem_TextPr_RFonts_EastAsia:
             {
                 // Bool : undefined ?
                 // false -> String
@@ -2591,7 +2591,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_RFonts_Hint:
+            case AscDFH.historyitem_TextPr_RFonts_Hint:
             {
                 // Bool : undefined ?
                 // false -> Long
@@ -2603,7 +2603,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Bidi:
+            case AscDFH.historyitem_TextPr_Lang_Bidi:
             {
                 // Bool : undefined ?
                 // false -> Long
@@ -2616,7 +2616,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_EastAsia:
+            case AscDFH.historyitem_TextPr_Lang_EastAsia:
             {
                 // Bool : undefined ?
                 // false -> Long
@@ -2629,7 +2629,7 @@ ParaTextPr.prototype =
                 break;
             }
 
-            case historyitem_TextPr_Lang_Val:
+            case AscDFH.historyitem_TextPr_Lang_Val:
             {
                 // Bool : undefined ?
                 // false -> Long
@@ -4455,14 +4455,14 @@ ParaDrawing.prototype =
 
     SetSizeRelH : function(oSize)
     {
-        History.Add(this, {Type: historyitem_Drawing_SetSizeRelH, Old: this.SizeRelH, New: oSize});
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetSizeRelH, Old: this.SizeRelH, New: oSize});
         this.SizeRelH = oSize;
     },
 
 
     SetSizeRelV : function(oSize)
     {
-        History.Add(this, {Type: historyitem_Drawing_SetSizeRelV, Old: this.SizeRelV, New: oSize});
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetSizeRelV, Old: this.SizeRelV, New: oSize});
         this.SizeRelV = oSize;
     },
 
@@ -4798,7 +4798,7 @@ ParaDrawing.prototype =
 
     Set_GraphicObject: function(graphicObject)
     {
-        var data = {Type: historyitem_Drawing_SetGraphicObject};
+        var data = {Type: AscDFH.historyitem_Drawing_SetGraphicObject};
         if(isRealObject(this.GraphicObj))
         {
             data.oldId = this.GraphicObj.Get_Id();
@@ -4842,7 +4842,7 @@ ParaDrawing.prototype =
 
     Set_Parent : function(oParent)
     {
-        History.Add(this, {Type: historyitem_Drawing_SetParent, oldPr: this.Parent, newPr: oParent});
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetParent, oldPr: this.Parent, newPr: oParent});
         this.Parent = oParent;
     },
 
@@ -5031,7 +5031,7 @@ ParaDrawing.prototype =
 
     Set_DrawingType : function(DrawingType)
     {
-        History.Add( this, { Type : historyitem_Drawing_DrawingType, New : DrawingType, Old : this.DrawingType } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_DrawingType, New : DrawingType, Old : this.DrawingType } );
         this.DrawingType = DrawingType;
         /*if(typeof this.graphicObjects.curState.updateAnchorPos === "function")
          this.graphicObjects.curState.updateAnchorPos();      */
@@ -5040,14 +5040,14 @@ ParaDrawing.prototype =
 
     Set_WrappingType : function(WrapType)
     {
-        History.Add( this, { Type : historyitem_Drawing_WrappingType, New : WrapType, Old : this.wrappingType } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_WrappingType, New : WrapType, Old : this.wrappingType } );
         this.wrappingType = WrapType;
 
     },
 
     Set_BehindDoc : function(BehindDoc)
     {
-        History.Add( this, { Type : historyitem_Drawing_BehindDoc, New : BehindDoc, Old : this.behindDoc } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_BehindDoc, New : BehindDoc, Old : this.behindDoc } );
         this.behindDoc = BehindDoc;
     },
 
@@ -5071,7 +5071,7 @@ ParaDrawing.prototype =
             B = oDistance.B;
         }
 
-        History.Add( this, { Type : historyitem_Drawing_Distance, Old : { Left : this.Distance.L, Top : this.Distance.T, Right : this.Distance.R, Bottom : this.Distance.B }, New : { Left : L, Top : T, Right : R, Bottom : B } } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_Distance, Old : { Left : this.Distance.L, Top : this.Distance.T, Right : this.Distance.R, Bottom : this.Distance.B }, New : { Left : L, Top : T, Right : R, Bottom : B } } );
         this.Distance.L = L;
         this.Distance.R = R;
         this.Distance.T = T;
@@ -5083,7 +5083,7 @@ ParaDrawing.prototype =
         if (this.LayoutInCell === LayoutInCell)
             return;
 
-        History.Add(this, {Type : historyitem_Drawing_LayoutInCell, Old : this.LayoutInCell, New : LayoutInCell});
+        History.Add(this, {Type : AscDFH.historyitem_Drawing_LayoutInCell, Old : this.LayoutInCell, New : LayoutInCell});
         this.LayoutInCell = LayoutInCell;
     },
 
@@ -5100,13 +5100,13 @@ ParaDrawing.prototype =
 
     Set_AllowOverlap : function(AllowOverlap)
     {
-        History.Add( this, { Type : historyitem_Drawing_AllowOverlap, Old : this.AllowOverlap, New : AllowOverlap } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_AllowOverlap, Old : this.AllowOverlap, New : AllowOverlap } );
         this.AllowOverlap = AllowOverlap;
     },
 
     Set_PositionH : function(RelativeFrom, Align, Value, Percent)
     {
-        History.Add( this, { Type : historyitem_Drawing_PositionH, Old : { RelativeFrom : this.PositionH.RelativeFrom, Align : this.PositionH.Align, Value : this.PositionH.Value, Percent : this.PositionH.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_PositionH, Old : { RelativeFrom : this.PositionH.RelativeFrom, Align : this.PositionH.Align, Value : this.PositionH.Value, Percent : this.PositionH.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
         this.PositionH.RelativeFrom = RelativeFrom;
         this.PositionH.Align        = Align;
         this.PositionH.Value        = Value;
@@ -5115,7 +5115,7 @@ ParaDrawing.prototype =
 
     Set_PositionV : function(RelativeFrom, Align, Value, Percent)
     {
-        History.Add( this, { Type : historyitem_Drawing_PositionV, Old : { RelativeFrom : this.PositionV.RelativeFrom, Align : this.PositionV.Align, Value : this.PositionV.Value, Percent : this.PositionV.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
+        History.Add( this, { Type : AscDFH.historyitem_Drawing_PositionV, Old : { RelativeFrom : this.PositionV.RelativeFrom, Align : this.PositionV.Align, Value : this.PositionV.Value, Percent : this.PositionV.Percent }, New : { RelativeFrom : RelativeFrom, Align : Align, Value : Value, Percent : Percent }  } );
         this.PositionV.RelativeFrom = RelativeFrom;
         this.PositionV.Align        = Align;
         this.PositionV.Value        = Value;
@@ -5124,13 +5124,13 @@ ParaDrawing.prototype =
 
     Set_Locked : function(bLocked)
     {
-        History.Add(this, {Type: historyitem_Drawing_SetLocked, OldPr: this.Locked, NewPr: bLocked });
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetLocked, OldPr: this.Locked, NewPr: bLocked });
         this.Locked = bLocked;
     },
 
     Set_RelativeHeight : function(nRelativeHeight)
     {
-        History.Add(this, {Type: historyitem_Drawing_SetRelativeHeight, OldPr: this.RelativeHeight, NewPr: nRelativeHeight});
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetRelativeHeight, OldPr: this.RelativeHeight, NewPr: nRelativeHeight});
         this.Set_RelativeHeight2(nRelativeHeight);
     },
 
@@ -5389,17 +5389,17 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_SetSizeRelH:
+            case AscDFH.historyitem_Drawing_SetSizeRelH:
             {
                 this.SizeRelH = Data.Old;
                 break;
             }
-            case historyitem_Drawing_SetSizeRelV:
+            case AscDFH.historyitem_Drawing_SetSizeRelV:
             {
                 this.SizeRelV = Data.Old;
                 break;
             }
-            case historyitem_Drawing_SetEffectExtent:
+            case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.OldEE.L;
                 this.EffectExtent.T = Data.OldEE.T;
@@ -5407,12 +5407,12 @@ ParaDrawing.prototype =
                 this.EffectExtent.B = Data.OldEE.B;
                 break;
             }
-            case historyitem_Drawing_SetRelativeHeight:
+            case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(Data.OldPr);
                 break;
             }
-            case historyitem_Drawing_DrawingType:
+            case AscDFH.historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.Old;
                 if(Data.Old === WRAPPING_TYPE_TIGHT || Data.Old === WRAPPING_TYPE_THROUGH)
@@ -5425,14 +5425,14 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_WrappingType:
+            case AscDFH.historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.Old;
                 //this.updateWidthHeight();
                 break;
             }
 
-            case historyitem_Drawing_Distance:
+            case AscDFH.historyitem_Drawing_Distance:
             {
                 this.Distance.L = Data.Old.Left;
                 this.Distance.T = Data.Old.Top;
@@ -5443,19 +5443,19 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_LayoutInCell:
+            case AscDFH.historyitem_Drawing_LayoutInCell:
             {
                 this.LayoutInCell = Data.Old;
                 break;
             }
 
-            case historyitem_Drawing_AllowOverlap:
+            case AscDFH.historyitem_Drawing_AllowOverlap:
             {
                 this.AllowOverlap = Data.Old;
                 break;
             }
 
-            case historyitem_Drawing_PositionH:
+            case AscDFH.historyitem_Drawing_PositionH:
             {
                 this.PositionH.RelativeFrom = Data.Old.RelativeFrom;
                 this.PositionH.Align        = Data.Old.Align;
@@ -5465,7 +5465,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_PositionV:
+            case AscDFH.historyitem_Drawing_PositionV:
             {
                 this.PositionV.RelativeFrom = Data.Old.RelativeFrom;
                 this.PositionV.Align        = Data.Old.Align;
@@ -5474,7 +5474,7 @@ ParaDrawing.prototype =
 
                 break;
             }
-            case historyitem_Drawing_BehindDoc:
+            case AscDFH.historyitem_Drawing_BehindDoc:
             {
                 this.behindDoc = Data.Old;
 
@@ -5482,7 +5482,7 @@ ParaDrawing.prototype =
             }
 
 
-            case historyitem_Drawing_SetGraphicObject:
+            case AscDFH.historyitem_Drawing_SetGraphicObject:
             {
                 if(this.GraphicObj != null)
                 {
@@ -5504,35 +5504,35 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_SetSimplePos:
+            case AscDFH.historyitem_SetSimplePos:
             {
                 this.SimplePos.Use = Data.oldUse;
                 this.SimplePos.X = Data.oldX;
                 this.SimplePos.Y = Data.oldY;
                 break;
             }
-            case historyitem_SetExtent:
+            case AscDFH.historyitem_SetExtent:
             {
                 this.Extent.W = Data.oldW;
                 this.Extent.H = Data.oldH;
                 break;
             }
-            case historyitem_SetWrapPolygon:
+            case AscDFH.historyitem_SetWrapPolygon:
             {
                 this.wrappingPolygon = Data.oldW;
                 break;
             }
-            case historyitem_Drawing_SetLocked:
+            case AscDFH.historyitem_Drawing_SetLocked:
             {
                 this.Locked = Data.OldPr;
                 break;
             }
-            case historyitem_Drawing_SetParent:
+            case AscDFH.historyitem_Drawing_SetParent:
             {
                 this.Parent = Data.oldPr;
                 break;
             }
-            case historyitem_Drawing_SetParaMath:
+            case AscDFH.historyitem_Drawing_SetParaMath:
             {
                 this.ParaMath = Data.Old;
                 break;
@@ -5546,17 +5546,17 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_SetSizeRelH:
+            case AscDFH.historyitem_Drawing_SetSizeRelH:
             {
                 this.SizeRelH = Data.New;
                 break;
             }
-            case historyitem_Drawing_SetSizeRelV:
+            case AscDFH.historyitem_Drawing_SetSizeRelV:
             {
                 this.SizeRelV = Data.New;
                 break;
             }
-            case historyitem_Drawing_SetEffectExtent:
+            case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = Data.NewEE.L;
                 this.EffectExtent.T = Data.NewEE.T;
@@ -5564,19 +5564,19 @@ ParaDrawing.prototype =
                 this.EffectExtent.B = Data.NewEE.B;
                 break;
             }
-            case historyitem_Drawing_SetRelativeHeight:
+            case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(Data.NewPr);
                 break;
             }
 
-            case historyitem_Drawing_DrawingType:
+            case AscDFH.historyitem_Drawing_DrawingType:
             {
                 this.DrawingType = Data.New;
                 break;
             }
 
-            case historyitem_Drawing_WrappingType:
+            case AscDFH.historyitem_Drawing_WrappingType:
             {
                 this.wrappingType = Data.New;
                 if(Data.New === WRAPPING_TYPE_TIGHT || Data.New === WRAPPING_TYPE_THROUGH)
@@ -5589,7 +5589,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_Distance:
+            case AscDFH.historyitem_Drawing_Distance:
             {
                 this.Distance.L = Data.New.Left;
                 this.Distance.T = Data.New.Top;
@@ -5599,19 +5599,19 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_LayoutInCell:
+            case AscDFH.historyitem_Drawing_LayoutInCell:
             {
                 this.LayoutInCell = Data.New;
                 break;
             }
 
-            case historyitem_Drawing_AllowOverlap :
+            case AscDFH.historyitem_Drawing_AllowOverlap :
             {
                 this.AllowOverlap = Data.New;
                 break;
             }
 
-            case historyitem_Drawing_PositionH:
+            case AscDFH.historyitem_Drawing_PositionH:
             {
                 this.PositionH.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionH.Align        = Data.New.Align;
@@ -5620,7 +5620,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_PositionV:
+            case AscDFH.historyitem_Drawing_PositionV:
             {
                 this.PositionV.RelativeFrom = Data.New.RelativeFrom;
                 this.PositionV.Align        = Data.New.Align;
@@ -5629,13 +5629,13 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_BehindDoc:
+            case AscDFH.historyitem_Drawing_BehindDoc:
             {
                 this.behindDoc = Data.New;
                 break;
             }
 
-            case historyitem_Drawing_SetGraphicObject:
+            case AscDFH.historyitem_Drawing_SetGraphicObject:
             {
 
                 if(Data.newId != null)
@@ -5655,7 +5655,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_SetSimplePos:
+            case AscDFH.historyitem_SetSimplePos:
             {
                 this.SimplePos.Use = Data.newUse;
                 this.SimplePos.X = Data.newX;
@@ -5663,30 +5663,30 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_SetExtent:
+            case AscDFH.historyitem_SetExtent:
             {
                 this.Extent.W = Data.newW;
                 this.Extent.H = Data.newH;
                 break;
             }
 
-            case historyitem_SetWrapPolygon:
+            case AscDFH.historyitem_SetWrapPolygon:
             {
                 this.wrappingPolygon = Data.newW;
                 break;
             }
 
-            case historyitem_Drawing_SetLocked:
+            case AscDFH.historyitem_Drawing_SetLocked:
             {
                 this.Locked = Data.NewPr;
                 break;
             }
-            case historyitem_Drawing_SetParent:
+            case AscDFH.historyitem_Drawing_SetParent:
             {
                 this.Parent = Data.newPr;
                 break;
             }
-            case historyitem_Drawing_SetParaMath:
+            case AscDFH.historyitem_Drawing_SetParaMath:
             {
                 this.ParaMath = Data.New;
                 break;
@@ -5709,7 +5709,7 @@ ParaDrawing.prototype =
             {
                 switch(Data.Type)
                 {
-                    case historyitem_Drawing_Distance:
+                    case AscDFH.historyitem_Drawing_Distance:
                     {
                         if( this.GraphicObj)
                         {
@@ -5719,7 +5719,7 @@ ParaDrawing.prototype =
                         break;
                     }
 
-                    case historyitem_SetExtent:
+                    case AscDFH.historyitem_SetExtent:
                     {
                         var Run = this.Parent.Get_DrawingObjectRun( this.Id );
                         if(Run)
@@ -5729,8 +5729,8 @@ ParaDrawing.prototype =
                         break;
                     }
 
-                    case historyitem_Drawing_SetSizeRelH:
-                    case historyitem_Drawing_SetSizeRelV:
+                    case AscDFH.historyitem_Drawing_SetSizeRelH:
+                    case AscDFH.historyitem_Drawing_SetSizeRelV:
                     {
                         if( this.GraphicObj)
                         {
@@ -5744,7 +5744,7 @@ ParaDrawing.prototype =
                         }
                         break;
                     }
-                    case historyitem_Drawing_WrappingType:
+                    case AscDFH.historyitem_Drawing_WrappingType:
                     {
                         if(this.GraphicObj)
                         {
@@ -5753,7 +5753,7 @@ ParaDrawing.prototype =
                         }
                         break;
                     }
-                    case historyitem_Drawing_SetRelativeHeight:
+                    case AscDFH.historyitem_Drawing_SetRelativeHeight:
                     {
                         //TODO
                         break;
@@ -5954,7 +5954,7 @@ ParaDrawing.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Drawing );
+        Writer.WriteLong( AscDFH.historyitem_type_Drawing );
 
         var Type = Data.Type;
 
@@ -5963,8 +5963,8 @@ ParaDrawing.prototype =
 
         switch ( Type )
         {
-            case historyitem_Drawing_SetSizeRelH:
-            case historyitem_Drawing_SetSizeRelV:
+            case AscDFH.historyitem_Drawing_SetSizeRelH:
+            case AscDFH.historyitem_Drawing_SetSizeRelV:
             {
                 if(Data.New)
                 {
@@ -5978,7 +5978,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_Drawing_SetEffectExtent:
+            case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
                 writeDouble(Writer, Data.NewEE.L);
                 writeDouble(Writer, Data.NewEE.T);
@@ -5986,26 +5986,26 @@ ParaDrawing.prototype =
                 writeDouble(Writer, Data.NewEE.B);
                 break;
             }
-            case historyitem_Drawing_SetRelativeHeight:
+            case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
                 writeLong(Writer, Data.NewPr);
                 break;
             }
-            case historyitem_Drawing_DrawingType:
+            case AscDFH.historyitem_Drawing_DrawingType:
             {
                 // Long : тип обтекания
                 Writer.WriteLong( Data.New );
                 break;
             }
 
-            case historyitem_Drawing_WrappingType:
+            case AscDFH.historyitem_Drawing_WrappingType:
             {
                 // Long : тип обтекания
                 Writer.WriteLong( Data.New );
                 break;
             }
 
-            case historyitem_Drawing_Distance:
+            case AscDFH.historyitem_Drawing_Distance:
             {
                 // Double : Left
                 // Double : Top
@@ -6020,22 +6020,22 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_LayoutInCell:
+            case AscDFH.historyitem_Drawing_LayoutInCell:
             {
                 // Bool : LayoutInCell
                 Writer.WriteBool(Data.New);
                 break;
             }
 
-            case historyitem_Drawing_AllowOverlap:
+            case AscDFH.historyitem_Drawing_AllowOverlap:
             {
                 // Bool : AllowOverlap
                 Writer.WriteBool( Data.New );
                 break;
             }
 
-            case historyitem_Drawing_PositionH:
-            case historyitem_Drawing_PositionV:
+            case AscDFH.historyitem_Drawing_PositionH:
+            case AscDFH.historyitem_Drawing_PositionV:
             {
                 // Long : RelativeFrom
                 // Bool : Align
@@ -6054,7 +6054,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_BehindDoc:
+            case AscDFH.historyitem_Drawing_BehindDoc:
             {
                 // Bool
                 Writer.WriteBool( Data.New );
@@ -6062,7 +6062,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_SetGraphicObject:
+            case AscDFH.historyitem_Drawing_SetGraphicObject:
             {
                 Writer.WriteBool(Data.newId != null);
                 if(Data.newId != null)
@@ -6071,7 +6071,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case  historyitem_SetSimplePos:
+            case  AscDFH.historyitem_SetSimplePos:
             {
                 Writer.WriteBool(Data.newUse);
                 Writer.WriteBool(typeof Data.newX === "number");
@@ -6086,7 +6086,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_SetExtent:
+            case AscDFH.historyitem_SetExtent:
             {
                 Writer.WriteBool(typeof Data.newW === "number");
                 if(typeof Data.newW === "number")
@@ -6100,7 +6100,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_SetWrapPolygon:
+            case AscDFH.historyitem_SetWrapPolygon:
             {
                 writeObject(Writer, Data.newW);
                // Writer.WriteBool(Data.newW !== null && typeof Data.newW === "object");
@@ -6110,18 +6110,18 @@ ParaDrawing.prototype =
                // }
                 break;
             }
-            case historyitem_Drawing_SetLocked:
+            case AscDFH.historyitem_Drawing_SetLocked:
             {
                 writeBool(Writer, Data.NewPr);
                 break;
             }
 
-            case historyitem_Drawing_SetParent:
+            case AscDFH.historyitem_Drawing_SetParent:
             {
                 writeObject(Writer, Data.newPr);
                 break;
             }
-            case historyitem_Drawing_SetParaMath:
+            case AscDFH.historyitem_Drawing_SetParaMath:
             {
                 // Bool    : isUndefined
                 // String2 : ParaMath.Id
@@ -6150,14 +6150,14 @@ ParaDrawing.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Drawing != ClassType )
+        if ( AscDFH.historyitem_type_Drawing != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case historyitem_Drawing_SetSizeRelH:
+            case AscDFH.historyitem_Drawing_SetSizeRelH:
             {
                 if(Reader.GetBool())
                 {
@@ -6171,7 +6171,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_Drawing_SetSizeRelV:
+            case AscDFH.historyitem_Drawing_SetSizeRelV:
             {
                 if(Reader.GetBool())
                 {
@@ -6185,7 +6185,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_Drawing_SetEffectExtent:
+            case AscDFH.historyitem_Drawing_SetEffectExtent:
             {
                 this.EffectExtent.L = readDouble(Reader);
                 this.EffectExtent.T = readDouble(Reader);
@@ -6193,12 +6193,12 @@ ParaDrawing.prototype =
                 this.EffectExtent.B = readDouble(Reader);
                 break;
             }
-            case historyitem_Drawing_SetRelativeHeight:
+            case AscDFH.historyitem_Drawing_SetRelativeHeight:
             {
                 this.Set_RelativeHeight2(readLong(Reader));
                 break;
             }
-            case historyitem_Drawing_DrawingType:
+            case AscDFH.historyitem_Drawing_DrawingType:
             {
                 // Long : тип обтекания
                 this.DrawingType = Reader.GetLong();
@@ -6206,14 +6206,14 @@ ParaDrawing.prototype =
             }
 
 
-            case historyitem_Drawing_WrappingType:
+            case AscDFH.historyitem_Drawing_WrappingType:
             {
                 // Long : тип обтекания
                 this.wrappingType = Reader.GetLong();
                 break;
             }
 
-            case historyitem_Drawing_Distance:
+            case AscDFH.historyitem_Drawing_Distance:
             {
                 // Double : Left
                 // Double : Top
@@ -6229,21 +6229,21 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_LayoutInCell:
+            case AscDFH.historyitem_Drawing_LayoutInCell:
             {
                 // Bool : LayoutInCell
                 this.LayoutInCell = Reader.GetBool();
                 break;
             }
 
-            case historyitem_Drawing_AllowOverlap:
+            case AscDFH.historyitem_Drawing_AllowOverlap:
             {
                 // Bool : AllowOverlap
                 this.AllowOverlap = Reader.GetBool();
                 break;
             }
 
-            case historyitem_Drawing_PositionH:
+            case AscDFH.historyitem_Drawing_PositionH:
             {
                 // Long : RelativeFrom
                 // Bool : Align
@@ -6263,7 +6263,7 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_PositionV:
+            case AscDFH.historyitem_Drawing_PositionV:
             {
                 // Long : RelativeFrom
                 // Bool : Align
@@ -6283,14 +6283,14 @@ ParaDrawing.prototype =
                 break;
             }
 
-            case historyitem_Drawing_BehindDoc:
+            case AscDFH.historyitem_Drawing_BehindDoc:
             {
                 // Bool
                 this.behindDoc = Reader.GetBool();
                 break;
             }
 
-            case historyitem_Drawing_SetGraphicObject:
+            case AscDFH.historyitem_Drawing_SetGraphicObject:
             {
                 if(Reader.GetBool())
                 {
@@ -6306,7 +6306,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case  historyitem_SetSimplePos:
+            case  AscDFH.historyitem_SetSimplePos:
             {
                 this.SimplePos.Use = Reader.GetBool();
                 if(Reader.GetBool())
@@ -6319,7 +6319,7 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case  historyitem_SetExtent:
+            case  AscDFH.historyitem_SetExtent:
             {
                 if(Reader.GetBool())
                 {
@@ -6340,23 +6340,23 @@ ParaDrawing.prototype =
                 }
                 break;
             }
-            case historyitem_SetWrapPolygon:
+            case AscDFH.historyitem_SetWrapPolygon:
             {
                 this.wrappingPolygon = readObject(Reader);
                 break;
             }
-            case historyitem_Drawing_SetLocked:
+            case AscDFH.historyitem_Drawing_SetLocked:
             {
                 this.Locked = readBool(Reader);
                 break;
             }
 
-            case historyitem_Drawing_SetParent:
+            case AscDFH.historyitem_Drawing_SetParent:
             {
                 this.Parent = readObject(Reader);
                 break;
             }
-            case historyitem_Drawing_SetParaMath:
+            case AscDFH.historyitem_Drawing_SetParaMath:
             {
                 // Bool    : isUndefined
                 // String2 : ParaMath.Id
@@ -6388,7 +6388,7 @@ ParaDrawing.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Drawing );
+        Writer.WriteLong( AscDFH.historyitem_type_Drawing );
         Writer.WriteString2(this.Id);
         writeDouble(Writer, this.Extent.W);
         writeDouble(Writer, this.Extent.H);
@@ -6483,7 +6483,7 @@ ParaDrawing.prototype =
             cur_doc_content = cur_doc_content.Parent.Row.Table.Parent;
         }
 
-        if(isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.getObjectType === "function" && cur_doc_content.Parent.getObjectType() === historyitem_type_Shape)
+        if(isRealObject(cur_doc_content.Parent) && typeof cur_doc_content.Parent.getObjectType === "function" && cur_doc_content.Parent.getObjectType() === AscDFH.historyitem_type_Shape)
             return bRetShape ? cur_doc_content.Parent : true;
 
         return bRetShape ? null : false;
@@ -7023,7 +7023,7 @@ ParaDrawing.prototype =
 
     setSimplePos: function(use, x, y)
     {
-        History.Add(this,  {Type: historyitem_SetSimplePos, oldX: this.SimplePos.X, oldY: this.SimplePos.Y, oldUse: this.SimplePos.Use, newX:x, newY: y, newUse: use});
+        History.Add(this,  {Type: AscDFH.historyitem_SetSimplePos, oldX: this.SimplePos.X, oldY: this.SimplePos.Y, oldUse: this.SimplePos.Use, newX:x, newY: y, newUse: use});
         this.SimplePos.Use = use;
         this.SimplePos.X = x;
         this.SimplePos.Y = y;
@@ -7031,7 +7031,7 @@ ParaDrawing.prototype =
 
     setExtent: function(extX, extY)
     {
-        History.Add(this,  {Type: historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
+        History.Add(this,  {Type: AscDFH.historyitem_SetExtent, oldW: this.Extent.W, oldH: this.Extent.H, newW: extX, newH: extY});
         this.Extent.W = extX;
         this.Extent.H = extY;
     },
@@ -7039,7 +7039,7 @@ ParaDrawing.prototype =
     setEffectExtent: function(L, T, R, B)
     {
         var oEE = this.EffectExtent;
-        History.Add(this, {Type: historyitem_Drawing_SetEffectExtent, OldEE: {L: oEE.L, T: oEE.T, R: oEE.R, B: oEE.B}, NewEE:  {L: L, T: T, R: R, B: B}});
+        History.Add(this, {Type: AscDFH.historyitem_Drawing_SetEffectExtent, OldEE: {L: oEE.L, T: oEE.T, R: oEE.R, B: oEE.B}, NewEE:  {L: L, T: T, R: R, B: B}});
         this.EffectExtent.L = L;
         this.EffectExtent.T = T;
         this.EffectExtent.R = R;
@@ -7048,7 +7048,7 @@ ParaDrawing.prototype =
 
     addWrapPolygon: function(wrapPolygon)
     {
-        History.Add(this,  {Type: historyitem_SetWrapPolygon, oldW: this.wrappingPolygon, newW: wrapPolygon});
+        History.Add(this,  {Type: AscDFH.historyitem_SetWrapPolygon, oldW: this.wrappingPolygon, newW: wrapPolygon});
         this.wrappingPolygon = wrapPolygon;
     },
 
@@ -7119,7 +7119,7 @@ ParaDrawing.prototype =
 
     Set_ParaMath : function(ParaMath)
     {
-        History.Add(this, {Type : historyitem_Drawing_SetParaMath, New : ParaMath, Old : this.ParaMath});
+        History.Add(this, {Type : AscDFH.historyitem_Drawing_SetParaMath, New : ParaMath, Old : this.ParaMath});
         this.ParaMath = ParaMath;
     },
 
@@ -7163,7 +7163,7 @@ ParaDrawing.prototype =
         var LogicDocument = editor.WordControl.m_oLogicDocument;
         if (false === LogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type : AscCommon.changestype_2_Element_and_Type, Element : Para, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            LogicDocument.Create_NewHistoryPoint(historydescription_Document_ConvertOldEquation);
+            LogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_ConvertOldEquation);
 
             // Коректируем формулу после конвертации
             this.ParaMath.Correct_AfterConvertFromEquation();
@@ -7204,7 +7204,7 @@ ParaDrawing.prototype =
         if (this.GraphicObj)
             return this.GraphicObj.getObjectType();
 
-        return historyitem_type_Drawing;
+        return AscDFH.historyitem_type_Drawing;
     }
 };
 
