@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 function CImageShape()
 {
     this.nvPicPr  = null;
@@ -174,11 +177,7 @@ CImageShape.prototype =
         snapY.push(transform.ty + this.extY);
     },
 
-    getBoundsInGroup: function()
-    {
-        return getBoundsInGroup(this);
-    },
-
+    getBoundsInGroup: CShape.prototype.getBoundsInGroup,
     normalize: CShape.prototype.normalize,
     checkHitToBounds: CShape.prototype.checkHitToBounds,
     calculateSnapArrays: CShape.prototype.calculateSnapArrays,

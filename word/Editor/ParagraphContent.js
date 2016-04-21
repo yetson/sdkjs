@@ -6493,7 +6493,7 @@ ParaDrawing.prototype =
     {
         var parent_paragraph = !paragraph ? this.Get_ParentParagraph() : paragraph;
         var parent_doc_content = parent_paragraph.Parent;
-        if(parent_doc_content.Parent instanceof CShape)
+        if(parent_doc_content.Parent instanceof AscFormat.CShape)
         {
             if(!parent_doc_content.Parent.group)
             {
@@ -6514,7 +6514,7 @@ ParaDrawing.prototype =
             {
                 top_doc_content = top_doc_content.Parent.Row.Table.Parent;
             }
-            if(top_doc_content.Parent instanceof CShape)
+            if(top_doc_content.Parent instanceof AscFormat.CShape)
             {
                 if(!top_doc_content.Parent.group)
                 {

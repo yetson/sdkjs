@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 CImageShape.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CImageShape.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CImageShape.prototype.setDrawingBase = CShape.prototype.setDrawingBase;

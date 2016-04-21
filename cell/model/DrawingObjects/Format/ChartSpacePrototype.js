@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+
 function getChartTranslateManager()
 {
     return window["Asc"]["editor"].chartTranslate;
