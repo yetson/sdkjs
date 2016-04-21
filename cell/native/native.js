@@ -5065,7 +5065,7 @@ function OfflineEditor () {
         settings.putRange(ws.getSelectionRangeValue());
         //settings.putShowHorAxis(true);
         //settings.putShowVerAxis(true);
-        var series = getChartSeries(ws.model, settings);
+        var series = AscFormat.getChartSeries(ws.model, settings);
         if(series && series.series.length > 1)
         {
             settings.putLegendPos(Asc.c_oAscChartLegendShowSettings.right);
@@ -5816,7 +5816,7 @@ function offline_mouse_down(x, y, pin, isViewerMode, isFormulaEditMode, isRangeR
         _s.isShapeAction = true;
         ws.visibleRange = range;
 
-        if (graphicsInfo.object && !graphicsInfo.object.graphicObject instanceof CChartSpace) {
+        if (graphicsInfo.object && !graphicsInfo.object.graphicObject instanceof AscFormat.CChartSpace) {
             ws.isChartAreaEditMode = false;
         }
 
