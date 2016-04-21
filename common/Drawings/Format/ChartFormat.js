@@ -25882,7 +25882,7 @@ CUnionMarker.prototype =
 
 function CreateMarkerGeometryByType(type, src)
 {
-    var ret = new Geometry();
+    var ret = new AscFormat.Geometry();
     var w = 43200, h = 43200;
     function AddRect(geom, w, h)
     {

@@ -32,7 +32,7 @@
 function (window, undefined) {
 
 function CreateGeometry(prst){
-    var f = new Geometry();
+    var f = new AscFormat.Geometry();
     switch(prst){
         case 'accentBorderCallout1':{
             f.AddAdj('adj1', 15, '18750');
@@ -9236,7 +9236,7 @@ function getNumByTxPrst(sPreset)
 
 function CreatePrstTxWarpGeometry(prst)
 {
-    var f = new Geometry();
+    var f = new AscFormat.Geometry();
     switch(prst)
     {
         case 'textArchDown':{
