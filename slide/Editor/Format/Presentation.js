@@ -2124,10 +2124,10 @@ CPresentation.prototype =
             if(this.Slides[this.CurPage])
             {
                 var oDrawingObjects = this.Slides[this.CurPage].graphicObjects;
-                if(oDrawingObjects.curState instanceof  StartAddNewShape
-                    || oDrawingObjects.curState instanceof  SplineBezierState
-                    || oDrawingObjects.curState instanceof  PolyLineAddState
-                    || oDrawingObjects.curState instanceof  AddPolyLine2State
+                if(oDrawingObjects.curState instanceof  AscFormat.StartAddNewShape
+                    || oDrawingObjects.curState instanceof  AscFormat.SplineBezierState
+                    || oDrawingObjects.curState instanceof  AscFormat.PolyLineAddState
+                    || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
                     || oDrawingObjects.arrTrackObjects.length > 0)
                 {
                     oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));
@@ -3750,7 +3750,7 @@ CPresentation.prototype =
 
     CreateAndAddShapeFromSelectedContent : function(oDocContent)
     {
-        var track_object = new NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
+        var track_object = new AscFormat.NewShapeTrack("textRect", 0, 0, this.Slides[this.CurPage].Layout.Master.Theme, this.Slides[this.CurPage].Layout.Master, this.Slides[this.CurPage].Layout, this.Slides[this.CurPage], this.CurPage);
         track_object.track({}, 0, 0);
         var shape = track_object.getShape(false, this.DrawingDocument, this.Slides[this.CurPage]);
         shape.setParent(this.Slides[this.CurPage]);

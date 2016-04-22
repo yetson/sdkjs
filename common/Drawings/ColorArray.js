@@ -24,7 +24,7 @@
 */
 "use strict";
 
-(function(){
+(function(window, undefined){
 
 function CShapeColor(r, g, b){
     this.r = r;
@@ -160,4 +160,4 @@ function HSLToRGB(HSLColor) {  //{h : 0..360, s : 0..1, l : 0..1}
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CShapeColor = CShapeColor;
-})();
+})(window);

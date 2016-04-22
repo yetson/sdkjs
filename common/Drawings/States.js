@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
 var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
@@ -64,7 +66,7 @@ StartAddNewShape.prototype =
                 slide = oParentObjects.slide;
             }
         }
-        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.getTheme(), master, layout, slide, 0));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
     },
@@ -1817,7 +1819,7 @@ PolyLineAddState.prototype =
             return {objectId: "1", bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.checkChartTextSelection();
         this.drawingObjects.resetSelection();
@@ -1933,7 +1935,7 @@ AddPolyLine2State.prototype =
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.getTheme(), null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.changeCurrentState(new AddPolyLine2State2(this.drawingObjects, x, y));
     },
@@ -2091,3 +2093,25 @@ AddPolyLine2State3.prototype =
         }
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].MOVE_DELTA = MOVE_DELTA;
+    window['AscFormat'].SNAP_DISTANCE = SNAP_DISTANCE;
+    window['AscFormat'].StartAddNewShape = StartAddNewShape;
+    window['AscFormat'].NullState = NullState;
+    window['AscFormat'].PreChangeAdjState = PreChangeAdjState;
+    window['AscFormat'].PreRotateState = PreRotateState;
+    window['AscFormat'].PreResizeState = PreResizeState;
+    window['AscFormat'].PreMoveState = PreMoveState;
+    window['AscFormat'].MoveState = MoveState;
+    window['AscFormat'].PreMoveInGroupState = PreMoveInGroupState;
+    window['AscFormat'].MoveInGroupState = MoveInGroupState;
+    window['AscFormat'].PreRotateInGroupState = PreRotateInGroupState;
+    window['AscFormat'].PreResizeInGroupState = PreResizeInGroupState;
+    window['AscFormat'].PreChangeAdjInGroupState = PreChangeAdjInGroupState;
+    window['AscFormat'].TextAddState = TextAddState;
+    window['AscFormat'].SplineBezierState = SplineBezierState;
+    window['AscFormat'].PolyLineAddState = PolyLineAddState;
+    window['AscFormat'].AddPolyLine2State = AddPolyLine2State;
+})(window);

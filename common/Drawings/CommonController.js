@@ -575,7 +575,7 @@ function DrawingObjectsController(drawingObjects)
 {
     this.drawingObjects = drawingObjects;
 
-    this.curState = new NullState(this);
+    this.curState = new AscFormat.NullState(this);
 
     this.selectedObjects = [];
     this.drawingDocument = drawingObjects.drawingDocument;
@@ -644,7 +644,7 @@ DrawingObjectsController.prototype =
 
     canReceiveKeyPress: function()
     {
-        return this.curState instanceof NullState;
+        return this.curState instanceof AscFormat.NullState;
     },
 
     handleAdjustmentHit: function(hit, selectedObject, group, pageIndex, bWord)
@@ -654,7 +654,7 @@ DrawingObjectsController.prototype =
             this.arrPreTrackObjects.length = 0;
             if(hit.adjPolarFlag === false)
             {
-                this.arrPreTrackObjects.push(new XYAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
+                this.arrPreTrackObjects.push(new AscFormat.XYAdjustmentTrack(selectedObject, hit.adjNum, hit.warp));
             }
             else
             {
@@ -664,12 +664,12 @@ DrawingObjectsController.prototype =
             {
 
                 this.resetInternalSelection();
-                this.changeCurrentState(new PreChangeAdjState(this, selectedObject));
+                this.changeCurrentState(new AscFormat.PreChangeAdjState(this, selectedObject));
             }
             else
             {
                 group.resetInternalSelection();
-                this.changeCurrentState(new PreChangeAdjInGroupState(this, group));
+                this.changeCurrentState(new AscFormat.PreChangeAdjInGroupState(this, group));
             }
             return true;
         }
@@ -781,13 +781,13 @@ DrawingObjectsController.prototype =
                     {
                         this.resetInternalSelection();
                         this.updateOverlay();
-                        this.changeCurrentState(new PreRotateState(this, selectedObject));
+                        this.changeCurrentState(new AscFormat.PreRotateState(this, selectedObject));
                     }
                     else
                     {
                         group.resetInternalSelection();
                         this.updateOverlay();
-                        this.changeCurrentState(new PreRotateInGroupState(this, group, selectedObject));
+                        this.changeCurrentState(new AscFormat.PreRotateInGroupState(this, group, selectedObject));
                     }
                 }
             }
@@ -806,14 +806,14 @@ DrawingObjectsController.prototype =
                         this.resetInternalSelection();
                         this.updateOverlay();
 
-                        this.changeCurrentState(new PreResizeState(this, selectedObject, card_direction));
+                        this.changeCurrentState(new AscFormat.PreResizeState(this, selectedObject, card_direction));
                     }
                     else
                     {
                         group.resetInternalSelection();
                         this.updateOverlay();
 
-                        this.changeCurrentState(new PreResizeInGroupState(this, group, selectedObject, card_direction));
+                        this.changeCurrentState(new AscFormat.PreResizeInGroupState(this, group, selectedObject, card_direction));
                     }
                 }
             }
@@ -857,16 +857,16 @@ DrawingObjectsController.prototype =
                 {
                     this.resetInternalSelection();
                     if(!b_is_inline)
-                        this.changeCurrentState(new PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
+                        this.changeCurrentState(new AscFormat.PreMoveState(this, x, y, e.ShiftKey, e.CtrlKey,  object, is_selected, /*true*/!bInSelect));
                     else
                     {
-                        this.changeCurrentState(new PreMoveInlineObject(this, object, is_selected, !bInSelect, pageIndex, x, y));
+                        this.changeCurrentState(new AscFormat.PreMoveInlineObject(this, object, is_selected, !bInSelect, pageIndex, x, y));
                     }
                 }
                 else
                 {
                     group.resetInternalSelection();
-                    this.changeCurrentState(new PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
+                    this.changeCurrentState(new AscFormat.PreMoveInGroupState(this, group, x, y, e.ShiftKey, e.CtrlKey, object,  is_selected));
                 }
                 if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((this.selection.groupSelection && this.selection.groupSelection.selectedObjects.length === 1) || this.selectedObjects.length === 1))
                 {
@@ -964,7 +964,7 @@ DrawingObjectsController.prototype =
 
             object.selectionSetStart(e, x, y, pageIndex);
 
-            this.changeCurrentState(new TextAddState(this, object, x, y));
+            this.changeCurrentState(new AscFormat.TextAddState(this, object, x, y));
             return true;
         }
         else
@@ -4749,9 +4749,9 @@ DrawingObjectsController.prototype =
         this.swapTrackObjects();
         var move_state;
         if(!this.selection.groupSelection)
-            move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+            move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
         else
-            move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+            move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
         for(var i = 0; i < this.arrTrackObjects.length; ++i)
             this.arrTrackObjects[i].track(dx, dy, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -5475,22 +5475,22 @@ DrawingObjectsController.prototype =
     },
 
     checkTrackDrawings: function(){
-        return this.curState instanceof  StartAddNewShape
-        || this.curState instanceof  SplineBezierState
-        || this.curState instanceof  PolyLineAddState
-        || this.curState instanceof  AddPolyLine2State
+        return this.curState instanceof  AscFormat.StartAddNewShape
+        || this.curState instanceof  AscFormat.SplineBezierState
+        || this.curState instanceof  AscFormat.PolyLineAddState
+        || this.curState instanceof  AscFormat.AddPolyLine2State
         || this.arrTrackObjects.length > 0 || this.arrPreTrackObjects.length > 0;
     },
 
     checkEndAddShape: function()
     {
-        if(this.curState instanceof  StartAddNewShape
-            || this.curState instanceof  SplineBezierState
-            || this.curState instanceof  PolyLineAddState
-            || this.curState instanceof  AddPolyLine2State
+        if(this.curState instanceof  AscFormat.StartAddNewShape
+            || this.curState instanceof  AscFormat.SplineBezierState
+            || this.curState instanceof  AscFormat.PolyLineAddState
+            || this.curState instanceof  AscFormat.AddPolyLine2State
             || this.arrTrackObjects.length > 0)
         {
-            this.changeCurrentState(new NullState(this));
+            this.changeCurrentState(new AscFormat.NullState(this));
             if( this.arrTrackObjects.length > 0)
             {
                 this.clearTrackObjects();
@@ -5519,7 +5519,7 @@ DrawingObjectsController.prototype =
         this.resetSelection();
         this.clearPreTrackObjects();
         this.clearTrackObjects();
-        this.changeCurrentState(new NullState(this, this.drawingObjects));
+        this.changeCurrentState(new AscFormat.NullState(this, this.drawingObjects));
         this.updateSelectionState();
         Asc["editor"] && Asc["editor"].asc_endAddShape();
     },
@@ -5532,7 +5532,7 @@ DrawingObjectsController.prototype =
             this.selectedObjects[0].deselect(this);
             --count;
         }
-        this.changeCurrentState(new NullState(this, this.drawingObjects));
+        this.changeCurrentState(new AscFormat.NullState(this, this.drawingObjects));
     },
 
     getColorMapOverride: function()
@@ -6052,22 +6052,22 @@ DrawingObjectsController.prototype =
         {
             case "spline":
             {
-                this.changeCurrentState(new SplineBezierState(this));
+                this.changeCurrentState(new AscFormat.SplineBezierState(this));
                 break;
             }
             case "polyline1":
             {
-                this.changeCurrentState(new PolyLineAddState(this));
+                this.changeCurrentState(new AscFormat.PolyLineAddState(this));
                 break;
             }
             case "polyline2":
             {
-                this.changeCurrentState(new AddPolyLine2State(this));
+                this.changeCurrentState(new AscFormat.AddPolyLine2State(this));
                 break;
             }
             default :
             {
-                this.changeCurrentState(new StartAddNewShape(this, presetGeom));
+                this.changeCurrentState(new AscFormat.StartAddNewShape(this, presetGeom));
                 break;
             }
         }
@@ -6138,7 +6138,7 @@ DrawingObjectsController.prototype =
         this.clearPreTrackObjects();
         this.clearTrackObjects();
         this.resetSelection();
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         if(selection_state.textObject)
         {
             this.selectObject(selection_state.textObject, selection_state.selectStartPage);
@@ -7572,9 +7572,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(leftPos - arrBounds[i].minX, 0, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7601,9 +7601,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(rightPos - arrBounds[i].maxX, 0, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7631,9 +7631,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(0, topPos - arrBounds[i].minY, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7661,9 +7661,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(0, bottomPos - arrBounds[i].maxY, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7691,9 +7691,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(centerPos - (arrBounds[i].maxX - arrBounds[i].minX)/2 - arrBounds[i].minX, 0, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7720,9 +7720,9 @@ DrawingObjectsController.prototype =
             this.swapTrackObjects();
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             for(i = 0; i < this.arrTrackObjects.length; ++i)
                 this.arrTrackObjects[i].track(0, middlePos - (arrBounds[i].maxY - arrBounds[i].minY)/2 - arrBounds[i].minY, this.arrTrackObjects[i].originalObject.selectStartPage);
@@ -7765,9 +7765,9 @@ DrawingObjectsController.prototype =
             gap = (pos2 - pos1 - summ_width)/(sortObjects.length+1);
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             lastPos = pos1;
             for(i = 0; i < sortObjects.length; ++i)
@@ -7813,9 +7813,9 @@ DrawingObjectsController.prototype =
             gap = (pos2 - pos1 - summ_heigth)/(sortObjects.length+1);
             var move_state;
             if(!this.selection.groupSelection)
-                move_state = new MoveState(this, this.selectedObjects[0], 0, 0);
+                move_state = new AscFormat.MoveState(this, this.selectedObjects[0], 0, 0);
             else
-                move_state = new MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
+                move_state = new AscFormat.MoveInGroupState(this, this.selection.groupSelection.selectedObjects[0], this.selection.groupSelection, 0, 0);
 
             lastPos = pos1;
             for(i = 0; i < sortObjects.length; ++i)

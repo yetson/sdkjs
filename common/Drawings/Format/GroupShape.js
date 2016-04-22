@@ -1674,7 +1674,7 @@ CGroupShape.prototype =
 
     createMoveTrack: function()
     {
-        return new MoveGroupTrack(this);
+        return new AscFormat.MoveGroupTrack(this);
     },
     createResizeTrack: function(cardDirection)
     {
