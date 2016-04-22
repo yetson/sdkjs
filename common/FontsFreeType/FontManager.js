@@ -22,9 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
+var FT_Open_Args = AscFonts.FT_Open_Args;
+var FT_Library = AscFonts.FT_Library;
+var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
+var raster_memory = AscFonts.raster_memory;
+
 var AscBrowser = AscCommon.AscBrowser;
 
 var g_bIsAppleDevices = AscBrowser.isAppleDevices;

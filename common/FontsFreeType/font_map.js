@@ -22,7 +22,12 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
+
+// Import
+var FT_Common = AscFonts.FT_Common;
+var FT_Stream = AscFonts.FT_Stream;
+var g_memory = AscFonts.g_memory;
 
 var charA = "A".charCodeAt(0);
 var charZ = "Z".charCodeAt(0);
