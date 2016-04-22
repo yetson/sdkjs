@@ -24,9 +24,6 @@
 */
 "use strict";
 
-var ArcToCurvers = null;
-var ArcToOnCanvas = null;
-var HitToArc = null;
 (function(){
     // arcTo new version
     function Arc3(ctx, fX, fY, fWidth, fHeight, fStartAngle, fSweepAngle)
@@ -212,8 +209,6 @@ var HitToArc = null;
             return {X: fX1, Y: fY1};
         }
     }
-
-    ArcToCurvers = Arc3;
 
     // ----------------------------------------------------------------------- //
 
@@ -563,7 +558,9 @@ var HitToArc = null;
         }
     }
 
-    ArcToOnCanvas = _ArcToOnCanvas;
-    HitToArc = _HitToArc;
-    // ----------------------------------------------------------------------- //
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].ArcToCurvers = Arc3;
+    window['AscFormat'].HitToArc = _HitToArc;
+    window['AscFormat'].ArcToOnCanvas = _ArcToOnCanvas;
 })();
