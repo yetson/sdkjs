@@ -35,6 +35,7 @@ function (window, undefined) {
 var cToDeg = AscFormat.cToDeg;
 var Path = AscFormat.Path;
 var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
+var Point3D = AscFormat.Point3D;
 
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
@@ -2142,7 +2143,7 @@ CChartsDrawer.prototype =
 		standartMarginForCharts = 17;
 
 
-		this.processor3D = new Processor3D(widthCanvas, heightCanvas, left, right, bottom, top, chartSpace, this);
+		this.processor3D = new AscFormat.Processor3D(widthCanvas, heightCanvas, left, right, bottom, top, chartSpace, this);
 		this.processor3D.calaculate3DProperties();
 		this.processor3D.correctPointsPosition(chartSpace);
 	},
@@ -11098,7 +11099,7 @@ TEST3D2.prototype =
 
 
 			// ToDo а нужна ли global3DPersperctive в ChartsDrawer ?
-		var perspective = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.perspective ? this.cChartSpace.chart.view3D.perspective : global3DPersperctive;
+		var perspective = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.perspective ? this.cChartSpace.chart.view3D.perspective : AscFormat.global3DPersperctive;
 		var alpha = perspective / 2;
 		
 		var halfHeight  = heightChart / 2;
@@ -11499,6 +11500,7 @@ TEST3D.prototype =
     }
 };
 
+	//----------------------------------------------------------export----------------------------------------------------
 	window['AscFormat'] = window['AscFormat'] || {};
 	window['AscFormat'].CChartsDrawer = CChartsDrawer;
 })(window);
