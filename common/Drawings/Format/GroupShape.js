@@ -1669,7 +1669,7 @@ CGroupShape.prototype =
 
     createRotateTrack: function()
     {
-        return new RotateTrackGroup(this);
+        return new AscFormat.RotateTrackGroup(this);
     },
 
     createMoveTrack: function()
@@ -1678,7 +1678,7 @@ CGroupShape.prototype =
     },
     createResizeTrack: function(cardDirection)
     {
-        return new ResizeTrackGroup(this, cardDirection);
+        return new AscFormat.ResizeTrackGroup(this, cardDirection);
     },
 
     resetSelection: function(graphicObjects)

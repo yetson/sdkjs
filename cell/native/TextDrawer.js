@@ -648,7 +648,7 @@ function CLineStructure(oLine)
 {
     this.m_nType = DRAW_COMMAND_LINE;
     this.m_oLine = oLine;
-    this.m_aContent = [];//ObjectToDraw
+    this.m_aContent = [];//AscFormat.ObjectToDraw
     this.m_aBorders = [];
     this.m_aBackgrounds = [];
     this.m_aUnderlinesStrikeouts = [];
@@ -1221,7 +1221,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
+                                oLastCommand.m_aContent.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -1233,7 +1233,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aContent.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -1243,7 +1243,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBorders.length === 0)
                             {
-                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1255,7 +1255,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                                 }
                             }
@@ -1265,7 +1265,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
 
@@ -1277,7 +1277,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
                                 }
                             }
@@ -1289,7 +1289,7 @@ CTextDrawer.prototype =
                             {
                                 oBrushColor = this.m_oBrush.Color1;
                                 oPenColor = this.m_oPen.Color;
-                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aUnderlinesStrikeouts.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
 
@@ -1301,7 +1301,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aUnderlinesStrikeouts.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
                                 }
                             }
@@ -1311,7 +1311,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aParagraphBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
 
@@ -1323,7 +1323,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aParagraphBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
                                 }
                             }
@@ -1338,7 +1338,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                        oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1350,7 +1350,7 @@ CTextDrawer.prototype =
                         }
                         else
                         {
-                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
+                            oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }

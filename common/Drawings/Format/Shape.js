@@ -4893,11 +4893,11 @@ CShape.prototype =
     },
 
     createRotateTrack: function () {
-        return new RotateTrackShapeImage(this);
+        return new AscFormat.RotateTrackShapeImage(this);
     },
 
     createResizeTrack: function (cardDirection) {
-        return new ResizeTrackShapeImage(this, cardDirection);
+        return new AscFormat.ResizeTrackShapeImage(this, cardDirection);
     },
 
     createMoveTrack: function () {

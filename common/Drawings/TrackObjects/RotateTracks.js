@@ -24,8 +24,12 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var c_oAscFill = Asc.c_oAscFill;
+
+var MIN_ANGLE = 0.07;
 
 
 function OverlayObject(geometry, extX, extY, brush, pen, transform )
@@ -41,7 +45,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     if((!brush || !brush.fill || brush.fill.type === c_oAscFill.FILL_TYPE_NOFILL) &&
         (!pen || !pen.Fill || !pen.Fill || !pen.Fill.fill || pen.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL || pen.w === 0))
     {
-        var penBrush = CreatePenBrushForChartTrack();
+        var penBrush = AscFormat.CreatePenBrushForChartTrack();
         _brush = penBrush.brush;
         _pen = penBrush.pen;
     }
@@ -570,3 +574,11 @@ function RotateTrackGroup(originalObject)
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].OverlayObject = OverlayObject;
+    window['AscFormat'].ObjectToDraw = ObjectToDraw;
+    window['AscFormat'].RotateTrackGroup = RotateTrackShapeImage;
+    window['AscFormat'].RotateTrackGroup = RotateTrackGroup;
+})(window);
