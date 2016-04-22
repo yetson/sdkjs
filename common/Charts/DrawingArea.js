@@ -24,6 +24,13 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 //-----------------------------------------------------------------------------------
 // Drawing area manager
 //-----------------------------------------------------------------------------------
@@ -747,3 +754,8 @@ DrawingArea.prototype.getOffsets = function(x, y, bEvents) {
         }
         return null;
     };
+
+	//--------------------------------------------------------export----------------------------------------------------
+	window['AscFormat'] = window['AscFormat'] || {};
+	window['AscFormat'].DrawingArea = DrawingArea;
+})(window);
