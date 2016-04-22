@@ -24,6 +24,13 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var cToDeg = AscFormat.cToDeg;
 var Path = AscFormat.Path;
@@ -32,8 +39,6 @@ var ORIENTATION_MIN_MAX = AscFormat.ORIENTATION_MIN_MAX;
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
 
-var global3DPersperctive = 30;
-var globalBasePercent = 100;
 var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
 var standartMarginForCharts = 13;
@@ -2635,7 +2640,7 @@ CChartsDrawer.prototype =
 
 
 
-//*****BAR CHART*****
+	/** @constructor */
 function drawBarChart()
 {
 	this.chartProp = null;
@@ -3244,11 +3249,11 @@ drawBarChart.prototype =
 
 		return {paths: paths, x: point1.x, y: point1.y, zIndex: point1.z, sortPaths: sortPaths};
 	}
-}
+};
 
 
 
-//*****LINE CHART*****
+	/** @constructor */
 function drawLineChart()
 {
 	this.chartProp = null;
@@ -3779,7 +3784,7 @@ drawLineChart.prototype =
 
 
 
-//*****AREA CHART*****
+	/** @constructor */
 function drawAreaChart()
 {
 	this.chartProp = null;
@@ -5853,7 +5858,7 @@ drawAreaChart.prototype =
 
 
 
-//*****HBAR CHART*****
+	/** @constructor */
 function drawHBarChart()
 {
 	this.chartProp = null;
@@ -6554,7 +6559,7 @@ drawHBarChart.prototype =
 
 
 
-//*****PIE CHART*****
+	/** @constructor */
 function drawPieChart()
 {
 	this.tempAngle = null;
@@ -7476,7 +7481,7 @@ drawPieChart.prototype =
 };
 
 
-//*****Doughnut CHART*****
+	/** @constructor */
 function drawDoughnutChart()
 {
 	this.tempAngle = null;
@@ -7702,7 +7707,7 @@ drawDoughnutChart.prototype =
 };
 
 
-//*****RADAR CHART*****
+	/** @constructor */
 function drawRadarChart()
 {
 	this.chartProp = null;
@@ -8064,7 +8069,7 @@ drawRadarChart.prototype =
 
 
 
-//*****Scatter CHART*****
+	/** @constructor */
 function drawScatterChart()
 {
 	this.chartProp = null;
@@ -8536,7 +8541,7 @@ drawScatterChart.prototype =
 };
 
 
-//*****Stock CHART*****
+	/** @constructor */
 function drawStockChart()
 {
 	this.chartProp = null;
@@ -8831,7 +8836,7 @@ drawStockChart.prototype =
 	}
 };
 
-
+	/** @constructor */
 function drawBubbleChart()
 {
 	this.chartProp = null;
@@ -9125,7 +9130,7 @@ drawBubbleChart.prototype =
 
 
 
-//*****GRID*****
+	/** @constructor */
 function gridChart()
 {
 	this.chartProp = null;
@@ -9616,9 +9621,9 @@ gridChart.prototype =
 		}	
 	}
 };
-	
 
-//*****Category axis*****
+
+	/** @constructor */
 function catAxisChart()
 {
 	this.chartProp = null;
@@ -9971,7 +9976,7 @@ catAxisChart.prototype =
 };
 
 
-//*****value axis*****
+	/** @constructor */
 function valAxisChart()
 {
 	this.chartProp = null;
@@ -10239,7 +10244,7 @@ valAxisChart.prototype =
 	}
 };
 
-
+	/** @constructor */
 function serAxisChart()
 {
 	this.chartProp = null;
@@ -10428,6 +10433,7 @@ serAxisChart.prototype =
 	}
 };
 
+	/** @constructor */
 function floor3DChart()
 {
 	this.chartProp = null;
@@ -10519,7 +10525,7 @@ floor3DChart.prototype =
 
 };
 
-
+	/** @constructor */
 function sideWall3DChart()
 {
 	this.chartProp = null;
@@ -10610,7 +10616,7 @@ sideWall3DChart.prototype =
 	}
 };
 
-
+	/** @constructor */
 function backWall3DChart()
 {
 	this.chartProp = null;
@@ -10702,7 +10708,7 @@ backWall3DChart.prototype =
 };
 
 
-//*****all area of chart*****
+	/** @constructor */
 function allAreaChart()
 {
 	this.chartProp = null;
@@ -10767,8 +10773,8 @@ allAreaChart.prototype =
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 };
-	
-//*****Area of chart*****
+
+	/** @constructor */
 function areaChart()
 {
 	this.chartProp = null;
@@ -10901,8 +10907,8 @@ areaChart.prototype =
 		this.cChartDrawer.drawPath(this.paths, pen, brush);
 	}
 };
-	
-//****another functions and classes***
+
+	/** @constructor */
 function CGeometry2()
 {
     this.pathLst = [];
@@ -10961,7 +10967,7 @@ CGeometry2.prototype =
     }
 };
 
-
+	/** @constructor */
 function CColorObj(pen, brush, geometry)
 {
     this.pen = pen;
@@ -11089,9 +11095,9 @@ TEST3D2.prototype =
 		var point6 = new Point3D(left + widthChart, heightChart + top, depthChart, this.cChartDrawer);
 		var point7 = new Point3D(left + widthChart, top, depthChart, this.cChartDrawer);
 		var point8 = new Point3D(left + widthChart, top, 0, this.cChartDrawer);
-		
-		
-		
+
+
+			// ToDo а нужна ли global3DPersperctive в ChartsDrawer ?
 		var perspective = this.cChartSpace.chart.view3D && this.cChartSpace.chart.view3D.perspective ? this.cChartSpace.chart.view3D.perspective : global3DPersperctive;
 		var alpha = perspective / 2;
 		
@@ -11493,3 +11499,6 @@ TEST3D.prototype =
     }
 };
 
+	window['AscFormat'] = window['AscFormat'] || {};
+	window['AscFormat'].CChartsDrawer = CChartsDrawer;
+})(window);

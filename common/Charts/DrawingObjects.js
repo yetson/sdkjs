@@ -3909,6 +3909,7 @@ function CoordsManager(ws) {
     //--------------------------------------------------------export----------------------------------------------------
     var prot;
     window['AscFormat'] = window['AscFormat'] || {};
+    window['Asc'] = window['Asc'] || {};
     window['AscFormat'].isObject = isObject;
     window['AscFormat'].CCellObjectInfo = CCellObjectInfo;
 

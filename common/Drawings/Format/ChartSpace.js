@@ -2733,7 +2733,7 @@ CChartSpace.prototype =
     {
         if(!this.chartObj)
         {
-            this.chartObj = new CChartsDrawer();
+            this.chartObj = new AscFormat.CChartsDrawer();
         }
         return this.chartObj.calculatePositionLabelsCatAxFromAngle(this);
     },
@@ -7243,7 +7243,7 @@ CChartSpace.prototype =
     getChartSizes: function()
     {
         if(!this.chartObj)
-            this.chartObj = new CChartsDrawer();
+            this.chartObj = new AscFormat.CChartsDrawer();
         return this.chartObj.calculateSizePlotArea(this);
     },
 
@@ -7404,7 +7404,7 @@ CChartSpace.prototype =
     {
         if(!this.chartObj)
         {
-            this.chartObj = new CChartsDrawer()
+            this.chartObj = new AscFormat.CChartsDrawer()
         }
         this.chartObj.preCalculateData(this);
         return [].concat(this.chartObj.calcProp.xScale);
@@ -7415,7 +7415,7 @@ CChartSpace.prototype =
     {
         if(!this.chartObj)
         {
-            this.chartObj = new CChartsDrawer()
+            this.chartObj = new AscFormat.CChartsDrawer()
         }
         this.chartObj.preCalculateData(this);
         return [].concat(this.chartObj.calcProp.scale);
@@ -7425,7 +7425,7 @@ CChartSpace.prototype =
     {
         if(!this.chartObj)
         {
-            this.chartObj = new CChartsDrawer()
+            this.chartObj = new AscFormat.CChartsDrawer()
         }
         this.chartObj.preCalculateData(this);
         return this.chartObj.calcProp;
@@ -8533,7 +8533,7 @@ CChartSpace.prototype =
     recalculateChart: function()
     {
         if(this.chartObj == null)
-            this.chartObj =  new CChartsDrawer();
+            this.chartObj =  new AscFormat.CChartsDrawer();
         this.chartObj.reCalculate(this);
     },
 
