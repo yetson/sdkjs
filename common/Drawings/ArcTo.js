@@ -25,6 +25,9 @@
 "use strict";
 
 (function(){
+    // Import
+    var HitInBezier4 = AscFormat.HitInBezier4;
+    
     // arcTo new version
     function Arc3(ctx, fX, fY, fWidth, fHeight, fStartAngle, fSweepAngle)
     {
