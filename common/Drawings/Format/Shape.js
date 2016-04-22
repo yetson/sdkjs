@@ -37,6 +37,7 @@ var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 
 var checkNormalRotate = AscFormat.checkNormalRotate;
 var HitInLine = AscFormat.HitInLine;
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
 var c_oAscFill = Asc.c_oAscFill;
 
