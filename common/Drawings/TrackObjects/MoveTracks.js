@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 function MoveShapeImageTrack(originalObject)
 {
     this.originalObject = originalObject;
@@ -382,3 +384,10 @@ function MoveComment(comment)
         this.comment.setPosition(this.x, this.y);
     };
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].MoveShapeImageTrack = MoveShapeImageTrack;
+    window['AscFormat'].MoveGroupTrack = MoveGroupTrack;
+    window['AscFormat'].MoveComment = MoveComment;
+})(window);
