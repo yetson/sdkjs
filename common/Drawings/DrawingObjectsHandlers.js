@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
 
@@ -487,8 +489,6 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
     return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
 }
 
-
-
 function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInSelect)
 {
     var selected_objects = drawingObjects.selectedObjects;
@@ -629,3 +629,12 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
     }
     return false;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CheckCoordsNeedPage = CheckCoordsNeedPage;
+    window['AscFormat'].handleSelectedObjects = handleSelectedObjects;
+    window['AscFormat'].handleFloatObjects = handleFloatObjects;
+    window['AscFormat'].handleInlineObjects = handleInlineObjects;
+    window['AscFormat'].handleMouseUpPreMoveState = handleMouseUpPreMoveState;
+})(window);
