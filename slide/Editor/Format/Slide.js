@@ -1506,7 +1506,7 @@ PropLocker.prototype = {
 
 };
 
-CTextBody.prototype.Get_StartPage_Absolute = function()
+AscFormat.CTextBody.prototype.Get_StartPage_Absolute = function()
 {
     if(this.parent)
     {
@@ -1521,15 +1521,15 @@ CTextBody.prototype.Get_StartPage_Absolute = function()
     }
     return 0;
 };
-CTextBody.prototype.Get_AbsolutePage = function(CurPage)
+AscFormat.CTextBody.prototype.Get_AbsolutePage = function(CurPage)
 {
     return this.Get_StartPage_Absolute();
 };
-CTextBody.prototype.Get_AbsoluteColumn = function(CurPage)
+AscFormat.CTextBody.prototype.Get_AbsoluteColumn = function(CurPage)
 {
     return 0;//TODO;
 };
-CTextBody.prototype.checkCurrentPlaceholder = function()
+AscFormat.CTextBody.prototype.checkCurrentPlaceholder = function()
 {
     var presentation = editor.WordControl.m_oLogicDocument;
 

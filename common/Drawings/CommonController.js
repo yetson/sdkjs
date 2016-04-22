@@ -1891,7 +1891,7 @@ DrawingObjectsController.prototype =
         var content = this.getTargetDocContent();
         if(content)
         {
-            if(this.document && content.Parent && content.Parent instanceof  CTextBody)
+            if(this.document && content.Parent && content.Parent instanceof  AscFormat.CTextBody)
                 return false;
             return content.Hyperlink_CanAdd(bCheckInHyperlink);
         }
@@ -3272,7 +3272,7 @@ DrawingObjectsController.prototype =
                             }
                             if(!hor_axis.title.txPr)
                             {
-                                hor_axis.title.setTxPr(new CTextBody());
+                                hor_axis.title.setTxPr(new AscFormat.CTextBody());
                             }
                             if(!hor_axis.title.txPr.bodyPr)
                             {
@@ -3342,7 +3342,7 @@ DrawingObjectsController.prototype =
                                 }
                                 if(!vert_axis.title.txPr)
                                 {
-                                    vert_axis.title.setTxPr(new CTextBody());
+                                    vert_axis.title.setTxPr(new AscFormat.CTextBody());
                                 }
                                 _text_body =  vert_axis.title.txPr;
                             }

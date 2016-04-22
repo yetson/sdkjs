@@ -4604,7 +4604,7 @@ PasteProcessor.prototype =
 		else	
 			shape = new CShape(presentation);
 		
-        shape.setTxBody(new CTextBody(shape));
+        shape.setTxBody(new AscFormat.CTextBody(shape));
 		
         var count = stream.GetULong() / 100000;
 		

@@ -165,9 +165,9 @@ StartAddNewShape.prototype =
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();
-        if(asc["editor"])
+        if(Asc["editor"])
         {
-            asc["editor"].asc_endAddShape();
+            Asc["editor"].asc_endAddShape();
         }
         else if(editor && editor.sync_EndAddShape)
         {
@@ -527,7 +527,7 @@ RotateState.prototype =
             var drawingObjects = this.drawingObjects;
             var oThis = this;
 
-            if(e.CtrlKey && this instanceof MoveState && !(asc["editor"] && asc["editor"].isChartEditor === true))
+            if(e.CtrlKey && this instanceof MoveState && !(Asc["editor"] && Asc["editor"].isChartEditor === true))
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
@@ -1347,9 +1347,9 @@ SplineBezierState.prototype =
 
     onMouseUp: function(e, X, Y, pageIndex)
     {
-        if(asc["editor"])
+        if(Asc["editor"])
         {
-            asc["editor"].asc_endAddShape();
+            Asc["editor"].asc_endAddShape();
         }
         else if(editor && editor.sync_EndAddShape)
         {
@@ -1832,9 +1832,9 @@ PolyLineAddState.prototype =
     onMouseUp: function()
     {
 
-        if(asc["editor"])
+        if(Asc["editor"])
         {
-            asc["editor"].asc_endAddShape();
+            Asc["editor"].asc_endAddShape();
         }
         else if(editor && editor.sync_EndAddShape)
         {
@@ -1901,9 +1901,9 @@ PolyLineAddState2.prototype =
             this.drawingObjects.updateOverlay();
             this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
 
-            if(asc["editor"])
+            if(Asc["editor"])
             {
-                asc["editor"].asc_endAddShape();
+                Asc["editor"].asc_endAddShape();
             }
             else if(editor && editor.sync_EndAddShape)
             {
@@ -1963,9 +1963,9 @@ AddPolyLine2State2.prototype =
             return {objectId: "1", bMarker: true};
         if(e.ClickCount > 1)
         {
-            if(asc["editor"])
+            if(Asc["editor"])
             {
-                asc["editor"].asc_endAddShape();
+                Asc["editor"].asc_endAddShape();
             }
             else if(editor && editor.sync_EndAddShape)
             {

@@ -1896,7 +1896,7 @@
 			
 			_loadImagesOnServer: function(aPastedImages, callback)
 			{
-				var api = asc["editor"];
+				var api = Asc["editor"];
 				
 				var oObjectsForDownload = AscCommon.GetObjectsForImageDownload(aPastedImages);
 
@@ -2170,7 +2170,7 @@
 				var aImagesToDownload = this._getImageFromHtml(node, true);
 				if(aImagesToDownload !== null)//load to server
 				{
-                    var api = asc["editor"];
+                    var api = Asc["editor"];
 					AscCommon.sendImgUrls(api, aImagesToDownload, function (data) {
                        for (var i = 0, length = Math.min(data.length, aImagesToDownload.length); i < length; ++i) 
 					   {
