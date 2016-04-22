@@ -323,7 +323,8 @@ var c_oAscChartLegendShowSettings =
     bottom: 4,
     leftOverlay: 5,
     rightOverlay: 6,
-    layout: 7
+    layout: 7,
+    topRight: 8 // ToDo добавить в меню
 };
 
 var c_oAscChartDataLabelsPos =
@@ -1087,6 +1088,7 @@ var offlineMode = '_offline_';
   prot['leftOverlay'] = prot.leftOverlay;
   prot['rightOverlay'] = prot.rightOverlay;
   prot['layout'] = prot.layout;
+  prot['topRight'] = prot.topRight;
   window['Asc']['c_oAscChartDataLabelsPos'] = window['Asc'].c_oAscChartDataLabelsPos = c_oAscChartDataLabelsPos;
   prot = c_oAscChartDataLabelsPos;
   prot['none'] = prot.none;
