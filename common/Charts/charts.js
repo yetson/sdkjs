@@ -59,41 +59,41 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 	{
 		case c_oAscChartTypeSettings.lineNormal:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
 			series.push(ser);
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
 			series.push(ser);
 			break;
 		}
         case c_oAscChartTypeSettings.line3d:
         {
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(1), createItem(2), createItem(1), createItem(2) ];
             series.push(ser);
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(3), createItem(2.5), createItem(3), createItem(3.5) ];
             series.push(ser);
             break;
         }
 		case c_oAscChartTypeSettings.lineStacked:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
 			series.push(ser);
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
 			series.push(ser);
 			break;
 		}
 		case c_oAscChartTypeSettings.lineStackedPer:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
 			series.push(ser);
 			break;
@@ -102,19 +102,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarNormal:
 		case c_oAscChartTypeSettings.hBarNormal3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1) ];
 			series.push(ser);
 			break;
@@ -123,11 +123,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarStacked:
 		case c_oAscChartTypeSettings.hBarStacked3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
 			series.push(ser);
 			break;
@@ -136,11 +136,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarStackedPer:
 		case c_oAscChartTypeSettings.hBarStackedPer3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
 			series.push(ser);
 			break;
@@ -149,19 +149,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barNormal:
 		case c_oAscChartTypeSettings.barNormal3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4) ];
 			series.push(ser);
 			break;
@@ -170,11 +170,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barStacked:
 		case c_oAscChartTypeSettings.barStacked3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
 			series.push(ser);
 			break;
@@ -183,22 +183,22 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barStackedPer:
 		case c_oAscChartTypeSettings.barStackedPer3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
 			series.push(ser);
 			break;
 		}
         case c_oAscChartTypeSettings.barNormal3dPerspective:
         {
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
             series.push(ser);
 
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
             series.push(ser);
             break;
@@ -206,7 +206,7 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.pie:
 		case c_oAscChartTypeSettings.doughnut:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3), createItem(1) ];
 			series.push(ser);
 			break;
@@ -214,11 +214,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaNormal:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
 			series.push(ser);
 			break;
@@ -226,11 +226,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaStacked:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
 			series.push(ser);
 			break;
@@ -238,11 +238,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaStackedPer:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
 			series.push(ser);
 			break;
@@ -250,11 +250,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.scatter:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(5) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(6) ];
 			series.push(ser);
 			break;
@@ -262,19 +262,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		default:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3), createItem(5), createItem(7) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(10), createItem(12), createItem(14) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(8), createItem(10), createItem(12) ];
 			series.push(ser);
 			break;
@@ -483,7 +483,7 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 		var objectGroup = [];
 
 		for (var style = 0; style <  group.length; ++style) {
-			var chartStyle = new asc_CChartStyle();
+			var chartStyle = new AscFormat.asc_CChartStyle();
 			chartStyle.asc_setStyle(style + 1);
 			chartStyle.asc_setImageUrl(group[style]);
 			objectGroup.push(chartStyle);

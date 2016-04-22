@@ -3347,7 +3347,7 @@ Woorksheet.prototype.copyDrawingObjects=function(oNewWs, wsFrom)
 {
     if(null != this.Drawings && this.Drawings.length > 0)
     {
-        var drawingObjects = new DrawingObjects();
+        var drawingObjects = new AscFormat.DrawingObjects();
         oNewWs.Drawings = [];
       AscFormat.NEW_WORKSHEET_DRAWING_DOCUMENT = oNewWs.DrawingDocument;
         for(var i = 0; i < this.Drawings.length; ++i)

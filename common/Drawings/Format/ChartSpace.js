@@ -11927,7 +11927,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
 				cell = ws.getCell3(i, rangeBBox.c1);
 				value = cell.getValue();
                 numFormatType = cell.getNumFormatType();
-                if(!isNumber(value) && (value != ""))
+                if(!AscCommon.isNumber(value) && (value != ""))
                 {
                     bLeftOnlyDateTime = false;
                     headers.bLeft = true;
@@ -11945,7 +11945,7 @@ function parseSeriesHeaders (ws, rangeBBox) {
 				cell = ws.getCell3(rangeBBox.r1, i);
 				value = cell.getValue();
                 numFormatType= cell.getNumFormatType();
-                if(!isNumber(value) && value != "")
+                if(!AscCommon.isNumber(value) && value != "")
                 {
                     bTopOnlyDateTime = false;
                     headers.bTop = true;
@@ -12106,7 +12106,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 			left_header_bbox = {r1: serHeadersBBox.r1, c1: serHeadersBBox.c1, r2: serHeadersBBox.r1, c2: serHeadersBBox.c2};
 
 		for (i = data_bbox.r1; i <= data_bbox.r2; ++i) {
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			startCell = new CellAddress(i, data_bbox.c1, 0);
 			endCell = new CellAddress(i, data_bbox.c2, 0);
 
@@ -12165,7 +12165,7 @@ function getChartSeries (worksheet, options, catHeadersBBox, serHeadersBBox) {
 
 		for (i = data_bbox.c1; i <= data_bbox.c2; i++) {
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			startCell = new CellAddress(data_bbox.r1, i, 0);
 			endCell = new CellAddress(data_bbox.r2, i, 0);
 

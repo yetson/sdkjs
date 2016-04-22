@@ -4775,7 +4775,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
 
         var sImageUrl = null, fReplaceCallback = null, bImageUrl = false, sImageToDownLoad = "";
-        if(!isNullOrEmptyString(ImagePr.ImageUrl)){
+        if(!AscCommon.isNullOrEmptyString(ImagePr.ImageUrl)){
             if(!g_oDocumentUrls.getImageLocal(ImagePr.ImageUrl)){
                 sImageUrl = ImagePr.ImageUrl;
                 fReplaceCallback = function(sUrl){
@@ -4786,7 +4786,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
             sImageToDownLoad = ImagePr.ImageUrl;
         }
         else if(ImagePr.ShapeProperties && ImagePr.ShapeProperties.fill &&
-            ImagePr.ShapeProperties.fill.fill && !isNullOrEmptyString(ImagePr.ShapeProperties.fill.fill.url)){
+            ImagePr.ShapeProperties.fill.fill && !AscCommon.isNullOrEmptyString(ImagePr.ShapeProperties.fill.fill.url)){
             if(!g_oDocumentUrls.getImageLocal(ImagePr.ShapeProperties.fill.fill.url)){
                 sImageUrl = ImagePr.ShapeProperties.fill.fill.url;
                 fReplaceCallback = function(sUrl){
@@ -4799,7 +4799,7 @@ asc_docs_api.prototype.ImgApply = function(obj)
 
         var oApi = this;
 
-        if(!isNullOrEmptyString(sImageToDownLoad)){
+        if(!AscCommon.isNullOrEmptyString(sImageToDownLoad)){
 
             var fApplyCallback = function(){
                 var _img = oApi.ImageLoader.LoadImage(sImageToDownLoad, 1);
@@ -6855,7 +6855,7 @@ asc_docs_api.prototype.asc_editChartDrawingObject = function(chartBinary)
     /**/
 	
 	// Находим выделенную диаграмму и накатываем бинарник
-	if ( isObject(chartBinary) )
+	if ( AscFormat.isObject(chartBinary) )
 	{
 		var binary = chartBinary["binary"];
         if ( false === this.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(changestype_Paragraph_Content) )

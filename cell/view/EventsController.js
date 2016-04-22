@@ -106,7 +106,7 @@
 			this.frozenAnchorMode = false;
 			
 			// Обработчик кликов для граф.объектов
-			this.clickCounter = new ClickCounter();
+			this.clickCounter = new AscFormat.ClickCounter();
 			this.isMousePressed = false;
 			this.isShapeAction = false;
             this.isUpOnCanvas = false;

@@ -5776,6 +5776,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	this.dateTimeGrouping = oDateGroupItem.DateTimeGrouping;
 };
 
+var prot;
 window["Asc"]["CustomFilters"]			= window["Asc"].CustomFilters = CustomFilters;
 prot									= CustomFilters.prototype;
 prot["asc_getAnd"]						= prot.asc_getAnd;
