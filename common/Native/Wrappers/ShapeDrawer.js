@@ -856,25 +856,25 @@ CShapeDrawer.prototype =
                 var rgba = this.FillUniColor;
                 if (mode == "darken")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.darken();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "darkenLess")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.darkenLess();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "lighten")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.lighten();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "lightenLess")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.lightenLess();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
@@ -1248,25 +1248,25 @@ CShapeDrawer.prototype =
                     var rgba = this.FillUniColor;
                     if (fill_mode == "darken")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.darken();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "darkenLess")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.darkenLess();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "lighten")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.lighten();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "lightenLess")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.lightenLess();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
