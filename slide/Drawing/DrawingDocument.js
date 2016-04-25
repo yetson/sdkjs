@@ -5048,7 +5048,7 @@ function DrawBackground(graphics, unifill, w, h)
         checker._e();
     }
 
-    var shape_drawer = new CShapeDrawer();
+    var shape_drawer = new AscCommon.CShapeDrawer();
     shape_drawer.fromShape2(_shape, graphics, null);
     shape_drawer.draw(null);
 }

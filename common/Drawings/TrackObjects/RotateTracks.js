@@ -58,7 +58,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     this.brush = _brush;
     this.pen = _pen;
     this.TransformMatrix = transform;
-    this.shapeDrawer = new CShapeDrawer();
+    this.shapeDrawer = new AscCommon.CShapeDrawer();
 
     this.updateTransform = function(extX, extY, transform)
     {
@@ -323,7 +323,7 @@ ObjectToDraw.prototype =
         graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(oTransform, false);
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.geometry);
         if(graphics.IsSlideBoundsCheckerType)
         {
