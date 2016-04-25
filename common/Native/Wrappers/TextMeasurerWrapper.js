@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿function CTextMeasurerWrapper()
+function CTextMeasurerWrapper()
 {
     this.Measurer = CreateNativeTextMeasurer();
 
@@ -59,13 +59,13 @@ CTextMeasurerWrapper.prototype =
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
-        var oFontStyle = FontStyle.FontStyleRegular;
+        var oFontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBold;
+            oFontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( bItalic && !bBold )
-            oFontStyle = FontStyle.FontStyleItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBoldItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
         this.SetFontInternal(font.FontFamily.Name, font.FontSize, oFontStyle);
     },
@@ -263,7 +263,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
 
     switch (lStyle)
     {
-        case FontStyle.FontStyleBoldItalic:
+        case AscFonts.FontStyle.FontStyleBoldItalic:
         {
             bSrcItalic  = true;
             bSrcBold    = true;
@@ -296,7 +296,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
             }
             break;
         }
-        case FontStyle.FontStyleBold:
+        case AscFonts.FontStyle.FontStyleBold:
         {
             bSrcBold    = true;
 
@@ -326,7 +326,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
             }
             break;
         }
-        case FontStyle.FontStyleItalic:
+        case AscFonts.FontStyle.FontStyleItalic:
         {
             bSrcItalic  = true;
 
@@ -356,7 +356,7 @@ function GetLoadInfoForMeasurer(info, lStyle)
             }
             break;
         }
-        case FontStyle.FontStyleRegular:
+        case AscFonts.FontStyle.FontStyleRegular:
         {
             bNeedBold   = false;
             bNeedItalic = false;

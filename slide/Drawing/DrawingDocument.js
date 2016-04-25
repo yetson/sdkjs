@@ -27,7 +27,9 @@
 // Import
 var CColor = AscCommon.CColor;
 
-var g_fontManager = new CFontManager();
+var FontStyle = AscFonts.FontStyle;
+
+var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
 
 var TRACK_CIRCLE_RADIUS     = 5;
@@ -323,7 +325,7 @@ CTextMeasurer.prototype =
 
 function CTextMeasurer()
 {
-    this.m_oManager     = new CFontManager();
+    this.m_oManager     = new AscFonts.CFontManager();
 
     this.m_oFont        = null;
 
@@ -3554,7 +3556,7 @@ function CThPage()
 
 function CThumbnailsManager()
 {
-    this.m_oFontManager = new CFontManager();
+    this.m_oFontManager = new AscFonts.CFontManager();
 
     this.m_bIsScrollVisible = true;
     this.DigitWidths = [];

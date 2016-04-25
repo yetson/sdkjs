@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿function CDrawingStreamSerializer()
+function CDrawingStreamSerializer()
 {
     this.Memory = [];
 }
@@ -713,13 +713,13 @@ CDrawingStream.prototype =
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
-        var oFontStyle = FontStyle.FontStyleRegular;
+        var oFontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBold;
+            oFontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( bItalic && !bBold )
-            oFontStyle = FontStyle.FontStyleItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBoldItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
         var _fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
         var _info = GetLoadInfoForMeasurer(_fontinfo, oFontStyle);
