@@ -310,6 +310,7 @@
 
     //--------------------------------------------------------export----------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].CTextMeasurer = CTextMeasurer;
     window['AscCommon'].g_oTextMeasurer = g_oTextMeasurer;
 })(window);
 
