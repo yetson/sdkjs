@@ -30,8 +30,8 @@ function CTextMeasurerWrapper()
 
     // RFonts
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
+    this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
@@ -251,8 +251,8 @@ CTextMeasurerWrapper.prototype =
     {
         this.m_oFont = null;
         this.m_oTextPr = null;
-        this.m_oGrFonts = new CGrRFonts();
-        this.m_oLastFont = new CFontSetup();
+        this.m_oGrFonts = new AscCommon.CGrRFonts();
+        this.m_oLastFont = new AscCommon.CFontSetup();
         this.LastFontOriginInfo = { Name : "", Replace : null };
         this.Ascender  = 0;
         this.Descender = 0;

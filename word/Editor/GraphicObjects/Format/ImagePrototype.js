@@ -69,8 +69,8 @@ CImageShape.prototype.setRecalculateInfo = function()
     this.snapArrayX = [];
     this.snapArrayY = [];
 
-    this.localTransform = new CMatrix();
-    this.localTransformText = new CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
+    this.localTransformText = new AscCommon.CMatrix();
 };
 
 CImageShape.prototype.recalcBrush = function()

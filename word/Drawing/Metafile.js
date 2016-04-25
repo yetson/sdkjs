@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var g_fontApplication = AscFonts.g_fontApplication;
 
@@ -2429,3 +2431,17 @@ CMatrixL.prototype =
         return x * this.shy + y * this.sy  + this.ty;
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].CGrRFonts = CGrRFonts;
+    window['AscCommon'].CFontSetup = CFontSetup;
+    window['AscCommon'].CGrState = CGrState;
+    window['AscCommon'].Base64Encode = Base64Encode;
+    window['AscCommon'].CMemory = CMemory;
+    window['AscCommon'].CDocumentRenderer = CDocumentRenderer;
+    window['AscCommon'].MATRIX_ORDER_PREPEND = MATRIX_ORDER_PREPEND;
+    window['AscCommon'].MATRIX_ORDER_APPEND = MATRIX_ORDER_APPEND;
+    window['AscCommon'].CMatrix = CMatrix;
+    window['AscCommon'].CMatrixL = CMatrixL;
+})(window);

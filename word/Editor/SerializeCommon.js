@@ -802,7 +802,7 @@ function CPPTXContentWriter()
 
     this._Start = function()
     {
-        this.ShapeTextBoxContent = new CMemory();
+        this.ShapeTextBoxContent = new AscCommon.CMemory();
         this.arrayStackStartsTextBoxContent = [];
         this.arrayStackStarts = [];
     }

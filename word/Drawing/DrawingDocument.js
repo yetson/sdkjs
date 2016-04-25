@@ -1812,7 +1812,7 @@ function CPage()
             var ctx = overlay.m_oContext;
 
 
-            var _ft = new CMatrix();
+            var _ft = new AscCommon.CMatrix();
             _ft.sx = transform.sx;
             _ft.shx = transform.shx;
             _ft.shy = transform.shy;
@@ -1820,7 +1820,7 @@ function CPage()
             _ft.tx = transform.tx;
             _ft.ty = transform.ty;
 
-            var coords = new CMatrix();
+            var coords = new AscCommon.CMatrix();
             coords.sx = wDst / this.width_mm;
             coords.sy = hDst / this.height_mm;
             coords.tx = xDst;
@@ -2541,8 +2541,8 @@ function CDrawingDocument()
 
     this.ToRenderer = function()
     {
-        var Renderer = new CDocumentRenderer();
-        Renderer.VectorMemoryForPrint = new CMemory();
+        var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
         this.RenderDocument(Renderer);
@@ -2554,7 +2554,7 @@ function CDrawingDocument()
 
     this.ToRenderer2 = function()
     {
-        var Renderer = new CDocumentRenderer();
+        var Renderer = new AscCommon.CDocumentRenderer();
 
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2581,8 +2581,8 @@ function CDrawingDocument()
 
         if (-1 == this.m_lCurrentRendererPage)
         {
-            this.m_oDocRenderer = new CDocumentRenderer();
-            this.m_oDocRenderer.VectorMemoryForPrint = new CMemory();
+            this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
             this.m_lCurrentRendererPage = 0;
             this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
             this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -3239,7 +3239,7 @@ function CDrawingDocument()
             this.TextMatrix = matrix;
         else if (matrix)
         {
-            this.TextMatrix.Multiply(matrix, MATRIX_ORDER_PREPEND);
+            this.TextMatrix.Multiply(matrix, AscCommon.MATRIX_ORDER_PREPEND);
         }
     }
 
