@@ -219,6 +219,23 @@
     }
 
     /**
+     * Class representing an unsupported element.
+     * @constructor
+     */
+    function ApiUnsupported()
+    {
+    }
+
+    /**
+     * Class representing a graphical object.
+     * @constructor
+     */
+    function ApiDrawing(Drawing)
+    {
+        this.Drawing = Drawing;
+    }
+
+    /**
      * Twentieths of a point (equivalent to 1/1440th of an inch).
      * @typedef {number} twips
      */
@@ -301,6 +318,21 @@
      * @typedef {("topLeftCell" | "topRightCell" | "bottomLeftCell" | "bottomRightCell" | "firstRow" | "lastRow" | "firstColumn" | "lastColumn" | "bandedColumn" | "bandedColumnEven" | "bandedRow" | "bandedRowEven" | "wholeTable")} TableStyleOverrideType
      */
 
+    /**
+     * The types of elements that can be in the paragraph
+     * @typedef {(ApiUnsupported | ApiRun)} ParagraphContent
+     */
+
+    /**
+     * The possible values for the base from which the relative horizontal positioning of an object shall be calculated.
+     * @typedef {("character" | "column" | "leftMargin" | "rightMargin" | "margin" | "page")} RelFromH
+     */
+
+    /**
+     * The possible values for the base from which the relative vertical positioning of an object shall be calculated.
+     * @typedef {("bottomMargin" | "topMargin" | "margin" | "page" | "line" | "paragraph")} RelFromV
+     */
+
     //------------------------------------------------------------------------------------------------------------------
     //
     // Base Api
@@ -317,7 +349,7 @@
         return new ApiDocument(this.WordControl.m_oLogicDocument);
     };
     /**
-     * Create new paragraph
+     * Create a new paragraph.
      * @memberof Api
      * @returns {ApiParagraph}
      */
@@ -326,7 +358,7 @@
         return new ApiParagraph(new Paragraph(private_GetDrawingDocument(), private_GetLogicDocument()));
     };
     /**
-     * Create new table
+     * Create a new table.
      * @memberof Api
      * @param {number} nCols
      * @param {number} nRows
@@ -341,6 +373,48 @@
         oTable.Set_TableStyle2(undefined);
         return new ApiTable(oTable);
     };
+    /**
+     * Create a new text block.
+     * @memberof Api
+     * @returns {ApiRun}
+     */
+    Api.prototype.CreateRun = function()
+    {
+        return new ApiRun(new ParaRun(null, false));
+    };
+    /**
+     * Create a drawing object.
+     * @memberof Api
+     * @param {twips} nWidth
+     * @param {twips} nHeight
+     * @returns {ApiDrawing}
+     */
+    Api.prototype.CreateDrawing = function(nWidth, nHeight)
+    {
+        var nW = private_Twips2MM(nWidth);
+        var nH = private_Twips2MM(nHeight);
+
+        var oDrawing = new ParaDrawing(nW, nH, null, private_GetDrawingDocument(), private_GetLogicDocument(), null);
+        var oImage = private_GetLogicDocument().DrawingObjects.createImage("", 0, 0, nW, nH);
+        oImage.setParent(oDrawing);
+        oDrawing.Set_GraphicObject(oImage);
+        return new ApiDrawing(oDrawing);
+    };
+
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiUnsupported
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"unsupported"}
+     */
+    ApiUnsupported.prototype.GetClassType = function()
+    {
+        return "unsupported";
+    };
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -348,6 +422,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"documentContent"}
+     */
+    ApiDocumentContent.prototype.GetClassType = function()
+    {
+        return "documentContent";
+    };
     /**
      * Get the number of elements.
      * @returns {number}
@@ -383,10 +465,7 @@
         if (oElement instanceof ApiParagraph || oElement instanceof ApiTable)
         {
             this.Document.Internal_Content_Add(nPos, oElement.private_GetImpl(), false);
-            return true;
         }
-
-        return false;
     };
     /**
      * Push paragraph or table
@@ -409,6 +488,17 @@
     {
         this.Document.Content = [];
     };
+    /**
+     * Remove element by specified position.
+     * @param {number} nPos
+     */
+    ApiDocumentContent.prototype.RemoveElement = function(nPos)
+    {
+        if (nPos < 0 || nPos >= this.GetElementsCount())
+            return;
+
+        this.Document.Internal_Content_Remove(nPos, 1);
+    };
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -416,6 +506,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"document"}
+     */
+    ApiDocument.prototype.GetClassType = function()
+    {
+        return "document";
+    };
     /**
      * Create new history point.
      */
@@ -566,6 +664,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"document"}
+     */
+    ApiParagraph.prototype.GetClassType = function()
+    {
+        return "paragraph";
+    };
+    /**
      * Add text
      * @param {string} [sText=""]
      * @returns {ApiRun}
@@ -590,7 +696,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add page break
+     * Add page break.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddPageBreak = function()
@@ -601,7 +707,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add line break
+     * Add line break.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddLineBreak = function()
@@ -612,7 +718,7 @@
         return new ApiRun(oRun);
     };
     /**
-     * Add column break
+     * Add column break.
      * @returns {ApiRun}
      */
     ApiParagraph.prototype.AddColumnBreak = function()
@@ -668,6 +774,103 @@
 
         this.SetNumPr(oNumberingLevel.GetNumbering(), oNumberingLevel.GetLevelIndex());
     };
+    /**
+     * Get the number of elements in the current paragraph.
+     * @returns {number}
+     */
+    ApiParagraph.prototype.GetElementsCount = function()
+    {
+        // TODO: ParaEnd
+        return this.Paragraph.Content.length - 1;
+    };
+    /**
+     * Get the element of the paragraph content by specified position.
+     * @param {number} nPos
+     * @returns {?ParagraphContent}
+     */
+    ApiParagraph.prototype.GetElement = function(nPos)
+    {
+        // TODO: ParaEnd
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+            return null;
+
+        var oElement = this.Paragraph.Content[nPos];
+        if (oElement instanceof ParaRun)
+            return new ApiRun(oElement);
+        else
+            return new ApiUnsupported();
+    };
+    /**
+     * Remove element by specified position.
+     * @param {number} nPos
+     */
+    ApiParagraph.prototype.RemoveElement = function(nPos)
+    {
+        if (nPos < 0 || nPos >= this.Paragraph.Content.length - 2)
+            return;
+
+        this.Paragraph.Remove_FromContent(nPos, 1);
+    };
+    /**
+     * Remove all elements.
+     */
+    ApiParagraph.prototype.RemoveAllElements = function()
+    {
+        if (this.Paragraph.Content.length > 1)
+            this.Paragraph.Remove_FromContent(0, this.Paragraph.Content.length - 1);
+    };
+    /**
+     * Add an element to paragraph content.
+     * @param {ParagraphContent} oElement
+     * @param {number} [nPos] If this value is not specified then element will be added to the end of this paragraph.
+     * @returns {boolean} Returns <code>false</code> if the type of <code>oElement</code> is not supported by paragraph
+     * content.
+     */
+    ApiParagraph.prototype.AddElement = function(oElement, nPos)
+    {
+        // TODO: ParaEnd
+        if (!(oElement instanceof ApiRun) || nPos < 0 || nPos > this.Paragraph.Content.length - 1)
+            return false;
+
+        var oParaElement = oElement.private_GetImpl();
+        if (undefined !== nPos)
+        {
+            this.Paragraph.Add_ToContent(nPos, oParaElement);
+        }
+        else
+        {
+            private_PushElementToParagraph(this.Paragraph, oParaElement);
+        }
+
+        return true;
+    };
+    /**
+     * Add a tab stop.
+     * @returns {ApiRun}
+     */
+    ApiParagraph.prototype.AddTabStop = function()
+    {
+        var oRun = new ParaRun(this.Paragraph, false);
+        oRun.Add_ToContent(0, new ParaTab());
+        private_PushElementToParagraph(this.Paragraph, oRun);
+        return new ApiRun(oRun);
+    };
+    /**
+     * Add a drawing.
+     * @param {ApiDrawing} oDrawing
+     * @returns {ApiRun}
+     */
+    ApiParagraph.prototype.AddDrawing = function(oDrawing)
+    {
+        var oRun = new ParaRun(this.Paragraph, false);
+
+        if (!(oDrawing instanceof ApiDrawing))
+            return new ApiRun(oRun);
+
+        oRun.Add_ToContent(0, oDrawing.Drawing);
+        private_PushElementToParagraph(this.Paragraph, oRun);
+        return new ApiRun(oRun);
+    };
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -676,6 +879,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"run"}
+     */
+    ApiRun.prototype.GetClassType = function()
+    {
+        return "run";
+    };
+    /**
      * Get the text properties of the current run.
      * @returns {ApiTextPr}
      */
@@ -683,6 +894,73 @@
     {
         return new ApiTextPr(this, this.Run.Pr.Copy());
     };
+    /**
+     * Remove all content from the current run.
+     */
+    ApiRun.prototype.ClearContent = function()
+    {
+        this.Run.Remove_FromContent(0, this.Run.Content.length);
+    };
+    /**
+     * Add text to this run.
+     * @param {string} sText
+     */
+    ApiRun.prototype.AddText = function(sText)
+    {
+        if (!sText || !sText.length)
+            return;
+
+        var nLastPos = this.Run.Content.length;
+
+        for (var nPos = 0, nCount = sText.length; nPos < nCount; ++nPos)
+        {
+            var nChar = sText.charAt(nPos);
+            if (" " == nChar)
+                this.Run.Add_ToContent(nLastPos + nPos, new ParaSpace(), false);
+            else
+                this.Run.Add_ToContent(nLastPos + nPos, new ParaText(nChar), false);
+        }
+    };
+    /**
+     * Add a page break.
+     */
+    ApiRun.prototype.AddPageBreak = function()
+    {
+        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Page));
+    };
+    /**
+     * Add a line break.
+     */
+    ApiRun.prototype.AddLineBreak = function()
+    {
+        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Line));
+    };
+    /**
+     * Add a column break.
+     */
+    ApiRun.prototype.AddColumnBreak = function()
+    {
+        this.Run.Add_ToContent(this.Run.Content.length, new ParaNewLine(break_Column));
+    };
+    /**
+     * Add a tab stop.
+     */
+    ApiRun.prototype.AddTabStop = function()
+    {
+        this.Run.Add_ToContent(this.Run.Content.length, new ParaTab());
+    };
+    /**
+     * Add a drawing.
+     * @param {ApiDrawing} oDrawing
+     */
+    ApiRun.prototype.AddDrawing = function(oDrawing)
+    {
+        if (!(oDrawing instanceof ApiDrawing))
+            return;
+
+        this.Run.Add_ToContent(this.Run.Content.length, oDrawing.Drawing);
+    };
+
 
     //------------------------------------------------------------------------------------------------------------------
     //
@@ -690,6 +968,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"section"}
+     */
+    ApiSection.prototype.GetClassType = function()
+    {
+        return "section";
+    };
     /**
      * Specify the section type of the current section. The section type specifies how the contents of the current
      * section shall be placed relative to the previous section.
@@ -903,6 +1189,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"table"}
+     */
+    ApiTable.prototype.GetClassType = function()
+    {
+        return "table";
+    };
     /**
      * Get the number of rows in the current table.
      */
@@ -1123,6 +1417,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"tableRow"}
+     */
+    ApiTableRow.prototype.GetClassType = function()
+    {
+        return "tableRow";
+    };
+    /**
      * Get the number of cells in the current row.
      * @returns {number}
      */
@@ -1150,6 +1452,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"tableCell"}
+     */
+    ApiTableCell.prototype.GetClassType = function()
+    {
+        return "tableCell";
+    };
+    /**
      * Get cell content.
      * @returns {ApiDocumentContent}
      */
@@ -1164,6 +1474,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"style"}
+     */
+    ApiStyle.prototype.GetClassType = function()
+    {
+        return "style";
+    };
     /**
      * Get the name of the current style.
      * @returns {string}
@@ -1304,6 +1622,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"textPr"}
+     */
+    ApiTextPr.prototype.GetClassType = function()
+    {
+        return "textPr";
+    };
     /**
      * Specifies the character style.
      * @param {ApiStyle} oStyle
@@ -1502,6 +1828,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"paraPr"}
+     */
+    ApiParaPr.prototype.GetClassType = function()
+    {
+        return "paraPr";
+    };
     /**
      * Set paragraph style.
      * @param {ApiStyle} oStyle
@@ -1802,6 +2136,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"numbering"}
+     */
+    ApiNumbering.prototype.GetClassType = function()
+    {
+        return "numbering";
+    };
+    /**
      * Get the specified level of the current numbering.
      * @param {number} nLevel - Index of the numbering level. This value MUST BE from 0 to 8.
      * @returns {ApiNumberingLevel}
@@ -1817,6 +2159,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"numberingLevel"}
+     */
+    ApiNumberingLevel.prototype.GetClassType = function()
+    {
+        return "numberingLevel";
+    };
     /**
      * Get a numbering defenition.
      * @returns {ApiNumbering}
@@ -1967,6 +2317,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"tablePr"}
+     */
+    ApiTablePr.prototype.GetClassType = function()
+    {
+        return "tablePr";
+    };
     /**
      * Specifies the number of columns which shall comprise each a table style column band for this table style.
      * @param {number} nCount
@@ -2192,6 +2550,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"tableRowPr"}
+     */
+    ApiTableRowPr.prototype.GetClassType = function()
+    {
+        return "tableRowPr";
+    };
+    /**
      * Set the height of the current table row within the current table.
      * @param {("auto" | "atLeast")} sHRule - Specifies the meaning of the height specified for this table row.
      * @param {twips} [nValue] - This value will be ignored if <code>sHRule="auto"</code>.
@@ -2223,6 +2589,14 @@
     //
     //------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Get the type of this class.
+     * @returns {"tableCellPr"}
+     */
+    ApiTableCellPr.prototype.GetClassType = function()
+    {
+        return "tableCellPr";
+    };
     /**
      * Specify the shading which shall be applied to the extents of the current table cell.
      * @param {ShdType} sType
@@ -2451,6 +2825,14 @@
     //------------------------------------------------------------------------------------------------------------------
 
     /**
+     * Get the type of this class.
+     * @returns {"tableStylePr"}
+     */
+    ApiTableStylePr.prototype.GetClassType = function()
+    {
+        return "tableStylePr";
+    };
+    /**
      * Get the type of the current conditional style.
      * @returns {TableStyleOverrideType}
      */
@@ -2504,19 +2886,121 @@
         return new ApiTableCellPr(this, this.TableStylePr.TableCellPr);
     };
 
+    //------------------------------------------------------------------------------------------------------------------
+    //
+    // ApiDrawing
+    //
+    //------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * Get the type of this class.
+     * @returns {"drawing"}
+     */
+    ApiDrawing.prototype.GetClassType = function()
+    {
+        return "drawing";
+    };
+    /**
+     * Set the size of the bounding box.
+     * @param {twips} nWidth
+     * @param {twips} nHeight
+     */
+    ApiDrawing.prototype.SetSize = function(nWidth, nHeight)
+    {
+        this.Drawing.setExtent(private_Twips2MM(nWidth), private_Twips2MM(nHeight));
+    };
+    /**
+     * Set the wrapping type of this drawing object.
+     * @param {"inline" | "square" | "tight" | "through" | "topAndBottom" | "behind" | "inFront"} sType
+     */
+    ApiDrawing.prototype.SetWrappingStyle = function(sType)
+    {
+        if ("inline" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Inline);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_BehindDoc(false);
+        }
+        else if ("square" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_SQUARE);
+            this.Drawing.Set_BehindDoc(false);
+        }
+        else if ("tight" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_TIGHT);
+            this.Drawing.Set_BehindDoc(false);
+        }
+        else if ("through" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_THROUGH);
+            this.Drawing.Set_BehindDoc(false);
+        }
+        else if ("topAndBottom" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_TOP_AND_BOTTOM);
+            this.Drawing.Set_BehindDoc(false);
+        }
+        else if ("behind" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_BehindDoc(true);
+        }
+        else if ("inFront" === sType)
+        {
+            this.Drawing.Set_DrawingType(drawing_Anchor);
+            this.Drawing.Set_WrappingType(WRAPPING_TYPE_NONE);
+            this.Drawing.Set_BehindDoc(false);
+        }
+
+    };
+
+    /**
+     * Set the horizontal alignment.
+     * @param {RelFromH} sRelativeFrom
+     * @param {("left" | "right" | "center")} [sAlign="left"]
+     */
+    ApiDrawing.prototype.SetHorAlign = function(sRelativeFrom, sAlign)
+    {
+
+        this.Drawing.Set_PositionH();
+    };
+    /**
+     * Set the vertical alignment.
+     * @param {RelFromV} sRelativeFrom
+     * @param {("top" | "bottom" | "center")} [sAlign="top"]
+     */
+    ApiDrawing.prototype.SetVerAlign = function(sRelativeFrom, sAlign)
+    {
+
+
+    };
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Export
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     Api.prototype["GetDocument"]                     = Api.prototype.GetDocument;
     Api.prototype["CreateParagraph"]                 = Api.prototype.CreateParagraph;
     Api.prototype["CreateTable"]                     = Api.prototype.CreateTable;
+    Api.prototype["CreateRun"]                       = Api.prototype.CreateRun;
+    Api.prototype["CreateDrawing"]                   = Api.prototype.CreateDrawing;
 
+    ApiUnsupported.prototype["GetClassType"]         = ApiUnsupported.prototype.GetClassType;
+
+    ApiDocumentContent.prototype["GetClassType"]     = ApiDocumentContent.prototype.GetClassType;
     ApiDocumentContent.prototype["GetElementsCount"] = ApiDocumentContent.prototype.GetElementsCount;
     ApiDocumentContent.prototype["GetElement"]       = ApiDocumentContent.prototype.GetElement;
     ApiDocumentContent.prototype["AddElement"]       = ApiDocumentContent.prototype.AddElement;
     ApiDocumentContent.prototype["Push"]             = ApiDocumentContent.prototype.Push;
     ApiDocumentContent.prototype["RemoveAllElements"]= ApiDocumentContent.prototype.RemoveAllElements;
+    ApiDocumentContent.prototype["RemoveElement"]    = ApiDocumentContent.prototype.RemoveElement;
 
+    ApiDocument.prototype["GetClassType"]            = ApiDocument.prototype.GetClassType;
 	ApiDocument.prototype["Create_NewHistoryPoint"]  = ApiDocument.prototype.Create_NewHistoryPoint;
 	ApiDocument.prototype["GetDefaultTextPr"]        = ApiDocument.prototype.GetDefaultTextPr;
 	ApiDocument.prototype["GetDefaultParaPr"]        = ApiDocument.prototype.GetDefaultParaPr;
@@ -2528,6 +3012,7 @@
     ApiDocument.prototype["SetEvenAndOddHdrFtr"]     = ApiDocument.prototype.SetEvenAndOddHdrFtr;
     ApiDocument.prototype["CreateNumbering"]         = ApiDocument.prototype.CreateNumbering;
 
+    ApiParagraph.prototype["GetClassType"]           = ApiParagraph.prototype.GetClassType;
     ApiParagraph.prototype["AddText"]                = ApiParagraph.prototype.AddText;
     ApiParagraph.prototype["AddPageBreak"]           = ApiParagraph.prototype.AddPageBreak;
     ApiParagraph.prototype["AddLineBreak"]           = ApiParagraph.prototype.AddLineBreak;
@@ -2536,9 +3021,25 @@
     ApiParagraph.prototype["GetParaPr"]              = ApiParagraph.prototype.GetParaPr;
     ApiParagraph.prototype["GetNumbering"]           = ApiParagraph.prototype.GetNumbering;
     ApiParagraph.prototype["SetNumbering"]           = ApiParagraph.prototype.SetNumbering;
+    ApiParagraph.prototype["GetElementsCount"]       = ApiParagraph.prototype.GetElementsCount;
+    ApiParagraph.prototype["GetElement"]             = ApiParagraph.prototype.GetElement;
+    ApiParagraph.prototype["RemoveElement"]          = ApiParagraph.prototype.RemoveElement;
+    ApiParagraph.prototype["RemoveAllElements"]      = ApiParagraph.prototype.RemoveAllElements;
+    ApiParagraph.prototype["AddElement"]             = ApiParagraph.prototype.AddElement;
+    ApiParagraph.prototype["AddTabStop"]             = ApiParagraph.prototype.AddTabStop;
+    ApiParagraph.prototype["AddDrawing"]             = ApiParagraph.prototype.AddDrawing;
 
+    ApiRun.prototype["GetClassType"]                 = ApiRun.prototype.GetClassType;
     ApiRun.prototype["GetTextPr"]                    = ApiRun.prototype.GetTextPr;
+    ApiRun.prototype["ClearContent"]                 = ApiRun.prototype.ClearContent;
+    ApiRun.prototype["AddText"]                      = ApiRun.prototype.AddText;
+    ApiRun.prototype["AddPageBreak"]                 = ApiRun.prototype.AddPageBreak;
+    ApiRun.prototype["AddLineBreak"]                 = ApiRun.prototype.AddLineBreak;
+    ApiRun.prototype["AddColumnBreak"]               = ApiRun.prototype.AddColumnBreak;
+    ApiRun.prototype["AddTabStop"]                   = ApiRun.prototype.AddTabStop;
+    ApiRun.prototype["AddDrawing"]                   = ApiRun.prototype.AddDrawing;
 
+    ApiSection.prototype["GetClassType"]             = ApiSection.prototype.GetClassType;
     ApiSection.prototype["SetType"]                  = ApiSection.prototype.SetType;
     ApiSection.prototype["SetEqualColumns"]          = ApiSection.prototype.SetEqualColumns;
     ApiSection.prototype["SetNotEqualColumns"]       = ApiSection.prototype.SetNotEqualColumns;
@@ -2552,6 +3053,7 @@
     ApiSection.prototype["RemoveFooter"]             = ApiSection.prototype.RemoveFooter;
     ApiSection.prototype["SetTitlePage"]             = ApiSection.prototype.SetTitlePage;
 
+    ApiTable.prototype["GetClassType"]               = ApiTable.prototype.GetClassType;
     ApiTable.prototype["SetJc"]                      = ApiTable.prototype.SetJc;
     ApiTable.prototype["GetRowsCount"]               = ApiTable.prototype.GetRowsCount;
     ApiTable.prototype["GetRow"]                     = ApiTable.prototype.GetRow;
@@ -2563,12 +3065,14 @@
     ApiTable.prototype["RemoveRow"]                  = ApiTable.prototype.RemoveRow;
     ApiTable.prototype["RemoveColumn"]               = ApiTable.prototype.RemoveColumn;
 
-
+    ApiTableRow.prototype["GetClassType"]            = ApiTableRow.prototype.GetClassType;
     ApiTableRow.prototype["GetCellsCount"]           = ApiTableRow.prototype.GetCellsCount;
     ApiTableRow.prototype["GetCell"]                 = ApiTableRow.prototype.GetCell;
 
+    ApiTableCell.prototype["GetClassType"]           = ApiTableCell.prototype.GetClassType;
     ApiTableCell.prototype["GetContent"]             = ApiTableCell.prototype.GetContent;
 
+    ApiStyle.prototype["GetClassType"]               = ApiStyle.prototype.GetClassType;
     ApiStyle.prototype["GetName"]                    = ApiStyle.prototype.GetName;
     ApiStyle.prototype["SetName"]                    = ApiStyle.prototype.SetName;
     ApiStyle.prototype["GetType"]                    = ApiStyle.prototype.GetType;
@@ -2580,9 +3084,10 @@
     ApiStyle.prototype["SetBasedOn"]                 = ApiStyle.prototype.SetBasedOn;
     ApiStyle.prototype["GetConditionalTableStyle"]   = ApiStyle.prototype.GetConditionalTableStyle;
 
-
+    ApiNumbering.prototype["GetClassType"]           = ApiNumbering.prototype.GetClassType;
     ApiNumbering.prototype["GetLevel"]               = ApiNumbering.prototype.GetLevel;
 
+    ApiNumberingLevel.prototype["GetClassType"]      = ApiNumberingLevel.prototype.GetClassType;
     ApiNumberingLevel.prototype["GetNumbering"]      = ApiNumberingLevel.prototype.GetNumbering;
     ApiNumberingLevel.prototype["GetLevelIndex"]     = ApiNumberingLevel.prototype.GetLevelIndex;
     ApiNumberingLevel.prototype["GetTextPr"]         = ApiNumberingLevel.prototype.GetTextPr;
@@ -2593,6 +3098,7 @@
     ApiNumberingLevel.prototype["SetStart"]          = ApiNumberingLevel.prototype.SetStart;
     ApiNumberingLevel.prototype["SetSuff"]           = ApiNumberingLevel.prototype.SetSuff;
 
+    ApiTextPr.prototype["GetClassType"]              = ApiTextPr.prototype.GetClassType;
     ApiTextPr.prototype["SetStyle"]                  = ApiTextPr.prototype.SetStyle;
     ApiTextPr.prototype["SetBold"]                   = ApiTextPr.prototype.SetBold;
     ApiTextPr.prototype["SetItalic"]                 = ApiTextPr.prototype.SetItalic;
@@ -2611,6 +3117,7 @@
     ApiTextPr.prototype["SetLanguage"]               = ApiTextPr.prototype.SetLanguage;
     ApiTextPr.prototype["SetShd"]                    = ApiTextPr.prototype.SetShd;
 
+    ApiParaPr.prototype["GetClassType"]              = ApiParaPr.prototype.GetClassType;
     ApiParaPr.prototype["SetStyle"]                  = ApiParaPr.prototype.SetStyle;
     ApiParaPr.prototype["SetContextualSpacing"]      = ApiParaPr.prototype.SetContextualSpacing;
     ApiParaPr.prototype["SetIndLeft"]                = ApiParaPr.prototype.SetIndLeft;
@@ -2633,6 +3140,7 @@
     ApiParaPr.prototype["SetTabs"]                   = ApiParaPr.prototype.SetTabs;
     ApiParaPr.prototype["SetNumPr"]                  = ApiParaPr.prototype.SetNumPr;
 
+    ApiTablePr.prototype["GetClassType"]             = ApiTablePr.prototype.GetClassType;
     ApiTablePr.prototype["SetStyleColBandSize"]      = ApiTablePr.prototype.SetStyleColBandSize;
     ApiTablePr.prototype["SetStyleRowBandSize"]      = ApiTablePr.prototype.SetStyleRowBandSize;
     ApiTablePr.prototype["SetJc"]                    = ApiTablePr.prototype.SetJc;
@@ -2652,9 +3160,11 @@
     ApiTablePr.prototype["SetWidth"]                 = ApiTablePr.prototype.SetWidth;
     ApiTablePr.prototype["SetTableLayout"]           = ApiTablePr.prototype.SetTableLayout;
 
+    ApiTableRowPr.prototype["GetClassType"]          = ApiTableRowPr.prototype.GetClassType;
     ApiTableRowPr.prototype["SetHeight"]             = ApiTableRowPr.prototype.SetHeight;
     ApiTableRowPr.prototype["SetTableHeader"]        = ApiTableRowPr.prototype.SetTableHeader;
 
+    ApiTableCellPr.prototype["GetClassType"]         = ApiTableCellPr.prototype.GetClassType;
     ApiTableCellPr.prototype["SetShd"]               = ApiTableCellPr.prototype.SetShd;
     ApiTableCellPr.prototype["SetCellMarginBottom"]  = ApiTableCellPr.prototype.SetCellMarginBottom;
     ApiTableCellPr.prototype["SetCellMarginLeft"]    = ApiTableCellPr.prototype.SetCellMarginLeft;
@@ -2669,6 +3179,7 @@
     ApiTableCellPr.prototype["SetTextDirection"]     = ApiTableCellPr.prototype.SetTextDirection;
     ApiTableCellPr.prototype["SetNoWrap"]            = ApiTableCellPr.prototype.SetNoWrap;
 
+    ApiTableStylePr.prototype["GetClassType"]        = ApiTableStylePr.prototype.GetClassType;
     ApiTableStylePr.prototype["GetType "]            = ApiTableStylePr.prototype.GetType;
     ApiTableStylePr.prototype["GetTextPr"]           = ApiTableStylePr.prototype.GetTextPr;
     ApiTableStylePr.prototype["GetParaPr"]           = ApiTableStylePr.prototype.GetParaPr;
@@ -2845,6 +3356,29 @@
     {
         private_GetLogicDocument().End_SilentMode(false);
     }
+    function private_GetAlignH(sAlign)
+    {
+        if ("left" === sAlign)
+            return c_oAscAlignH.Left;
+        else if ("right" === sAlign)
+            return c_oAscAlignH.Right;
+        else if ("center" === sAlign)
+            return c_oAscAlignH.Center;
+
+        return c_oAscAlignH.Left;
+    }
+
+    function private_GetAlignV(sAlign)
+    {
+        if ("top" === sAlign)
+            return c_oAscAlignV.Top;
+        else if ("bottom" === sAlign)
+            return c_oAscAlignV.Bottom;
+        else if ("center" === sAlign)
+            return c_oAscAlignV.Center;
+
+        return c_oAscAlignV.Center;
+    }
 
     ApiDocument.prototype.OnChangeParaPr = function(oApiParaPr)
     {
@@ -2871,6 +3405,10 @@
     {
         this.Paragraph.TextPr.Set_Value(oApiTextPr.TextPr);
         oApiTextPr.TextPr = this.Paragraph.TextPr.Value.Copy();
+    };
+    ApiRun.prototype.private_GetImpl = function()
+    {
+        return this.Run;
     };
     ApiRun.prototype.OnChangeTextPr = function(oApiTextPr)
     {
@@ -3605,7 +4143,7 @@ function TEST_BUILDER2()
     //------------------------------------------------------------------------------------------------------------------
     var Api = editor;
     var oDocument  = Api.GetDocument();
-    var oParagraph, oTable, oTableRow, oCell, oCellContent;
+    var oParagraph, oTable, oTableRow, oCell, oCellContent, oRun, oDrawing;
 
     //------------------------------------------------------------------------------------------------------------------
     // TextPr
@@ -4077,6 +4615,36 @@ function TEST_BUILDER2()
     oCell = oTable.MergeCells([oTable.GetRow(1).GetCell(1), oTable.GetRow(1).GetCell(2), oTable.GetRow(2).GetCell(1), oTable.GetRow(2).GetCell(2)]);
     oCell.GetContent().GetElement(0).AddText("Merged cell");
 
+    //------------------------------------------------------------------------------------------------------------------
+    // Create/Add/Change Run
+    //------------------------------------------------------------------------------------------------------------------
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oRun = Api.CreateRun();
+    oRun.AddText("Before add count : ");
+    oRun.AddTabStop();
+    oRun.AddText("" + oParagraph.GetElementsCount());
+    oRun.AddLineBreak();
+    oParagraph.AddElement(oRun);
+    oRun.AddText("After add count : ");
+    oRun.AddTabStop();
+    oRun.AddText("" + oParagraph.GetElementsCount());
+
+    //------------------------------------------------------------------------------------------------------------------
+    // Drawings
+    //------------------------------------------------------------------------------------------------------------------
+    oParagraph = Api.CreateParagraph();
+    oDocument.Push(oParagraph);
+    oDrawing = Api.CreateDrawing(1000, 2000);
+    oParagraph.AddDrawing(oDrawing);
+
+    oDrawing = Api.CreateDrawing(1000, 2000);
+    oParagraph.AddDrawing(oDrawing);
+    oDrawing.SetSize(2000, 2000);
+
+    oDrawing = Api.CreateDrawing(1000, 2000);
+    oParagraph.AddDrawing(oDrawing);
+    oDrawing.SetWrappingStyle("square");
 
     //------------------------------------------------------------------------------------------------------------------
     oLD.Recalculate_FromStart();
