@@ -2130,7 +2130,7 @@ CPresentation.prototype =
                     || oDrawingObjects.curState instanceof  AscFormat.AddPolyLine2State
                     || oDrawingObjects.arrTrackObjects.length > 0)
                 {
-                    oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));
+                    oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
                     if( oDrawingObjects.arrTrackObjects.length > 0)
                     {
                         oDrawingObjects.clearTrackObjects();
@@ -3664,7 +3664,7 @@ CPresentation.prototype =
             oDrawingObjects.clearPreTrackObjects();
             oDrawingObjects.clearTrackObjects();
             oDrawingObjects.resetSelection();
-            oDrawingObjects.changeCurrentState(new NullState(oDrawingObjects));
+            oDrawingObjects.changeCurrentState(new AscFormat.NullState(oDrawingObjects));
             oDrawingObjects.loadDocumentStateAfterLoadChanges(oState);
         }
     },
