@@ -415,6 +415,7 @@ CAscChartProp.prototype.putStyle = function(v)
 CAscChartProp.prototype.changeType = function(v)
 {
     return this.ChartProperties && this.ChartProperties.changeType(v);
+}
 
 function CLayoutThumbnail()
 {
