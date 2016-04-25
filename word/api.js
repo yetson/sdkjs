@@ -25,6 +25,8 @@
 "use strict";
 
 // Import
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
 var DownloadType = AscCommon.DownloadType;
 var c_oAscFormatPainterState = AscCommon.c_oAscFormatPainterState;

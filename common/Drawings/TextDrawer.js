@@ -27,6 +27,8 @@
 (function(window, undefined){
 
 // Import
+var g_fontApplication = AscFonts.g_fontApplication;
+    
 var Geometry = AscFormat.Geometry;
 var EPSILON_TEXT_AUTOFIT = AscFormat.EPSILON_TEXT_AUTOFIT;
 var ObjectToDraw = AscFormat.ObjectToDraw;

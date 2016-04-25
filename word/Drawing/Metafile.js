@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var g_fontApplication = AscFonts.g_fontApplication;
+
 function CGrRFonts()
 {
     this.Ascii    = {Name: "Empty", Index: -1};

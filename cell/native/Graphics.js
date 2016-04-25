@@ -1226,7 +1226,7 @@ CGraphics.prototype =
         else if ( bItalic && bBold )
             oFontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
-        var _fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
+        var _fontinfo = AscFonts.g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
         var _info = GetLoadInfoForMeasurer(_fontinfo, oFontStyle);
 
         this.m_oLastFont.SetUpName = font.FontFamily.Name;
@@ -1316,7 +1316,7 @@ CGraphics.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
+            var _fontinfo = AscFonts.g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
             var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
 
             var flag = 0;
@@ -1340,7 +1340,7 @@ CGraphics.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
        // var _x = this.m_oInvertFullTransform.TransformPointX(x,y);
        // var _y = this.m_oInvertFullTransform.TransformPointY(x,y);
@@ -1359,7 +1359,7 @@ CGraphics.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         this.Native["PD_FillText2"](x,y,_code,cropX,cropW);
     },
@@ -1374,7 +1374,7 @@ CGraphics.prototype =
     FillTextCode : function(x,y,lUnicode)
     {
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         this.Native["PD_FillText"](x,y,lUnicode);
     },

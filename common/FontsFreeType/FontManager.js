@@ -32,6 +32,7 @@ var FT_Library = AscFonts.FT_Library;
 var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
 var CFontFile = AscFonts.CFontFile;
 var EGlyphState = AscFonts.EGlyphState;
+var g_fontApplication = AscFonts.g_fontApplication;
 
 var AscBrowser = AscCommon.AscBrowser;
 
@@ -498,16 +499,6 @@ function CDefaultFont()
         return this.m_arrDefaultFont[nIndex];
     };
 }
-
-var FontStyle =
-{
-    FontStyleRegular:    0,
-    FontStyleBold:       1,
-    FontStyleItalic:     2,
-    FontStyleBoldItalic: 3,
-    FontStyleUnderline:  4,
-    FontStyleStrikeout:  8
-};
 
 function CPoint1()
 {
@@ -1276,6 +1267,5 @@ function CFontManager()
     //------------------------------------------------------export------------------------------------------------------
     window['AscFonts'] = window['AscFonts'] || {};
     window['AscFonts'].CRasterHeapTotal = CRasterHeapTotal;
-    window['AscFonts'].FontStyle = FontStyle;
     window['AscFonts'].CFontManager = CFontManager;
 })(window);
