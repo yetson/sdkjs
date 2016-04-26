@@ -3053,3 +3053,8 @@ CSlideBoundsChecker.prototype =
         }
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].COverlay = COverlay;
+window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;

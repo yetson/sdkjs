@@ -24,6 +24,9 @@
 */
 "use strict";
 
+(function(window, undefined){
+    var AscBrowser = AscCommon.AscBrowser;
+
 var TRACK_CIRCLE_RADIUS     = 5;
 var TRACK_RECT_SIZE2        = 4;
 var TRACK_RECT_SIZE         = 8;
@@ -32,6 +35,10 @@ var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
 var IMAGE_ROTATE_TRACK_W    = 21;
+
+if (AscBrowser.isRetina && AscBrowser.isMobile) {
+    TRACK_DISTANCE_ROTATE <<= 1;
+}
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -83,7 +90,7 @@ COverlay.prototype =
     init : function(context, controlName, x, y, w_pix, h_pix, w_mm, h_mm)
     {
         this.m_oContext = context;
-        this.m_oControl = CreateControl(controlName);
+        this.m_oControl = AscCommon.CreateControl(controlName);
 
         this.m_oHtmlPage = new CHtmlPage();
         this.m_oHtmlPage.init(x, y, w_pix, h_pix, w_mm, h_mm);
@@ -536,8 +543,6 @@ COverlay.prototype =
         _ctx.quadraticCurveTo(x, y, x + r, y);
     }
 };
-
-
 
 function CAutoshapeTrack()
 {
@@ -2532,3 +2537,10 @@ CAutoshapeTrack.prototype =
     }
 };
 
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].TRACK_CIRCLE_RADIUS = TRACK_CIRCLE_RADIUS;
+    window['AscCommon'].TRACK_DISTANCE_ROTATE = TRACK_DISTANCE_ROTATE;
+    window['AscCommon'].COverlay = COverlay;
+    window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
+})(window);

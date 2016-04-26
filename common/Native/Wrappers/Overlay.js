@@ -471,3 +471,7 @@ CAutoshapeTrack.prototype =
 
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
