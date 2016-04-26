@@ -30,14 +30,14 @@
 /**
  *
  * @constructor
- * @extends {CCollaborativeEditingBase}
+ * @extends {AscCommon.CCollaborativeEditingBase}
  */
 function CCollaborativeEditing()
 {
     CCollaborativeEditing.superclass.constructor.call(this);
 }
 
-AscCommon.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
 
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {

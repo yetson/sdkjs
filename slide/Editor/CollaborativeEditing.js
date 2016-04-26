@@ -28,15 +28,15 @@
 /**
  *
  * @constructor
- * @extends {CCollaborativeEditingBase}
+ * @extends {AscCommon.CCollaborativeEditingBase}
  */
 function CCollaborativeEditing()
 {
     CCollaborativeEditing.superclass.constructor.call(this);
 
     this.m_oLogicDocument     = null;
-    this.m_aDocumentPositions = new CDocumentPositionsManager();
-    this.m_aForeignCursorsPos = new CDocumentPositionsManager();
+    this.m_aDocumentPositions = new AscCommon.CDocumentPositionsManager();
+    this.m_aForeignCursorsPos = new AscCommon.CDocumentPositionsManager();
     this.m_aForeignCursors    = {};
     this.PosExtChangesX = [];
     this.PosExtChangesY = [];
@@ -47,7 +47,7 @@ function CCollaborativeEditing()
     this.m_aForeignCursorsToShow = {};
 }
 
-AscCommon.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
 
 
 CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalInfo)
@@ -88,7 +88,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
         for ( var Index = 0; Index < Point.Items.length; Index++ )
         {
             var Item = Point.Items[Index];
-            var oChanges = new CCollaborativeChanges();
+            var oChanges = new AscCommon.CCollaborativeChanges();
             oChanges.Set_FromUndoRedo( Item.Class, Item.Data, Item.Binary );
             aChanges.push( oChanges.m_pData );
         }
@@ -208,7 +208,7 @@ CCollaborativeEditing.prototype.Send_Changes = function(IsUserSave, AdditionalIn
     //    editor.WordControl.m_oLogicDocument.DrawingDocument.FirePaint();
 };
 
-CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
+AscCommon.CCollaborativeEditingBase.prototype.Refresh_ForeignCursors = function()
 {
     for (var UserId in this.m_aCursorsToUpdate)
     {
@@ -593,7 +593,7 @@ CCollaborativeEditing.prototype.Show_ForeignCursorLabel = function(UserId)
     {
         Cursor.ShowId = null;
         Api.sync_HideForeignCursorLabel(UserId);
-    }, FOREIGN_CURSOR_LABEL_HIDETIME);
+    }, AscCommon.FOREIGN_CURSOR_LABEL_HIDETIME);
 
     var UserShortId = this.m_aForeignCursorsId[UserId] ? this.m_aForeignCursorsId[UserId] : UserId;
     var Color  = AscCommon.getUserColorById(UserShortId, null, true);
