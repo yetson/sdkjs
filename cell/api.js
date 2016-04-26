@@ -919,7 +919,7 @@ var editor;
     }
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
-      var pdf_writer = new CPdfPrinter();
+      var pdf_writer = new AscCommonExcel.CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, printPagesData);
 
       dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
@@ -3240,7 +3240,7 @@ var editor;
       _memory2.WriteString2 = _memory1["WriteString2"];
     }
 
-    var _printer = new CPdfPrinter();
+    var _printer = new AscCommonExcel.CPdfPrinter();
     _printer.DocumentRenderer.Memory = _memory1;
     _printer.DocumentRenderer.VectorMemoryForPrint = _memory2;
     return _printer;
@@ -3266,7 +3266,7 @@ var editor;
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
     if (undefined === _printer && _page === undefined) {
-      var pdf_writer = new CPdfPrinter();
+      var pdf_writer = new AscCommonExcel.CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, _printPagesData);
 
       if (undefined !== window["AscDesktopEditor"]) {

@@ -3220,7 +3220,7 @@ function Woorksheet(wb, _index, sId){
 	this.sheetPr = null;
 	this.aFormulaExt = null;
 	
-	this.autoFilters = Asc.AutoFilters !== undefined ? new Asc.AutoFilters(this) : null;
+	this.autoFilters = AscCommonExcel.AutoFilters !== undefined ? new AscCommonExcel.AutoFilters(this) : null;
 
     this.oDrawingOjectsManager = new DrawingObjectsManager(this);
     this.contentChanges = new AscCommon.CContentChanges();
@@ -3492,7 +3492,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               break;
             }
             oRuleElement = oRule.aRuleElements[0];
-            if (!(oRuleElement instanceof Asc.CColorScale)) {
+            if (!(oRuleElement instanceof AscCommonExcel.CColorScale)) {
               break;
             }
 
@@ -3511,7 +3511,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
             // ToDo CFVO Type (formula, max, min, num, percent, percentile) (page 2681)
             // ToDo support 3 colors in rule
             if (0 < arrayCells.length && 2 === oRuleElement.aColors.length) {
-              oGradient = new Asc.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
+              oGradient = new AscCommonExcel.CGradient(oRuleElement.aColors[0], oRuleElement.aColors[1]);
               oGradient.init(min, max);
 
               for (cell = 0; cell < arrayCells.length; ++cell) {

@@ -100,6 +100,7 @@
     var c_oAscChangeTableStyleInfo = asc.c_oAscChangeTableStyleInfo;
     var c_oAscChangeSelectionFormatTable = asc.c_oAscChangeSelectionFormatTable;
     var asc_CSelectionMathInfo = AscCommonExcel.asc_CSelectionMathInfo;
+    var vector_koef = AscCommonExcel.vector_koef;
 
     /*
      * Constants
@@ -12636,7 +12637,7 @@
         var cellId = ws.autoFilters._rangeToId(rangeButton);
 
         //get filter object
-        var filterObj = new Asc.AutoFilterObj();
+        var filterObj = new AscCommonExcel.AutoFilterObj();
         if(filters && filters.ColorFilter)
         {
             filterObj.type = c_oAscAutoFilterTypes.ColorFilter;
@@ -12674,7 +12675,7 @@
         }
 
         //set menu object
-        var autoFilterObject = new Asc.AutoFiltersOptions();
+        var autoFilterObject = new AscCommonExcel.AutoFiltersOptions();
 
         autoFilterObject.asc_setSortState(sortVal);
         autoFilterObject.asc_setCellId(cellId);
