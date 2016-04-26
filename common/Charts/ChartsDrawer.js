@@ -39,6 +39,7 @@ var Point3D = AscFormat.Point3D;
 
 var c_oAscTickMark = Asc.c_oAscTickMark;
 var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
 
 var globalGapDepth = 150;
 var isTurnOn3DCharts = true;
