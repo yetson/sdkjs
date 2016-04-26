@@ -3399,13 +3399,15 @@
 						var cell = worksheet.getCell3(i, colId + ref.c1);
 						var text = cell.getValueWithFormat();
 						var val = cell.getValueWithoutFormat();
+						var textLowerCase = text.toLowerCase();
+						
 						isDateTimeFormat = cell.getNumFormat().isDateTimeFormat();
 						
 						//if(isDateTimeFormat)
 							//dataValue = NumFormat.prototype.parseDate(val);
 							
 						//check duplicate value
-						if(temp.hasOwnProperty(text))
+						if(temp.hasOwnProperty(textLowerCase))
 							continue;
 						
 						//apply filter by current button
@@ -3437,7 +3439,7 @@
 								
 								addValueToMenuObj(tempResult, count);
 								
-								temp[text] = 1;
+								temp[textLowerCase] = 1;
 								count++;
 							}
 						}
@@ -3453,7 +3455,7 @@
 								worksheet.setRowHidden(false, i, i);
 							
 							addValueToMenuObj(tempResult, count);
-							temp[text] = 1;
+							temp[textLowerCase] = 1;
 							count++;
 						}
 						
