@@ -33,6 +33,11 @@
       var CellValueType = AscCommon.CellValueType;
       var c_oAscCellAnchorType = AscCommon.c_oAscCellAnchorType;
       var c_oAscBorderStyles = AscCommon.c_oAscBorderStyles;
+      var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+      var Binary_CommonReader = AscCommon.Binary_CommonReader;
+      var BinaryCommonWriter = AscCommon.BinaryCommonWriter;
+      var c_oSerPropLenType = AscCommon.c_oSerPropLenType;
+      var c_oSerConstants = AscCommon.c_oSerConstants;
 
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
 
@@ -1097,6 +1102,13 @@
             return this.oSizes[8];//A4
         };
     };
+
+      function OpenColor() {
+          this.rgb = null;
+          this.auto = null;
+          this.theme = null;
+          this.tint = null;
+      }
 
 	function ReadColorSpreadsheet2(bcr, length) {
 		var output = null;
@@ -5492,7 +5504,7 @@
                 if(aTempCols.length > 0)
                 {
                     var oLast = aTempCols[aTempCols.length - 1];
-                    if(gc_nMaxCol == oLast.Max)
+                    if(AscCommon.gc_nMaxCol == oLast.Max)
                     {
                         oAllCol = oLast;
                         fInitCol(oAllCol, oWorksheet.getAllCol());
@@ -5912,7 +5924,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSerCellTypes.Ref == type ){
-				var oCellAddress = g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
+				var oCellAddress = AscCommon.g_oCellAddressUtils.getCellAddress(this.stream.GetString2LE(length));
 				oCell.nRow = nRowIndex;
 				oCell.nCol = oCellAddress.getCol0();
 			}
@@ -6964,7 +6976,7 @@
 
             var dstLen = dst_len >> 0;
             var pointer = g_memory.Alloc(dstLen);
-            var stream = new FT_Stream2(pointer.data, dstLen);
+            var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
             stream.obj = pointer.obj;
 
             this.getbase64DecodedData2(szSrc, index, stream, 0);
@@ -7076,7 +7088,7 @@
         {
             History.TurnOff();
 
-            this.stream = new FT_Stream2(data, data.length);
+            this.stream = new AscCommon.FT_Stream2(data, data.length);
             this.ReadFile(wb);
 
             ReadDefCellStyles(wb, wb.CellStyles.DefaultStyles);

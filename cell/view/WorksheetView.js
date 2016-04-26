@@ -52,6 +52,10 @@
     var fSortAscending = AscCommon.fSortAscending;
     var parserHelp = AscCommon.parserHelp;
     var gc_nMaxDigCountView = AscCommon.gc_nMaxDigCountView;
+    var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+    var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+    var gc_nMaxRow = AscCommon.gc_nMaxRow;
+    var gc_nMaxCol = AscCommon.gc_nMaxCol;
 
     var asc = window["Asc"];
     var asc_applyFunction = asc.applyFunction;
@@ -3391,7 +3395,7 @@
         }
 
         var _this = this;
-        var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress( 0, 0, 0 );
+        var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress( 0, 0, 0 );
 
         x *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIX() );
         y *= asc_getcvt( 0/*px*/, 1/*pt*/, this._getPPIY() );
@@ -3523,7 +3527,7 @@
                 isUpdate = true;
             }
             var pane = this.model.sheetViews[0].pane = new asc.asc_CPane();
-            this.topLeftFrozenCell = pane.topLeftFrozenCell = new CellAddress( row, col, 0 );
+            this.topLeftFrozenCell = pane.topLeftFrozenCell = new AscCommon.CellAddress( row, col, 0 );
         }
         this.visibleRange.c1 = col;
         this.visibleRange.r1 = row;
@@ -5083,7 +5087,7 @@
      * @return {String}
      */
     WorksheetView.prototype._getColumnTitle = function ( col ) {
-        return g_oCellAddressUtils.colnumToColstrFromWsView( col + 1 );
+        return AscCommon.g_oCellAddressUtils.colnumToColstrFromWsView( col + 1 );
     };
 
     /**
@@ -6353,7 +6357,7 @@
             isLocked = this.collaborativeEditing.getLockIntersection( lockInfo, c_oAscLockTypes.kLockTypeOther, false );
             if ( false !== isLocked ) {
                 // Кто-то сделал lock
-                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new CellAddress( 0, 0, 0 );
+                var frozenCell = this.topLeftFrozenCell ? this.topLeftFrozenCell : new AscCommon.CellAddress( 0, 0, 0 );
                 userId = isLocked.UserId;
                 lockRangePosLeft = this.getCellLeft( frozenCell.getCol0(), 0 );
                 lockRangePosTop = this.getCellTop( frozenCell.getRow0(), 0 );

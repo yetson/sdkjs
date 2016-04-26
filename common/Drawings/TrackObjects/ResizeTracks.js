@@ -1496,7 +1496,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.trackEnd = function(bWord)
         {
-            if(!isRealObject(this.original.group))
+            if(!AscCommon.isRealObject(this.original.group))
             {
                 this.original.normalize();
             }

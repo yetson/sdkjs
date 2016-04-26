@@ -349,7 +349,7 @@ Slide.prototype =
 
     addComment: function(comment)
     {
-        if(isRealObject(this.slideComments))
+        if(AscCommon.isRealObject(this.slideComments))
         {
             this.slideComments.addComment(comment);
         }
@@ -357,7 +357,7 @@ Slide.prototype =
 
     changeComment: function(id, commentData)
     {
-        if(isRealObject(this.slideComments))
+        if(AscCommon.isRealObject(this.slideComments))
         {
             this.slideComments.changeComment(id, commentData);
         }
@@ -365,7 +365,7 @@ Slide.prototype =
 
     removeComment: function(id)
     {
-        if(isRealObject(this.slideComments))
+        if(AscCommon.isRealObject(this.slideComments))
         {
             this.slideComments.removeComment(id);
         }
@@ -1293,7 +1293,7 @@ Slide.prototype =
                     var hierarchy = sp.getHierarchy();
                     for(var j = 0; j < hierarchy.length; ++j)
                     {
-                        if(isRealObject(hierarchy[j]))
+                        if(AscCommon.isRealObject(hierarchy[j]))
                             break;
                     }
                     if(j === hierarchy.length)

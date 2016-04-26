@@ -2877,7 +2877,7 @@ PasteProcessor.prototype =
                     oInsFirstPar.CopyPr_Open( oSourceFirstPar );
                     //�������� ���������� ������������ ���������
                     oSourceFirstPar.Concat(oInsFirstPar);
-                    if(isRealObject(oInsFirstPar.bullet))
+                    if(AscCommon.isRealObject(oInsFirstPar.bullet))
                     {
                         oSourceFirstPar.setPresentationBullet(oInsFirstPar.bullet.createDuplicate());
                     }

@@ -39,6 +39,7 @@ var b64_decode = AscFonts.b64_decode;
 var c_oAscSizeRelFromH = AscCommon.c_oAscSizeRelFromH;
 var c_oAscSizeRelFromV = AscCommon.c_oAscSizeRelFromV;
 var CMatrix = AscCommon.CMatrix;
+var isRealObject = AscCommon.isRealObject;
 
 var checkNormalRotate = AscFormat.checkNormalRotate;
 var HitInLine = AscFormat.HitInLine;
@@ -5774,7 +5775,7 @@ function CreateBinaryReader(szSrc, offset, srcLen)
     if(isNaN(dstLen))
         return null;
     var pointer = g_memory.Alloc(dstLen);
-    var stream = new FT_Stream2(pointer.data, dstLen);
+    var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
     stream.obj = pointer.obj;
 
     var dstPx = stream.data;

@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
 var c_oAscDocumentUnits = Asc.c_oAscDocumentUnits;
@@ -2201,11 +2201,11 @@ function CHorRuler()
         var _c = this.m_arrTabs.length;
         for (var i = 0; i < _c; i++)
         {
-            if (this.m_arrTabs[i].type == g_tabtype_left)
+            if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
                 _arr.Add( new CParaTab( tab_Left, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == g_tabtype_right)
+            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
                 _arr.Add( new CParaTab( tab_Right, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == g_tabtype_center)
+            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
                 _arr.Add( new CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
         }
         
@@ -2424,7 +2424,7 @@ function CHorRuler()
                 context.lineWidth = 2;
                 switch (_tab.type)
                 {
-                    case g_tabtype_left:
+                    case AscCommon.g_tabtype_left:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2433,7 +2433,7 @@ function CHorRuler()
                         context.stroke();
                         break;
                     }
-                    case g_tabtype_right:
+                    case AscCommon.g_tabtype_right:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2442,7 +2442,7 @@ function CHorRuler()
                         context.stroke();
                         break;
                     }
-                    case g_tabtype_center:
+                    case AscCommon.g_tabtype_center:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2591,7 +2591,7 @@ function CHorRuler()
 
                     switch (tab.type)
                     {
-                        case g_tabtype_left:
+                        case AscCommon.g_tabtype_left:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
@@ -2600,7 +2600,7 @@ function CHorRuler()
                             context.stroke();
                             break;
                         }
-                        case g_tabtype_right:
+                        case AscCommon.g_tabtype_right:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
@@ -2609,7 +2609,7 @@ function CHorRuler()
                             context.stroke();
                             break;
                         }
-                        case g_tabtype_center:
+                        case AscCommon.g_tabtype_center:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
