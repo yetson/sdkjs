@@ -53,7 +53,7 @@
                 tintExcel = color.tint;
             var tintPresentation = 0;
             var basecolor = g_oColorManager.getThemeColor(color.theme);
-            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
             if(null != oThemeColorTint)
             {
                 for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)
@@ -134,13 +134,6 @@
     function rad2deg(rad){
         return rad * 180.0 / Math.PI;
     }
-
-
-
-    /** @const */
-    var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
-    var MATRIX_ORDER_APPEND  = AscCommon.MATRIX_ORDER_APPEND;
-
     /**
      * @constructor
      */
@@ -192,9 +185,9 @@
     };
 
     Matrix.prototype.multiply = function (matrix, order) {
-        if (MATRIX_ORDER_PREPEND === order) {
+        if (AscCommon.MATRIX_ORDER_PREPEND === order) {
             var m = matrix.clone();
-            m.multiply(this, MATRIX_ORDER_APPEND);
+            m.multiply(this, AscCommon.MATRIX_ORDER_APPEND);
             this.copyFrom(m);
         } else {
             var t0   = this.sx  * matrix.sx  + this.shy * matrix.shx;
@@ -1314,12 +1307,12 @@
 
     DrawingContext.prototype._calcMFT = function () {
         this._mft = this._mct.clone();
-        this._mft.multiply(this._mbt, MATRIX_ORDER_PREPEND);
-        this._mft.multiply(this._mt, MATRIX_ORDER_PREPEND);
+        this._mft.multiply(this._mbt, AscCommon.MATRIX_ORDER_PREPEND);
+        this._mft.multiply(this._mt, AscCommon.MATRIX_ORDER_PREPEND);
 
         this._mift = this._mt.clone();
         this._mift.invert();
-        this._mift.multiply(this._mft, MATRIX_ORDER_PREPEND);
+        this._mift.multiply(this._mft, AscCommon.MATRIX_ORDER_PREPEND);
     };
 
     /**

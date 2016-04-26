@@ -23,6 +23,10 @@
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
+		"../common/Shapes/EditorSettings.js",
+		"../common/Shapes/Serialize.js",
+		"../common/Shapes/SerializeWriter.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -57,23 +61,25 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		
-		"../common/Shapes/Serialize.js",
+		"../common/CollaborativeEditingBase.js",
+		"../common/Controls.js",
+		"../common/Overlay.js",
+		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
 
         "../common/wordcopypaste.js",
 
         "../slide/apiDefines.js",
+		"../slide/themes/Themes.js",
+		
         "../slide/Drawing/ThemeLoader.js",
         "../word/Editor/Serialize2.js",
         "../word/Editor/Styles.js",
         "../word/Editor/Numbering.js",
-        "../common/CollaborativeEditingBase.js",
         "../slide/Editor/CollaborativeEditing.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/WorkEvents.js",
-        "../common/Controls.js",
         "../word/Drawing/Rulers.js",
         "../word/Editor/Table.js",
         "../word/Editor/Table/TableRecalculate.js",
@@ -83,14 +89,11 @@
         "../word/Editor/Common.js",
         "../word/Editor/Sections.js",
         "../word/Editor/History.js",
-        "../word/Drawing/HatchPattern.js",
         "../word/Drawing/Graphics.js",
-        "../common/Overlay.js",
         "../word/Drawing/ShapeDrawer.js",
         "../slide/Drawing/Transitions.js",
         "../slide/Drawing/DrawingDocument.js",
         "../slide/Drawing/HtmlPage.js",
-        "../common/Shapes/SerializeWriter.js",
         "../word/Editor/SerializeCommon.js",
         "../slide/Editor/Format/Presentation.js",
         "../cell/view/DrawingObjectsController.js",
@@ -196,13 +199,6 @@
       ],
       "map": "sdk-all.js.map",
       "log": "../slide/Build/Log"
-    },
-    "defines": {
-      "src": [
-        "../common/Shapes/EditorSettings.js",
-        "../slide/themes/Themes.js"
-      ],
-      "dst": "apiDefines.min.js"
     },
     "source_map": {
       "url": "http://localhost:8080/sdkjs/slide"

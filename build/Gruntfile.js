@@ -93,9 +93,7 @@ module.exports = function(grunt) {
 	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
 		var tmp_sdk_path = 'sdk-js.tmp';
-		var concat_src = [
-			packageFile['compile']['sdk']['dst'],
-			packageFile['compile']['defines']['dst']];
+		var concat_src = [packageFile['compile']['sdk']['dst']];
 		var concat_src_with_banner_file = [];
 		var srcFiles = packageFile['compile']['sdk']['common'];
 		var sdkOpt = {
@@ -103,12 +101,8 @@ module.exports = function(grunt) {
 			warning_level: 'QUIET',
 			externs: packageFile['compile']['sdk']['externs']
 		};
-		var definesOpt = {
-			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
-			warning_level: 'QUIET'
-		};
 		if (formatting) {
-			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
+			sdkOpt['formatting'] = formatting;
 		}
 		
 		if (grunt.option('mobile')) {
@@ -143,12 +137,6 @@ module.exports = function(grunt) {
 						'<%= pkg.compile.sdk.dst %>': srcFiles
 					},
 					options: sdkOpt
-				},
-				defines: {
-					files: {
-						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
-					},
-					options: definesOpt
 				}
 			},
 			concat: {
@@ -166,7 +154,6 @@ module.exports = function(grunt) {
 				}
 			},
 			clean: [ 
-				packageFile['compile']['defines']['dst'],
 				tmp_sdk_path
 			],
 			replace: {
@@ -186,7 +173,5 @@ module.exports = function(grunt) {
 	});
 	
 	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
-		 
-	grunt.registerTask('default', ['build_webpowerpoint']);
+	grunt.registerTask('default', ['build_all']);
 };

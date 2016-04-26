@@ -570,7 +570,7 @@ function CDrawingDocument()
 
     this.Frame = null;
     this.Table = null;
-    this.AutoShapesTrack        = new CAutoshapeTrack();
+    this.AutoShapesTrack        = new AscCommon.CAutoshapeTrack();
     
     this.m_oWordControl = this;
 

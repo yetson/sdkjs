@@ -128,13 +128,13 @@ function asc_CChartBinary(chart) {
         this["binary"] = writer.memory.pos + ";" + writer.memory.GetBase64Memory();
         if(chart.theme)
         {
-            pptx_writer = new CBinaryFileWriter();
+            pptx_writer = new AscCommon.CBinaryFileWriter();
             pptx_writer.WriteTheme(chart.theme);
             this["themeBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
         if(chart.colorMapOverride)
         {
-            pptx_writer = new CBinaryFileWriter();
+            pptx_writer = new AscCommon.CBinaryFileWriter();
             pptx_writer.WriteRecord1(1, chart.colorMapOverride, pptx_writer.WriteClrMap);
             this["colorMapBinary"] = pptx_writer.pos + ";" + pptx_writer.GetBase64Memory();
         }
@@ -1353,10 +1353,10 @@ function DrawingObjects() {
         shapeCtx = currentSheet.shapeCtx;
         shapeOverlayCtx = currentSheet.shapeOverlayCtx;
 
-        trackOverlay = new COverlay();
+        trackOverlay = new AscCommon.COverlay();
         trackOverlay.init( shapeOverlayCtx.m_oContext, "ws-canvas-graphic-overlay", 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
 
-        autoShapeTrack = new CAutoshapeTrack();
+        autoShapeTrack = new AscCommon.CAutoshapeTrack();
         autoShapeTrack.init( trackOverlay, 0, 0, shapeOverlayCtx.m_lWidthPix, shapeOverlayCtx.m_lHeightPix, shapeOverlayCtx.m_dWidthMM, shapeOverlayCtx.m_dHeightMM );
         shapeCtx.m_oAutoShapesTrack = autoShapeTrack;
 

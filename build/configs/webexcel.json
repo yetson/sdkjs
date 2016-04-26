@@ -23,6 +23,10 @@
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
+		"../common/Shapes/EditorSettings.js",
+		"../common/Shapes/Serialize.js",
+		"../common/Shapes/SerializeWriter.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -57,8 +61,10 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		
-		"../common/Shapes/Serialize.js",
+		"../common/CollaborativeEditingBase.js",
+		"../common/Controls.js",
+		"../common/Overlay.js",
+		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
 		"../cell/view/iscroll.js",
@@ -66,7 +72,7 @@
         "../common/wordcopypaste.js",
 
         "../cell/apiDefines.js",
-        "../word/Drawing/HatchPattern.js",
+		
         "../word/Drawing/WorkEvents.js",
         "../cell/document/empty-workbook.js",
         "../cell/utils/utils.js",
@@ -105,11 +111,8 @@
         "../cell/view/EventsController.js",
         "../cell/view/WorkbookView.js",
         "../word/Editor/SerializeCommon.js",
-        "../common/Shapes/SerializeWriter.js",
         "../cell/view/DrawingObjectsController.js",
         "../cell/model/DrawingObjects/Graphics.js",
-        "../common/Overlay.js",
-        "../common/Controls.js",
         "../cell/model/DrawingObjects/ShapeDrawer.js",
         "../cell/model/DrawingObjects/DrawingDocument.js",
         "../cell/model/DrawingObjects/Format/ShapePrototype.js",
@@ -156,7 +159,6 @@
         "../word/Math/operators.js",
         "../word/Math/accent.js",
         "../word/Math/borderBox.js",
-        "../common/CollaborativeEditingBase.js",
         "../cell/model/DrawingObjects/GlobalCounters.js",
         "../word/apiCommon.js",
         "../cell/apiCommonExport.js",
@@ -214,12 +216,6 @@
       ],
       "map": "sdk-all.js.map",
       "log": "../cell/Build/Log"
-    },
-    "defines": {
-      "src": [
-        "../common/Shapes/EditorSettings.js"
-      ],
-      "dst": "apiDefines.min.js"
     },
     "source_map": {
       "url": "http://localhost:8080/sdkjs/cell"

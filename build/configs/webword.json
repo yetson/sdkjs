@@ -26,6 +26,10 @@
 		"../common/Drawings/Metafile.js",
 		"../common/FontsFreeType/TextMeasurer.js",
 		
+		"../common/Shapes/EditorSettings.js",
+		"../common/Shapes/Serialize.js",
+		"../common/Shapes/SerializeWriter.js",
+		
 		"../common/Drawings/Hit.js",
 		"../common/Drawings/ArcTo.js",
 		"../common/Drawings/ColorArray.js",
@@ -60,8 +64,10 @@
 		
 		"../common/Drawings/Externals.js",
 		"../common/GlobalLoaders.js",
-		
-		"../common/Shapes/Serialize.js",
+		"../common/CollaborativeEditingBase.js",
+		"../common/Controls.js",
+		"../common/Overlay.js",
+		"../common/Drawings/HatchPattern.js",
 		
 		"../common/scroll.js",
 		"../common/Scrolls/iscroll.js",
@@ -69,7 +75,6 @@
         "../common/wordcopypaste.js",
 
         "../word/apiDefines.js",
-        "../common/Shapes/SerializeWriter.js",
         "../word/Drawing/translations.js",
         "../word/Editor/GraphicObjects/Format/ShapePrototype.js",
         "../word/Editor/GraphicObjects/Format/ImagePrototype.js",
@@ -108,14 +113,10 @@
         "../word/Editor/FontClassification.js",
         "../word/Editor/Spelling.js",
         "../word/Drawing/Graphics.js",
-        "../common/Overlay.js",
-        "../word/Drawing/HatchPattern.js",
         "../word/Drawing/ShapeDrawer.js",
-        "../common/CollaborativeEditingBase.js",
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/WorkEvents.js",
-        "../common/Controls.js",
         "../word/Drawing/Rulers.js",
         "../word/Drawing/HtmlPage.js",
         "../word/Drawing/documentrenderer.js",
@@ -176,12 +177,6 @@
       ],
       "map": "sdk-all.js.map",
       "log": "../word/Build/Log"
-    },
-    "defines": {
-      "src": [
-        "../common/Shapes/EditorSettings.js"
-      ],
-      "dst": "apiDefines.min.js"
     },
     "source_map": {
       "url": "http://localhost:8080/sdkjs/word"
