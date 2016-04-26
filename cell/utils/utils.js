@@ -1003,7 +1003,7 @@
 			}
 
 			// Класс Hyperlink из модели
-			this.hyperlinkModel = null != obj ? obj : new Hyperlink();
+			this.hyperlinkModel = null != obj ? obj : new AscCommonExcel.Hyperlink();
 			// Используется только для выдачи наружу и выставлении обратно
 			this.text = null;
 

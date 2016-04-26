@@ -151,7 +151,7 @@ var editor;
     var arr_colors = new Array(10);
     var _count = arr_colors.length;
     for (var i = 0; i < _count; ++i) {
-      var color = g_oColorManager.getThemeColor(i);
+      var color = AscCommonExcel.g_oColorManager.getThemeColor(i);
       arr_colors[i] = new CColor(color.getR(), color.getG(), color.getB());
     }
 
@@ -201,11 +201,11 @@ var editor;
     var _cur_index = 0;
 
     for (var i = 0; i < _count; ++i) {
-      var basecolor = g_oColorManager.getThemeColor(i);
-      var aTints = g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+      var basecolor = AscCommonExcel.g_oColorManager.getThemeColor(i);
+      var aTints = AscCommonExcel.g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
       for (var j = 0, length = aTints.length; j < length; ++j) {
         var tint = aTints[j];
-        var color = g_oColorManager.getThemeColor(i, tint);
+        var color = AscCommonExcel.g_oColorManager.getThemeColor(i, tint);
         _ret_array[_cur_index] = new CColor(color.getR(), color.getG(), color.getB());
         _cur_index++;
       }
@@ -1740,7 +1740,7 @@ var editor;
     var t = this;
     var changeTabColorCallback = function(res) {
       if (res) {
-        color = CorrectAscColor(color);
+        color = AscCommonExcel.CorrectAscColor(color);
         t.wbModel.getWorksheet(index).setTabColor(color);
       }
     };
@@ -2802,7 +2802,7 @@ var editor;
       ws.objectRender.controller.setCellTextColor(color);
     } else {
       if (color instanceof Asc.asc_CColor) {
-        color = CorrectAscColor(color);
+        color = AscCommonExcel.CorrectAscColor(color);
         this.wb.setFontAttributes("c", color);
         this.wb.restoreFocus();
       }
@@ -2817,7 +2817,7 @@ var editor;
     } else {
       if (color instanceof Asc.asc_CColor || null == color) {
         if (null != color) {
-          color = CorrectAscColor(color);
+          color = AscCommonExcel.CorrectAscColor(color);
         }
         this.wb.getWorksheet().setSelectionInfo("bc", color);
         this.wb.restoreFocus();

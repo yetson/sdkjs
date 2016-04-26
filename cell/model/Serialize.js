@@ -40,6 +40,8 @@
       var c_oSerConstants = AscCommon.c_oSerConstants;
 
       var c_oAscPageOrientation = Asc.c_oAscPageOrientation;
+    
+    var g_oDefaultFormat = AscCommonExcel.g_oDefaultFormat;
 
     /** @enum */
     var c_oSerFormat = {
@@ -1011,6 +1013,8 @@
           Group: 1,
           Custom: 2
       };
+    
+    var g_nNumsMaxId = 160;
 
     var DocumentPageSize = new function() {
         this.oSizes = [
@@ -1117,9 +1121,9 @@
 			return bcr.ReadColorSpreadsheet(t,l, color);
 		});
 		if(null != color.theme)
-			output = g_oColorManager.getThemeColor(color.theme, color.tint);
+			output = AscCommonExcel.g_oColorManager.getThemeColor(color.theme, color.tint);
 		else if(null != color.rgb)
-			output = new RgbColor(0x00ffffff & color.rgb);
+			output = new AscCommonExcel.RgbColor(0x00ffffff & color.rgb);
 		return output;
 	};
 
@@ -1251,7 +1255,7 @@
         };
         this.WriteDateGroupItem = function(dateGroupItem)
         {
-			var oDateGroupItem = new DateGroupItem();
+			var oDateGroupItem = new AscCommonExcel.DateGroupItem();
 			oDateGroupItem.convertRangeToDateGroupItem(dateGroupItem);
 			dateGroupItem = oDateGroupItem;
 			
@@ -1652,7 +1656,7 @@
             for(var i = 0, length = aBorders.length; i < length; ++i)
             {
                 var border = aBorders[i];
-                this.bs.WriteItem(c_oSerStylesTypes.Border, function(){oThis.WriteBorder(border.getDif(g_oDefaultBorderAbs));});
+                this.bs.WriteItem(c_oSerStylesTypes.Border, function(){oThis.WriteBorder(border.getDif(g_oDefaultFormat.BorderAbs));});
             }
         };
         this.WriteBorder = function(border)
@@ -1762,17 +1766,17 @@
             for(var i = 0, length = aFonts.length; i < length; ++i)
             {
                 var font = aFonts[i];
-                var fontMinimized = font.getDif(g_oDefaultFontAbs);
+                var fontMinimized = font.getDif(g_oDefaultFormat.FontAbs);
                 if(null == fontMinimized)
-                    fontMinimized = new Font();
+                    fontMinimized = new AscCommonExcel.Font();
                 if(null == fontMinimized.fn)
-                    fontMinimized.fn = g_oDefaultFontAbs.fn;
+                    fontMinimized.fn = g_oDefaultFormat.FontAbs.fn;
                 if(null == fontMinimized.scheme)
-                    fontMinimized.scheme = g_oDefaultFontAbs.scheme;
+                    fontMinimized.scheme = g_oDefaultFormat.FontAbs.scheme;
                 if(null == fontMinimized.fs)
-                    fontMinimized.fs = g_oDefaultFontAbs.fs;
+                    fontMinimized.fs = g_oDefaultFormat.FontAbs.fs;
                 if(null == fontMinimized.c)
-                    fontMinimized.c = g_oDefaultFontAbs.c;
+                    fontMinimized.c = g_oDefaultFormat.FontAbs.c;
                 this.bs.WriteItem(c_oSerStylesTypes.Font, function(){oThis.WriteFont(fontMinimized);});
             }
         };
@@ -1848,7 +1852,7 @@
             for(var i in this.oNumMap)
             {
                 var num = this.oNumMap[i];
-                if(false == num.val.isEqual(g_oDefaultNumAbs))
+                if(false == num.val.isEqual(g_oDefaultFormat.NumAbs))
                     this.bs.WriteItem(c_oSerStylesTypes.NumFmt, function(){oThis.WriteNum({id: num.index, f: num.val.f});});
             }
         };
@@ -1944,7 +1948,7 @@
             }
             if(null != xfs.align)
             {
-                var alignMinimized = xfs.align.getDif(g_oDefaultAlignAbs);
+                var alignMinimized = xfs.align.getDif(g_oDefaultFormat.AlignAbs);
                 if(null != alignMinimized)
                 {
                     this.memory.WriteByte(c_oSerXfsTypes.ApplyAlignment);
@@ -2354,27 +2358,27 @@
         };
         this._prepeareStyles = function()
         {
-            this.oFontMap[this._getStringFromObjWithProperty(g_oDefaultFont)] = {index: this.nFontMapIndex++, val: g_oDefaultFont};
+            this.oFontMap[this._getStringFromObjWithProperty(g_oDefaultFormat.Font)] = {index: this.nFontMapIndex++, val: g_oDefaultFormat.Font};
             //первый 2 fill должны быть стандартными. Excel игнорирует то что записано, берет стандартные
-            this.oFillMap[this._getStringFromObjWithProperty(new Fill())] = { index: this.nFillMapIndex++, val: new Fill() };
+            this.oFillMap[this._getStringFromObjWithProperty(new AscCommonExcel.Fill())] = { index: this.nFillMapIndex++, val: new AscCommonExcel.Fill() };
             //не добавляем в oFillMap а делаем nFillMapIndex, потому что элементы совпадают и перетрут друг друга
             this.nFillMapIndex++;
             //проверяем совпадает ли g_oDefaultFill с new Fill
-            var sFillHash = this._getStringFromObjWithProperty(g_oDefaultFill);
+            var sFillHash = this._getStringFromObjWithProperty(g_oDefaultFormat.Fill);
             var oFillDefElement = this.oFillMap[sFillHash];
             if (null == oFillDefElement) {
                 this.nDefaultFillIndex = this.nFillMapIndex;
-                oFillDefElement =  {index: this.nFillMapIndex++, val: g_oDefaultFill};
+                oFillDefElement =  {index: this.nFillMapIndex++, val: g_oDefaultFormat.Fill};
                 this.oFillMap[sFillHash] = oFillDefElement;
             }
-            this.oBorderMap[this._getStringFromObjWithProperty(g_oDefaultBorder)] = {index: this.nBorderMapIndex++, val: g_oDefaultBorder};
+            this.oBorderMap[this._getStringFromObjWithProperty(g_oDefaultFormat.Border)] = {index: this.nBorderMapIndex++, val: g_oDefaultFormat.Border};
             this.nNumMapIndex = g_nNumsMaxId;
             var sAlign = "0";
             var oAlign = null;
-            if(false == g_oDefaultAlign.isEqual(g_oDefaultAlignAbs))
+            if(false == g_oDefaultFormat.Align.isEqual(g_oDefaultFormat.AlignAbs))
             {
-                oAlign = g_oDefaultAlign;
-                sAlign = this._getStringFromObjWithProperty(g_oDefaultAlign);
+                oAlign = g_oDefaultFormat.Align;
+                sAlign = this._getStringFromObjWithProperty(g_oDefaultFormat.Align);
             }
             this.prepareXfsStyles();
             var xfs = { borderid: 0, fontid: 0, fillid: oFillDefElement.index, numid: 0, align: oAlign, QuotePrefix: null };
@@ -2684,13 +2688,13 @@
                     this.memory.WriteByte(c_oSerPropLenType.Double);
                     this.memory.WriteDouble2(oAllRow.h);
                 }
-                if(0 != (g_nRowFlag_CustomHeight & oAllRow.flags))
+                if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oAllRow.flags))
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.CustomHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
                     this.memory.WriteBool(true);
                 }
-                if(0 != (g_nRowFlag_hd & oAllRow.flags))
+                if(0 != (AscCommonExcel.g_nRowFlag_hd & oAllRow.flags))
                 {
                     this.memory.WriteByte(c_oSerSheetFormatPrTypes.ZeroHeight);
                     this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3044,13 +3048,13 @@
                 this.memory.WriteByte(c_oSerPropLenType.Double);
                 this.memory.WriteDouble2(oRow.h);
             }
-            if(0 != (g_nRowFlag_CustomHeight & oRow.flags))
+            if(0 != (AscCommonExcel.g_nRowFlag_CustomHeight & oRow.flags))
             {
                 this.memory.WriteByte(c_oSerRowTypes.CustomHeight);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
                 this.memory.WriteBool(true);
             }
-            if(0 != (g_nRowFlag_hd & oRow.flags))
+            if(0 != (AscCommonExcel.g_nRowFlag_hd & oRow.flags))
             {
                 this.memory.WriteByte(c_oSerRowTypes.Hidden);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
@@ -3175,7 +3179,7 @@
                     sStyle.numid = this.getNumIdByFormat(xfs.num);
                 sStyle.val += "|" + sStyle.numid.toString();
 
-                if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultAlignAbs))
+                if(null != xfs.align && false == xfs.align.isEqual(g_oDefaultFormat.AlignAbs))
                     sStyle.align = this._getStringFromObjWithProperty(xfs.align);
                 sStyle.val += "|" + sStyle.align;
                 sStyle.val += "|";
@@ -3923,14 +3927,14 @@
                 oTable.DisplayName = this.stream.GetString2LE(length);
             else if ( c_oSer_TablePart.AutoFilter == type )
             {
-                oTable.AutoFilter = new AutoFilter();
+                oTable.AutoFilter = new AscCommonExcel.AutoFilter();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadAutoFilter(t,l, oTable.AutoFilter);
                 });
             }
             else if ( c_oSer_TablePart.SortState == type )
             {
-                oTable.SortState = new SortState();
+                oTable.SortState = new AscCommonExcel.SortState();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadSortState(t,l, oTable.SortState);
                 });
@@ -3944,7 +3948,7 @@
             }
             else if ( c_oSer_TablePart.TableStyleInfo == type )
             {
-                oTable.TableStyleInfo = new TableStyleInfo();
+                oTable.TableStyleInfo = new AscCommonExcel.TableStyleInfo();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadTableStyleInfo(t,l, oTable.TableStyleInfo);
                 });
@@ -3968,7 +3972,7 @@
             }
             else if ( c_oSer_AutoFilter.SortState == type )
             {
-                oAutoFilter.SortState = new SortState();
+                oAutoFilter.SortState = new AscCommonExcel.SortState();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadSortState(t,l, oAutoFilter.SortState);
                 });
@@ -3983,7 +3987,7 @@
             var oThis = this;
             if ( c_oSer_AutoFilter.FilterColumn == type )
             {
-                var oFilterColumn = new FilterColumn();
+                var oFilterColumn = new AscCommonExcel.FilterColumn();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFilterColumn(t,l, oFilterColumn);
                 });
@@ -4001,7 +4005,7 @@
                 oFilterColumn.ColId = this.stream.GetULongLE();
             else if ( c_oSer_FilterColumn.Filters == type )
             {
-                oFilterColumn.Filters = new Filters();
+                oFilterColumn.Filters = new AscCommonExcel.Filters();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFilters(t,l, oFilterColumn.Filters);
                 });
@@ -4017,27 +4021,27 @@
             }
             else if ( c_oSer_FilterColumn.CustomFilters == type )
             {
-                oFilterColumn.CustomFiltersObj = new CustomFilters();
+                oFilterColumn.CustomFiltersObj = new Asc.CustomFilters();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadCustomFilters(t,l, oFilterColumn.CustomFiltersObj);
                 });
             }
             else if ( c_oSer_FilterColumn.DynamicFilter == type )
             {
-                oFilterColumn.DynamicFilter = new DynamicFilter();
+                oFilterColumn.DynamicFilter = new Asc.DynamicFilter();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadDynamicFilter(t,l, oFilterColumn.DynamicFilter);
                 });
             }else if ( c_oSer_FilterColumn.ColorFilter == type )
             {
-                oFilterColumn.ColorFilter = new ColorFilter();
+                oFilterColumn.ColorFilter = new Asc.ColorFilter();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadColorFilter(t,l, oFilterColumn.ColorFilter);
                 });
             }
             else if ( c_oSer_FilterColumn.Top10 == type )
             {
-                oFilterColumn.Top10 = new Top10();
+                oFilterColumn.Top10 = new Asc.Top10();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadTop10(t,l, oFilterColumn.Top10);
                 });
@@ -4056,7 +4060,7 @@
             var oThis = this;
             if ( c_oSer_FilterColumn.Filter == type )
             {
-                var oFilterVal = new Filter();
+                var oFilterVal = new AscCommonExcel.Filter();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFilter(t,l, oFilterVal);
                 });
@@ -4065,12 +4069,12 @@
             }
             else if ( c_oSer_FilterColumn.DateGroupItem == type )
             {
-                var oDateGroupItem = new DateGroupItem();
+                var oDateGroupItem = new AscCommonExcel.DateGroupItem();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadDateGroupItem(t,l, oDateGroupItem);
                 });
 
-				var autoFilterDateElem = new AutoFilterDateElem();
+				var autoFilterDateElem = new AscCommonExcel.AutoFilterDateElem();
 				autoFilterDateElem.convertDateGroupItemToRange(oDateGroupItem);
 				oFilters.Dates.push(autoFilterDateElem);
             }
@@ -4133,7 +4137,7 @@
             var oThis = this;
             if ( c_oSer_CustomFilters.CustomFilter == type )
             {
-                var oCustomFiltersItem = new CustomFilter();
+                var oCustomFiltersItem = new Asc.CustomFilter();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadCustomFiltersItem(t,l, oCustomFiltersItem);
                 });
@@ -4220,7 +4224,7 @@
             var oThis = this;
             if ( c_oSer_SortState.SortCondition == type )
             {
-                var oSortCondition = new SortCondition();
+                var oSortCondition = new AscCommonExcel.SortCondition();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadSortConditionContent(t,l, oSortCondition);
                 });
@@ -4277,7 +4281,7 @@
             var oThis = this;
             if ( c_oSer_TableColumns.TableColumn == type )
             {
-                var oTableColumn = new TableColumn();
+                var oTableColumn = new AscCommonExcel.TableColumn();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadTableColumn(t,l, oTableColumn);
                 });
@@ -4325,7 +4329,7 @@
             if ( c_oSerSharedStringTypes.Si === type )
             {
                 var oThis = this;
-                var Si = new CCellValue();
+                var Si = new AscCommonExcel.CCellValue();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadSharedString(t,l,Si);
                 });
@@ -4342,7 +4346,7 @@
             if ( c_oSerSharedStringTypes.Run == type )
             {
                 var oThis = this;
-                var oRun = new CCellValueMultiText();
+                var oRun = new AscCommonExcel.CCellValueMultiText();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadRun(t,l,oRun);
                 });
@@ -4367,7 +4371,7 @@
             if ( c_oSerSharedStringTypes.RPr == type )
             {
                 if(null == oRun.format)
-                    oRun.format = new Font();
+                    oRun.format = new AscCommonExcel.Font();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadRPr(t,l, oRun.format);
                 });
@@ -4482,7 +4486,7 @@
                 if (null == oCellStyleXfs)
                     continue;
 
-                oCellStyle.xfs = new CellXfs();
+                oCellStyle.xfs = new AscCommonExcel.CellXfs();
                 // XfId
                 XfIdTmp = oCellStyle.XfId;
                 if (null !== XfIdTmp) {
@@ -4560,7 +4564,7 @@
 
             for(var i = 0, length = oStyleObject.aCellXfs.length; i < length; ++i) {
                 var xfs = oStyleObject.aCellXfs[i];
-                var oNewXfs = new CellXfs();
+                var oNewXfs = new AscCommonExcel.CellXfs();
 
                 if(null != xfs.borderid)
                 {
@@ -4670,15 +4674,15 @@
         };
         this.minimizeXfs = function(xfs)
         {
-            if(null != xfs.border && g_oDefaultBorder.isEqual(xfs.border))
+            if(null != xfs.border && g_oDefaultFormat.Border.isEqual(xfs.border))
                 xfs.border = null;
-            if(null != xfs.fill && g_oDefaultFill.isEqual(xfs.fill))
+            if(null != xfs.fill && g_oDefaultFormat.Fill.isEqual(xfs.fill))
                 xfs.fill = null;
-            if(null != xfs.font && g_oDefaultFont.isEqual(xfs.font))
+            if(null != xfs.font && g_oDefaultFormat.Font.isEqual(xfs.font))
                 xfs.font = null;
-            if(null != xfs.num && g_oDefaultNum.isEqual(xfs.num))
+            if(null != xfs.num && g_oDefaultFormat.Num.isEqual(xfs.num))
                 xfs.num = null;
-            if(null != xfs.align && g_oDefaultAlignAbs.isEqual(xfs.align))
+            if(null != xfs.align && g_oDefaultFormat.AlignAbs.isEqual(xfs.align))
                 xfs.align = null;
         };
         this.ParseNum = function(oNum, oNumFmts)
@@ -4714,7 +4718,7 @@
             }
             if(null != sFormat)
             {
-                oRes = new Num();
+                oRes = new AscCommonExcel.Num();
                 oRes.f = sFormat;
             }
             return oRes;
@@ -4768,7 +4772,7 @@
             var oThis = this;
             if ( c_oSerStylesTypes.Border == type )
             {
-                var oNewBorder = new Border();
+                var oNewBorder = new AscCommonExcel.Border();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadBorder(t,l,oNewBorder);
                 });
@@ -4935,7 +4939,7 @@
             else if ( c_oSerXfsTypes.Aligment == type )
             {
                 if(null == oXfs.Aligment)
-                    oXfs.align = new Align();
+                    oXfs.align = new AscCommonExcel.Align();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadAligment(t,l,oXfs.align);
                 });
@@ -4992,7 +4996,7 @@
             var oThis = this;
             if ( c_oSerStylesTypes.Fill == type )
             {
-                var oNewFill = new Fill();
+                var oNewFill = new AscCommonExcel.Fill();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFill(t,l,oNewFill);
                 });
@@ -5036,7 +5040,7 @@
             var oThis = this;
             if ( c_oSerStylesTypes.Font == type )
             {
-                var oNewFont = new Font();
+                var oNewFont = new AscCommonExcel.Font();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.bssr.ReadRPr(t,l,oNewFont);
                 });
@@ -5084,7 +5088,7 @@
             var oThis = this;
             var oCellStyle = null;
             if (c_oSerStylesTypes.CellStyle === type) {
-                oCellStyle = new CCellStyle();
+                oCellStyle = new AscCommonExcel.CCellStyle();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadCellStyle(t, l, oCellStyle);
                 });
@@ -5117,7 +5121,7 @@
             var oThis = this;
             if ( c_oSerStylesTypes.Dxf == type )
             {
-                var oDxf = new CellXfs();
+                var oDxf = new AscCommonExcel.CellXfs();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadDxf(t,l,oDxf);
                 });
@@ -5133,14 +5137,14 @@
             var oThis = this;
             if ( c_oSer_Dxf.Alignment == type )
             {
-                oDxf.align = new Align();
+                oDxf.align = new AscCommonExcel.Align();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadAligment(t,l,oDxf.align);
                 });
             }
             else if ( c_oSer_Dxf.Border == type )
             {
-                var oNewBorder = new Border();
+                var oNewBorder = new AscCommonExcel.Border();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadBorder(t,l,oNewBorder);
                 });
@@ -5148,7 +5152,7 @@
             }
             else if ( c_oSer_Dxf.Fill == type )
             {
-                var oNewFill = new Fill();
+                var oNewFill = new AscCommonExcel.Fill();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadFill(t,l,oNewFill);
                 });
@@ -5156,7 +5160,7 @@
             }
             else if ( c_oSer_Dxf.Font == type )
             {
-                var oNewFont = new Font();
+                var oNewFont = new AscCommonExcel.Font();
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.bssr.ReadRPr(t,l,oNewFont);
                 });
@@ -5521,7 +5525,7 @@
                         elem.hd = true;
                     }
                     for(var j = elem.Min; j <= elem.Max; j++){
-                        var oNewCol = new Col(oWorksheet, j - 1);
+                        var oNewCol = new AscCommonExcel.Col(oWorksheet, j - 1);
                         fInitCol(elem, oNewCol);
                         oWorksheet.aCols[oNewCol.index] = oNewCol;
                     }
@@ -5588,7 +5592,7 @@
             else if ( c_oSerWorksheetsTypes.Autofilter == type )
             {
                 oBinary_TableReader = new Binary_TableReader(this.stream, oWorksheet, this.Dxfs);
-                oWorksheet.AutoFilter = new AutoFilter();
+                oWorksheet.AutoFilter = new AscCommonExcel.AutoFilter();
                 res = this.bcr.Read1(length, function(t,l){
                     return oBinary_TableReader.ReadAutoFilter(t,l, oWorksheet.AutoFilter);
                 });
@@ -5706,14 +5710,14 @@
                 var oAllRow = oWorksheet.getAllRow();
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oAllRow.flags |= g_nRowFlag_CustomHeight;
+					oAllRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
             }
             else if ( c_oSerSheetFormatPrTypes.ZeroHeight == type )
             {
                 var oAllRow = oWorksheet.getAllRow();
 				var hd = this.stream.GetBool();
 				if(hd)
-					oAllRow.flags |= g_nRowFlag_hd;
+					oAllRow.flags |= AscCommonExcel.g_nRowFlag_hd;
             }
             else
                 res = c_oSerConstants.ReadUnknown;
@@ -5777,7 +5781,7 @@
             var oThis = this;
             if ( c_oSerWorksheetsTypes.Hyperlink == type )
             {
-                var oNewHyperlink = new Hyperlink();
+                var oNewHyperlink = new AscCommonExcel.Hyperlink();
                 res = this.bcr.Read1(length, function(t,l){
                     return oThis.ReadHyperlink(t,l, ws, oNewHyperlink);
                 });
@@ -5820,7 +5824,7 @@
             if ( c_oSerWorksheetsTypes.Row == type )
             {
 				var oCellOffset = {pos: null, len: null};
-                var oNewRow = new Row(ws);
+                var oNewRow = new AscCommonExcel.Row(ws);
                 res = this.bcr.Read2Spreadsheet(length, function(t,l){
                     return oThis.ReadRow(t,l, oNewRow, ws, oCellOffset);
                 });
@@ -5861,19 +5865,19 @@
             {
                 oRow.h = this.stream.GetDoubleLE();
                 if(g_nCurFileVersion < 2)
-                    oRow.flags |= g_nRowFlag_CustomHeight;
+                    oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
             }
             else if ( c_oSerRowTypes.CustomHeight == type )
 			{
 				var CustomHeight = this.stream.GetBool();
 				if(CustomHeight)
-					oRow.flags |= g_nRowFlag_CustomHeight;
+					oRow.flags |= AscCommonExcel.g_nRowFlag_CustomHeight;
 			}
             else if ( c_oSerRowTypes.Hidden == type )
 			{
 				var hd = this.stream.GetBool();
 				if(hd)
-					oRow.flags |= g_nRowFlag_hd;
+					oRow.flags |= AscCommonExcel.g_nRowFlag_hd;
 			}
             else if ( c_oSerRowTypes.Cells == type )
             {
@@ -6564,7 +6568,7 @@
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.SparklineGroup === type) {
-				var newSparklineGroup = new sparklineGroup();
+				var newSparklineGroup = new AscCommonExcel.sparklineGroup();
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparklineGroup(t, l, newSparklineGroup);
                 });
@@ -6640,7 +6644,7 @@
             var oThis = this;
             var res = c_oSerConstants.ReadOk;
             if (c_oSer_Sparkline.Sparkline === type) {
-				var newSparkline = new sparkline();
+				var newSparkline = new AscCommonExcel.sparkline();
 				res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSparkline(t, l, newSparkline);
                 });
@@ -6889,7 +6893,7 @@
     {
         var wb = this.wb ? this.wb : workbook;
 
-        g_oColorManager.setTheme(wb.theme);
+        AscCommonExcel.g_oColorManager.setTheme(wb.theme);
 
         var sMinorFont = null;
         if(null != wb.theme.themeElements && null != wb.theme.themeElements.fontScheme && null != wb.theme.themeElements.fontScheme.minorFont)
@@ -6897,7 +6901,7 @@
         var sDefFont = "Arial";
         if(null != sMinorFont && "" != sMinorFont)
             sDefFont = sMinorFont;
-        g_oDefaultFont = g_oDefaultFontAbs = new Font({
+        g_oDefaultFormat.Font = g_oDefaultFormat.FontAbs = new AscCommonExcel.Font({
             fn : sDefFont,
             scheme : EFontScheme.fontschemeNone,
             fs : 11,
@@ -6905,25 +6909,25 @@
             i : false,
             u : EUnderline.underlineNone,
             s : false,
-            c : g_oColorManager.getThemeColor(g_nColorTextDefault),
+            c : AscCommonExcel.g_oColorManager.getThemeColor(AscCommonExcel.g_nColorTextDefault),
             va : "baseline",
             skip : false,
             repeat : false
         });
-        g_oDefaultFill = g_oDefaultFillAbs = new Fill({bg : null});
-        g_oDefaultBorder = g_oDefaultBorderAbs = new Border({
-            l : new BorderProp(),
-            t : new BorderProp(),
-            r : new BorderProp(),
-            b : new BorderProp(),
-            d : new BorderProp(),
-            ih : new BorderProp(),
-            iv : new BorderProp(),
+        g_oDefaultFormat.Fill = g_oDefaultFormat.FillAbs = new AscCommonExcel.Fill({bg : null});
+        g_oDefaultFormat.Border = g_oDefaultFormat.BorderAbs = new AscCommonExcel.Border({
+            l : new AscCommonExcel.BorderProp(),
+            t : new AscCommonExcel.BorderProp(),
+            r : new AscCommonExcel.BorderProp(),
+            b : new AscCommonExcel.BorderProp(),
+            d : new AscCommonExcel.BorderProp(),
+            ih : new AscCommonExcel.BorderProp(),
+            iv : new AscCommonExcel.BorderProp(),
             dd : false,
             du : false
         });
-        g_oDefaultNum = g_oDefaultNumAbs = new Num({f : "General"});
-        g_oDefaultAlign = g_oDefaultAlignAbs = new Align({
+        g_oDefaultFormat.Num = g_oDefaultFormat.NumAbs = new AscCommonExcel.Num({f : "General"});
+        g_oDefaultFormat.Align = g_oDefaultFormat.AlignAbs = new AscCommonExcel.Align({
             hor : "none",
             indent : 0,
             RelativeIndent : 0,
@@ -7559,7 +7563,7 @@
                 var styles = {};
                 for(var i in configs)
                 {
-                    styles[i] = new CellXfs();
+                    styles[i] = new AscCommonExcel.CellXfs();
                 }
                 this._compileOption(options, headerRowCount, totalsRowCount, styles, configs);
                 this.compiled.options[nBitMask] = styles;
@@ -7571,7 +7575,7 @@
             if(null != inputDxf && null != inputDxf.border)
             {
                 var oCurBorder = inputDxf.border;
-                var oNewBorder = new Border();
+                var oNewBorder = new AscCommonExcel.Border();
                 if(bLeft)
                     oNewBorder.l = oCurBorder.l;
                 else if(bInnerVer)
@@ -7600,7 +7604,7 @@
             if(null != inputDxf && null != inputDxf.border)
             {
                 var oCurBorder = inputDxf.border;
-                var oNewBorder = new Border();
+                var oNewBorder = new AscCommonExcel.Border();
                 if(bHeader)
                     oNewBorder.t = oCurBorder.b;
                 else
@@ -8006,18 +8010,18 @@
                     return oBinary_StylesTableReader.ReadXfs(t, l, oStyleObject.xfs);
                 });
             } else if (Types.Font === type) {
-                oStyleObject.font = new Font();
+                oStyleObject.font = new AscCommonExcel.Font();
                 res = bcr.Read2Spreadsheet(length, function (t, l) {
                     return oBinary_StylesTableReader.bssr.ReadRPr(t, l, oStyleObject.font);
                 });
                 oBinary_StylesTableReader.bssr.CheckSchemeFont(oStyleObject.font);
             } else if (Types.Fill === type) {
-                oStyleObject.fill = new Fill();
+                oStyleObject.fill = new AscCommonExcel.Fill();
                 res = bcr.Read1(length, function (t, l) {
                     return oBinary_StylesTableReader.ReadFill(t, l, oStyleObject.fill);
                 });
             } else if (Types.Border === type) {
-                oStyleObject.border = new Border();
+                oStyleObject.border = new AscCommonExcel.Border();
                 res = bcr.Read1(length, function (t, l) {
                     return oBinary_StylesTableReader.ReadBorder(t, l, oStyleObject.border);
                 });
@@ -8033,12 +8037,12 @@
             var res = c_oSerConstants.ReadOk;
             var oStyleObject = {font: null, fill: null, border: null, oNumFmts: [], xfs: null};
             if (Types.Style === type) {
-                var oCellStyle = new CCellStyle();
+                var oCellStyle = new AscCommonExcel.CCellStyle();
                 res = bcr.Read1(length, function (t, l) {
                     return fReadStyle(t,l, oCellStyle, oStyleObject);
                 });
 
-                oCellStyle.xfs = new CellXfs();
+                oCellStyle.xfs = new AscCommonExcel.CellXfs();
                 // Border
                 if (null !== oStyleObject.border)
                     oCellStyle.xfs.border = oStyleObject.border.clone();
@@ -8094,11 +8098,12 @@
             wb.CellStyles.CustomStyles[0].XfId = 0;
         }
         // Если XfId не задан, то определим его
-        if (null == g_oDefaultXfId) {
-            g_oDefaultXfId = 0;
+        if (null == g_oDefaultFormat.XfId) {
+            g_oDefaultFormat.XfId = 0;
         }
     }
 
+    window['Asc'] = window['Asc'] || {};
     window["Asc"].c_oSerFormat = c_oSerFormat;
     window["Asc"].EBorderStyle = EBorderStyle;
     window["Asc"].EUnderline = EUnderline;
@@ -8130,5 +8135,4 @@
     window["Asc"].BinaryFileWriter = BinaryFileWriter;
 
     window["Asc"].getBinaryOtherTableGVar = getBinaryOtherTableGVar;
-}
-    )(window);
+})(window);
