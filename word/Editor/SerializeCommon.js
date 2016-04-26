@@ -26,7 +26,7 @@
 
 function CPPTXContentLoader()
 {
-    this.Reader = new BinaryPPTYLoader();
+    this.Reader = new AscCommon.BinaryPPTYLoader();
     this.Writer = null;
 
     this.stream = null;
@@ -50,7 +50,7 @@ function CPPTXContentLoader()
     {
         this.BaseReader = reader;
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
 
         if (null != paraDrawing)
         {
@@ -63,7 +63,7 @@ function CPPTXContentLoader()
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -128,7 +128,7 @@ function CPPTXContentLoader()
     this.ReadGraphicObject = function(stream, presentation)
     {
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
 
         if(presentation)
         {
@@ -141,7 +141,7 @@ function CPPTXContentLoader()
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -173,7 +173,7 @@ function CPPTXContentLoader()
     {
         this.BaseReader = reader;
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
         if(presentation)
             this.Reader.presentation = presentation;
 
@@ -184,7 +184,7 @@ function CPPTXContentLoader()
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -210,7 +210,7 @@ function CPPTXContentLoader()
     {
         this.BaseReader = reader;
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
 
         var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
@@ -219,7 +219,7 @@ function CPPTXContentLoader()
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -244,7 +244,7 @@ function CPPTXContentLoader()
     this.ReadShapeProperty = function(stream, type)
     {
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
 
         var oLogicDocument = this.LogicDocument;
         this.LogicDocument = null;
@@ -253,7 +253,7 @@ function CPPTXContentLoader()
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -302,7 +302,7 @@ function CPPTXContentLoader()
         while (true)
         {
             var _at = s.GetUChar();
-            if (_at == g_nodeAttributeEnd)
+            if (_at == AscCommon.g_nodeAttributeEnd)
                 break;
 
             switch (_at)
@@ -409,7 +409,7 @@ function CPPTXContentLoader()
         while (true)
         {
             var _at = s.GetUChar();
-            if (_at == g_nodeAttributeEnd)
+            if (_at == AscCommon.g_nodeAttributeEnd)
                 break;
 
             switch (_at)
@@ -630,7 +630,7 @@ function CPPTXContentLoader()
         while (true)
         {
             var _at = s.GetUChar();
-            if (_at == g_nodeAttributeEnd)
+            if (_at == AscCommon.g_nodeAttributeEnd)
                 break;
 
             if (0 == _at)
@@ -735,11 +735,11 @@ function CPPTXContentLoader()
     {
         this.BaseReader = reader;
         if (this.Reader == null)
-            this.Reader = new BinaryPPTYLoader();
+            this.Reader = new AscCommon.BinaryPPTYLoader();
 
         if (null == this.stream)
         {
-            this.stream = new FileStream();
+            this.stream = new AscCommon.FileStream();
             this.stream.obj    = stream.obj;
             this.stream.data   = stream.data;
             this.stream.size   = stream.size;
@@ -947,9 +947,9 @@ function CPPTXContentWriter()
         var _writer = this.BinaryFileWriter;
         _writer.StartRecord(1);
 
-        _writer.WriteUChar(g_nodeAttributeStart);
+        _writer.WriteUChar(AscCommon.g_nodeAttributeStart);
         _writer._WriteBool2(0, shape.attrUseBgFill);
-        _writer.WriteUChar(g_nodeAttributeEnd);
+        _writer.WriteUChar(AscCommon.g_nodeAttributeEnd);
 
         shape.spPr.WriteXfrm = shape.spPr.xfrm;
 
