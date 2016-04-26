@@ -776,7 +776,7 @@ function CPPTXContentLoader()
 
 function CPPTXContentWriter()
 {
-    this.BinaryFileWriter = new CBinaryFileWriter();
+    this.BinaryFileWriter = new AscCommon.CBinaryFileWriter();
     this.BinaryFileWriter.Init();
     //this.BinaryFileWriter.IsWordWriter = true;
 

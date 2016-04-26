@@ -4398,7 +4398,7 @@
 			this.bOccurEndPar = null;
 			this.oCurHyperlink = null;
 			this.oCurHyperlinkElem = null;
-			this.oPresentationWriter = new CBinaryFileWriter();
+			this.oPresentationWriter = new AscCommon.CBinaryFileWriter();
 		}
 		CopyProcessor.prototype =
 		{
