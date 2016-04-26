@@ -7519,7 +7519,7 @@ CDocumentContent.prototype =
 
             if ( true === SelectionUse_old && true === MouseEvent.ShiftKey && true === bOldSelectionIsCommon )
             {
-                this.Selection_SetEnd( X, Y, this.CurPage, {Type : g_mouse_event_type_up, ClickCount : 1} );
+                this.Selection_SetEnd( X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_up, ClickCount : 1} );
                 this.Selection.Use      = true;
                 this.Selection.Start    = true;
                 this.Selection.EndPos   = ContentPos;
@@ -7528,7 +7528,7 @@ CDocumentContent.prototype =
             else
             {
                 Item.Selection_SetStart( X, Y, this.CurPage, MouseEvent );
-                Item.Selection_SetEnd( X, Y, this.CurPage, {Type : g_mouse_event_type_move, ClickCount : 1} );
+                Item.Selection_SetEnd( X, Y, this.CurPage, {Type : AscCommon.g_mouse_event_type_move, ClickCount : 1} );
 
                 if ( !(type_Table == Item.GetType() && true == bTableBorder) )
                 {
@@ -7572,7 +7572,7 @@ CDocumentContent.prototype =
         if (docpostype_DrawingObjects === this.CurPos.Type)
         {
             var PageAbs = (this.Parent instanceof CHeaderFooter ? CurPage : this.Get_StartPage_Absolute(CurPage));
-            if (g_mouse_event_type_up == MouseEvent.Type)
+            if (AscCommon.g_mouse_event_type_up == MouseEvent.Type)
             {
                 this.LogicDocument.DrawingObjects.OnMouseUp(MouseEvent, X, Y, PageAbs);
                 this.Selection.Start = false;
@@ -7599,7 +7599,7 @@ CDocumentContent.prototype =
             var Item = this.Content[this.Selection.Data.Pos];
             Item.Selection_SetEnd( X, Y, this.CurPage, MouseEvent );
 
-            if ( g_mouse_event_type_up == MouseEvent.Type )
+            if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
             {
                 this.Selection.Start = false;
 
@@ -7655,7 +7655,7 @@ CDocumentContent.prototype =
         // Направление селекта: 1 - прямое, -1 - обратное, 0 - отмечен 1 элемент документа
         var Direction = ( ContentPos > this.Selection.StartPos ? 1 : ( ContentPos < this.Selection.StartPos ? -1 : 0 )  );
 
-        if ( g_mouse_event_type_up == MouseEvent.Type )
+        if ( AscCommon.g_mouse_event_type_up == MouseEvent.Type )
         {
             // Останаливаем селект в глобальном классе. Кроме этого мы должны остановить селект в
             // стартовом элементе селекта.
@@ -7833,7 +7833,7 @@ CDocumentContent.prototype =
                 _X = this.Pages[this.Pages.length - 1].XLimit + 1;
         }
 
-        var _MouseEvent = {ClickCount : 1, Type : g_mouse_event_type_up};
+        var _MouseEvent = {ClickCount : 1, Type : AscCommon.g_mouse_event_type_up};
         this.Selection_SetEnd(_X, _Y, CurPage, _MouseEvent);
     },
 

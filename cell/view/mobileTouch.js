@@ -31,6 +31,20 @@
 function (window, undefined) {
     // Import
     var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
+    var global_mouseEvent = AscCommon.global_mouseEvent;
+
+    var MobileTouchMode =
+    {
+        None        : 0,
+        Scroll      : 1,
+        Zoom        : 2,
+        Select      : 3,
+        InlineObj   : 4,
+        FlowObj     : 5,
+        Cursor      : 6,
+        TableMove   : 7,
+        TableRuler  : 8
+    };
     
 function CMobileTouchManager()
 {
@@ -109,7 +123,7 @@ CMobileTouchManager.prototype.Init = function(ctrl)
 
 CMobileTouchManager.prototype.MoveCursorToPoint = function(e)
 {
-    check_MouseMoveEvent(e);
+    AscCommon.check_MouseMoveEvent(e);
     var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 
     var old_click_count = global_mouseEvent.ClickCount;
@@ -1028,7 +1042,7 @@ CMobileTouchManager.prototype.onTouchEnd = function(e)
 
 CMobileTouchManager.prototype.onTouchStart_renderer = function(e)
 {
-    check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
+    AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
     global_mouseEvent.LockMouse();
 
     this.ScrollH = this.HtmlPage.m_dScrollX;
@@ -1090,7 +1104,7 @@ CMobileTouchManager.prototype.onTouchStart_renderer = function(e)
 };
 CMobileTouchManager.prototype.onTouchMove_renderer = function(e)
 {
-    check_MouseMoveEvent(e.touches ? e.touches[0] : e);
+    AscCommon.check_MouseMoveEvent(e.touches ? e.touches[0] : e);
 
     if (!this.MoveAfterDown)
     {
@@ -1154,7 +1168,7 @@ CMobileTouchManager.prototype.onTouchMove_renderer = function(e)
 };
 CMobileTouchManager.prototype.onTouchEnd_renderer = function(e)
 {
-    check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
+    AscCommon.check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
 
     this.ScrollH = this.HtmlPage.m_dScrollX;
     this.ScrollV = this.HtmlPage.m_dScrollY;

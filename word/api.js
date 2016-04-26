@@ -49,6 +49,7 @@ var mapAscServerErrorToAscError = AscCommon.mapAscServerErrorToAscError;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
 var PasteElementsId = AscCommon.PasteElementsId;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var c_oAscError = Asc.c_oAscError;
 var c_oAscFileType = Asc.c_oAscFileType;
@@ -1729,7 +1730,7 @@ asc_docs_api.prototype.Copy = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 67;
 
@@ -1748,7 +1749,7 @@ asc_docs_api.prototype.Cut = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 88;
 
@@ -1764,7 +1765,7 @@ asc_docs_api.prototype.Paste = function()
 {
     if (window["AscDesktopEditor"])
     {
-        var _e = new CKeyboardEvent();
+        var _e = new AscCommon.CKeyboardEvent();
         _e.CtrlKey = true;
         _e.KeyCode = 86;
 
@@ -6726,7 +6727,7 @@ function _downloadAs(editor, command, filetype, actionType, options, fCallbackRe
 		return;
 	} else if (c_oAscFileType.HTML === filetype && null == options.oDocumentMailMerge && null == options.oMailMergeSendData) {
 		//в asc_nativeGetHtml будет вызван select all, чтобы выделился документ должны выйти из колонтитулов и автофигур
-		var _e = new CKeyboardEvent();
+		var _e = new AscCommon.CKeyboardEvent();
 		_e.CtrlKey = false;
 		_e.KeyCode = 27;
 		editor.WordControl.m_oLogicDocument.OnKeyDown(_e);

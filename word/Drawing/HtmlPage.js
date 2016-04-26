@@ -34,6 +34,8 @@ var g_anchor_right = AscCommon.g_anchor_right;
 var g_anchor_bottom = AscCommon.g_anchor_bottom;
 var CreateControlContainer = AscCommon.CreateControlContainer;
 var CreateControl = AscCommon.CreateControl;
+var global_keyboardEvent = AscCommon.global_keyboardEvent;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
@@ -42,7 +44,6 @@ var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
 var g_bIsMobile =  AscBrowser.isMobile;
-var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 210;
 var Page_Height    = 297;
@@ -472,7 +473,7 @@ function CEditorPage(api)
 
         if (this.m_oApi.isMobileVersion)
         {
-            this.MobileTouchManager = new CMobileTouchManager();
+            this.MobileTouchManager = new AscCommon.CMobileTouchManager();
             this.MobileTouchManager.Init(this);
         }
 
@@ -540,9 +541,9 @@ function CEditorPage(api)
 
     this.initEvents2 = function()
     {
-        this.arrayEventHandlers[0] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
-        this.arrayEventHandlers[1] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
-        this.arrayEventHandlers[2] = new button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
+        this.arrayEventHandlers[0] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
+        this.arrayEventHandlers[1] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
+        this.arrayEventHandlers[2] = new AscCommon.button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
 
         this.m_oLeftRuler_buttonsTabs.HtmlElement.onclick = this.onButtonTabsClick;//new Function("onButtonTabsClick();");
 
@@ -1623,7 +1624,7 @@ function CEditorPage(api)
         if (window.closeDialogs != undefined)
             closeDialogs();
 
-        check_MouseDownEvent(e, true);
+        AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.LockMouse();
 
         // у Илюхи есть проблема при вводе с клавы, пока нажата кнопка мыши
@@ -1707,7 +1708,7 @@ function CEditorPage(api)
         //if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block")
         //    return;
 
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
             pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1819,7 +1820,7 @@ function CEditorPage(api)
             oWordControl.m_oScrollHorApi.evt_mouseup(e);
         }
 
-        check_MouseUpEvent(e);
+        AscCommon.check_MouseUpEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
             pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1884,9 +1885,9 @@ function CEditorPage(api)
 
 		var oWordControl = oThis;
 
-		global_mouseEvent.Type = g_mouse_event_type_up;
+		global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
 
-		g_bIsMouseUpLockedSend = true;
+		AscCommon.MouseUpLock.MouseUpLockedSend = true;
 
 		global_mouseEvent.Sender = null;
 
@@ -1912,9 +1913,9 @@ function CEditorPage(api)
         global_mouseEvent.X = x;
         global_mouseEvent.Y = y;
 
-        global_mouseEvent.Type = g_mouse_event_type_up;
+        global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
 
-        g_bIsMouseUpLockedSend = true;
+        AscCommon.MouseUpLock.MouseUpLockedSend = true;
 
         if (oWordControl.m_oHorRuler.m_bIsMouseDown)
             oWordControl.m_oHorRuler.OnMouseUpExternal();
@@ -2250,7 +2251,7 @@ function CEditorPage(api)
 
         this.ReaderModeDiv = document.getElementById("reader_id");
 
-        this.ReaderTouchManager = new CReaderTouchManager();
+        this.ReaderTouchManager = new AscCommon.CReaderTouchManager();
         this.ReaderTouchManager.Init(this);
 
         this.TransformDivUseAnimation(this.ReaderModeDivWrapper, 0);
@@ -2351,14 +2352,14 @@ function CEditorPage(api)
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
 
         if (oWordControl.m_bIsRuler && oWordControl.m_oHorRuler.m_bIsMouseDown)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
@@ -2369,7 +2370,7 @@ function CEditorPage(api)
         {
             if (!window.USER_AGENT_MACOS)
             {
-                check_KeyboardEvent2(e);
+                AscCommon.check_KeyboardEvent2(e);
                 e.preventDefault();
                 return;
             }
@@ -2381,7 +2382,7 @@ function CEditorPage(api)
             oWordControl.onMouseUpExternal(global_mouseEvent.X, global_mouseEvent.Y);
         }
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         if (oWordControl.IsFocus === false)
         {
             // некоторые команды нужно продолжать обрабатывать
@@ -2493,7 +2494,7 @@ function CEditorPage(api)
 
         if (null == oWordControl.m_oLogicDocument)
         {
-            check_KeyboardEvent(e);
+            AscCommon.check_KeyboardEvent(e);
             var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(global_keyboardEvent) === true) ? false : true;
             if (false === bIsPrev)
             {
@@ -2505,7 +2506,7 @@ function CEditorPage(api)
         if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
             return;
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         oWordControl.IsKeyDownButNoPress = true;
 
@@ -2599,7 +2600,7 @@ function CEditorPage(api)
             if (oThis.bIsUseKeyPress === false)
                 return;
 
-            check_KeyboardEvent(e);
+            AscCommon.check_KeyboardEvent(e);
 
             var Code;
             if (null != global_keyboardEvent.Which)
@@ -2645,7 +2646,7 @@ function CEditorPage(api)
             return;
         */
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         /*
         if (oWordControl.m_oApi.isViewMode)
@@ -2806,11 +2807,11 @@ function CEditorPage(api)
                 this.m_oScrollHor_ = new AscCommon.ScrollObject( "id_horizontal_scroll", settings );
 
 				this.m_oScrollHor_.onLockMouse = function(evt){
-					check_MouseDownEvent(evt, true);
+            AscCommon.check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();
 				}
 				this.m_oScrollHor_.offLockMouse = function(evt){
-					check_MouseUpEvent(evt);
+            AscCommon.check_MouseUpEvent(evt);
 				}
                 this.m_oScrollHor_.bind("scrollhorizontal",function(evt){
                      oThis.horizontalScroll(this,evt.scrollD,evt.maxScrollX);
@@ -2825,11 +2826,11 @@ function CEditorPage(api)
                 this.m_oScrollVer_ = new AscCommon.ScrollObject( "id_vertical_scroll", settings );
 
 				this.m_oScrollVer_.onLockMouse = function(evt){
-					check_MouseDownEvent(evt, true);
+            AscCommon.check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();
 				}
 				this.m_oScrollVer_.offLockMouse = function(evt){
-					check_MouseUpEvent(evt);
+            AscCommon.check_MouseUpEvent(evt);
 				}
                 this.m_oScrollVer_.bind("scrollvertical",function(evt){
                      oThis.verticalScroll(this,evt.scrollD,evt.maxScrollY);
@@ -4200,7 +4201,7 @@ function CEditorPage(api)
 
     this.TextBoxOnKeyDown = function(e)
     {
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         if (global_keyboardEvent.KeyCode == 9)
         {
             e.preventDefault();

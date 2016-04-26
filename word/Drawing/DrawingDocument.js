@@ -32,6 +32,7 @@ var CColor = AscCommon.CColor;
 var CAscMathCategory = AscCommon.CAscMathCategory;
 var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 var g_fontManager = new AscFonts.CFontManager();
 g_fontManager.Initialize(true);
@@ -3352,7 +3353,7 @@ function CDrawingDocument()
 
         if (0 != nValueScrollHor || 0 != nValueScrollVer)
         {
-            if (this.m_oWordControl.m_bIsMouseUpSend === true && global_keyboardEvent.ClickCount != 1)
+            if (this.m_oWordControl.m_bIsMouseUpSend === true && AscCommon.global_keyboardEvent.ClickCount != 1)
             {
                 this.m_tempX = x;
                 this.m_tempY = y;
@@ -5229,7 +5230,7 @@ function CDrawingDocument()
 
     this.CorrectRulerPosition = function(pos)
     {
-        if (global_keyboardEvent.AltKey)
+        if (AscCommon.global_keyboardEvent.AltKey)
             return pos;
 
         return ((pos / 2.5 + 0.5) >> 0) * 2.5;
@@ -6748,7 +6749,7 @@ function CDrawingDocument()
     {
         this.InlineTextTrackEnabled = false;
 
-        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
+        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
         this.InlineTextTrackPage = -1;
     }

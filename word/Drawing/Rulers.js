@@ -26,6 +26,7 @@
 
 // Import
 var c_oAscDocumentUnits = Asc.c_oAscDocumentUnits;
+var global_mouseEvent = AscCommon.global_mouseEvent;
 
 function CTab(pos,type)
 {
@@ -102,7 +103,7 @@ function CVerRulerRepaintChecker()
 
 function RulerCorrectPosition(_ruler, val, margin)
 {
-    if (global_keyboardEvent.AltKey)
+    if (AscCommon.global_keyboardEvent.AltKey)
         return val;
 
     var mm_1_4 = 10 / 4;
@@ -1077,8 +1078,8 @@ function CHorRuler()
     this.OnMouseMove = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        
-        check_MouseMoveEvent(e);
+
+        AscCommon.check_MouseMoveEvent(e);
 
         this.SimpleChanges.CheckMove();
 
@@ -1802,7 +1803,7 @@ function CHorRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
         this.SimpleChanges.Reinit();
@@ -2010,7 +2011,7 @@ function CHorRuler()
     {
         var word_control = this.m_oWordControl;
         this.m_oWordControl.OnUpdateOverlay();
-        var lockedElement = check_MouseUpEvent(e);
+        var lockedElement = AscCommon.check_MouseUpEvent(e);
 
         this.m_dIndentLeft_old      = -10000;
         this.m_dIndentLeftFirst_old = -10000;
@@ -3205,7 +3206,7 @@ function CVerRuler()
     this.OnMouseMove = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
 
         this.SimpleChanges.CheckMove();
         var ver_ruler = word_control.m_oLeftRuler_vertRuler;
@@ -3457,7 +3458,7 @@ function CVerRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e);
 
         this.SimpleChanges.Reinit();
         global_mouseEvent.LockMouse();
@@ -3518,7 +3519,7 @@ function CVerRuler()
 
     this.OnMouseUp = function(left, top, e)
     {
-        var lockedElement = check_MouseUpEvent(e);
+        var lockedElement = AscCommon.check_MouseUpEvent(e);
 
         //this.m_oWordControl.m_oOverlayApi.UnShow();
         this.m_oWordControl.OnUpdateOverlay();

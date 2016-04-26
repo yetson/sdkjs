@@ -22,14 +22,13 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿var g_dDpiX = 96.0;
+var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
 
 var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
 var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
 
 var g_bIsMobile =  AscCommon.AscBrowser.isMobile;
-var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 210;
 var Page_Height    = 297;

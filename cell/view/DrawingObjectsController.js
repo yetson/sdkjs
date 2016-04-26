@@ -233,7 +233,7 @@ DrawingObjectsController.prototype.onMouseDown = function(e, x, y)
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
     e.Button = e.button;
-    e.Type = g_mouse_event_type_down;
+    e.Type = AscCommon.g_mouse_event_type_down;
     var ret = this.curState.onMouseDown(e, x, y, 0);
     if(e.ClickCount < 2)
     {
@@ -250,7 +250,7 @@ DrawingObjectsController.prototype.onMouseMove = function(e, x, y)
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
     e.Button = e.button;
-    e.Type = g_mouse_event_type_move;
+    e.Type = AscCommon.g_mouse_event_type_move;
     this.curState.onMouseMove(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseMove = DrawingObjectsController.prototype.onMouseMove;
@@ -261,7 +261,7 @@ DrawingObjectsController.prototype.onMouseUp = function(e, x, y)
     e.ShiftKey = e.shiftKey;
     e.CtrlKey = e.metaKey || e.ctrlKey;
     e.Button = e.button;
-    e.Type = g_mouse_event_type_up;
+    e.Type = AscCommon.g_mouse_event_type_up;
     this.curState.onMouseUp(e, x, y, 0);
 };
 DrawingObjectsController.prototype.OnMouseUp = DrawingObjectsController.prototype.onMouseUp;
