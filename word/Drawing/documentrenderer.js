@@ -204,6 +204,9 @@ function CreateDocumentData(szSrc)
     index++;
     var dstLen = parseInt(dst_len);
 
+    if (0 == dstLen)
+        return null;
+
     var pointer = g_memory.Alloc(dstLen);
     var stream = new CStream(pointer.data, dstLen);
     stream.obj = pointer.obj;
@@ -275,7 +278,7 @@ function CreateDocumentData(szSrc)
     return stream;
 }
 
-function CDrawingObject()
+function CDrawingObject(metaDoc)
 {
     this.Page = -1;
     this.StreamPos = -1;
@@ -291,6 +294,8 @@ function CDrawingObject()
     this.tm_shy = 0;
 
     this.LastTimeDrawing = -1;
+
+    this.MetaDoc = metaDoc;
 }
 
 CDrawingObject.prototype =
@@ -388,9 +393,9 @@ function CDocMeta()
 
     this.SearchInfo =
     {
-        Id      : null,
-        Page    : 0,
-        Text    : null
+        Id   : null,
+        Page : 0,
+        Text : null
     };
 
     this.SearchResults = {
@@ -404,9 +409,12 @@ function CDocMeta()
         Count       : 0
     };
 
-    var oThisDoc = this;
+    this.pagestreams = [];
+}
 
-    this.Load = function(url, doc_bin_base64)
+CDocMeta.prototype =
+{
+    Load : function(url, doc_bin_base64)
     {
         var stream = CreateDocumentData(doc_bin_base64);
 
@@ -457,9 +465,9 @@ function CDocMeta()
         }
 
         AscCommon.g_font_loader.LoadEmbeddedFonts("fonts/", this.Fonts);
-    }
+    },
 
-    this.InitDocument = function(drDoc)
+    InitDocument : function(drDoc)
     {
         for (var i = 0; i < this.PagesCount; i++)
         {
@@ -483,48 +491,53 @@ function CDocMeta()
 
         editor.sync_countPagesCallback(this.PagesCount);
         editor.sync_currentPageCallback(0);
-    }
+    },
 
-    this.drawPage = function(pageIndex, g)
+    drawPage : function(pageIndex, g)
     {
-        var drObject = new CDrawingObject();
+        var drObject = new CDrawingObject(this);
         drObject.Page = pageIndex;
         drObject.StreamPos = this.Pages[pageIndex].start;
         drObject.Graphics = g;
 
         this.Drawings[this.Drawings.length] = drObject;
         this.OnImageLoad(drObject);
-    }
+    },
 
-    this.stopRenderingPage = function(pageIndex)
+    stopRenderingPage : function(pageIndex)
     {
         for (var i = 0; i < this.Drawings.length; i++)
         {
             if (pageIndex == this.Drawings[i].Page)
             {
-                oThisDoc.Drawings[i].BreakDrawing = 1;
+                this.Drawings[i].BreakDrawing = 1;
 
-                if (oThisDoc.Drawings[i].Graphics.IsClipContext)
+                if (this.Drawings[i].Graphics.IsClipContext)
                 {
-                    oThisDoc.Drawings[i].Graphics.m_oContext.restore();
-                    oThisDoc.Drawings[i].Graphics.IsClipContext = false;
+                    this.Drawings[i].Graphics.m_oContext.restore();
+                    this.Drawings[i].Graphics.IsClipContext = false;
                 }
 
-                oThisDoc.Drawings.splice(i, 1);
+                this.Drawings.splice(i, 1);
                 i--;
             }
         }
-    }
+    },
 
-    this.OnImageLoad = function(obj)
+    getStreamPage : function(pageNum)
+    {
+        return this.stream;
+    },
+
+    OnImageLoad : function(obj)
     {
         if (obj.BreakDrawing == 1)
         {
             return;
         }
 
-        var page = oThisDoc.Pages[obj.Page];
-        var s = oThisDoc.stream;
+        var page = this.Pages[obj.Page];
+        var s = this.getStreamPage(obj.Page);
         s.Seek(obj.StreamPos);
         var g = obj.Graphics;
 
@@ -548,7 +561,7 @@ function CDocMeta()
             g.font("font" + obj.fontId, obj.fontSize);
         }
 
-        var bIsFromPaint = (oThisDoc.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
+        var bIsFromPaint = (this.Pages[obj.Page].start == obj.StreamPos) ? 1 : 0;
 
         if (obj.CheckOnScroll() && 0 == bIsFromPaint)
             editor.WordControl.OnScroll();
@@ -714,10 +727,10 @@ function CDocMeta()
                                 g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
                             }
 
-                            oThisDoc.OnImageLoad(obj);
+                            obj.MetaDoc.OnImageLoad(obj);
                         };
                         img.onerror = function(){
-                            oThisDoc.OnImageLoad(obj);
+                            obj.MetaDoc.OnImageLoad(obj);
                         };
                         img.src = _src;
 
@@ -737,10 +750,10 @@ function CDocMeta()
                                 g.drawImage2(img, 0, 0, page.width_mm, page.height_mm);
                             }
 
-                            oThisDoc.OnImageLoad(obj);
+                            obj.MetaDoc.OnImageLoad(obj);
                         };
                         img.onerror = function(){
-                            oThisDoc.OnImageLoad(obj);
+                            obj.MetaDoc.OnImageLoad(obj);
                         };
                         img.src = _src;
 
@@ -791,11 +804,11 @@ function CDocMeta()
                                 _ctx.restore();
                             }
                         }
-						
-                        oThisDoc.OnImageLoad(obj);
+
+                        obj.MetaDoc.OnImageLoad(obj);
                     };
                     img.onerror = function(){
-                        oThisDoc.OnImageLoad(obj);
+                        obj.MetaDoc.OnImageLoad(obj);
                     };
                     img.src = _src;
 
@@ -896,16 +909,16 @@ function CDocMeta()
 
         // дорисовали страницу. теперь нужно удалить все объекты, у которых страница такая же
         // по идее удаляем только obj
-        oThisDoc.stopRenderingPage(obj.Page);
+        this.stopRenderingPage(obj.Page);
 
         if (bIsFromPaint == 0)
             editor.WordControl.OnScroll();
-    }
+    },
 
-    this.GetNearestPos = function(pageNum, x, y)
+    GetNearestPos : function(pageNum, x, y)
     {
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         // textline parameters
@@ -1237,12 +1250,12 @@ function CDocMeta()
         }
 
         return { Line : _line, Glyph : _glyph };
-    }
+    },
 
-    this.GetCountLines = function(pageNum)
+    GetCountLines : function(pageNum)
     {
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         var _lineGidExist = false;
@@ -1396,9 +1409,9 @@ function CDocMeta()
         }
 
         return _numLine;
-    }
+    },
 
-    this.DrawSelection = function(pageNum, overlay, xDst, yDst, width, height)
+    DrawSelection : function(pageNum, overlay, xDst, yDst, width, height)
     {
         var sel = this.Selection;
         var Page1 = 0;
@@ -1487,7 +1500,7 @@ function CDocMeta()
             bIsFillToEnd = true;
 
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         // textline parameters
@@ -1785,9 +1798,9 @@ function CDocMeta()
                 }
             }
         }
-    }
+    },
 
-    this.CopySelection = function(pageNum, _text_format)
+    CopySelection : function(pageNum, _text_format)
     {
         var ret = "";
 
@@ -1869,7 +1882,7 @@ function CDocMeta()
 
 
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         var lineSpans = [];
@@ -2124,12 +2137,12 @@ function CDocMeta()
             }
         }
         return ret;
-    }
+    },
 
-    this.SearchPage = function(pageNum, text)
+    SearchPage : function(pageNum, text)
     {
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         var glyphsEqualFound = 0;
@@ -2601,12 +2614,12 @@ function CDocMeta()
                 }
             }
         }
-    }
+    },
 
-    this.SearchPage2 = function(pageNum)
+    SearchPage2 : function(pageNum)
     {
         var page = this.Pages[pageNum];
-        var s = this.stream;
+        var s = this.getStreamPage(pageNum);
         s.Seek(page.start);
 
         var _searchResults = this.SearchResults;
@@ -3044,9 +3057,9 @@ function CDocMeta()
                 }
             }
         }
-    }
+    },
 
-    this.OnMouseDown = function(page, x, y)
+    OnMouseDown : function(page, x, y)
     {
         var ret = this.GetNearestPos(page, x, y);
 
@@ -3061,9 +3074,9 @@ function CDocMeta()
 
         sel.IsSelection = true;
         this.OnUpdateSelection();
-    }
+    },
 
-    this.OnMouseMove = function(page, x, y)
+    OnMouseMove : function(page, x, y)
     {
         if (false === this.Selection.IsSelection)
             return;
@@ -3076,20 +3089,20 @@ function CDocMeta()
         sel.Glyph2 = ret.Glyph;
 
         this.OnUpdateSelection();
-    }
+    },
 
-    this.OnMouseUp = function()
+    OnMouseUp : function()
     {
         this.Selection.IsSelection = false;
-    }
+    },
 
-    this.OnUpdateSelection = function()
+    OnUpdateSelection : function()
     {
         editor.WordControl.m_oOverlayApi.Show();
         editor.WordControl.OnUpdateOverlay();
-    }
+    },
 
-    this.Copy = function(_text_format)
+    Copy : function(_text_format)
     {
         var sel = this.Selection;
         var page1 = sel.Page1;
@@ -3110,9 +3123,9 @@ function CDocMeta()
 
         //console.log(ret);
         return ret;
-    }
+    },
 
-    this.OnKeyDown = function(e)
+    OnKeyDown : function(e)
     {
         if (!editor.bInit_word_control)
             return false;
@@ -3208,32 +3221,35 @@ function CDocMeta()
         }
 
         return bRetValue;
-    }
+    },
 
-    this.StartSearch = function(text)
+    StartSearch : function(text)
     {
         editor.WordControl.m_oDrawingDocument.StartSearch();
 
         this.SearchInfo.Text = text;
         this.SearchInfo.Page = 0;
-        this.SearchInfo.Id = setTimeout(oThisDoc.OnSearchPage, 1);
-    }
 
-    this.OnSearchPage = function()
+        var oThis = this;
+        this.SearchInfo.Id = setTimeout(function(){oThis.OnSearchPage();}, 1);
+    },
+
+    OnSearchPage : function()
     {
-        oThisDoc.SearchPage(oThisDoc.SearchInfo.Page, oThisDoc.SearchInfo.Text);
-        oThisDoc.SearchInfo.Page++;
+        this.SearchPage(this.SearchInfo.Page, this.SearchInfo.Text);
+        this.SearchInfo.Page++;
 
-        if (oThisDoc.SearchInfo.Page >= oThisDoc.PagesCount)
+        if (this.SearchInfo.Page >= this.PagesCount)
         {
-            oThisDoc.StopSearch();
+            this.StopSearch();
             return;
         }
 
-        oThisDoc.SearchInfo.Id = setTimeout(oThisDoc.OnSearchPage, 1);
-    }
+        var oThis = this;
+        this.SearchInfo.Id = setTimeout(function(){oThis.OnSearchPage();}, 1);
+    },
 
-    this.StopSearch = function()
+    StopSearch : function()
     {
         if (null != this.SearchInfo.Id)
         {
@@ -3241,9 +3257,9 @@ function CDocMeta()
             this.SearchInfo.Id = null;
         }
         editor.WordControl.m_oDrawingDocument.EndSearch(false);
-    }
+    },
 
-    this.findText = function(text, isMachingCase, isNext)
+    findText : function(text, isMachingCase, isNext)
     {
         this.SearchResults.IsSearch = true;
         if (text == this.SearchResults.Text && isMachingCase == this.SearchResults.MachingCase)
@@ -3378,4 +3394,4 @@ function CDocMeta()
 
         editor.WordControl.ToSearchResult();
     }
-}
+};
