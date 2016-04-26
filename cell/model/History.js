@@ -203,7 +203,7 @@ CHistory.prototype.Undo = function()
 		this.LastState = this.workbook.handlers.trigger("getSelectionState");
 
 	var Point = this.Points[this.Index--];
-	var oRedoObjectParam = new Asc.RedoObjectParam();
+	var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
 	this.UndoRedoPrepare(oRedoObjectParam, true);
 
 	// Откатываем все действия в обратном порядке (относительно их выполенения)
@@ -450,7 +450,7 @@ CHistory.prototype.Redo = function()
 	if ( true != this.Can_Redo() )
 		return;
 
-	var oRedoObjectParam = new Asc.RedoObjectParam();
+	var oRedoObjectParam = new AscCommonExcel.RedoObjectParam();
 	this.UndoRedoPrepare(oRedoObjectParam, false);
 
 	var Point = this.Points[++this.Index];

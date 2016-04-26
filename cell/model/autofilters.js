@@ -677,7 +677,7 @@
 				var objOptions = new AddFormatTableOptions();
 				
 				if(userRange)
-					activeCells = Asc.g_oRangeCache.getAscRange(userRange);
+					activeCells = AscCommonExcel.g_oRangeCache.getAscRange(userRange);
 				
 				var alreadyAddFilter = this._searchFilters(activeCells, false);
 				//в случае если меняем стиль фильтра
@@ -1673,7 +1673,7 @@
 				var res = false;
 				var worksheet = this.worksheet;
 
-				var activeRange = Asc.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
+				var activeRange = AscCommonExcel.g_oRangeCache.getAscRange(addFormatTableOptionsObj.asc_getRange());
 				if(activeRange && worksheet.AutoFilter && worksheet.AutoFilter.Ref.intersection(activeRange))
 					res = true;
 					
@@ -4575,7 +4575,7 @@
 				{
 					tempRange = addFormatTableOptionsObj.asc_getRange();
 					addNameColumn = !addFormatTableOptionsObj.asc_getIsTitle();
-					tempRange = Asc.g_oRangeCache.getAscRange(tempRange).clone();
+					tempRange = AscCommonExcel.g_oRangeCache.getAscRange(tempRange).clone();
 				}
 				else if(addFormatTableOptionsObj === true)
 					addNameColumn = false;

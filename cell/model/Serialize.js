@@ -3914,7 +3914,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_TablePart.Ref == type )
-                oTable.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+                oTable.Ref = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_TablePart.HeaderRowCount == type )
                 oTable.HeaderRowCount = this.stream.GetULongLE();
             else if ( c_oSer_TablePart.TotalsRowCount == type )
@@ -3958,7 +3958,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_AutoFilter.Ref == type )
-                oAutoFilter.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+                oAutoFilter.Ref = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_AutoFilter.FilterColumns == type )
             {
                 oAutoFilter.FilterColumns = [];
@@ -4200,7 +4200,7 @@
         {
             var res = c_oSerConstants.ReadOk;
             if ( c_oSer_SortState.ConditionRef == type )
-                oSortCondition.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+                oSortCondition.Ref = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_SortState.ConditionSortBy == type )
                 oSortCondition.ConditionSortBy = this.stream.GetUChar();
             else if ( c_oSer_SortState.ConditionDescending == type )
@@ -4235,7 +4235,7 @@
             var res = c_oSerConstants.ReadOk;
             var oThis = this;
             if ( c_oSer_SortState.Ref == type )
-                oSortState.Ref = Asc.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
+                oSortState.Ref = AscCommonExcel.g_oRangeCache.getAscRange(this.stream.GetString2LE(length));
             else if ( c_oSer_SortState.CaseSensitive == type )
                 oSortState.CaseSensitive = this.stream.GetBool();
             else if ( c_oSer_SortState.SortConditions == type )
@@ -5614,7 +5614,7 @@
                     return oThis.ReadSheetViews(t, l, oWorksheet.sheetViews);
                 });
             } else if (c_oSerWorksheetsTypes.SheetPr === type) {
-                oWorksheet.sheetPr = new Asc.asc_CSheetPr();
+                oWorksheet.sheetPr = new AscCommonExcel.asc_CSheetPr();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSheetPr(t, l, oWorksheet.sheetPr);
                 });
@@ -6488,7 +6488,7 @@
             var oSheetView = null;
 
             if (c_oSerWorksheetsTypes.SheetView === type) {
-                oSheetView = new Asc.asc_CSheetViewSettings();
+                oSheetView = new AscCommonExcel.asc_CSheetViewSettings();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadSheetView(t, l, oSheetView);
                 });
@@ -6506,7 +6506,7 @@
             } else if (c_oSer_SheetView.ShowRowColHeaders === type) {
                 oSheetView.showRowColHeaders = this.stream.GetBool();
             } else if (c_oSer_SheetView.Pane === type) {
-                oSheetView.pane = new Asc.asc_CPane();
+                oSheetView.pane = new AscCommonExcel.asc_CPane();
                 res = this.bcr.Read1(length, function (t, l) {
                     return oThis.ReadPane(t, l, oSheetView.pane);
                 });
