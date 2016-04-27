@@ -289,7 +289,7 @@
     /**
      * Widget for displaying and editing Worksheet object
      * -----------------------------------------------------------------------------
-     * @param {Woorksheet} model  Worksheet
+     * @param {AscCommonExcel.Woorksheet} model  Worksheet
      * @param {asc_CHandlersList} handlers  Event handlers
      * @param {Object} buffers    DrawingContext + Overlay
      * @param {StringRender} stringRender    StringRender
@@ -1206,8 +1206,8 @@
         this.defaultColWidthPx = asc_ceil( this.defaultColWidthPx / 8 ) * 8;
         this.defaultColWidthChars = this._colWidthToCharCount( this.defaultColWidthPx * asc_getcvt( 0/*px*/, 1/*pt*/, 96 ) );
 
-        gc_dDefaultColWidthCharsAttribute = this._charCountToModelColWidth( this.defaultColWidthChars );
-        this.defaultColWidth = this._modelColWidthToColWidth( gc_dDefaultColWidthCharsAttribute );
+        AscCommonExcel.oDefaultMetrics.ColWidthChars = this._charCountToModelColWidth(this.defaultColWidthChars);
+        this.defaultColWidth = this._modelColWidthToColWidth(AscCommonExcel.oDefaultMetrics.ColWidthChars);
 
         var defaultFontSize = this.model.getDefaultFontSize();
         // ToDo разобраться со значениями
@@ -1217,7 +1217,9 @@
 
         this.maxRowHeight = asc_calcnpt(Asc.c_oAscMaxRowHeight, this._getPPIY());
         this.defaultRowDescender = this._calcRowDescender( defaultFontSize );
-        gc_dDefaultRowHeightAttribute = this.defaultRowHeight = this.model.getDefaultHeight() || Math.max( asc_calcnpt( defaultFontSize * this.vspRatio, this._getPPIY() ) + this.height_1px, this.headersHeightByFont );
+        AscCommonExcel.oDefaultMetrics.RowHeight = this.defaultRowHeight = this.model.getDefaultHeight() ||
+          Math.max(asc_calcnpt(defaultFontSize * this.vspRatio, this._getPPIY()) + this.height_1px,
+            this.headersHeightByFont);
 
         // Инициализируем число колонок и строк (при открытии). Причем нужно поставить на 1 больше,
         // чтобы могли показать последнюю строку/столбец (http://bugzserver/show_bug.cgi?id=23513)
@@ -5435,12 +5437,12 @@
 
         if ( se == AscCommonExcel.c_oAscDrawDepOptions.Master ) {
             c = c.getCells()[0];
-            var id = getVertexId( this.model.getId(), c.getName() );
+            var id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
             this.depDrawCells[id] = {from: c, to: nodes};
         }
         else {
-            var to = {}, to1, id = getVertexId( this.model.getId(), c.getName() );
-            to[getVertexId( this.model.getId(), c.getName() )] = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
+            var to = {}, to1, id = AscCommonExcel.getVertexId( this.model.getId(), c.getName() );
+            to[AscCommonExcel.getVertexId( this.model.getId(), c.getName() )] = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
             to1 = this.model.workbook.dependencyFormulas.getNode( this.model.getId(), c.getName() );
             for ( var id2 in nodes ) {
                 if ( this.depDrawCells[id2] ) {
@@ -7926,7 +7928,7 @@
             t.cleanSelection();
 
             if ( true === isSuccess ) {
-                promoteFromTo(from, t.model, to, t.model);
+                AscCommonExcel.promoteFromTo(from, t.model, to, t.model);
             }
 
             t.expandColsOnScroll( false, true, to.c2 + 1 );
@@ -7941,7 +7943,7 @@
             t._recalculateAfterUpdate( [to] );
         };
 
-        var result = preparePromoteFromTo( from, to );
+        var result = AscCommonExcel.preparePromoteFromTo( from, to );
         if ( !result ) {
             // ToDo вывести ошибку
             onApplyFormatPainterCallback( false );
@@ -9071,7 +9073,7 @@
                         t.handlers.trigger( "slowOperation", true );
                     }
                     /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-                    lockDraw( t.model.workbook );
+                    AscCommonExcel.lockDraw( t.model.workbook );
 
                     // Если нужно удалить автофильтры - удаляем
                     if ( val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text ) {
@@ -9103,8 +9105,8 @@
                     t.model.autoFilters.renameTableColumn( arn );
 
                     /* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-                    buildRecalc( t.model.workbook );
-                    unLockDraw( t.model.workbook );
+                    AscCommonExcel.buildRecalc( t.model.workbook );
+                    AscCommonExcel.unLockDraw( t.model.workbook );
                     break;
 
                 case "changeDigNum":
@@ -9209,7 +9211,7 @@
             t.handlers.trigger( "slowOperation", true );
         }
 
-        lockDraw( t.model.workbook );
+        AscCommonExcel.lockDraw( t.model.workbook );
         var selectData;
         if ( isLocal === 'binary' ) {
             selectData = t._pasteFromBinary( val );
@@ -9222,8 +9224,8 @@
 
         if ( !selectData ) {
             bIsUpdate = false;
-            buildRecalc( t.model.workbook );
-            unLockDraw( t.model.workbook );
+            AscCommonExcel.buildRecalc( t.model.workbook );
+            AscCommonExcel.unLockDraw( t.model.workbook );
             return;
         }
         this.expandColsOnScroll(false, true);
@@ -9242,8 +9244,8 @@
             }
         }
 
-        buildRecalc( t.model.workbook );
-        unLockDraw( t.model.workbook );
+        AscCommonExcel.buildRecalc( t.model.workbook );
+        AscCommonExcel.unLockDraw( t.model.workbook );
         var arn = selectData[0];
         var selectionRange = arn.clone( true );
 
@@ -10711,9 +10713,8 @@
             pad = this.width_padding * 2 + this.width_1px;
             cc = Math.min( this._colWidthToCharCount( width + pad ), Asc.c_oAscMaxColumnWidth );
             cw = this._charCountToModelColWidth( cc );
-        }
-        else {
-            cw = gc_dDefaultColWidthCharsAttribute;
+        } else {
+            cw = AscCommonExcel.oDefaultMetrics.ColWidthChars;
             cc = this.defaultColWidthChars;
         }
 
@@ -12141,7 +12142,7 @@
     WorksheetView.prototype.setData = function ( oData ) {
         History.Clear();
         History.TurnOff();
-        var oAllRange = new Range( this.model, 0, 0, this.nRowsCount - 1, this.nColsCount - 1 );
+        var oAllRange = new AscCommonExcel.Range( this.model, 0, 0, this.nRowsCount - 1, this.nColsCount - 1 );
         oAllRange.cleanAll();
 
         var row, oCell;
