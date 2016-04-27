@@ -2622,4 +2622,5 @@ function GetRectContentWidth(oContent, dMaxWidth)
     window['AscFormat'].CreatePenFromParams = CreatePenFromParams;
     window['AscFormat'].CTextDrawer = CTextDrawer;
     window['AscFormat'].PolygonWrapper = PolygonWrapper;
+    window['AscFormat'].GetRectContentWidth = GetRectContentWidth;
 })(window);

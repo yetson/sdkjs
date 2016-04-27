@@ -2508,4 +2508,5 @@ function GetRectContentWidth(oContent, dMaxWidth)
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].CTextDrawer = CTextDrawer;
+    window['AscFormat'].GetRectContentWidth = GetRectContentWidth;
 })(window);
