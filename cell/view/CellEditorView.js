@@ -2171,7 +2171,7 @@
 		}
 		tmp = this.options.fragments[tmp.index].format;
 
-		var result = new asc.asc_CFont();
+		var result = new AscCommonExcel.asc_CFont();
 		result.name = tmp.fn;
 		result.size = tmp.fs;
 		result.bold = tmp.b;
