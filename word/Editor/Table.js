@@ -84,8 +84,8 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (CollaborativeEditing)
-            CollaborativeEditing.Add_Unlock2(this);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Add_Unlock2(this);
     }
     
     this.DrawingDocument = null;
@@ -5146,7 +5146,7 @@ CTable.prototype =
                     if (null != Element)
                     {
                         this.Content.splice(Pos, 0, Element);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                     }
                 }
 
@@ -5172,7 +5172,7 @@ CTable.prototype =
                         continue;
 
                     this.Content.splice(Pos, 1);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
                 }
 
                 this.Recalc_CompiledPr2();
@@ -5415,7 +5415,7 @@ CTable.prototype =
 
         this.Internal_ReIndexing();
 
-        CollaborativeEditing.Add_NewObject(this);
+        AscCommon.CollaborativeEditing.Add_NewObject(this);
 
         var DrawingDocument = editor.WordControl.m_oDrawingDocument;
         if ( undefined !== DrawingDocument && null !== DrawingDocument )
@@ -5427,7 +5427,7 @@ CTable.prototype =
         // Добавляем, чтобы в конце выставить CurCell
         var LinkData = {};
         LinkData.CurCell = true;
-        CollaborativeEditing.Add_LinkData( this, LinkData );
+        AscCommon.CollaborativeEditing.Add_LinkData( this, LinkData );
     },
 
     Load_LinkData : function(LinkData)

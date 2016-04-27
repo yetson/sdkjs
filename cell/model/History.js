@@ -314,7 +314,7 @@ CHistory.prototype.RedoExecute = function(Point, oRedoObjectParam)
 		}
 		this._addRedoObjectParam(oRedoObjectParam, Item);
 	}
-	CollaborativeEditing.Apply_LinkData();
+	AscCommon.CollaborativeEditing.Apply_LinkData();
 	var wsViews = Asc["editor"].wb.wsViews;
 	this.Get_RecalcData(Point);
 	for(var i = 0; i < wsViews.length; ++i)
@@ -329,7 +329,7 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
 	var wsViews, i, oState = null, bCoaut = false;
 	if (!bUndo && null == Point) {
 		Point = this.Points[this.Index];
-		CollaborativeEditing.Apply_LinkData();
+		AscCommon.CollaborativeEditing.Apply_LinkData();
 		bCoaut = true;
         if(!window["NATIVE_EDITOR_ENJINE"] || window['IS_NATIVE_EDITOR']) {
             this.Get_RecalcData(Point);

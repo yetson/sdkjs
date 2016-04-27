@@ -2989,7 +2989,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
                 var wsViews = window["Asc"]["editor"].wb.wsViews;
                 if(oThis.oApi.collaborativeEditing.getFast()){
-                    CollaborativeEditing.Clear_DocumentPositions();
+                  AscCommon.CollaborativeEditing.Clear_DocumentPositions();
                 }
                 for(var i in wsViews)
                 {
@@ -3003,11 +3003,11 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                             var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
                             if(oState){
                                 if (oState.Pos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
                                 if (oState.StartPos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
                                 if (oState.EndPos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
                             }
                         }
                         wsViews[i].objectRender.controller.resetSelection();
@@ -3043,11 +3043,11 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                             var oState = wsViews[i].objectRender.getStateBeforeLoadChanges();
                             if(oState){
                                 if (oState.Pos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.Pos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.Pos);
                                 if (oState.StartPos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.StartPos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.StartPos);
                                 if (oState.EndPos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.EndPos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.EndPos);
                             }
                             wsViews[i].objectRender.loadStateAfterLoadChanges();
                         }
