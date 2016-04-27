@@ -464,7 +464,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
         var ctx = _canvas.getContext('2d');
         var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
         graphics.transform(1,0,0,1,0,0);
         chart_space.draw(graphics);
         return _canvas.toDataURL("image/png");
@@ -948,7 +948,7 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
         return "";
     }
 	graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
-	graphics.m_oFontManager = g_fontManager;
+	graphics.m_oFontManager = AscCommon.g_fontManager;
 	graphics.transform(1,0,0,1,0,0);
 
 	var oldShowParaMarks;
@@ -985,7 +985,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         }
         oShape.recalculate();
 
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
 
         var oldShowParaMarks;
         if(editor)

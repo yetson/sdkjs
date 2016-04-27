@@ -37,12 +37,8 @@ var CreateControl = AscCommon.CreateControl;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
-
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile =  AscBrowser.isMobile;
 
@@ -171,7 +167,7 @@ function CEditorPage(api)
     this.m_oHorRuler        = new CHorRuler();
     this.m_oVerRuler        = new CVerRuler();
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oDrawingDocument.m_oWordControl = this;
@@ -1031,7 +1027,7 @@ function CEditorPage(api)
             return;
 
         // нужно проверить режим и сбросить кеш грамотно (ie version)
-        g_fontManager.ClearRasterMemory();
+        AscCommon.g_fontManager.ClearRasterMemory();
 
         if (AscCommon.g_fontManager2)
             AscCommon.g_fontManager2.ClearRasterMemory();
@@ -3398,7 +3394,7 @@ function CEditorPage(api)
 
             if (!this.bIsRetinaSupport)
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left;
                 _cur_page_rect.y = drawPage.top;
                 _cur_page_rect.w = drawPage.right - drawPage.left;
@@ -3408,7 +3404,7 @@ function CEditorPage(api)
             }
             else
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left << 1;
                 _cur_page_rect.y = drawPage.top << 1;
                 _cur_page_rect.w = (drawPage.right << 1) - _cur_page_rect.x;
@@ -3566,17 +3562,17 @@ function CEditorPage(api)
             {
                 if (49 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(false, false);
+                    AscCommon.SetHintsProps(false, false);
                     bFlag = true;
                 }
                 else if (50 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, false);
+                    AscCommon.SetHintsProps(true, false);
                     bFlag = true;
                 }
                 else if (51 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, true);
+                    AscCommon.SetHintsProps(true, true);
                     bFlag = true;
                 }
             }
@@ -3585,7 +3581,7 @@ function CEditorPage(api)
         if (bFlag)
         {
             this.m_oDrawingDocument.ClearCachePages();
-            g_fontManager.ClearFontsRasterCache();
+            AscCommon.g_fontManager.ClearFontsRasterCache();
 
             if (AscCommon.g_fontManager2)
                 AscCommon.g_fontManager2.ClearFontsRasterCache();
