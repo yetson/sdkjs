@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var getFullImageSrc2 = AscCommon.getFullImageSrc2;
 
@@ -1917,3 +1919,5 @@ function ShapeToImageConverter(shape, pageIndex)
 //------------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].CShapeDrawer = CShapeDrawer;
+window['AscCommon'].ShapeToImageConverter = ShapeToImageConverter;
+})(window);

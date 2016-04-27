@@ -22,7 +22,6 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-window.IsShapeToImageConverter = false;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
@@ -1627,3 +1626,5 @@ function ShapeToImageConverter(shape, pageIndex)
 //------------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].CShapeDrawer = CShapeDrawer;
+window['AscCommon'].ShapeToImageConverter = ShapeToImageConverter;
+window['AscCommon'].IsShapeToImageConverter = false;
