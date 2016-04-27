@@ -1246,7 +1246,7 @@ CShapeDrawer.prototype =
             // и отправляем на отрисовку (с матрицей)
 
             var trans = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oFullTransform : this.Graphics.m_oFullTransform;
-            var trans1 = global_MatrixTransformer.Invert(trans);
+            var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var x1 = trans.TransformPointX(0, 0);
             var y1 = trans.TransformPointY(0, 0);
@@ -1539,7 +1539,7 @@ CShapeDrawer.prototype =
                 // и отправляем на отрисовку (с матрицей)
 
                 var trans = (this.Graphics.RENDERER_PDF_FLAG === undefined) ? this.Graphics.m_oFullTransform : this.Graphics.GetTransform();
-                var trans1 = global_MatrixTransformer.Invert(trans);
+                var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
                 var lineSize = (this.Graphics.RENDERER_PDF_FLAG === undefined) ? this.Graphics.m_oContext.lineWidth : this.Graphics.GetLineWidth();
 
@@ -1704,7 +1704,7 @@ CShapeDrawer.prototype =
             return points;
         }
 
-        var grad_a = deg2rad(angle);
+        var grad_a = AscCommon.deg2rad(angle);
         if (!scale)
         {
             if (angle > 0 && angle < 90)
@@ -1889,7 +1889,7 @@ function ShapeToImageConverter(shape, pageIndex)
 
     var _ctx = _canvas.getContext('2d');
 
-    var g = new CGraphics();
+    var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
     g.m_oFontManager = g_fontManager;
 

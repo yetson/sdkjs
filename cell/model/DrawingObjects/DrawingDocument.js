@@ -31,6 +31,7 @@ var g_fontApplication = AscFonts.g_fontApplication;
 var CColor = AscCommon.CColor;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var g_dDpiX = 96.0;
 var g_dDpiY = 96.0;
@@ -1451,7 +1452,7 @@ function CDrawingDocument(drawingObjects)
     this.IsLockObjectsEnable = false;
 
     this.cursorMarkerFormat = "";
-    if (bIsIE)
+    if (AscCommon.AscBrowser.isIE)
     {
         // Пути указаны относительно html в меню, не надо их исправлять
         // и коммитить на пути относительно тестового меню
@@ -1879,7 +1880,7 @@ function CDrawingDocument(drawingObjects)
         //var StartTime = new Date().getTime();
 
         // ������ ����� �������
-        var g = new CGraphics();
+        var g = new AscCommon.CGraphics();
         g.init(page.drawingPage.cachedImage.image.ctx, w, h, page.width_mm, page.height_mm);
         g.m_oFontManager = g_fontManager;
 
@@ -4510,7 +4511,7 @@ function CDrawingDocument(drawingObjects)
             var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
             var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
             graphics.m_oFontManager = g_fontManager;
 
@@ -4629,7 +4630,7 @@ function CDrawingDocument(drawingObjects)
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
             graphics.m_oFontManager = g_fontManager;
             graphics.transform(1,0,0,1,0,0);

@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+
 function CCacheSlideImage()
 {
     this.Image = null;
@@ -213,7 +216,7 @@ function CTransitionAnimation(htmlpage)
 
             this.CacheImage1.Image = this.CreateImage(_w, _h);
 
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(this.CacheImage1.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
             g.m_oFontManager = g_fontManager;
 
@@ -254,7 +257,7 @@ function CTransitionAnimation(htmlpage)
 
             this.CacheImage2.Image = this.CreateImage(_w, _h);
 
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(this.CacheImage2.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
             g.m_oFontManager = g_fontManager;
 
@@ -2687,7 +2690,7 @@ function CDemonstrationManager(htmlpage)
 
         var _image = this.CacheImagesManager.Lock(_w, _h);
 
-        var g = new CGraphics();
+        var g = new AscCommon.CGraphics();
         g.init(_image.image.getContext('2d'), _w, _h, _w_mm, _h_mm);
         g.m_oFontManager = g_fontManager;
 

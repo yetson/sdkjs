@@ -2103,7 +2103,7 @@ Workbook.prototype.init=function(bNoBuildDep){
 	
 	var self = this;
 
-	this.wsHandlers = new Asc.asc_CHandlersList( /*handlers*/{
+	this.wsHandlers = new AscCommonExcel.asc_CHandlersList( /*handlers*/{
 		"changeRefTablePart"   : function ( displayName, ref ) {
 			self.dependencyFormulas.changeTableName( displayName, null, ref );
 		},

@@ -433,7 +433,7 @@ function CEditorPage(api)
         if (this.m_oApi.isMobileVersion)
         {
             var _tag_background = "textarea";
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
                 _tag_background = "input";
 
             var _text_bx_back = document.createElement(_tag_background);
@@ -441,7 +441,7 @@ function CEditorPage(api)
             _text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
             _text_bx_back.setAttribute("spellcheck", "false");
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 _text_bx_back.setAttribute("autocomplete", "off");
                 _text_bx_back.setAttribute("type", "password");
@@ -734,7 +734,7 @@ function CEditorPage(api)
                 }
             }
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 /*
                 var moveCursorToEnd = function(el)
@@ -1033,8 +1033,8 @@ function CEditorPage(api)
         // нужно проверить режим и сбросить кеш грамотно (ie version)
         g_fontManager.ClearRasterMemory();
 
-        if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-            window.g_fontManager2.ClearRasterMemory();
+        if (AscCommon.g_fontManager2)
+            AscCommon.g_fontManager2.ClearRasterMemory();
 
         var oWordControl = oThis;
 
@@ -3587,8 +3587,8 @@ function CEditorPage(api)
             this.m_oDrawingDocument.ClearCachePages();
             g_fontManager.ClearFontsRasterCache();
 
-            if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-                window.g_fontManager2.ClearFontsRasterCache();
+            if (AscCommon.g_fontManager2)
+                AscCommon.g_fontManager2.ClearFontsRasterCache();
         }
 
         return bFlag;

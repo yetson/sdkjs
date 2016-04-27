@@ -221,7 +221,7 @@
 		t.overlayCtx = new asc.DrawingContext( {
 			canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		} );
-		t.textRender = new asc.CellTextRender( t.drawingCtx );
+		t.textRender = new AscCommonExcel.CellTextRender( t.drawingCtx );
 		t.textRender.setDefaultFont( settings.font.clone() );
 
 		// bind event handlers
@@ -2737,9 +2737,7 @@
 	};
 
 
-	/*
-	 * Export
-	 * -----------------------------------------------------------------------------
-	 */
-	window["Asc"].CellEditor = CellEditor;
+	//------------------------------------------------------------export---------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window["AscCommonExcel"].CellEditor = CellEditor;
 })( jQuery, window );

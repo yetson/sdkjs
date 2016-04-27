@@ -569,7 +569,7 @@ CAutoshapeTrack.prototype =
         this.m_oOverlay = overlay;
         this.m_oContext = this.m_oOverlay.m_oContext;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 
@@ -754,7 +754,7 @@ CAutoshapeTrack.prototype =
 
         var drawPage = oPage.drawingPage;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 
