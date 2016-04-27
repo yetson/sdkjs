@@ -9227,6 +9227,9 @@
             bIsUpdate = false;
             AscCommonExcel.buildRecalc( t.model.workbook );
             AscCommonExcel.unLockDraw( t.model.workbook );
+			if ( callTrigger ) {
+                t.handlers.trigger( "slowOperation", false );
+            }
             return;
         }
         this.expandColsOnScroll(false, true);
