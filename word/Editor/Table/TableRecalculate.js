@@ -1749,7 +1749,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
 
         // Временно отключаем регистрацию новых классов
         AscCommon.g_oTableId.m_bTurnOff = true;
-        History.TurnOff();
+        AscCommon.History.TurnOff();
 
         var aContentDrawings = [];
         for ( var Index = 0; Index < this.HeaderInfo.Count; Index++ )
@@ -1774,7 +1774,7 @@ CTable.prototype.private_RecalculatePage = function(CurPage)
         }
 
         AscCommon.g_oTableId.m_bTurnOff = false;
-        History.TurnOn();
+        AscCommon.History.TurnOn();
 
         var bHeaderNextPage = false;
         for ( var CurRow = 0; CurRow < this.HeaderInfo.Count; CurRow++  )

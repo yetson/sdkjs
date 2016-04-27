@@ -591,7 +591,7 @@ CFraction.prototype.Apply_MenuProps = function(Props)
 
         if(FractionType !== this.Pr.type)
         {
-            History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
+            AscCommon.History.Add(this, new CChangesMathFractionType(FractionType, this.Pr.type));
             this.raw_SetFractionType(FractionType);
         }
     }

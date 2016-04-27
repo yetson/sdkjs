@@ -50,6 +50,7 @@ var editor;
   var oNumFormatCache = AscCommon.oNumFormatCache;
   var g_aCultureInfos = AscCommon.g_aCultureInfos;
   var PasteElementsId = AscCommon.PasteElementsId;
+  var History = AscCommon.History;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -502,7 +503,7 @@ var editor;
 
   spreadsheet_api.prototype.initGlobalObjects = function(wbModel) {
     // History & global counters
-    History = new CHistory(wbModel);
+    History.init(wbModel);
 
     g_oTableId.init();
     AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wbModel);

@@ -22,6 +22,10 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
+
+// Import
+var History = AscCommon.History;
+
 var WRAP_TEXT_SIDE_BOTH_SIDES = 0x00;
 var WRAP_TEXT_SIDE_LARGEST = 0x01;
 var WRAP_TEXT_SIDE_LEFT = 0x02;

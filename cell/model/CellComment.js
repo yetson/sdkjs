@@ -32,6 +32,7 @@
 function (window, undefined) {
 	// Import
 	var CellAddress = AscCommon.CellAddress;
+	var History = AscCommon.History;
 	
 	var c_oAscInsertOptions = Asc.c_oAscInsertOptions;
 	var c_oAscDeleteOptions = Asc.c_oAscDeleteOptions;

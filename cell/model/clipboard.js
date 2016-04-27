@@ -43,6 +43,7 @@
 		var PasteElementsId = AscCommon.PasteElementsId;
 		var PASTE_EMPTY = AscCommon.PASTE_EMPTY;
 		var CopyPasteCorrectString = AscCommon.CopyPasteCorrectString;
+		var History = AscCommon.History;
 
 		var doc = window.document;
 		

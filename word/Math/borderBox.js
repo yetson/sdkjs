@@ -24,6 +24,9 @@
  */
 "use strict";
 
+// Import
+var History = AscCommon.History;
+
 function CMathBreak()
 {
     this.alnAt = undefined;

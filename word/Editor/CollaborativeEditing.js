@@ -24,11 +24,8 @@
 */
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 25.07.12
- * Time: 12:01
- */
+// Import
+var History = AscCommon.History;
 
 /**
  *

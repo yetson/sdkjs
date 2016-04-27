@@ -37,6 +37,7 @@
 		 */
 		var CellValueType = AscCommon.CellValueType;
 		var CellAddress = AscCommon.CellAddress;
+		var History = AscCommon.History;
 		
 		var UndoRedoDataTypes = AscCommonExcel.UndoRedoDataTypes;
 

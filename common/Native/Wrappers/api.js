@@ -5156,7 +5156,7 @@ CStylesPainter.prototype =
         _api.WordControl.m_oDrawingDocument.Native["DD_StartNativeDraw"](_w_px, _h_px, _w_px * dKoefToMM, _h_px * dKoefToMM);
 
         AscCommon.g_oTableId.m_bTurnOff = true;
-        History.TurnOff();
+        AscCommon.History.TurnOff();
 
         var oldDefTabStop = Default_Tab_Stop;
         Default_Tab_Stop = 1;
@@ -5261,7 +5261,7 @@ CStylesPainter.prototype =
         Default_Tab_Stop = oldDefTabStop;
 
         AscCommon.g_oTableId.m_bTurnOff = false;
-        History.TurnOn();
+        AscCommon.History.TurnOn();
 
         var _stream = global_memory_stream_menu;
 
@@ -5467,7 +5467,7 @@ asc_docs_api.prototype.Call_Menu_Context_SelectAll = function()
 };
 asc_docs_api.prototype.pre_Paste = function(_fonts, _images, callback)
 {
-    History.Create_NewPoint(AscDFH.historydescription_PasteNative);
+    AscCommon.History.Create_NewPoint(AscDFH.historydescription_PasteNative);
     callback();
 };
 /************************************************************************/
