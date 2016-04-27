@@ -44,6 +44,8 @@
 		var PASTE_EMPTY = AscCommon.PASTE_EMPTY;
 		var CopyPasteCorrectString = AscCommon.CopyPasteCorrectString;
 		var History = AscCommon.History;
+		var pptx_content_loader = AscCommon.pptx_content_loader;
+		var pptx_content_writer = AscCommon.pptx_content_writer;
 
 		var doc = window.document;
 		
@@ -577,7 +579,7 @@
 			
 			_getBinaryForCopy: function(worksheet)
 			{
-				window.global_pptx_content_writer.Start_UseFullUrl();
+				pptx_content_writer.Start_UseFullUrl();
 				
 				//TODO стоит убрать заглушку при правке бага с activeRange
 				var cloneActiveRange = worksheet.activeRange.clone();
@@ -599,7 +601,7 @@
 				var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, cloneActiveRange);
 				var sBase64 = oBinaryFileWriter.Write();
 				
-				window.global_pptx_content_writer.End_UseFullUrl();
+				pptx_content_writer.End_UseFullUrl();
 				
 				return sBase64;
 			},
@@ -626,7 +628,7 @@
 						}	
 						else
 						{
-							window.global_pptx_content_writer.Start_UseFullUrl();
+							pptx_content_writer.Start_UseFullUrl();
 							
 							var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 							var sBase64 = oBinaryFileWriter.Write();
@@ -641,7 +643,7 @@
 							//for buttons copy/paste
 							this.lStorage = sBase64;
 							
-							window.global_pptx_content_writer.End_UseFullUrl()
+							pptx_content_writer.End_UseFullUrl()
 						}
 					}
 					
@@ -705,7 +707,7 @@
 					}	
 					else
 					{
-						window.global_pptx_content_writer.Start_UseFullUrl();
+						pptx_content_writer.Start_UseFullUrl();
 						
 						var oBinaryFileWriter = new Asc.BinaryFileWriter(worksheet.model.workbook, worksheet.activeRange);
 						var sBase64 = oBinaryFileWriter.Write();
@@ -713,7 +715,7 @@
 						//for buttons copy/paste
 						this.lStorage = sBase64;
 						
-						window.global_pptx_content_writer.End_UseFullUrl()
+						pptx_content_writer.End_UseFullUrl()
 					};
 					
 					while (this.element.hasChildNodes()) {
@@ -1712,10 +1714,10 @@
 				var tempWorkbook = new AscCommonExcel.Workbook();
 				var t = this;
 				
-				window.global_pptx_content_loader.Start_UseFullUrl();
+				pptx_content_loader.Start_UseFullUrl();
 				oBinaryFileReader.Read(base64, tempWorkbook);
 				this.activeRange = oBinaryFileReader.copyPasteObj.activeRange;
-				var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+				var aPastedImages = pptx_content_loader.End_UseFullUrl();
 				
 				var pasteData = null;
 				if (tempWorkbook)
@@ -1783,7 +1785,7 @@
 			
 			_pasteFromBinaryPresentation: function(worksheet, base64, isIntoShape)
 			{
-				window.global_pptx_content_loader.Clear();
+				pptx_content_loader.Clear();
 
 				var _stream = AscFormat.CreateBinaryReader(base64, 0, base64.length);
 				var stream = new AscCommon.FileStream(_stream.data, _stream.size);
@@ -2308,14 +2310,14 @@
 			    //создается глобальная переменная
 			    editor = { isDocumentEditor: true, WordControl: { m_oLogicDocument: newCDocument } };
 				
-				window.global_pptx_content_loader.Clear();
-				window.global_pptx_content_loader.Start_UseFullUrl();
+				pptx_content_loader.Clear();
+				pptx_content_loader.Start_UseFullUrl();
 				
 			    var openParams = { checkFileSize: false, charCount: 0, parCount: 0 };
 			    var oBinaryFileReader = new BinaryFileReader(newCDocument, openParams);
 			    var oRes = oBinaryFileReader.ReadFromString(sBase64);
 				
-				window.global_pptx_content_loader.End_UseFullUrl();
+				pptx_content_loader.End_UseFullUrl();
 				History.TurnOn();
 				AscCommon.g_oIdCounter.m_bRead = false;
 			    editor = oOldEditor;
