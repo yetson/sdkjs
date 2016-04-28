@@ -258,7 +258,7 @@ Paragraph.prototype =
 
     Use_YLimit : function()
     {
-        if ( undefined != this.Get_FramePr() && this.Parent instanceof CDocument )
+        if ( undefined != this.Get_FramePr() && this.Parent instanceof AscCommon.CDocument )
             return false;
 
         return true;
@@ -1297,7 +1297,7 @@ Paragraph.prototype =
         if (true !== this.Is_Inline())
         {
             var FramePr = this.Get_FramePr();
-            if (undefined != FramePr && this.Parent instanceof CDocument)
+            if (undefined != FramePr && this.Parent instanceof AscCommon.CDocument)
             {
                 var PixelError = editor.WordControl.m_oLogicDocument.DrawingDocument.GetMMPerDot(1);
                 var BoundsL = this.CalculatedFrame.L2 - PixelError;
@@ -1363,7 +1363,7 @@ Paragraph.prototype =
         this.Internal_Draw_6( CurPage, pGraphics, Pr );
 
         // Убираем обрезку
-        if ( undefined != FramePr && this.Parent instanceof CDocument  )
+        if ( undefined != FramePr && this.Parent instanceof AscCommon.CDocument  )
         {
             pGraphics.RestoreGrState();
         }
@@ -2632,7 +2632,7 @@ Paragraph.prototype =
             {
                 this.Selection.Use      = true;
                 this.Selection.Start    = false;
-                this.Selection.Flag     = selectionflag_Common;
+                this.Selection.Flag     = AscCommon.selectionflag_Common;
                 this.Selection.StartPos = this.CurPos.ContentPos;
                 this.Selection.EndPos   = this.CurPos.ContentPos;
 
@@ -2673,7 +2673,7 @@ Paragraph.prototype =
                 {
                     this.Selection.Use      = true;
                     this.Selection.Start    = false;
-                    this.Selection.Flag     = selectionflag_Common;
+                    this.Selection.Flag     = AscCommon.selectionflag_Common;
                     this.Selection.StartPos = ContentPos;
                     this.Selection.EndPos   = ContentPos;
 
@@ -6028,7 +6028,7 @@ Paragraph.prototype =
         // Начинаем селект
         this.Selection.Use      = true;
         this.Selection.Start    = true;
-        this.Selection.Flag     = selectionflag_Common;
+        this.Selection.Flag     = AscCommon.selectionflag_Common;
         this.Selection.StartManually = true;
         
         // Выставим текущую позицию
@@ -6178,7 +6178,7 @@ Paragraph.prototype =
 
         this.Selection.Use      = false;
         this.Selection.Start    = false;
-        this.Selection.Flag     = selectionflag_Common;
+        this.Selection.Flag     = AscCommon.selectionflag_Common;
         this.Selection.StartPos = 0;
         this.Selection.EndPos   = 0;
         this.Selection_Clear();
@@ -6203,7 +6203,7 @@ Paragraph.prototype =
 
         switch ( this.Selection.Flag )
         {
-            case selectionflag_Common:
+            case AscCommon.selectionflag_Common:
             {
                 // Делаем подсветку
                 var StartPos = this.Selection.StartPos;
@@ -6290,7 +6290,7 @@ Paragraph.prototype =
 
                 break;
             }
-            case selectionflag_Numbering:
+            case AscCommon.selectionflag_Numbering:
             {
                 var ParaNum = this.Numbering;
                 var NumberingRun = ParaNum.Run;
@@ -6461,7 +6461,7 @@ Paragraph.prototype =
         if ( undefined != this.Numbering_Get() )
         {
             this.Selection.Use  = true;
-            this.Selection.Flag = selectionflag_Numbering;
+            this.Selection.Flag = AscCommon.selectionflag_Numbering;
         }
     },
 
@@ -6517,7 +6517,7 @@ Paragraph.prototype =
                 this.Selection.EndManually   = false;
                 this.Selection.StartPos      = nPos;
                 this.Selection.EndPos        = nPos;
-                this.Selection.Flag          = selectionflag_Common;
+                this.Selection.Flag          = AscCommon.selectionflag_Common;
 
                 this.Document_SetThisElementCurrent(false);
                 return;
@@ -6836,7 +6836,7 @@ Paragraph.prototype =
         if ( true === this.Selection_IsFromStart() && true === this.Selection_CheckParaEnd() )
         {
             Para = this.Copy(this.Parent);
-            DocContent.Add( new CSelectedElement( Para, true ) );
+            DocContent.Add( new AscCommon.CSelectedElement( Para, true ) );
         }
         else
         {
@@ -6872,7 +6872,7 @@ Paragraph.prototype =
                 SectPr.Copy(this.SectPr);
                 Para.Set_SectionPr(SectPr);
             }
-            DocContent.Add( new CSelectedElement( Para, false ) );
+            DocContent.Add( new AscCommon.CSelectedElement( Para, false ) );
         }
     },
 
@@ -9310,7 +9310,7 @@ Paragraph.prototype =
     {
         if (true === this.Is_Inline())
         {
-            if (this.Parent instanceof CDocument)
+            if (this.Parent instanceof AscCommon.CDocument)
                 this.LogicDocument.Document_UpdateRulersStateBySection();
         }
         else
@@ -9337,7 +9337,7 @@ Paragraph.prototype =
             EndPos   = CurPos;
         }
 
-        if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use && selectionflag_Numbering !== this.Selection.Flag)
+        if (this.bFromDocument && this.LogicDocument && true === this.LogicDocument.Spelling.Use && AscCommon.selectionflag_Numbering !== this.Selection.Flag)
             this.SpellChecker.Document_UpdateInterfaceState( StartPos, EndPos );
 
         if ( true === this.Selection.Use )
@@ -9466,7 +9466,7 @@ Paragraph.prototype =
         var Parent = this.Parent;
 
         Parent.Update_ContentIndexing();
-        if ( docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
+        if ( AscCommon.docpostype_Content === Parent.CurPos.Type && false === Parent.Selection.Use && this.Index === Parent.CurPos.ContentPos && Parent.Content[this.Index] === this )
             return this.Parent.Is_ThisElementCurrent();
 
         return false;
@@ -9479,7 +9479,7 @@ Paragraph.prototype =
         if (true === this.Is_Empty() && undefined !== this.Get_SectionPr() && null !== PrevElement && (type_Paragraph !== PrevElement.Get_Type() || undefined === PrevElement.Get_SectionPr()))
             return true;
 
-        if (undefined === this.Parent || (!(this.Parent instanceof CDocument) && (undefined === this.Parent.Parent || !(this.Parent.Parent instanceof CHeaderFooter))))
+        if (undefined === this.Parent || (!(this.Parent instanceof AscCommon.CDocument) && (undefined === this.Parent.Parent || !(this.Parent.Parent instanceof CHeaderFooter))))
             return true;
 
         if (undefined != this.Pr.FramePr && Asc.c_oAscYAlign.Inline !== this.Pr.FramePr.YAlign)
@@ -12892,7 +12892,7 @@ Paragraph.prototype =
 
         this.Set_SelectionContentPos( StartPos, EndPos );
         this.Selection.Use  = true;
-        this.Selection.Flag = selectionflag_Common;
+        this.Selection.Flag = AscCommon.selectionflag_Common;
 
         this.Remove();
 
@@ -13788,7 +13788,7 @@ Paragraph.prototype.Get_AbsolutePage = function(CurPage)
 };
 Paragraph.prototype.Get_AbsoluteColumn = function(CurPage)
 {
-    if (this.Parent instanceof CDocument)
+    if (this.Parent instanceof AscCommon.CDocument)
         return this.private_GetColumnIndex(CurPage);
 
     return this.Parent.Get_AbsoluteColumn(this.private_GetRelativePageIndex(CurPage));
@@ -14195,7 +14195,7 @@ function CParagraphSelection()
     this.Use       = false;
     this.StartPos  = 0;
     this.EndPos    = 0;
-    this.Flag      = selectionflag_Common;
+    this.Flag      = AscCommon.selectionflag_Common;
     
     this.StartManually = true; // true - через Selection_SetStart, false - через Selection_SetBegEnd
     this.EndManually   = true; // true - через Selection_SetEnd, афдыу - через Selection_SetBegEnd  
