@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var CShape = AscFormat.CShape;
 
@@ -180,19 +182,6 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
         graphic.addToRecalculate();
     }
     return ret;
-}
-
-function deleteDrawingBase(aObjects, graphicId)
-{
-    var position = null;
-    for (var i = 0; i < aObjects.length; i++) {
-        if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
-            aObjects.splice(i, 1);
-            position = i;
-            break;
-        }
-    }
-    return position;
 }
 
 CShape.prototype.addToDrawingObjects =  function(pos)
@@ -821,3 +810,9 @@ AscFormat.CTextBody.prototype.getDrawingDocument = function()
 {
     return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].G_O_DEFAULT_COLOR_MAP = G_O_DEFAULT_COLOR_MAP;
+    window['AscFormat'].addToDrawings = addToDrawings;
+})(window);

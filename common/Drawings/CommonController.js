@@ -2142,7 +2142,7 @@ DrawingObjectsController.prototype =
 
     getColorMap: function()
     {
-        return G_O_DEFAULT_COLOR_MAP;
+        return AscFormat.G_O_DEFAULT_COLOR_MAP;
     },
 
 
