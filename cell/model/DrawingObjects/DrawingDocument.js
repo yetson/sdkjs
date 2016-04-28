@@ -2941,7 +2941,7 @@ function CDrawingDocument(drawingObjects)
         var _type = type & 0x00FF;
         switch (_type)
         {
-            case search_Common:
+            case AscCommon.search_Common:
             {
                 var _pages = this.m_arrPages;
                 for (var i = 0; i < _len; i++)
@@ -2958,7 +2958,7 @@ function CDrawingDocument(drawingObjects)
                 }
                 break;
             }
-            case search_HdrFtr_All:
+            case AscCommon.search_HdrFtr_All:
             {
                 for (var i = 0; i < _len; i++)
                 {
@@ -2971,7 +2971,7 @@ function CDrawingDocument(drawingObjects)
 
                 break;
             }
-            case search_HdrFtr_All_no_First:
+            case AscCommon.search_HdrFtr_All_no_First:
             {
                 for (var i = 0; i < _len; i++)
                 {
@@ -2985,7 +2985,7 @@ function CDrawingDocument(drawingObjects)
 
                 break;
             }
-            case search_HdrFtr_First:
+            case AscCommon.search_HdrFtr_First:
             {
                 for (var i = 0; i < _len; i++)
                 {
@@ -2999,7 +2999,7 @@ function CDrawingDocument(drawingObjects)
 
                 break;
             }
-            case search_HdrFtr_Even:
+            case AscCommon.search_HdrFtr_Even:
             {
                 for (var i = 0; i < _len; i++)
                 {
@@ -3017,7 +3017,7 @@ function CDrawingDocument(drawingObjects)
 
                 break;
             }
-            case search_HdrFtr_Odd:
+            case AscCommon.search_HdrFtr_Odd:
             {
                 for (var i = 0; i < _len; i++)
                 {
@@ -3035,7 +3035,7 @@ function CDrawingDocument(drawingObjects)
 
                 break;
             }
-            case search_HdrFtr_Odd_no_First:
+            case AscCommon.search_HdrFtr_Odd_no_First:
             {
                 for (var i = 0; i < _len; i++)
                 {

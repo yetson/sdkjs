@@ -409,7 +409,7 @@ CHistory.prototype =
 
         var bPresentation = !(typeof CPresentation === "undefined");
         var bSlide = !(typeof Slide === "undefined");
-        if ( ( Class instanceof CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
+        if ( ( Class instanceof AscCommon.CDocument        && ( AscDFH.historyitem_Document_AddItem        === Data.Type || AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ) ||
             ( Class instanceof AscCommon.CDocumentContent && ( AscDFH.historyitem_DocumentContent_AddItem === Data.Type || AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) ) ||
             ( Class instanceof CTable           && ( AscDFH.historyitem_Table_AddRow            === Data.Type || AscDFH.historyitem_Table_RemoveRow            === Data.Type ) ) ||
             ( Class instanceof CTableRow        && ( AscDFH.historyitem_TableRow_AddCell        === Data.Type || AscDFH.historyitem_TableRow_RemoveCell        === Data.Type ) ) ||
@@ -420,7 +420,7 @@ CHistory.prototype =
             ( bSlide && Class instanceof Slide && (AscDFH.historyitem_SlideAddToSpTree === Data.Type || AscDFH.historyitem_SlideRemoveFromSpTree === Data.Type))
             )
         {
-            var bAdd = ( ( Class instanceof CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
+            var bAdd = ( ( Class instanceof AscCommon.CDocument        && AscDFH.historyitem_Document_AddItem        === Data.Type ) ||
                 ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_AddItem === Data.Type ) ||
                 ( Class instanceof CTable           && AscDFH.historyitem_Table_AddRow            === Data.Type ) ||
                 ( Class instanceof CTableRow        && AscDFH.historyitem_TableRow_AddCell        === Data.Type ) ||
@@ -434,7 +434,7 @@ CHistory.prototype =
             var Count = 1;
 
             if ( ( Class instanceof Paragraph ) ||  ( Class instanceof ParaHyperlink) || ( Class instanceof ParaRun ) ||
-                ( Class instanceof CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
+                ( Class instanceof AscCommon.CDocument        && AscDFH.historyitem_Document_RemoveItem        === Data.Type ) ||
                 ( Class instanceof AscCommon.CDocumentContent && AscDFH.historyitem_DocumentContent_RemoveItem === Data.Type ) )
                 Count = Data.Items.length;
 
