@@ -92,7 +92,7 @@ COverlay.prototype =
         this.m_oContext = context;
         this.m_oControl = AscCommon.CreateControl(controlName);
 
-        this.m_oHtmlPage = new CHtmlPage();
+        this.m_oHtmlPage = new AscCommon.CHtmlPage();
         this.m_oHtmlPage.init(x, y, w_pix, h_pix, w_mm, h_mm);
     },
 
@@ -569,7 +569,7 @@ CAutoshapeTrack.prototype =
         this.m_oOverlay = overlay;
         this.m_oContext = this.m_oOverlay.m_oContext;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 
@@ -754,7 +754,7 @@ CAutoshapeTrack.prototype =
 
         var drawPage = oPage.drawingPage;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 

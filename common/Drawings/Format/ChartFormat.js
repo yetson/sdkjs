@@ -37,6 +37,7 @@ var g_oTableId = AscCommon.g_oTableId;
 var CMatrix = AscCommon.CMatrix;
 var isRealObject = AscCommon.isRealObject;
     var History = AscCommon.History;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var CShape = AscFormat.CShape;
 var checkSpPrRasterImages = AscFormat.checkSpPrRasterImages;
@@ -3674,7 +3675,7 @@ CAreaSeries.prototype =
                 return this.tx.strRef.strCache.pt[0].val;
             }
         }
-        return getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
+        return AscFormat.getChartTranslateManager().asc_getSeries() + " " + (this.idx + 1) ;
     },
 
     getCatName: function(idx)
@@ -23199,17 +23200,17 @@ CTitle.prototype =
                         return oTx.strRef.strCache.pt[0].val;
                     }
                 }
-                return getChartTranslateManager().asc_getTitle();
+                return AscFormat.getChartTranslateManager().asc_getTitle();
             }
             else
             {
                 if(this.parent.axPos === AX_POS_B || this.parent.axPos === AX_POS_T)
                 {
-                    return getChartTranslateManager().asc_getXAxis();
+                    return AscFormat.getChartTranslateManager().asc_getXAxis();
                 }
                 else
                 {
-                    return getChartTranslateManager().asc_getYAxis();
+                    return AscFormat.getChartTranslateManager().asc_getYAxis();
                 }
             }
         }

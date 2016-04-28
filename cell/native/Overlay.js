@@ -517,7 +517,7 @@ CAutoshapeTrack.prototype =
         this.m_oOverlay = overlay;
         this.m_oContext = this.m_oOverlay.m_oContext;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
         this.Graphics.init(this.m_oContext, r - x, b - y, w_mm, h_mm);
 
         this.Graphics.m_oCoordTransform.tx = x;
@@ -2679,7 +2679,7 @@ CSlideBoundsChecker.prototype =
         this.m_oFullTransform.sy = this.m_oTransform.sy;
         this.m_oFullTransform.tx = this.m_oTransform.tx;
         this.m_oFullTransform.ty = this.m_oTransform.ty;
-        global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
+        AscCommon.global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
     },
 	
 	SetTextPr: function()

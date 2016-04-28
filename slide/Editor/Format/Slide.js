@@ -696,11 +696,11 @@ Slide.prototype =
                 {
                     Fill = this.cSld.Bg.bgPr.Fill;
                 }
-                if(typeof CollaborativeEditing !== "undefined")
+                if(typeof AscCommon.CollaborativeEditing !== "undefined")
                 {
                     if(Fill && Fill.fill && Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_BLIP && typeof Fill.fill.RasterImageId === "string" && Fill.fill.RasterImageId.length > 0)
                     {
-						CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
+                        AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(Fill.fill.RasterImageId));
                     }
                 }
                 break;
@@ -1001,7 +1001,7 @@ Slide.prototype =
         {
             return this.Layout.Master.clrMap;
         }
-        return G_O_DEFAULT_COLOR_MAP;
+        return AscFormat.G_O_DEFAULT_COLOR_MAP;
     },
 
     recalculate: function()
@@ -1277,7 +1277,7 @@ Slide.prototype =
     {
         if(typeof this.cachedImage === "string" && this.cachedImage.length > 0)
             return this.cachedImage;
-        return ShapeToImageConverter(this, 0).ImageUrl;
+        return AscCommon.ShapeToImageConverter(this, 0).ImageUrl;
     },
 
     checkNoTransformPlaceholder: function()

@@ -33,6 +33,7 @@ function (window, undefined) {
 // Import
 var CShape = AscFormat.CShape;
 var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var isRealObject = AscCommon.isRealObject;
 
@@ -732,12 +733,12 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.Pos);
+                AscFormat.addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
@@ -813,12 +814,12 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
             {
-                addToDrawings(this.worksheet, this, data.Pos);
+                AscFormat.addToDrawings(this.worksheet, this, data.Pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
@@ -971,7 +972,7 @@ CImageShape.prototype =
             }
             case AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects:
             {
-                deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+                AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
                 break;
             }
             case AscDFH.historyitem_AutoShapes_AddToDrawingObjects:
@@ -981,7 +982,7 @@ CImageShape.prototype =
                 {
                     pos = this.worksheet.contentChanges.Check(AscCommon.contentchanges_Add, pos);
                 }
-                addToDrawings(this.worksheet, this, pos);
+                AscFormat.addToDrawings(this.worksheet, this, pos);
                 break;
             }
             case AscDFH.historyitem_AutoShapes_SetWorksheet:
@@ -1012,11 +1013,11 @@ CImageShape.prototype =
                     this.blipFill = new AscFormat.CBlipFill();
                     r.GetLong();
                     this.blipFill.Read_FromBinary(r);
-                    if(typeof CollaborativeEditing !== "undefined")
+                    if(typeof AscCommon.CollaborativeEditing !== "undefined")
                     {
                         if(typeof this.blipFill.RasterImageId === "string" && this.blipFill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
+                            AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.blipFill.RasterImageId));
                         }
                     }
                 }

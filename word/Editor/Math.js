@@ -2541,9 +2541,9 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     History.TurnOn();
 
-    window.IsShapeToImageConverter = true;
+    AscCommon.IsShapeToImageConverter = true;
 
-    var dKoef = g_dKoef_mm_to_pix;
+    var dKoef = AscCommon.g_dKoef_mm_to_pix;
 
     var JointSize = this.Get_JointSize();
 
@@ -2573,7 +2573,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     var _ctx = _canvas.getContext('2d');
 
-    var g = new CGraphics();
+    var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
     g.m_oFontManager = g_fontManager;
 
@@ -2600,7 +2600,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     if (true === isShowParaMarks)
         par.LogicDocument.Set_ShowParagraphMarks(true, false);
 
-    window.IsShapeToImageConverter = false;
+    AscCommon.IsShapeToImageConverter = false;
 
     if (undefined === _canvasInput)
     {
@@ -4676,7 +4676,7 @@ CChangesMathRemoveItems.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathDelimiterGrow(NewValue, OldValue)
@@ -5216,7 +5216,7 @@ CChangesMathMatrixRemoveRow.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathMatrixAddColumn(Pos, Items)

@@ -78,9 +78,9 @@ var editor;
     this.topLineEditorName = inputName;
     this.topLineEditorElement = null;
 
-    this.controller = new asc.asc_CEventsController();
+    this.controller = new AscCommonExcel.asc_CEventsController();
 
-    this.handlers = new asc.asc_CHandlersList(eventsHandlers);
+    this.handlers = new AscCommonExcel.asc_CHandlersList(eventsHandlers);
     // Вид печати
     this.adjustPrint = null;
 
@@ -1078,7 +1078,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_SetFastCollaborative = function(bFast) {
     if (this.collaborativeEditing) {
-      CollaborativeEditing.Set_Fast(bFast);
+      AscCommon.CollaborativeEditing.Set_Fast(bFast);
       this.collaborativeEditing.setFast(bFast);
     }
   };
@@ -1444,7 +1444,7 @@ var editor;
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
-      CollaborativeEditing.Load_Images();
+      AscCommon.CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged(null);
       this.wb.getWorksheet().updateVisibleRange();
     }
@@ -1549,7 +1549,7 @@ var editor;
       return;
     }
 
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
     this.DocumentLoadComplete = true;
 
@@ -1618,7 +1618,7 @@ var editor;
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
-      CollaborativeEditing.Clear_CollaborativeMarks();
+      AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
 
@@ -3075,7 +3075,7 @@ var editor;
     }
     if (!History.Is_Modified(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
       if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
-        CollaborativeEditing.Clear_CollaborativeMarks();
+        AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
 
         // Принимаем чужие изменения
         this.collaborativeEditing.applyChanges();
@@ -3140,7 +3140,7 @@ var editor;
       AscCommonExcel.cFormulaFunctionToLocale = {};
       var localName;
       for (var i in AscCommonExcel.cFormulaFunction) {
-        localName = oLocalizedData[i] ? oLocalizedData[i]['n'] : null;
+        localName = oLocalizedData[i] ? oLocalizedData[i] : null;
         localName = localName ? localName : i;
         AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
         AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
@@ -3178,7 +3178,7 @@ var editor;
     g_oIdCounter.Set_Load(false);
 
     this._coAuthoringInit();
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {

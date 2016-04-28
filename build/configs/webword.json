@@ -121,8 +121,10 @@
         "../word/Editor/Search.js",
         "../word/Editor/FontClassification.js",
         "../word/Editor/Spelling.js",
+		
         "../word/Drawing/Graphics.js",
         "../word/Drawing/ShapeDrawer.js",
+		
         "../word/Drawing/DrawingDocument.js",
         "../word/Drawing/GraphicsEvents.js",
         "../word/Drawing/Rulers.js",
@@ -161,6 +163,7 @@
       ],
       "desktop": [
         "../common/Local/common.js",
+		"../word/Local/documentrenderer.js",
         "../word/Local/api.js"
       ],
 	  "mobile_banners": [],

@@ -2103,7 +2103,7 @@ Workbook.prototype.init=function(bNoBuildDep){
 	
 	var self = this;
 
-	this.wsHandlers = new Asc.asc_CHandlersList( /*handlers*/{
+	this.wsHandlers = new AscCommonExcel.asc_CHandlersList( /*handlers*/{
 		"changeRefTablePart"   : function ( displayName, ref ) {
 			self.dependencyFormulas.changeTableName( displayName, null, ref );
 		},
@@ -2267,10 +2267,21 @@ Workbook.prototype.insertWorksheet = function (index, sheet, cwf) {
 	this.aWorksheetsById[sheet.getId()] = sheet;
 	this._updateWorksheetIndexes(wsActive);
 	this._insertWorksheetFormula(index);
+	this._insertTablePartsName(sheet);
 	//восстанавливаем список ячеек с формулами для sheet
 	this.cwf[sheet.getId()] = cwf;
 	sheet._BuildDependencies(cwf.cells);
 	sortDependency(this);
+};
+Workbook.prototype._insertTablePartsName = function (sheet) {
+	if(sheet && sheet.TableParts && sheet.TableParts.length)
+	{
+		for(var i = 0; i < sheet.TableParts.length; i++)
+		{	
+			var oNewTable = sheet.TableParts[i];
+			this.dependencyFormulas.addTableName(oNewTable.DisplayName, sheet, oNewTable.Ref);
+		}
+	}
 };
 Workbook.prototype._insertWorksheetFormula=function(index){
 	if( index > 0 && index < this.aWorksheets.length - 1 ){
@@ -2978,7 +2989,7 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
 		window["Asc"]["editor"]._loadFonts(oFontMap, function(){
                 var wsViews = window["Asc"]["editor"].wb.wsViews;
                 if(oThis.oApi.collaborativeEditing.getFast()){
-                    CollaborativeEditing.Clear_DocumentPositions();
+                  AscCommon.CollaborativeEditing.Clear_DocumentPositions();
                 }
                 for(var i in wsViews)
                 {
@@ -2992,11 +3003,11 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                             var oState = wsViews[i].objectRender.saveStateBeforeLoadChanges();
                             if(oState){
                                 if (oState.Pos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.Pos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.Pos);
                                 if (oState.StartPos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.StartPos);
                                 if (oState.EndPos)
-                                    CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
+                                  AscCommon.CollaborativeEditing.Add_DocumentPosition(oState.EndPos);
                             }
                         }
                         wsViews[i].objectRender.controller.resetSelection();
@@ -3032,11 +3043,11 @@ Workbook.prototype.DeserializeHistory = function(aChanges, fCallback){
                             var oState = wsViews[i].objectRender.getStateBeforeLoadChanges();
                             if(oState){
                                 if (oState.Pos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.Pos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.Pos);
                                 if (oState.StartPos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.StartPos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.StartPos);
                                 if (oState.EndPos)
-                                    CollaborativeEditing.Update_DocumentPosition(oState.EndPos);
+                                  AscCommon.CollaborativeEditing.Update_DocumentPosition(oState.EndPos);
                             }
                             wsViews[i].objectRender.loadStateAfterLoadChanges();
                         }
@@ -3230,7 +3241,7 @@ function Woorksheet(wb, _index, sId){
 		}
 	});
 	this.hyperlinkManager.setDependenceManager(this.mergeManager);
-    this.DrawingDocument = new CDrawingDocument();
+    this.DrawingDocument = new AscCommon.CDrawingDocument();
 	this.sheetViews = [];
 	this.aConditionalFormatting = [];
 	this.sheetPr = null;

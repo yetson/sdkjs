@@ -24,6 +24,10 @@
 */
 "use strict";
 
+// Import
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+
 function CCacheSlideImage()
 {
     this.Image = null;
@@ -64,7 +68,7 @@ function CTransitionAnimation(htmlpage)
     this.CacheImage1 = new CCacheSlideImage();
     this.CacheImage2 = new CCacheSlideImage();
 
-    this.Rect = new _rect();
+    this.Rect = new AscCommon._rect();
     this.Params = null;
 
     this.IsBackward = false;
@@ -213,9 +217,9 @@ function CTransitionAnimation(htmlpage)
 
             this.CacheImage1.Image = this.CreateImage(_w, _h);
 
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(this.CacheImage1.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
-            g.m_oFontManager = g_fontManager;
+            g.m_oFontManager = AscCommon.g_fontManager;
 
             g.transform(1,0,0,1,0,0);
             g.IsNoDrawingEmptyPlaceholder = true;
@@ -254,9 +258,9 @@ function CTransitionAnimation(htmlpage)
 
             this.CacheImage2.Image = this.CreateImage(_w, _h);
 
-            var g = new CGraphics();
+            var g = new AscCommon.CGraphics();
             g.init(this.CacheImage2.Image.getContext('2d'), _w, _h, _w_mm, _h_mm);
-            g.m_oFontManager = g_fontManager;
+            g.m_oFontManager = AscCommon.g_fontManager;
 
             g.transform(1,0,0,1,0,0);
             g.IsNoDrawingEmptyPlaceholder = true;
@@ -2687,9 +2691,9 @@ function CDemonstrationManager(htmlpage)
 
         var _image = this.CacheImagesManager.Lock(_w, _h);
 
-        var g = new CGraphics();
+        var g = new AscCommon.CGraphics();
         g.init(_image.image.getContext('2d'), _w, _h, _w_mm, _h_mm);
-        g.m_oFontManager = g_fontManager;
+        g.m_oFontManager = AscCommon.g_fontManager;
 
         g.transform(1,0,0,1,0,0);
         g.IsNoDrawingEmptyPlaceholder = true;

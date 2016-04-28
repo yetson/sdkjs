@@ -37,12 +37,8 @@ var CreateControl = AscCommon.CreateControl;
 var global_keyboardEvent = AscCommon.global_keyboardEvent;
 var global_mouseEvent = AscCommon.global_mouseEvent;
 var History = AscCommon.History;
-
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile =  AscBrowser.isMobile;
 
@@ -171,7 +167,7 @@ function CEditorPage(api)
     this.m_oHorRuler        = new CHorRuler();
     this.m_oVerRuler        = new CVerRuler();
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oDrawingDocument.m_oWordControl = this;
@@ -433,7 +429,7 @@ function CEditorPage(api)
         if (this.m_oApi.isMobileVersion)
         {
             var _tag_background = "textarea";
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
                 _tag_background = "input";
 
             var _text_bx_back = document.createElement(_tag_background);
@@ -441,7 +437,7 @@ function CEditorPage(api)
             _text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
             _text_bx_back.setAttribute("spellcheck", "false");
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 _text_bx_back.setAttribute("autocomplete", "off");
                 _text_bx_back.setAttribute("type", "password");
@@ -734,7 +730,7 @@ function CEditorPage(api)
                 }
             }
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 /*
                 var moveCursorToEnd = function(el)
@@ -1031,10 +1027,10 @@ function CEditorPage(api)
             return;
 
         // нужно проверить режим и сбросить кеш грамотно (ie version)
-        g_fontManager.ClearRasterMemory();
+        AscCommon.g_fontManager.ClearRasterMemory();
 
-        if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-            window.g_fontManager2.ClearRasterMemory();
+        if (AscCommon.g_fontManager2)
+            AscCommon.g_fontManager2.ClearRasterMemory();
 
         var oWordControl = oThis;
 
@@ -2530,7 +2526,7 @@ function CEditorPage(api)
             {
                 oWordControl.TextBoxInputFocus = false;
 
-                CollaborativeEditing.m_bGlobalLock = false;
+                AscCommon.CollaborativeEditing.m_bGlobalLock = false;
                 this.TextBoxInput.style.zIndex = -1;
                 this.TextBoxInput.style.top = "-1000px";
                 this.TextBoxInputFocus = false;
@@ -2570,7 +2566,7 @@ function CEditorPage(api)
         {
             oWordControl.TextBoxInputFocus = false;
 
-            CollaborativeEditing.m_bGlobalLock = false;
+            AscCommon.CollaborativeEditing.m_bGlobalLock = false;
             this.TextBoxInput.style.zIndex = -1;
             this.TextBoxInput.style.top = "-1000px";
             this.TextBoxInputFocus = false;
@@ -3212,7 +3208,7 @@ function CEditorPage(api)
                 }
                 ctx.beginPath();
 
-                if (drDoc.CurrentSearchNavi)
+                if (drDoc.CurrentSearchNavi && drDoc.m_oDocumentRenderer.SearchResults.Show)
                 {
                     var _pageNum = drDoc.CurrentSearchNavi[0].PageNum;
                     ctx.fillStyle = "rgba(51,102,204,255)";
@@ -3398,7 +3394,7 @@ function CEditorPage(api)
 
             if (!this.bIsRetinaSupport)
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left;
                 _cur_page_rect.y = drawPage.top;
                 _cur_page_rect.w = drawPage.right - drawPage.left;
@@ -3408,7 +3404,7 @@ function CEditorPage(api)
             }
             else
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left << 1;
                 _cur_page_rect.y = drawPage.top << 1;
                 _cur_page_rect.w = (drawPage.right << 1) - _cur_page_rect.x;
@@ -3566,17 +3562,17 @@ function CEditorPage(api)
             {
                 if (49 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(false, false);
+                    AscCommon.SetHintsProps(false, false);
                     bFlag = true;
                 }
                 else if (50 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, false);
+                    AscCommon.SetHintsProps(true, false);
                     bFlag = true;
                 }
                 else if (51 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, true);
+                    AscCommon.SetHintsProps(true, true);
                     bFlag = true;
                 }
             }
@@ -3585,10 +3581,10 @@ function CEditorPage(api)
         if (bFlag)
         {
             this.m_oDrawingDocument.ClearCachePages();
-            g_fontManager.ClearFontsRasterCache();
+            AscCommon.g_fontManager.ClearFontsRasterCache();
 
-            if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-                window.g_fontManager2.ClearFontsRasterCache();
+            if (AscCommon.g_fontManager2)
+                AscCommon.g_fontManager2.ClearFontsRasterCache();
         }
 
         return bFlag;
@@ -3813,7 +3809,7 @@ function CEditorPage(api)
 
             if (!_bIsWaitScheme)
             {
-                var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
+                var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval)
                 {
@@ -4130,7 +4126,7 @@ function CEditorPage(api)
             return;
 
         oThis.TextBoxInputFocus = true;
-        CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
         this.ReinitTB(true);
         oThis.TextBoxInput.style.zIndex = 90;
@@ -4212,7 +4208,7 @@ function CEditorPage(api)
 
     this.onChangeTB = function()
     {
-        CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
         this.TextBoxInput.style.zIndex = -1;
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;

@@ -1370,7 +1370,7 @@ function DrawingObjects() {
         _this.drawingArea = currentSheet.drawingArea;
         _this.drawingArea.init();
         _this.coordsManager = new CoordsManager(worksheet, true);
-        _this.drawingDocument = currentSheet.model.DrawingDocument ? currentSheet.model.DrawingDocument : new CDrawingDocument(this);
+        _this.drawingDocument = currentSheet.model.DrawingDocument ? currentSheet.model.DrawingDocument : new AscCommon.CDrawingDocument(this);
         _this.drawingDocument.drawingObjects = this;
         _this.drawingDocument.AutoShapesTrack = autoShapeTrack;
         _this.drawingDocument.TargetHtmlElement = document.getElementById('id_target_cursor');
@@ -1847,7 +1847,7 @@ function DrawingObjects() {
     };
 
     _this.clipGraphicsCanvas = function(canvas, graphicOption) {
-        if ( canvas instanceof CGraphics ) {
+        if ( canvas instanceof AscCommon.CGraphics ) {
 
             var x, y, w, h;
 
@@ -1889,7 +1889,7 @@ function DrawingObjects() {
     };
 
     _this.restoreGraphicsCanvas = function(canvas) {
-        if ( canvas instanceof CGraphics ) {
+        if ( canvas instanceof AscCommon.CGraphics ) {
             canvas.m_oContext.restore();
 
             // этот рестор нужен для восстановления сложных вложенных клипов
@@ -2469,10 +2469,10 @@ function DrawingObjects() {
         }
         else
         {
-            graphics = new CGraphics();
+            graphics = new AscCommon.CGraphics();
             graphics.init(oDrawingContext.ctx, oDrawingContext.getWidth(0), oDrawingContext.getHeight(0),
                 oDrawingContext.getWidth(3)*nSparklineMultiplier, oDrawingContext.getHeight(3)*nSparklineMultiplier);
-            graphics.m_oFontManager = g_fontManager;
+            graphics.m_oFontManager = AscCommon.g_fontManager;
         }
 
         var _offX = offsetX* Asc.getCvtRatio(1, 3, oDrawingContext.getPPIX());

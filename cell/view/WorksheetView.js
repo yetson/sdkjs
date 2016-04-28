@@ -291,9 +291,9 @@
      * Widget for displaying and editing Worksheet object
      * -----------------------------------------------------------------------------
      * @param {AscCommonExcel.Woorksheet} model  Worksheet
-     * @param {asc_CHandlersList} handlers  Event handlers
+     * @param {AscCommonExcel.asc_CHandlersList} handlers  Event handlers
      * @param {Object} buffers    DrawingContext + Overlay
-     * @param {StringRender} stringRender    StringRender
+     * @param {AscCommonExcel.StringRender} stringRender    StringRender
      * @param {Number} maxDigitWidth    Максимальный размер цифры
      * @param {CCollaborativeEditing} collaborativeEditing
      * @param {Object} settings  Settings
@@ -9227,6 +9227,9 @@
             bIsUpdate = false;
             AscCommonExcel.buildRecalc( t.model.workbook );
             AscCommonExcel.unLockDraw( t.model.workbook );
+			if ( callTrigger ) {
+                t.handlers.trigger( "slowOperation", false );
+            }
             return;
         }
         this.expandColsOnScroll(false, true);
@@ -13300,11 +13303,8 @@
 
         return res;
     };
-    /*
-     * Export
-     * -----------------------------------------------------------------------------
-     */
-    window["Asc"].WorksheetView = WorksheetView;
-
-
+    
+    //------------------------------------------------------------export---------------------------------------------------
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+    window["AscCommonExcel"].WorksheetView = WorksheetView;
 })( jQuery, window );

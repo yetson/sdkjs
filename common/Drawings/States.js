@@ -234,7 +234,7 @@ NullState.prototype =
                         this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingObjects.showDrawingObjects(true);
                     }
-                    CollaborativeEditing.Update_ForeignCursorsPositions();
+                    AscCommon.CollaborativeEditing.Update_ForeignCursorsPositions();
                 }
                 return ret;
             }
@@ -249,7 +249,7 @@ NullState.prototype =
                         this.drawingObjects.checkChartTextSelection(true);
                         this.drawingObjects.drawingObjects.showDrawingObjects(true);
                     }
-                    CollaborativeEditing.Update_ForeignCursorsPositions();
+                    AscCommon.CollaborativeEditing.Update_ForeignCursorsPositions();
                 }
                 return ret;
             }
@@ -267,7 +267,7 @@ NullState.prototype =
                     this.drawingObjects.checkChartTextSelection(true);
                     this.drawingObjects.drawingObjects.showDrawingObjects(true);
                 }
-                CollaborativeEditing.Update_ForeignCursorsPositions();
+                AscCommon.CollaborativeEditing.Update_ForeignCursorsPositions();
             }
             return ret;
         }
@@ -283,7 +283,7 @@ NullState.prototype =
                     this.drawingObjects.checkChartTextSelection(true);
                     this.drawingObjects.drawingObjects.showDrawingObjects(true);
                 }
-                CollaborativeEditing.Update_ForeignCursorsPositions();
+                AscCommon.CollaborativeEditing.Update_ForeignCursorsPositions();
             }
             return ret;
         }

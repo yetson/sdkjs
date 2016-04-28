@@ -3626,7 +3626,7 @@ CStyle.prototype =
             }
         }
 
-        CollaborativeEditing.Add_LinkData(this, {StyleUpdate : true});
+        AscCommon.CollaborativeEditing.Add_LinkData(this, {StyleUpdate : true});
     },
 
     Write_ToBinary2 : function(Writer)
@@ -5030,7 +5030,7 @@ CStyles.prototype =
                 var Id = Reader.GetString2();
                 this.Style[Id] = g_oTableId.Get_ById( Id );
                 this.Update_Interface(Id);
-                CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
+                AscCommon.CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
                 break;
             }
             case AscDFH.historyitem_Styles_Remove:
@@ -5040,7 +5040,7 @@ CStyles.prototype =
                 var Id = Reader.GetString2();
                 delete this.Style[Id];
                 this.Update_Interface(Id);
-                CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
+                AscCommon.CollaborativeEditing.Add_LinkData(this, {UpdateStyleId : Id});
                 break;
             }
             case AscDFH.historyitem_Styles_ChangeDefaultParaPr:

@@ -102,9 +102,9 @@ function GenerateTableStyles(drawingDoc, logicDoc, tableLook)
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
         graphics.transform(1,0,0,1,0,0);
 
         table.Recalculate_Page(0);

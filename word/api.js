@@ -366,7 +366,7 @@ asc_docs_api.prototype.SetCollaborativeMarksShowType = function(Type)
     if (c_oAscCollaborativeMarksShowType.None !== this.CollaborativeMarksShowType && c_oAscCollaborativeMarksShowType.None === Type && this.WordControl && this.WordControl.m_oLogicDocument)
     {
         this.CollaborativeMarksShowType = Type;
-        CollaborativeEditing.Clear_CollaborativeMarks(true);
+      AscCommon.CollaborativeEditing.Clear_CollaborativeMarks(true);
     }
     else
     {
@@ -381,7 +381,7 @@ asc_docs_api.prototype.GetCollaborativeMarksShowType = function(Type)
 
 asc_docs_api.prototype.Clear_CollaborativeMarks = function()
 {
-    CollaborativeEditing.Clear_CollaborativeMarks(true);
+  AscCommon.CollaborativeEditing.Clear_CollaborativeMarks(true);
 };
 
 asc_docs_api.prototype.SetLanguage = function(langId)
@@ -827,7 +827,7 @@ asc_docs_api.prototype._coAuthoringSetChange = function(change, oColor)
 	var oChange = new AscCommon.CCollaborativeChanges();
 	oChange.Set_Data( change );
 	oChange.Set_Color( oColor );
-	CollaborativeEditing.Add_Changes( oChange );
+  AscCommon.CollaborativeEditing.Add_Changes( oChange );
 };
 
 asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
@@ -840,12 +840,12 @@ asc_docs_api.prototype._coAuthoringSetChanges = function(e, oColor)
 asc_docs_api.prototype._coAuthoringInitEnd = function() {
   var t = this;
   this.CoAuthoringApi.onCursor = function(e) {
-    if (true === CollaborativeEditing.Is_Fast()) {
+    if (true === AscCommon.CollaborativeEditing.Is_Fast()) {
       t.WordControl.m_oLogicDocument.Update_ForeignCursor(e[e.length - 1]['cursor'], e[e.length - 1]['user'], true, e[e.length - 1]['useridoriginal']);
     }
   };
   this.CoAuthoringApi.onConnectionStateChanged = function(e) {
-    if (true === CollaborativeEditing.Is_Fast() && false === e['state']) {
+    if (true === AscCommon.CollaborativeEditing.Is_Fast() && false === e['state']) {
       editor.WordControl.m_oLogicDocument.Remove_ForeignCursor(e['id']);
     }
     t.asc_fireCallback("asc_onConnectionStateChanged", e);
@@ -888,7 +888,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
         // Теперь обновлять состояние необходимо, чтобы обновить локи в режиме рецензирования.
         editor.WordControl.m_oLogicDocument.Document_UpdateInterfaceState();
       } else {
-        CollaborativeEditing.Add_NeedLock(Id, e["user"]);
+        AscCommon.CollaborativeEditing.Add_NeedLock(Id, e["user"]);
       }
     }
   };
@@ -915,7 +915,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
             NewType = locktype_None;
           } else {
             NewType = locktype_Other2;
-            CollaborativeEditing.Add_Unlock(Class);
+            AscCommon.CollaborativeEditing.Add_Unlock(Class);
           }
         } else if (CurType === locktype_Mine) {
           // Такого быть не должно
@@ -975,13 +975,13 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
           }
       }
     } else {
-      CollaborativeEditing.Remove_NeedLock(Id);
+      AscCommon.CollaborativeEditing.Remove_NeedLock(Id);
     }
   };
   this.CoAuthoringApi.onSaveChanges = function(e, userId, bFirstLoad) {
     var bUseColor;
     if (bFirstLoad) {
-      bUseColor = -1 === CollaborativeEditing.m_nUseType;
+      bUseColor = -1 === AscCommon.CollaborativeEditing.m_nUseType;
     }
     if (editor.CollaborativeMarksShowType === c_oAscCollaborativeMarksShowType.None) {
       bUseColor = false;
@@ -996,13 +996,13 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     }
   };
   this.CoAuthoringApi.onRecalcLocks = function(e) {
-    if (e && true === CollaborativeEditing.Is_Fast()) {
+    if (e && true === AscCommon.CollaborativeEditing.Is_Fast()) {
       var CursorInfo = JSON.parse(e);
-      CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
+      AscCommon.CollaborativeEditing.Add_ForeignCursorToUpdate(CursorInfo.UserId, CursorInfo.CursorInfo, CursorInfo.UserShortId);
     }
   };
   this.CoAuthoringApi.onStartCoAuthoring = function(isStartEvent) {
-    CollaborativeEditing.Start_CollaborationEditing();
+    AscCommon.CollaborativeEditing.Start_CollaborationEditing();
     t.asc_setDrawCollaborationMarks(true);
 
     if (t.ParcedDocument) {
@@ -1010,8 +1010,8 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
 
       if (!isStartEvent) {
         if (true != History.Is_Clear()) {
-          CollaborativeEditing.Apply_Changes();
-          CollaborativeEditing.Send_Changes();
+          AscCommon.CollaborativeEditing.Apply_Changes();
+          AscCommon.CollaborativeEditing.Send_Changes();
         } else {
           // Изменений нет, но нужно сбросить lock
           t.CoAuthoringApi.unLockDocument(true);
@@ -1026,7 +1026,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     }
   };
   this.CoAuthoringApi.onEndCoAuthoring = function(isStartEvent) {
-    CollaborativeEditing.End_CollaborationEditing();
+    AscCommon.CollaborativeEditing.End_CollaborationEditing();
     editor.asc_setDrawCollaborationMarks(false);
   };
 };
@@ -1066,7 +1066,7 @@ asc_docs_api.prototype.asc_SpellCheckDisconnect = function() {
 };
 asc_docs_api.prototype._onUpdateDocumentCanSave = function ()
 {
-    var CollEditing = CollaborativeEditing;
+    var CollEditing = AscCommon.CollaborativeEditing;
 
     // Можно модифицировать это условие на более быстрое (менять самим состояние в аргументах, а не запрашивать каждый раз)
 	var isCanSave = this.isDocumentModified() || (true !== CollEditing.Is_SingleUser() && 0 !== CollEditing.getOwnLocksLength());
@@ -1898,12 +1898,12 @@ function OnSave_Callback(e) {
     editor.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
 
     if (c_oAscCollaborativeMarksShowType.LastChanges === editor.CollaborativeMarksShowType) {
-      CollaborativeEditing.Clear_CollaborativeMarks();
+      AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
     }
 
     // Принимаем чужие изменения
-    var HaveOtherChanges = CollaborativeEditing.Have_OtherChanges();
-    CollaborativeEditing.Apply_Changes();
+    var HaveOtherChanges = AscCommon.CollaborativeEditing.Have_OtherChanges();
+    AscCommon.CollaborativeEditing.Apply_Changes();
 
     editor.CoAuthoringApi.onUnSaveLock = function() {
       editor.CoAuthoringApi.onUnSaveLock = null;
@@ -1923,12 +1923,12 @@ function OnSave_Callback(e) {
     };
 
     var CursorInfo = null;
-    if (true === CollaborativeEditing.Is_Fast()) {
+    if (true === AscCommon.CollaborativeEditing.Is_Fast()) {
       CursorInfo = History.Get_DocumentPositionBinary();
     }
 
     // Пересылаем свои изменения
-    CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo}, HaveOtherChanges);
+    AscCommon.CollaborativeEditing.Send_Changes(editor.IsUserSave, {UserId: editor.CoAuthoringApi.getUserConnectionId(), UserShortId : editor.DocInfo.get_UserId(), CursorInfo: CursorInfo}, HaveOtherChanges);
   } else {
     var nState = editor.CoAuthoringApi.get_state();
     if (AscCommon.ConnectionState.ClosedCoAuth === nState || AscCommon.ConnectionState.ClosedAll === nState) {
@@ -1936,7 +1936,7 @@ function OnSave_Callback(e) {
       editor.canSave = true;
       editor.IsUserSave = false;
     } else {
-      var TimeoutInterval = (true === CollaborativeEditing.Is_Fast() ? 1 : 1000);
+      var TimeoutInterval = (true === AscCommon.CollaborativeEditing.Is_Fast() ? 1 : 1000);
       setTimeout(function() {
         editor.CoAuthoringApi.askSaveChanges(OnSave_Callback);
       }, TimeoutInterval);
@@ -2006,14 +2006,14 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
     if (c_oAscFontRenderingModeType.noHinting === mode)
-        SetHintsProps(false, false);
+      AscCommon.SetHintsProps(false, false);
     else if (c_oAscFontRenderingModeType.hinting === mode)
-        SetHintsProps(true, false);
+      AscCommon.SetHintsProps(true, false);
     else if (c_oAscFontRenderingModeType.hintingAndSubpixeling === mode)
-        SetHintsProps(true, true);
+      AscCommon.SetHintsProps(true, true);
 
     this.WordControl.m_oDrawingDocument.ClearCachePages();
-    g_fontManager.ClearFontsRasterCache();
+  AscCommon.g_fontManager.ClearFontsRasterCache();
 
     if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
         window.g_fontManager2.ClearFontsRasterCache();
@@ -2089,14 +2089,14 @@ asc_docs_api.prototype.sync_GetDocInfoEndCallback = function(){
 };
 asc_docs_api.prototype.sync_CanUndoCallback = function(bCanUndo)
 {
-    if (true === CollaborativeEditing.Is_Fast() && true !== CollaborativeEditing.Is_SingleUser())
+    if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
         bCanUndo = false;
 
     this.asc_fireCallback("asc_onCanUndo", bCanUndo);
 };
 asc_docs_api.prototype.sync_CanRedoCallback = function(bCanRedo)
 {
-    if (true === CollaborativeEditing.Is_Fast() && true !== CollaborativeEditing.Is_SingleUser())
+    if (true === AscCommon.CollaborativeEditing.Is_Fast() && true !== AscCommon.CollaborativeEditing.Is_SingleUser())
         bCanRedo = false;
 
     this.asc_fireCallback("asc_onCanRedo", bCanRedo);
@@ -4549,8 +4549,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
         var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
         if (_image.Image != null)
         {
-            var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-            var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+            var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+            var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
             _w = Math.max(5, Math.min(_w, __w));
             _h = Math.max(5, Math.min(parseInt(_w * __h / __w)));
         }
@@ -4599,8 +4599,8 @@ asc_docs_api.prototype.AddImageUrlAction = function(url, imgProp)
             var _h = Math.max(1, Page_Height - (Y_Top_Margin + Y_Bottom_Margin));
             if (_image.Image != null)
             {
-                var __w = Math.max(parseInt(_image.Image.width * g_dKoef_pix_to_mm), 1);
-                var __h = Math.max(parseInt(_image.Image.height * g_dKoef_pix_to_mm), 1);
+                var __w = Math.max(parseInt(_image.Image.width * AscCommon.g_dKoef_pix_to_mm), 1);
+                var __h = Math.max(parseInt(_image.Image.height * AscCommon.g_dKoef_pix_to_mm), 1);
                 _w = Math.max(5, Math.min(_w, __w));
                 _h = Math.max(5, Math.min(parseInt(_w * __h / __w)));
             }
@@ -5493,7 +5493,7 @@ asc_docs_api.prototype.sync_UnLockDocumentProps = function()
 
 asc_docs_api.prototype.sync_CollaborativeChanges = function()
 {
-    if (true !== CollaborativeEditing.Is_Fast())
+    if (true !== AscCommon.CollaborativeEditing.Is_Fast())
         this.asc_fireCallback("asc_onCollaborativeChanges");
 };
 
@@ -5987,8 +5987,8 @@ asc_docs_api.prototype.OpenDocumentEndCallback = function()
                 {
                     this.isApplyChangesOnOpenEnabled = false;
                     this.isApplyChangesOnOpen = true;
-                    CollaborativeEditing.Apply_Changes();
-                    CollaborativeEditing.Release_Locks();
+                  AscCommon.CollaborativeEditing.Apply_Changes();
+                  AscCommon.CollaborativeEditing.Release_Locks();
 
                   // Применяем все lock-и (ToDo возможно стоит пересмотреть вообще Lock-и)
                   for (var i = 0; i < this.arrPreOpenLocksObjects.length; ++i) {
@@ -6221,7 +6221,7 @@ asc_docs_api.prototype.SyncLoadImages_callback = function()
 
 asc_docs_api.prototype.pre_SaveCallback = function()
 {
-    CollaborativeEditing.OnEnd_Load_Objects();
+  AscCommon.CollaborativeEditing.OnEnd_Load_Objects();
 
     if (this.isApplyChangesOnOpen)
     {
@@ -6560,7 +6560,7 @@ asc_docs_api.prototype.asc_setViewMode = function(isViewMode) {
 
     this.isViewMode = true;
     this.ShowParaMarks = false;
-    CollaborativeEditing.m_bGlobalLock = true;
+    AscCommon.CollaborativeEditing.m_bGlobalLock = true;
     //this.isShowTableEmptyLine = false;
     //this.WordControl.m_bIsRuler = true;
 
@@ -7069,7 +7069,7 @@ asc_docs_api.prototype.asc_CloseFile = function()
     History.Clear();
 	g_oIdCounter.Clear();
     g_oTableId.Clear();
-    CollaborativeEditing.Clear();
+  AscCommon.CollaborativeEditing.Clear();
 	this.isApplyChangesOnOpenEnabled = true;
 
 	var oLogicDocument = this.WordControl.m_oLogicDocument;
@@ -7081,8 +7081,8 @@ asc_docs_api.prototype.asc_CloseFile = function()
 };
 asc_docs_api.prototype.asc_SetFastCollaborative = function(isOn)
 {
-    if (CollaborativeEditing)
-        CollaborativeEditing.Set_Fast(isOn);
+    if (AscCommon.CollaborativeEditing)
+      AscCommon.CollaborativeEditing.Set_Fast(isOn);
 };
 
 window["asc_docs_api"] = asc_docs_api;
@@ -7176,11 +7176,11 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
     if ((window["NATIVE_EDITOR_ENJINE"] === undefined) && this.isApplyChangesOnOpenEnabled)
     {
         this.isApplyChangesOnOpenEnabled = false;
-        if (1 === CollaborativeEditing.m_nUseType)
+        if (1 === AscCommon.CollaborativeEditing.m_nUseType)
         {
             this.isApplyChangesOnOpen = true;
-            CollaborativeEditing.Apply_Changes();
-            CollaborativeEditing.Release_Locks();
+          AscCommon.CollaborativeEditing.Apply_Changes();
+          AscCommon.CollaborativeEditing.Release_Locks();
             return;
         }
     }
@@ -7210,12 +7210,12 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
     this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
-	CollaborativeEditing.Apply_OtherChanges();
+  AscCommon.CollaborativeEditing.Apply_OtherChanges();
 };
 
 window["asc_docs_api"].prototype["asc_nativeInitBuilder"] = function()
 {
-    this.asc_setDocInfo(new window["CDocInfo"]());
+    this.asc_setDocInfo(new window["Asc"]["asc_CDocInfo"]());
 };
 
 window["asc_docs_api"].prototype["asc_SetSilentMode"] = function(bEnabled)
@@ -7280,19 +7280,19 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
 
     if (isFull)
     {
-        CollaborativeEditing.m_aChanges = [];
+      AscCommon.CollaborativeEditing.m_aChanges = [];
 
         // У новых элементов выставляем указатели на другие классы
-        CollaborativeEditing.Apply_LinkData();
+      AscCommon.CollaborativeEditing.Apply_LinkData();
 
         // Делаем проверки корректности новых изменений
-        CollaborativeEditing.Check_MergeData();
+      AscCommon.CollaborativeEditing.Check_MergeData();
 
-        CollaborativeEditing.OnEnd_ReadForeignChanges();
+      AscCommon.CollaborativeEditing.OnEnd_ReadForeignChanges();
 
         if (window["NATIVE_EDITOR_ENJINE"] === true && window["native"]["AddImageInChanges"])
         {
-            var _new_images = CollaborativeEditing.m_aNewImages;
+            var _new_images = AscCommon.CollaborativeEditing.m_aNewImages;
             var _new_images_len = _new_images.length;
 
             for (var nImage = 0; nImage < _new_images_len; nImage++)

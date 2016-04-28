@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var CShape = AscFormat.CShape;
 var CGroupShape = AscFormat.CGroupShape;
@@ -250,3 +252,4 @@ CGroupShape.prototype.recalculate = function()
         }
     }, this, []);
 };
+})(window);

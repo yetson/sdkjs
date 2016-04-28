@@ -71,7 +71,7 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Markup = new CTableMarkup(this);
+    this.Markup = new AscCommon.CTableMarkup(this);
 
     this.Prev = null;
     this.Next = null;
@@ -84,8 +84,8 @@ function CTable(DrawingDocument, Parent, Inline, PageNum, X, Y, XLimit, YLimit, 
     if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (CollaborativeEditing)
-            CollaborativeEditing.Add_Unlock2(this);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Add_Unlock2(this);
     }
     
     this.DrawingDocument = null;
@@ -5146,7 +5146,7 @@ CTable.prototype =
                     if (null != Element)
                     {
                         this.Content.splice(Pos, 0, Element);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                     }
                 }
 
@@ -5172,7 +5172,7 @@ CTable.prototype =
                         continue;
 
                     this.Content.splice(Pos, 1);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, Pos, 1);
                 }
 
                 this.Recalc_CompiledPr2();
@@ -5415,7 +5415,7 @@ CTable.prototype =
 
         this.Internal_ReIndexing();
 
-        CollaborativeEditing.Add_NewObject(this);
+        AscCommon.CollaborativeEditing.Add_NewObject(this);
 
         var DrawingDocument = editor.WordControl.m_oDrawingDocument;
         if ( undefined !== DrawingDocument && null !== DrawingDocument )
@@ -5427,7 +5427,7 @@ CTable.prototype =
         // Добавляем, чтобы в конце выставить CurCell
         var LinkData = {};
         LinkData.CurCell = true;
-        CollaborativeEditing.Add_LinkData( this, LinkData );
+        AscCommon.CollaborativeEditing.Add_LinkData( this, LinkData );
     },
 
     Load_LinkData : function(LinkData)
@@ -13288,7 +13288,7 @@ CTable.prototype.private_StartTrackTable = function(CurPage)
         return;
 
     var Bounds     = this.Get_PageBounds(CurPage);
-    var NewOutline = new CTableOutline(this, this.Get_AbsolutePage(CurPage), Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top);
+    var NewOutline = new AscCommon.CTableOutline(this, this.Get_AbsolutePage(CurPage), Bounds.Left, Bounds.Top, Bounds.Right - Bounds.Left, Bounds.Bottom - Bounds.Top);
 
     var Transform = this.Get_ParentTextTransform();
     this.DrawingDocument.StartTrackTable(NewOutline, Transform);

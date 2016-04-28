@@ -58,7 +58,7 @@
 		 *
 		 * @constructor
 		 * @memberOf Asc
-		 * @extends {StringRender}
+		 * @extends {AscCommonExcel.StringRender}
 		 */
 		function CellTextRender(drawingCtx) {
 			CellTextRender.superclass.constructor.call(this, drawingCtx);
@@ -69,7 +69,7 @@
 			return this;
 		}
 
-		AscCommon.extendClass(CellTextRender, asc.StringRender);
+		AscCommon.extendClass(CellTextRender, AscCommonExcel.StringRender);
 
 		CellTextRender.prototype.getLinesCount = function () {
 			return this.lines.length;
@@ -243,10 +243,8 @@
 		};
 
 
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"].CellTextRender = CellTextRender;
+		//------------------------------------------------------------export---------------------------------------------------
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].CellTextRender = CellTextRender;
 	}
 )(window);
