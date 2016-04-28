@@ -34,6 +34,7 @@ var g_oTableId = AscCommon.g_oTableId;
 var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 var History = AscCommon.History;
 var recalcresultflags_Page = AscCommon.recalcresultflags_Page;
+var CParaPos = AscCommon.CParaPos;
 
 var c_oAscShdNil = Asc.c_oAscShdNil;
 
@@ -1623,7 +1624,7 @@ ParaRun.prototype.Split2 = function(CurPos, Parent, ParentPos)
 
 ParaRun.prototype.Check_NearestPos = function(ParaNearPos, Depth)
 {
-    var RunNearPos = new CParagraphElementNearPos();
+    var RunNearPos = new AscCommon.CParagraphElementNearPos();
     RunNearPos.NearPos = ParaNearPos.NearPos;
     RunNearPos.Depth   = Depth;
 
@@ -3756,7 +3757,7 @@ ParaRun.prototype.Refresh_RecalcData = function(Data)
 };
 ParaRun.prototype.Save_RecalculateObject = function(Copy)
 {
-    var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+    var RecalcObj = new AscCommon.CRunRecalculateObject(this.StartLine, this.StartRange);
     RecalcObj.Save_Lines( this, Copy );
     RecalcObj.Save_RunContent( this, Copy );
     return RecalcObj;
@@ -6525,7 +6526,7 @@ ParaRun.prototype.Get_PrReviewColor = function()
     if (this.Pr.ReviewInfo)
         return this.Pr.ReviewInfo.Get_Color();
 
-    return REVIEW_COLOR;
+    return AscCommon.REVIEW_COLOR;
 };
 
 ParaRun.prototype.Add_PrChange = function()
@@ -10489,7 +10490,7 @@ ParaRun.prototype.Get_ReviewColor = function()
     if (this.ReviewInfo)
         return this.ReviewInfo.Get_Color();
 
-    return REVIEW_COLOR;
+    return AscCommon.REVIEW_COLOR;
 };
 ParaRun.prototype.Set_ReviewType = function(Value)
 {
@@ -11019,7 +11020,7 @@ CReviewInfo.prototype.Read_FromBinary = function(Reader)
 CReviewInfo.prototype.Get_Color = function()
 {
     if (!this.UserId && !this.UserName)
-        return REVIEW_COLOR;
+        return AscCommon.REVIEW_COLOR;
 
     return AscCommon.getUserColorById(this.UserId, this.UserName, true, false);
 };

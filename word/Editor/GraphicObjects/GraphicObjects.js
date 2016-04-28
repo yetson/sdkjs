@@ -943,7 +943,7 @@ CGraphicObjects.prototype =
             var  ret = [];
             for(var i = 0; i < arrObjects.length; ++i)
             {
-                if(arrObjects[i].GetType() === type_Paragraph)
+                if(arrObjects[i].GetType() === AscCommon.type_Paragraph)
                 {
                     var calc_frame = arrObjects[i].CalculatedFrame;
                     var FramePr = arrObjects[i].Get_FramePr();
@@ -1334,7 +1334,7 @@ CGraphicObjects.prototype =
         }
         else
         {
-            var para = new Paragraph(this.document.DrawingDocument, this.document, 0, 0, 0, 0, 0);
+            var para = new AscCommon.Paragraph(this.document.DrawingDocument, this.document, 0, 0, 0, 0, 0);
             var selectedObjects, run, drawing, i;
             if(this.selection.groupSelection)
             {
@@ -1876,7 +1876,7 @@ CGraphicObjects.prototype =
         else
         {
             var ParaDrawing = this.getMajorParaDrawing();
-            if (ParaDrawing && ParaDrawing.Parent instanceof Paragraph)
+            if (ParaDrawing && ParaDrawing.Parent instanceof AscCommon.Paragraph)
                 return ParaDrawing.Parent;
 
             return null;

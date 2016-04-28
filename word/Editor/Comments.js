@@ -1020,7 +1020,7 @@ ParaComment.prototype =
 
     Get_ParaPosByContentPos : function(ContentPos, Depth)
     {
-        return new CParaPos(this.StartRange, this.StartLine, 0, 0);
+        return new AscCommon.CParaPos(this.StartRange, this.StartLine, 0, 0);
     },
 //-----------------------------------------------------------------------------------
 // Функции пересчета
@@ -1090,7 +1090,7 @@ ParaComment.prototype =
 
     Save_RecalculateObject : function(Copy)
     {
-        var RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
+        var RecalcObj = new AscCommon.CRunRecalculateObject(this.StartLine, this.StartRange);
         return RecalcObj;
     },
 
@@ -1453,7 +1453,7 @@ ParaComment.prototype =
 };
 ParaComment.prototype.Get_CurrentParaPos = function()
 {
-    return new CParaPos(this.StartRange, this.StartLine, 0, 0);
+    return new AscCommon.CParaPos(this.StartRange, this.StartLine, 0, 0);
 };
 ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
 {
