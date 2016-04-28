@@ -645,3 +645,4 @@ function CreateNoFillUniFill()
 window['AscFormat'].CreateUnifillSolidFillSchemeColor = CreateUnifillSolidFillSchemeColor;
 window['AscFormat'].CreateNoFillLine = CreateNoFillLine;
 window['AscFormat'].CreateNoFillUniFill = CreateNoFillUniFill;
+window['AscFormat'].getChartTranslateManager = getChartTranslateManager;
