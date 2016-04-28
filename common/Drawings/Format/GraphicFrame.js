@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
 var CShape = AscFormat.CShape;
 var HitInLine = AscFormat.HitInLine;
@@ -1262,3 +1264,8 @@ CGraphicFrame.prototype =
         this.Id = r.GetString2();
     }
 };
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CGraphicFrame = CGraphicFrame;
+})(window);

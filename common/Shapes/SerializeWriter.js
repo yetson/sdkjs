@@ -1556,7 +1556,7 @@ function CBinaryFileWriter()
                     }
 					default:
 					{
-						if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
+						if (spTree[i] instanceof AscFormat.CGraphicFrame && spTree[i].graphicObject instanceof CTable)
 						{
 							oThis.WriteTable(spTree[i]);
 						}
@@ -3282,7 +3282,7 @@ function CBinaryFileWriter()
                     }
 					default:
 					{
-						if (spTree[i] instanceof CGraphicFrame && spTree[i].graphicObject instanceof CTable)
+						if (spTree[i] instanceof AscFormat.CGraphicFrame && spTree[i].graphicObject instanceof CTable)
 						{
 							oThis.WriteTable(spTree[i]);
 						}
