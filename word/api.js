@@ -988,7 +988,7 @@ asc_docs_api.prototype._coAuthoringInitEnd = function() {
     }
 
     var oCommonColor = AscCommon.getUserColorById(userId, null, false, false);
-    var oColor = false === bUseColor ? null : new CDocumentColor(oCommonColor.r, oCommonColor.g, oCommonColor.b);
+    var oColor = false === bUseColor ? null : new AscCommon.CDocumentColor(oCommonColor.r, oCommonColor.g, oCommonColor.b);
     t._coAuthoringSetChange(e, oColor);
     // т.е. если bSendEvent не задан, то посылаем  сообщение + когда загрузился документ
     if (!bFirstLoad && t.bInit_word_control) {
@@ -1333,7 +1333,7 @@ function CTextProp (obj)
 		this.FontSize   = (undefined != obj.FontSize) ? obj.FontSize : null;
 		this.Color      = (undefined != obj.Color && null != obj.Color) ? AscCommon.CreateAscColorCustom(obj.Color.r, obj.Color.g, obj.Color.b) : null;
 		this.VertAlign  = (undefined != obj.VertAlign) ? obj.VertAlign : null;
-		this.HighLight  = (undefined != obj.HighLight) ? obj.HighLight == highlight_None ? obj.HighLight : new AscCommon.CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
+		this.HighLight  = (undefined != obj.HighLight) ? obj.HighLight == AscCommon.highlight_None ? obj.HighLight : new AscCommon.CColor (obj.HighLight.r, obj.HighLight.g, obj.HighLight.b) : null;
         this.DStrikeout = (undefined != obj.DStrikeout) ? obj.DStrikeout : null;
         this.Spacing    = (undefined != obj.Spacing)    ? obj.Spacing    : null;
         this.Caps       = (undefined != obj.Caps)       ? obj.Caps       : null;
@@ -1367,7 +1367,7 @@ function CTextProp (obj)
 		this.FontSize   = 12;
 		this.Color      = AscCommon.CreateAscColorCustom(0, 0, 0);
 		this.VertAlign  = AscCommon.vertalign_Baseline;
-		this.HighLight  = highlight_None;
+		this.HighLight  = AscCommon.highlight_None;
         this.DStrikeout = false;
         this.Spacing    = 0;
         this.Caps       = false;
@@ -1566,12 +1566,12 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     //-----------------------------------------------------------------------------
 
     if ( true === ParaPr.Spacing.AfterAutoSpacing )
-        ParaPr.Spacing.After = spacing_Auto;
+        ParaPr.Spacing.After = AscCommon.spacing_Auto;
     else if ( undefined === ParaPr.Spacing.AfterAutoSpacing )
         ParaPr.Spacing.After = AscCommon.UnknownValue;
 
     if ( true === ParaPr.Spacing.BeforeAutoSpacing )
-        ParaPr.Spacing.Before = spacing_Auto;
+        ParaPr.Spacing.Before = AscCommon.spacing_Auto;
     else if ( undefined === ParaPr.Spacing.BeforeAutoSpacing )
         ParaPr.Spacing.Before = UnknownValue;
 
@@ -1668,9 +1668,9 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
     
     if ( undefined !== ParaPr.FramePr && undefined !== ParaPr.FramePr.Wrap )
     {
-        if ( wrap_NotBeside === ParaPr.FramePr.Wrap )
+        if ( AscCommon.wrap_NotBeside === ParaPr.FramePr.Wrap )
             ParaPr.FramePr.Wrap = false;
-        else if ( wrap_Around === ParaPr.FramePr.Wrap )
+        else if ( AscCommon.wrap_Around === ParaPr.FramePr.Wrap )
             ParaPr.FramePr.Wrap = true;
         else
             ParaPr.FramePr.Wrap = undefined;
@@ -2556,7 +2556,7 @@ asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type 
         {
             case 0:
             {
-                if ( spacing_Auto === value )
+                if ( AscCommon.spacing_Auto === value )
                     this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { BeforeAutoSpacing : true } );
                 else
                     this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { Before : value, BeforeAutoSpacing : false } );
@@ -2565,7 +2565,7 @@ asc_docs_api.prototype.put_LineSpacingBeforeAfter = function(type,value)//"type 
             }
             case 1:
             {
-                if ( spacing_Auto === value )
+                if ( AscCommon.spacing_Auto === value )
                     this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { AfterAutoSpacing : true } );
                 else
                     this.WordControl.m_oLogicDocument.Set_ParagraphSpacing( { After : value, AfterAutoSpacing : false });
@@ -2770,7 +2770,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
         if ( undefined != Props.Tabs )
         {
-            var Tabs = new CParaTabs();
+            var Tabs = new AscCommon.CParaTabs();
             Tabs.Set_FromObject( Props.Tabs.Tabs );
             this.WordControl.m_oLogicDocument.Set_ParagraphTabs( Tabs );
         }
@@ -2782,7 +2782,7 @@ asc_docs_api.prototype.paraApply = function(Props)
 
 
         // TODO: как только разъединят настройки параграфа и текста переделать тут
-        var TextPr = new CTextPr();
+        var TextPr = new AscCommon.CTextPr();
 
         if ( true === Props.Subscript )
             TextPr.VertAlign = AscCommon.vertalign_SubScript;
@@ -3049,7 +3049,7 @@ asc_docs_api.prototype.put_LineHighLight = function(is_flag, r, g, b)
         if (false === is_flag)
         {
             this.WordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTextHighlightNone);
-            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { HighLight : highlight_None  } ) );
+            this.WordControl.m_oLogicDocument.Paragraph_Add( new ParaTextPr( { HighLight : AscCommon.highlight_None  } ) );
         }
         else
         {
@@ -3206,12 +3206,12 @@ asc_docs_api.prototype.sync_ParaStyleName = function(Name){
 asc_docs_api.prototype.sync_ParaSpacingLine = function(SpacingLine)
 {
     if ( true === SpacingLine.AfterAutoSpacing )
-        SpacingLine.After = spacing_Auto;
+        SpacingLine.After = AscCommon.spacing_Auto;
     else if ( undefined === SpacingLine.AfterAutoSpacing )
         SpacingLine.After = AscCommon.AscCommon.UnknownValue;
 
     if ( true === SpacingLine.BeforeAutoSpacing )
-        SpacingLine.Before = spacing_Auto;
+        SpacingLine.Before = AscCommon.spacing_Auto;
     else if ( undefined === SpacingLine.BeforeAutoSpacing )
         SpacingLine.Before = AscCommon.UnknownValue;
 
@@ -4447,7 +4447,7 @@ asc_docs_api.prototype.sync_TblPropCallback = function(tblProp)
         var LogicDocument = this.WordControl.m_oLogicDocument;
         tblProp.CellsBackground.Unifill.check(LogicDocument.Get_Theme(), LogicDocument.Get_ColorMap());
         var RGBA = tblProp.CellsBackground.Unifill.getRGBAColor();
-        tblProp.CellsBackground.Color = new CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
+        tblProp.CellsBackground.Color = new AscCommon.CDocumentColor(RGBA.R, RGBA.G, RGBA.B, false);
     }
     this.SelectedObjectsStack[this.SelectedObjectsStack.length] = new asc_CSelectedObject( c_oAscTypeSelectElement.Table, new CTableProp( tblProp ));
 };
@@ -7202,7 +7202,7 @@ window["asc_docs_api"].prototype["asc_nativeCalculateFile"] = function()
 
 window["asc_docs_api"].prototype["asc_nativeApplyChanges"] = function(changes)
 {
-    this._coAuthoringSetChanges(changes, new CDocumentColor( 191, 255, 199 ));
+    this._coAuthoringSetChanges(changes, new AscCommon.CDocumentColor( 191, 255, 199 ));
   AscCommon.CollaborativeEditing.Apply_OtherChanges();
 };
 
@@ -7229,7 +7229,7 @@ window["asc_docs_api"].prototype["asc_nativeApplyChanges2"] = function(data, isF
     var stream = new AscCommon.FT_Stream2(data, data.length);
     stream.obj = null;
     var Loader = { Reader : stream, Reader2 : null };
-    var _color = new CDocumentColor( 191, 255, 199 );
+    var _color = new AscCommon.CDocumentColor( 191, 255, 199 );
 
     // Применяем изменения, пока они есть
     var _count = Loader.Reader.GetLong();

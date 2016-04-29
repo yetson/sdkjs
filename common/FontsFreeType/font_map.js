@@ -1801,7 +1801,7 @@ CFontSelectList.prototype =
 
     getSetupRFonts : function(obj)
     {
-        var _rfonts = new CRFonts();
+        var _rfonts = new AscCommon.CRFonts();
         switch (obj.fontSlot)
         {
             case fontslot_EastAsia:

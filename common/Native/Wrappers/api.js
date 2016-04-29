@@ -138,16 +138,16 @@ asc_docs_api.prototype["Call_Common"] = function(type, param)
 
 asc_docs_api.prototype["Call_HR_Tabs"] = function(arrT, arrP)
 {
-    var _arr = new CParaTabs();
+    var _arr = new AscCommon.CParaTabs();
     var _c = arrT.length;
     for (var i = 0; i < _c; i++)
     {
         if (arrT[i] == 1)
-            _arr.Add( new CParaTab( tab_Left, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Left, arrP[i] ) );
         if (arrT[i] == 2)
-            _arr.Add( new CParaTab( tab_Right, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Right, arrP[i] ) );
         if (arrT[i] == 3)
-            _arr.Add( new CParaTab( tab_Center, arrP[i] ) );
+            _arr.Add( new AscCommon.CParaTab( tab_Center, arrP[i] ) );
     }
 
     var _logic = this.WordControl.m_oLogicDocument;
@@ -422,7 +422,7 @@ function asc_menu_WriteColor(_type, _color, _stream)
 // PARAINDENT
 function asc_menu_ReadParaInd(_params, _cursor)
 {
-    var _ind = new CParaInd();
+    var _ind = new AscCommon.CParaInd();
     var _continue = true;
     while (_continue)
     {
@@ -483,7 +483,7 @@ function asc_menu_WriteParaInd(_type, _ind, _stream)
 // PARASPACING
 function asc_menu_ReadParaSpacing(_params, _cursor)
 {
-    var _spacing = new CParaSpacing();
+    var _spacing = new AscCommon.CParaSpacing();
     var _continue = true;
     while (_continue)
     {
@@ -1079,7 +1079,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
     {
         case 1: // ASC_MENU_EVENT_TYPE_TEXTPR
         {
-            var _textPr = new CTextPr();
+            var _textPr = new AscCommon.CTextPr();
             while (_continue)
             {
                 var _attr = _params[_current.pos++];
@@ -1152,7 +1152,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     }
                     case 12:
                     {
-                        _textPr.HighLight = highlight_None;
+                        _textPr.HighLight = AscCommon.highlight_None;
                         break;
                     }
                     case 13:
@@ -1282,7 +1282,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 15:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         if (true == _params[_current.pos++])
                             _textPr.VertAlign = AscCommon.vertalign_SubScript;
                         else
@@ -1292,7 +1292,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 16:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         if (true == _params[_current.pos++])
                             _textPr.VertAlign = AscCommon.vertalign_SuperScript;
                         else
@@ -1302,7 +1302,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 17:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.SmallCaps = _params[_current.pos++];
                         _textPr.Caps   = false;
                         break;
@@ -1310,7 +1310,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 18:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.Caps = _params[_current.pos++];
                         if (true == _textPr.Caps)
                             _textPr.SmallCaps = false;
@@ -1319,7 +1319,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 19:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.Strikeout  = _params[_current.pos++];
                         _textPr.DStrikeout = false;
                         break;
@@ -1327,7 +1327,7 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 20:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.DStrikeout  = _params[_current.pos++];
                         if (true == _textPr.DStrikeout)
                             _textPr.Strikeout = false;
@@ -1336,14 +1336,14 @@ asc_docs_api.prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.TextSpacing = _params[_current.pos++];
                         break;
                     }
                     case 22:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommon.CTextPr();
                         _textPr.Position = _params[_current.pos++];
                         break;
                     }
@@ -4232,7 +4232,7 @@ asc_docs_api.prototype.UpdateTextPr = function(TextPr)
 
     if (TextPr.HighLight !== undefined)
     {
-        if (TextPr.HighLight === highlight_None)
+        if (TextPr.HighLight === AscCommon.highlight_None)
         {
             _stream["WriteByte"](12);
         }
@@ -4375,9 +4375,9 @@ asc_docs_api.prototype.UpdateParagraphProp = function(ParaPr)
 
     if ( undefined !== ParaPr.FramePr && undefined !== ParaPr.FramePr.Wrap )
     {
-        if ( wrap_NotBeside === ParaPr.FramePr.Wrap )
+        if ( AscCommon.wrap_NotBeside === ParaPr.FramePr.Wrap )
             ParaPr.FramePr.Wrap = false;
-        else if ( wrap_Around === ParaPr.FramePr.Wrap )
+        else if ( AscCommon.wrap_Around === ParaPr.FramePr.Wrap )
             ParaPr.FramePr.Wrap = true;
         else
             ParaPr.FramePr.Wrap = undefined;
@@ -5105,7 +5105,7 @@ CStylesPainter.prototype =
                 var res = formalStyle.match(/^heading([1-9][0-9]*)$/);
                 var index = (res) ? res[1] - 1 : -1;
 
-                var _dr_style = __Styles.Get_Pr(i, styletype_Paragraph);
+                var _dr_style = __Styles.Get_Pr(i, AscCommon.styletype_Paragraph);
                 _dr_style.Name = style.Name;
                 _dr_style.Id = i;
 
@@ -5158,8 +5158,8 @@ CStylesPainter.prototype =
         AscCommon.g_oTableId.m_bTurnOff = true;
         AscCommon.History.TurnOff();
 
-        var oldDefTabStop = Default_Tab_Stop;
-        Default_Tab_Stop = 1;
+        var oldDefTabStop = AscCommon.Default_Tab_Stop;
+        AscCommon.Default_Tab_Stop = 1;
 
         var hdr = new CHeaderFooter(_api.WordControl.m_oLogicDocument.HdrFtr, _api.WordControl.m_oLogicDocument, _api.WordControl.m_oDrawingDocument, AscCommon.hdrftr_Header);
         var _dc = hdr.Content;//new CDocumentContent(editor.WordControl.m_oLogicDocument, editor.WordControl.m_oDrawingDocument, 0, 0, 0, 0, false, true, false);
@@ -5176,12 +5176,12 @@ CStylesPainter.prototype =
         par.Add_ToContent(0, run);
         par.Style_Add(style.Id, false);
         par.Set_Align(AscCommon.align_Left);
-        par.Set_Tabs(new CParaTabs());
+        par.Set_Tabs(new AscCommon.CParaTabs());
 
         var _brdL = style.ParaPr.Brd.Left;
         if ( undefined !== _brdL && null !== _brdL )
         {
-            var brdL = new CDocumentBorder();
+            var brdL = new AscCommon.CDocumentBorder();
             brdL.Set_FromObject(_brdL);
             brdL.Space = 0;
             par.Set_Border(brdL, AscDFH.historyitem_Paragraph_Borders_Left);
@@ -5190,7 +5190,7 @@ CStylesPainter.prototype =
         var _brdT = style.ParaPr.Brd.Top;
         if ( undefined !== _brdT && null !== _brdT )
         {
-            var brd = new CDocumentBorder();
+            var brd = new AscCommon.CDocumentBorder();
             brd.Set_FromObject(_brdT);
             brd.Space = 0;
             par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Top);
@@ -5199,7 +5199,7 @@ CStylesPainter.prototype =
         var _brdB = style.ParaPr.Brd.Bottom;
         if ( undefined !== _brdB && null !== _brdB )
         {
-            var brd = new CDocumentBorder();
+            var brd = new AscCommon.CDocumentBorder();
             brd.Set_FromObject(_brdB);
             brd.Space = 0;
             par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Bottom);
@@ -5208,19 +5208,19 @@ CStylesPainter.prototype =
         var _brdR = style.ParaPr.Brd.Right;
         if ( undefined !== _brdR && null !== _brdR )
         {
-            var brd = new CDocumentBorder();
+            var brd = new AscCommon.CDocumentBorder();
             brd.Set_FromObject(_brdR);
             brd.Space = 0;
             par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Right);
         }
 
-        var _ind = new CParaInd();
+        var _ind = new AscCommon.CParaInd();
         _ind.FirstLine = 0;
         _ind.Left = 0;
         _ind.Right = 0;
         par.Set_Ind(_ind, false);
 
-        var _sp = new CParaSpacing();
+        var _sp = new AscCommon.CParaSpacing();
         _sp.Line              = 1;
         _sp.LineRule          = Asc.linerule_Auto;
         _sp.Before            = 0;
@@ -5258,7 +5258,7 @@ CStylesPainter.prototype =
 
         graphics.restore();
 
-        Default_Tab_Stop = oldDefTabStop;
+        AscCommon.Default_Tab_Stop = oldDefTabStop;
 
         AscCommon.g_oTableId.m_bTurnOff = false;
         AscCommon.History.TurnOn();

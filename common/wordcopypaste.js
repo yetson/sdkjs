@@ -48,6 +48,9 @@ var g_oDocumentUrls = AscCommon.g_oDocumentUrls;
   var CSelectedContent = AscCommon.CSelectedContent;
   var CSelectedElement = AscCommon.CSelectedElement;
   var type_Paragraph = AscCommon.type_Paragraph;
+  var CDocumentBorder = AscCommon.CDocumentBorder;
+  var CDocumentColor = AscCommon.CDocumentColor;
+  var tblwidth_Mm = AscCommon.tblwidth_Mm;
 
 var CShape = AscFormat.CShape;
   var CGraphicFrame = AscFormat.CGraphicFrame;
@@ -59,6 +62,8 @@ var c_oAscXAlign = Asc.c_oAscXAlign;
 
   var X_Right_Field  = AscCommon.Page_Width  - AscCommon.X_Right_Margin;
   var Y_Bottom_Field = AscCommon.Page_Height - AscCommon.Y_Bottom_Margin;
+
+  var g_dKoef_pc_to_mm = AscCommon.g_dKoef_pt_to_mm / 12;
 
 function CDocumentReaderMode()
 {
@@ -683,11 +688,11 @@ CopyProcessor.prototype =
         {
             //Ind
             if(Def_pPr.Ind.Left != Item_pPr.Ind.Left)
-                apPr.push("margin-left:" + (Item_pPr.Ind.Left * g_dKoef_mm_to_pt) + "pt");
+                apPr.push("margin-left:" + (Item_pPr.Ind.Left * AscCommon.g_dKoef_mm_to_pt) + "pt");
             if(Def_pPr.Ind.Right != Item_pPr.Ind.Right)
-                apPr.push("margin-right:" + ( Item_pPr.Ind.Right * g_dKoef_mm_to_pt) + "pt");
+                apPr.push("margin-right:" + ( Item_pPr.Ind.Right * AscCommon.g_dKoef_mm_to_pt) + "pt");
             if(Def_pPr.Ind.FirstLine != Item_pPr.Ind.FirstLine)
-                apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * g_dKoef_mm_to_pt) + "pt");
+                apPr.push("text-indent:" + (Item_pPr.Ind.FirstLine * AscCommon.g_dKoef_mm_to_pt) + "pt");
             //Jc
             if(Def_pPr.Jc != Item_pPr.Jc){
                 switch(Item_pPr.Jc)
@@ -718,7 +723,7 @@ CopyProcessor.prototype =
             if(Def_pPr.Spacing.Line != Item_pPr.Spacing.Line)
             {
                 if(Asc.linerule_AtLeast == Item_pPr.Spacing.LineRule)
-                    apPr.push("line-height:"+(Item_pPr.Spacing.Line * g_dKoef_mm_to_pt)+"pt");
+                    apPr.push("line-height:"+(Item_pPr.Spacing.Line * AscCommon.g_dKoef_mm_to_pt)+"pt");
                 else if( Asc.linerule_Auto == Item_pPr.Spacing.LineRule)
                 {
                     if(1 == Item_pPr.Spacing.Line)
@@ -735,9 +740,9 @@ CopyProcessor.prototype =
 			//TODO при вставке в EXCEL(внутрь ячейки) появляются лишние пустые строки из-за того, что в HTML пишутся отступы - BUG #14663
             //��� ������� � word ����� ����� ��� �������� ������������ ������
             //if(Def_pPr.Spacing.Before != Item_pPr.Spacing.Before)
-            apPr.push("margin-top:" + (Item_pPr.Spacing.Before * g_dKoef_mm_to_pt) + "pt");
+            apPr.push("margin-top:" + (Item_pPr.Spacing.Before * AscCommon.g_dKoef_mm_to_pt) + "pt");
             //if(Def_pPr.Spacing.After != Item_pPr.Spacing.After)
-            apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * g_dKoef_mm_to_pt) + "pt");
+            apPr.push("margin-bottom:" + (Item_pPr.Spacing.After * AscCommon.g_dKoef_mm_to_pt) + "pt");
             //Shd
             if (null != Item_pPr.Shd && c_oAscShdNil != Item_pPr.Shd.Value && (null != Item_pPr.Shd.Color || null != Item_pPr.Shd.Unifill))
                 apPr.push("background-color:" + this.RGBToCSS(Item_pPr.Shd.Color, Item_pPr.Shd.Unifill));
@@ -805,7 +810,7 @@ CopyProcessor.prototype =
 			 oTarget.wrapChild(new CopyElement("s"));
         if (null != Value.Shd && c_oAscShdNil != Value.Shd.Value && (null != Value.Shd.Color || null != Value.Shd.Unifill))
             aProp.push("background-color:" + this.RGBToCSS(Value.Shd.Color, Value.Shd.Unifill));
-        else if (null != Value.HighLight && highlight_None != Value.HighLight)
+        else if (null != Value.HighLight && AscCommon.highlight_None != Value.HighLight)
             aProp.push("background-color:" + this.RGBToCSS(Value.HighLight, null));
         if (null != Value.Color || null != Value.Unifill) {
 			var color;
@@ -1091,7 +1096,7 @@ CopyProcessor.prototype =
     _BorderToStyle : function(border, name)
     {
         var res = "";
-        if(border_None == border.Value)
+        if(AscCommon.border_None == border.Value)
             res += name + ":none;";
         else
         {
@@ -1099,7 +1104,7 @@ CopyProcessor.prototype =
             var color = border.Color;
             var unifill = border.Unifill;
             if(null != border.Size)
-                size = border.Size * g_dKoef_mm_to_pt;
+                size = border.Size * AscCommon.g_dKoef_mm_to_pt;
             if (null == color)
                 color = { r: 0, g: 0, b: 0 };
             res += name + ":" + size + "pt solid " + this.RGBToCSS(color, unifill) + ";";
@@ -1121,7 +1126,7 @@ CopyProcessor.prototype =
             nMarginRight = margins.Right.W;
         if(null != margins.Bottom && tblwidth_Mm == margins.Bottom.Type && null != margins.Bottom.W)
             nMarginBottom = margins.Bottom.W;
-        res = styleName + ":"+(nMarginTop * g_dKoef_mm_to_pt)+"pt "+(nMarginRight * g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * g_dKoef_mm_to_pt)+"pt;";
+        res = styleName + ":"+(nMarginTop * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginRight * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginBottom * AscCommon.g_dKoef_mm_to_pt)+"pt "+(nMarginLeft * AscCommon.g_dKoef_mm_to_pt)+"pt;";
         return res;
     },
     _BordersToStyle : function(borders, bUseInner, bUseBetween, mso, alt)
@@ -1179,7 +1184,7 @@ CopyProcessor.prototype =
         if(width > 0)
         {
             tc.oAttributes["width"] = Math.round(width * g_dKoef_mm_to_pix);
-            tcStyle += "width:"+(width * g_dKoef_mm_to_pt)+"pt;";
+            tcStyle += "width:"+(width * AscCommon.g_dKoef_mm_to_pt)+"pt;";
         }
         if(rowspan > 1)
             tc.oAttributes["rowspan"] = rowspan;
@@ -1259,7 +1264,7 @@ CopyProcessor.prototype =
             //height
             if(null != rowPr.Height && Asc.linerule_Auto != rowPr.Height.HRule && null != rowPr.Height.Value)
             {
-                trStyle += "height:"+(rowPr.Height.Value * g_dKoef_mm_to_pt)+"pt;";
+                trStyle += "height:"+(rowPr.Height.Value * AscCommon.g_dKoef_mm_to_pt)+"pt;";
             }
         }
 		//WBefore
@@ -1270,7 +1275,7 @@ CopyProcessor.prototype =
                 nGridBefore = elems.before;
                 var nWBefore = gridSum[elems.gridStart - 1] - gridSum[elems.gridStart - nGridBefore - 1];
                 //���������� margin
-                trStyle += "mso-row-margin-left:"+(nWBefore * g_dKoef_mm_to_pt)+"pt;";
+                trStyle += "mso-row-margin-left:"+(nWBefore * AscCommon.g_dKoef_mm_to_pt)+"pt;";
                 //��������� td ��� ��� ��� �� �������� mso-row-margin-left
                 var oNewTd = new CopyElement("td");
                 oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
@@ -1293,7 +1298,7 @@ CopyProcessor.prototype =
         for(var i in elems.cells)
         {
             var cell = row.Content[i];
-			if(vmerge_Continue != cell.Get_VMerge())
+			if(AscCommon.vmerge_Continue != cell.Get_VMerge())
 			{
 				var StartGridCol = cell.Metrics.StartGridCol;
 				var GridSpan = cell.Get_GridSpan();
@@ -1317,7 +1322,7 @@ CopyProcessor.prototype =
                 var nGridAfter = elems.after;
                 var nWAfter = gridSum[elems.gridEnd + nGridAfter] - gridSum[elems.gridEnd];
                 //���������� margin
-                trStyle += "mso-row-margin-right:"+(nWAfter * g_dKoef_mm_to_pt)+"pt;";
+                trStyle += "mso-row-margin-right:"+(nWAfter * AscCommon.g_dKoef_mm_to_pt)+"pt;";
                 //��������� td ��� ��� ��� �� �������� mso-row-margin-left
                 var oNewTd = new CopyElement("td");
                 oNewTd.oAttributes["style"] = "mso-cell-special:placeholder;border:none;padding:0cm 0cm 0cm 0cm";
@@ -1390,7 +1395,7 @@ CopyProcessor.prototype =
 			if("" != align)
 				DomTable.oAttributes["align"] = align;
             if(null != Pr.TableInd)
-                tblStyle += "margin-left:"+(Pr.TableInd * g_dKoef_mm_to_pt)+"pt;";
+                tblStyle += "margin-left:"+(Pr.TableInd * AscCommon.g_dKoef_mm_to_pt)+"pt;";
             if (null != Pr.Shd && c_oAscShdNil != Pr.Shd.Value && (null != Pr.Shd.Color || null != Pr.Shd.Unifill))
                 tblStyle += "background:" + this.RGBToCSS(Pr.Shd.Color, Pr.Shd.Unifill) + ";";
             if(null != Pr.TableCellMar)
@@ -1408,7 +1413,7 @@ CopyProcessor.prototype =
             {
                 bAddSpacing = true;
                 var cellSpacingMM = rowPr.TableCellSpacing;
-                tblStyle += "mso-cellspacing:"+(cellSpacingMM * g_dKoef_mm_to_pt)+"pt;";
+                tblStyle += "mso-cellspacing:"+(cellSpacingMM * AscCommon.g_dKoef_mm_to_pt)+"pt;";
 				DomTable.oAttributes["cellspacing"] = Math.round(cellSpacingMM * g_dKoef_mm_to_pix);
             }
         }
@@ -1897,7 +1902,7 @@ CopyProcessor.prototype =
                     for(var j = elem.indexStart - 1; j >= 0; --j)
                     {
                         var cellCur = row.Get_Cell(j);
-                        if(vmerge_Continue == cellCur.Get_VMerge())
+                        if(AscCommon.vmerge_Continue == cellCur.Get_VMerge())
                         {
                             var nCurGridCol = cellCur.Metrics.StartGridCol;
                             if(nCurGridCol >= nPrevStartGrid)
@@ -1917,7 +1922,7 @@ CopyProcessor.prototype =
                     for(var j = elem.indexEnd + 1; j < row.Get_CellsCount(); ++j)
                     {
                         var cellCur = row.Get_Cell(j);
-                        if(vmerge_Continue == cellCur.Get_VMerge())
+                        if(AscCommon.vmerge_Continue == cellCur.Get_VMerge())
                         {
                             var nCurGridCol = cellCur.Metrics.StartGridCol + cellCur.Get_GridSpan() - 1;
                             if(nCurGridCol <= nPrevEndGrid)
@@ -2622,7 +2627,7 @@ function PasteProcessor(api, bUploadImage, bUploadFonts, bNested, pasteInExcel)
     this.oCurParContentPos = 0;
     this.oCurHyperlink = null;
     this.oCurHyperlinkContentPos = 0;
-    this.oCur_rPr = new CTextPr();
+    this.oCur_rPr = new AscCommon.CTextPr();
 
     //Br ������� ������ ��� ���� ������ ����� �� ���� �������� br, ���� �� � ������������.
     this.nBrCount = 0;
@@ -4220,7 +4225,7 @@ PasteProcessor.prototype =
 			var res = new CDocumentBorder();
 			if(border.w)
 			{
-				res.Value = border_Single;
+				res.Value = AscCommon.border_Single;
 				res.Size = border.w * g_dKoef_pix_to_mm;
 			}
 			res.Color = new CDocumentColor(border.c.getR(), border.c.getG(), border.c.getB());
@@ -4286,13 +4291,13 @@ PasteProcessor.prototype =
 				{
 					sumWidthGrid += grid[j + l];
 				}
-				oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, sumWidthGrid));
+				oCurCell.Set_W(new AscCommon.CTableMeasurement(tblwidth_Mm, sumWidthGrid));
 				
 				//background color
 				var background_color = range.getFill();
 				if(null != background_color)
 				{
-					var Shd = new CDocumentShd();
+					var Shd = new AscCommon.CDocumentShd();
 					Shd.Value = c_oAscShdClear;
 					Shd.Color = new CDocumentColor(background_color.getR(), background_color.getG(), background_color.getB());
 					oCurCell.Set_Shd(Shd);
@@ -4320,7 +4325,7 @@ PasteProcessor.prototype =
 				//merge				
 				oCurCell.Set_GridSpan(gridSpan);
 				if(vMerge != 1)
-					oCurCell.Set_VMerge(vmerge_Continue);
+					oCurCell.Set_VMerge(AscCommon.vmerge_Continue);
 				
 				var oCurPar = oCurCell.Content.Content[0];
 				
@@ -4925,7 +4930,7 @@ PasteProcessor.prototype =
             else if(-1 != value.indexOf("in"))
             {
                 oType = "in";
-                oVal *= g_dKoef_in_to_mm;
+                oVal *= AscCommon.g_dKoef_in_to_mm;
             }
             else if(-1 != value.indexOf("cm"))
             {
@@ -4939,7 +4944,7 @@ PasteProcessor.prototype =
             else if(-1 != value.indexOf("pt"))
             {
                 oType = "pt";
-                oVal *= g_dKoef_pt_to_mm;
+                oVal *= AscCommon.g_dKoef_pt_to_mm;
             }
             else if(-1 != value.indexOf("pc"))
             {
@@ -5077,7 +5082,7 @@ PasteProcessor.prototype =
 		if("td" == sNodeName || "th" == sNodeName)
 		{
 			//для случая <td>br<span></span></td> без текста в ячейке
-			var oNewSpacing = new CParaSpacing();
+			var oNewSpacing = new AscCommon.CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
             Para.Set_Spacing(oNewSpacing);
 			return;
@@ -5138,7 +5143,7 @@ PasteProcessor.prototype =
         if (computedStyle)
         {
             //Ind
-            var Ind = new CParaInd();
+            var Ind = new AscCommon.CParaInd();
             var margin_left = computedStyle.getPropertyValue( "margin-left" );
             if(margin_left && null != (margin_left = this._ValueToMm(margin_left)))
                 Ind.Left = margin_left;
@@ -5181,7 +5186,7 @@ PasteProcessor.prototype =
                     Para.Set_Align(Jc, false);
             }
             //Spacing
-			var Spacing = new CParaSpacing();
+			var Spacing = new AscCommon.CParaSpacing();
             var margin_top = computedStyle.getPropertyValue( "margin-top" );
             if(margin_top && null != (margin_top = this._ValueToMm(margin_top)))
                 Spacing.Before = margin_top;
@@ -5213,7 +5218,7 @@ PasteProcessor.prototype =
             {
                 if(background_color)
                 {
-                    var Shd = new CDocumentShd();
+                    var Shd = new AscCommon.CDocumentShd();
                     Shd.Value = c_oAscShdClear;
                     Shd.Color = background_color;
                     Para.Set_Shd(Shd);
@@ -5261,12 +5266,12 @@ PasteProcessor.prototype =
             var nTabLen = aTabs.length;
             if(nTabLen > 0)
             {
-                var Tabs = new CParaTabs();
+                var Tabs = new AscCommon.CParaTabs();
                 for(var i = 0; i < nTabLen; i++)
                 {
                     var val = this._ValueToMm(aTabs[i]);
                     if(val)
-                        Tabs.Add(new CParaTab(tab_Left, val));
+                        Tabs.Add(new AscCommon.CParaTab(tab_Left, val));
                 }
                 Para.Set_Tabs(Tabs);
             }
@@ -5316,7 +5321,7 @@ PasteProcessor.prototype =
                     {
                         AbstractNum.Create_Default_Bullet();
                         var LvlText = String.fromCharCode(0x00B7);
-                        var NumTextPr = new CTextPr();
+                        var NumTextPr = new AscCommon.CTextPr();
                         NumTextPr.RFonts.Set_All("Symbol", -1);
 
                         switch(type)
@@ -5469,7 +5474,7 @@ PasteProcessor.prototype =
 			var tempRpr;
 			if(this.pasteInExcel === true && this.oDocument && this.oDocument.Parent && this.oDocument.Parent.parent && this.oDocument.Parent.parent.getObjectType() == AscDFH.historyitem_type_Shape)
 			{
-				tempRpr = new CTextPr();
+				tempRpr = new AscCommon.CTextPr();
 				tempRpr.Underline = rPr.Underline;
 				tempRpr.Bold = rPr.Bold;
 				tempRpr.Italic = rPr.Italic;
@@ -5488,7 +5493,7 @@ PasteProcessor.prototype =
     _read_rPr : function(node, bUseOnlyInherit)
     {
         var oDocument = this.oDocument;
-        var rPr = new CTextPr();
+        var rPr = new AscCommon.CTextPr();
         if(false == PasteElementsId.g_bIsDocumentCopyPaste)
         {
             rPr.Set_FromObject({
@@ -5523,7 +5528,7 @@ PasteProcessor.prototype =
                     b : 0
                 },
                 VertAlign : AscCommon.vertalign_Baseline,
-                HighLight : highlight_None
+                HighLight : AscCommon.highlight_None
             });
         }
         var computedStyle = this._getComputedStyle(node);
@@ -5552,9 +5557,9 @@ PasteProcessor.prototype =
                     font_size = obj.val;
                     //���� ������� �� ������������ ������� ������� �������� ���������� ������, ��� ���������� ��� ������� 8, 11, 14, 20, 26pt
                     if("px" == obj.type && false == this.bIsDoublePx)
-                        font_size = Math.round(font_size * g_dKoef_mm_to_pt);
+                        font_size = Math.round(font_size * AscCommon.g_dKoef_mm_to_pt);
                     else
-                        font_size = Math.round(2 * font_size * g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
+                        font_size = Math.round(2 * font_size * AscCommon.g_dKoef_mm_to_pt) / 2;//���������� �������� ���������.
 					
 					//TODO use constant
 					if(font_size > 300)
@@ -5741,7 +5746,7 @@ PasteProcessor.prototype =
         this.oCurRunContentPos = 0;
         this.aContent.push(this.oCurPar);
         //���������� ��������� �����
-        this.oCur_rPr = new CTextPr();
+        this.oCur_rPr = new AscCommon.CTextPr();
     },
     _Execute_AddParagraph : function(node, pPr)
     {
@@ -5981,10 +5986,10 @@ PasteProcessor.prototype =
         {
             res = new CDocumentBorder();
             if("none" == style)
-                res.Value = border_None;
+                res.Value = AscCommon.border_None;
             else
             {
-                res.Value = border_Single;
+                res.Value = AscCommon.border_Single;
                 var width = node.style["border"+type2+"Width"];
                 if(!width)
                     computedStyle.getPropertyValue( "border-"+type+"-width" );
@@ -6025,7 +6030,7 @@ PasteProcessor.prototype =
     _ExecuteTable : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef)
     {
 		//из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
-		table.Set_TableLayout(tbllayout_Fixed);
+		table.Set_TableLayout(AscCommon.tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
         //align ������� � parent tableNode
@@ -6185,7 +6190,7 @@ PasteProcessor.prototype =
             while(null != spans)
             {
 				var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
-				oCurCell.Set_VMerge(vmerge_Continue);
+				oCurCell.Set_VMerge(AscCommon.vmerge_Continue);
                 if(spans.col > 1)
                     oCurCell.Set_GridSpan(spans.col);
                 spans.row--;
@@ -6236,7 +6241,7 @@ PasteProcessor.prototype =
 					if(nColSpan > 1)
 						oCurCell.Set_GridSpan(nColSpan);
 					var width = aSumGrid[nCellIndexSpan + nColSpan - 1] - aSumGrid[nCellIndexSpan - 1];
-					oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, width));
+					oCurCell.Set_W(new AscCommon.CTableMeasurement(tblwidth_Mm, width));
 					var nRowSpan = tc.getAttribute("rowspan");
 					if(null != nRowSpan)
 						nRowSpan = nRowSpan - 0;
@@ -6264,7 +6269,7 @@ PasteProcessor.prototype =
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
-                var Shd = new CDocumentShd();
+                var Shd = new AscCommon.CDocumentShd();
                 Shd.Value = c_oAscShdClear;
                 Shd.Color = background_color;
                 cell.Set_Shd(Shd);
@@ -6316,7 +6321,7 @@ PasteProcessor.prototype =
             var oDocContent = cell.Content;
             var oNewPar = new AscCommon.Paragraph(oDocContent.DrawingDocument, oDocContent, 0, 50, 50, X_Right_Field, Y_Bottom_Field );
             //���������� ��������� ��������� - ����� ��� ����������� �� ������ � ������ ���� ��� ����������� ������ ������
-			var oNewSpacing = new CParaSpacing();
+			var oNewSpacing = new AscCommon.CParaSpacing();
 			oNewSpacing.Set_FromObject({After: 0, Before: 0, Line: Asc.linerule_Auto});
             oNewPar.Set_Spacing(oNewSpacing);
             oPasteProcessor.aContent.push(oNewPar);
@@ -6724,7 +6729,7 @@ PasteProcessor.prototype =
                 {
                     if(this.pasteInExcel)
                     {
-                        var TextPr = new CTextPr();
+                        var TextPr = new AscCommon.CTextPr();
                         TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
                         TextPr.Underline = true;
                         oHyperlink.Apply_TextPr( TextPr, undefined, true );
@@ -7278,7 +7283,7 @@ PasteProcessor.prototype =
     _ExecuteTablePresentation : function(tableNode, node, table, aSumGrid, aColsCountByRow, pPr, bUseScaleKoef, dScaleKoef, arrShapes, arrImages, arrTables)
     {
         //из-за проблем со вставкой больших таблиц, не вставляем tbllayout_AutoFit
-        table.Set_TableLayout(tbllayout_Fixed);
+        table.Set_TableLayout(AscCommon.tbllayout_Fixed);
         //Pr
         var Pr = table.Pr;
         //align ������� � parent tableNode
@@ -7436,7 +7441,7 @@ PasteProcessor.prototype =
             while(null != spans)
             {
                 var oCurCell = row.Add_Cell(row.Get_CellsCount(), row, null, false);
-                oCurCell.Set_VMerge(vmerge_Continue);
+                oCurCell.Set_VMerge(AscCommon.vmerge_Continue);
                 if(spans.col > 1)
                     oCurCell.Set_GridSpan(spans.col);
                 spans.row--;
@@ -7487,7 +7492,7 @@ PasteProcessor.prototype =
                     if(nColSpan > 1)
                         oCurCell.Set_GridSpan(nColSpan);
                     var width = aSumGrid[nCellIndexSpan + nColSpan - 1] - aSumGrid[nCellIndexSpan - 1];
-                    oCurCell.Set_W(new CTableMeasurement(tblwidth_Mm, width));
+                    oCurCell.Set_W(new AscCommon.CTableMeasurement(tblwidth_Mm, width));
                     var nRowSpan = tc.getAttribute("rowspan");
                     if(null != nRowSpan)
                         nRowSpan = nRowSpan - 0;
@@ -7515,7 +7520,7 @@ PasteProcessor.prototype =
             var background_color = computedStyle.getPropertyValue( "background-color" );
             if(null != background_color && (background_color = this._ParseColor(background_color)))
             {
-                var Shd = new CDocumentShd();
+                var Shd = new AscCommon.CDocumentShd();
                 Shd.Value = c_oAscShdClear;
                 Shd.Color = background_color;
                 cell.Set_Shd(Shd);
