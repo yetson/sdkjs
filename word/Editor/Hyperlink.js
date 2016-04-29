@@ -113,7 +113,7 @@ ParaHyperlink.prototype.Add = function(Item)
             var CurItem = this.Content[CurPos];
             if (para_Run === CurItem.Type || para_Math === CurItem.Type)
             {
-                var ContentPos = new AscCommon.CParagraphContentPos();
+                var ContentPos = new CParagraphContentPos();
                 this.Content[CurPos].Get_ParaContentPos(false, false, ContentPos);
 
                 // Разделяем текущий элемент (возвращается правая часть)
@@ -142,7 +142,7 @@ ParaHyperlink.prototype.Add = function(Item)
         }
         case para_Math :
         {
-            var ContentPos = new AscCommon.CParagraphContentPos();
+            var ContentPos = new CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
@@ -179,7 +179,7 @@ ParaHyperlink.prototype.Add = function(Item)
                 var CurPos  = this.State.ContentPos;
                 var CurItem = this.Content[CurPos];
 
-                var CurContentPos = new AscCommon.CParagraphContentPos();
+                var CurContentPos = new CParagraphContentPos();
                 CurItem.Get_ParaContentPos(false, false, CurContentPos);
 
                 var NewItem = CurItem.Split(CurContentPos, 0);
@@ -635,7 +635,7 @@ ParaHyperlink.prototype.Write_ToBinary2SpreadSheets = function(Writer)
 
 ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
 {
-    var HyperText = new AscCommon.CParagraphGetText();
+    var HyperText = new CParagraphGetText();
     this.Get_Text( HyperText );
 
     var HyperProps = new CHyperlinkProperty(this);

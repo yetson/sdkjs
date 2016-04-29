@@ -137,7 +137,7 @@ ParaField.prototype.Add = function(Item)
         }
         case para_Math :
         {
-            var ContentPos = new AscCommon.CParagraphContentPos();
+            var ContentPos = new CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
@@ -174,7 +174,7 @@ ParaField.prototype.Add = function(Item)
                 var CurPos  = this.State.ContentPos;
                 var CurItem = this.Content[CurPos];
 
-                var CurContentPos = new AscCommon.CParagraphContentPos();
+                var CurContentPos = new CParagraphContentPos();
                 CurItem.Get_ParaContentPos(false, false, CurContentPos);
 
                 var NewItem = CurItem.Split(CurContentPos, 0);
@@ -294,7 +294,7 @@ ParaField.prototype.Is_NeedRestoreTemplate = function()
     {
         var sStandardText = "«" + this.Arguments[0] + "»";
 
-        var oRunText = new AscCommon.CParagraphGetText();
+        var oRunText = new CParagraphGetText();
         oRun.Get_Text(oRunText);
 
         if (sStandardText === oRunText.Text)

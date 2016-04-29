@@ -1336,7 +1336,7 @@ CMathBase.prototype.Save_RecalculateObject = function(Copy)
 
         var Num = this.NumBreakContent;
 
-        RecalcObj = new AscCommon.CRunRecalculateObject(this.StartLine, this.StartRange);
+        RecalcObj = new CRunRecalculateObject(this.StartLine, this.StartRange);
         RecalcObj.Save_Lines( this, Copy );
 
         for(var Pos = 0; Pos < this.Content.length; Pos++)
@@ -2471,7 +2471,7 @@ CMathBase.prototype.Get_ReviewColor = function()
         return this.Parent.Get_ReviewColor();
     }
 
-    return AscCommon.REVIEW_COLOR;
+    return REVIEW_COLOR;
 };
 CMathBase.prototype.Set_ReviewType = function(Type, isSetToContent)
 {
