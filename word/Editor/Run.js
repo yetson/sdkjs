@@ -34,6 +34,19 @@ var CTextPr = AscCommon.CTextPr;
 var CRFonts = AscCommon.CRFonts;
 var CDocumentColor = AscCommon.CDocumentColor;
 var g_dKoef_pt_to_mm = AscCommon.g_dKoef_pt_to_mm;
+var TEXTWIDTH_DIVIDER = AscCommon.TEXTWIDTH_DIVIDER;
+var para_Math_BreakOperator = AscCommon.para_Math_BreakOperator;
+var para_Math_Ampersand = AscCommon.para_Math_Ampersand;
+var para_Math_Text = AscCommon.para_Math_Text;
+var para_Math_Placeholder = AscCommon.para_Math_Placeholder;
+var para_Math_Run = AscCommon.para_Math_Run;
+var para_PageNum = AscCommon.para_PageNum;
+var para_Drawing = AscCommon.para_Drawing;
+var para_Tab = AscCommon.para_Tab;
+var para_NewLine = AscCommon.para_NewLine;
+var para_End = AscCommon.para_End;
+var para_Space = AscCommon.para_Space;
+var para_Text = AscCommon.para_Text;
 
 var c_oAscShdNil = Asc.c_oAscShdNil;
 
@@ -56,7 +69,7 @@ function ParaRun(Paragraph, bMathRun)
     ParaRun.superclass.constructor.call(this);
     
     this.Id         = AscCommon.g_oIdCounter.Get_NewId();  // Id данного элемента
-    this.Type       = para_Run;                  // тип данного элемента
+    this.Type       = AscCommon.para_Run;                  // тип данного элемента
     this.Paragraph  = Paragraph;                 // Ссылка на параграф
     this.Pr         = new CTextPr();             // Текстовые настройки данного run
     this.Content    = [];                        // Содержимое данного run
@@ -416,7 +429,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         if (0 === CurPos && RunPos > 0)
         {
             var PrevElement = Parent.Content[RunPos - 1];
-            if (para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
+            if (AscCommon.para_Run === PrevElement.Type && DstReviewType === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr) && PrevElement.ReviewInfo && true === PrevElement.ReviewInfo.Is_CurrentUser())
             {
                 PrevElement.State.ContentPos = PrevElement.Content.length;
                 PrevElement.Add_ToContent(PrevElement.Content.length, Item, true);
@@ -428,7 +441,7 @@ ParaRun.prototype.Add = function(Item, bMath)
         if (this.Content.length === CurPos && (RunPos < Parent.Content.length - 2 || (RunPos < Parent.Content.length - 1 && !(Parent instanceof Paragraph))))
         {
             var NextElement = Parent.Content[RunPos + 1];
-            if (para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
+            if (AscCommon.para_Run === NextElement.Type && DstReviewType === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr) && NextElement.ReviewInfo && true === NextElement.ReviewInfo.Is_CurrentUser())
             {
                 NextElement.State.ContentPos = 0;
                 NextElement.Add_ToContent(0, Item, true);
@@ -596,7 +609,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (1 === CurPos && Parent && RunPos > 0)
                     {
                         var PrevElement = Parent.Content[RunPos - 1];
-                        if (para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
+                        if (AscCommon.para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
                         {
                             var Item = this.Content[CurPos - 1];
                             this.Remove_FromContent(CurPos - 1, 1, true);
@@ -609,7 +622,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (CurPos === this.Content.length && Parent && RunPos < Parent.Content.length - 1)
                     {
                         var NextElement = Parent.Content[RunPos + 1];
-                        if (para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
+                        if (AscCommon.para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
                         {
                             var Item = this.Content[CurPos - 1];
                             this.Remove_FromContent(CurPos - 1, 1, true);
@@ -649,7 +662,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (0 === CurPos && Parent && RunPos > 0)
                     {
                         var PrevElement = Parent.Content[RunPos - 1];
-                        if (para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
+                        if (AscCommon.para_Run === PrevElement.Type && reviewtype_Remove === PrevElement.Get_ReviewType() && true === this.Pr.Is_Equal(PrevElement.Pr))
                         {
                             var Item = this.Content[CurPos];
                             this.Remove_FromContent(CurPos, 1, true);
@@ -662,7 +675,7 @@ ParaRun.prototype.Remove = function(Direction, bOnAddText)
                     else if (CurPos === this.Content.length - 1 && Parent && RunPos < Parent.Content.length - 1)
                     {
                         var NextElement = Parent.Content[RunPos + 1];
-                        if (para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
+                        if (AscCommon.para_Run === NextElement.Type && reviewtype_Remove === NextElement.Get_ReviewType() && true === this.Pr.Is_Equal(NextElement.Pr))
                         {
                             var Item = this.Content[CurPos];
                             this.Remove_FromContent(CurPos, 1, true);
@@ -1165,7 +1178,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
             {
                 case para_Text:
                 case para_Space:
-                case para_Sym:
+                case AscCommon.para_Sym:
                 case para_PageNum:
                 case para_Tab:
                 case para_End:
@@ -1180,7 +1193,7 @@ ParaRun.prototype.Recalculate_CurPos = function(X, Y, CurrentRun, _CurRange, _Cu
                 }
                 case para_Drawing:
                 {
-                    if ( drawing_Inline != Item.DrawingType )
+                    if ( AscCommon.drawing_Inline != Item.DrawingType )
                         break;
 
                     X += Item.Get_WidthVisible();
@@ -1963,8 +1976,8 @@ ParaRun.prototype.Get_SelectedText = function(bAll, bClearText)
         {
             case para_Drawing:
             //case para_End:
-            case para_Numbering:
-            case para_PresentationNumbering:
+            case AscCommon.para_Numbering:
+            case AscCommon.para_PresentationNumbering:
             case para_PageNum:
             {
                 if ( true === bClearText )
@@ -2067,7 +2080,7 @@ ParaRun.prototype.Get_StartTabsCount = function(TabsCounter)
             TabsCounter.Count++;
             TabsCounter.Pos.push( Pos );
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || AscCommon.para_Math === ItemType )
             return false;
     }
 
@@ -2090,7 +2103,7 @@ ParaRun.prototype.Remove_StartTabs = function(TabsCounter)
             Pos--;
             ContentLen--;
         }
-        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || para_Math === ItemType )
+        else if ( para_Text === ItemType || para_Space === ItemType || (para_Drawing === ItemType && true === Item.Is_Inline() ) || para_PageNum === ItemType || AscCommon.para_Math === ItemType )
             return false;
     }
 
@@ -2297,7 +2310,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
             switch (ItemType)
             {
-                case para_Sym:
+                case AscCommon.para_Sym:
                 case para_Text:
                 {
                     // Отмечаем, что началось слово
@@ -2329,7 +2342,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             PRS.Set_LineBreakPos(Pos);
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            if (Item.Flags & AscCommon.PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
                             {
                                 // Добавляем длину пробелов до слова и ширину самого слова.
                                 X += SpaceLen + LetterLen;
@@ -2396,7 +2409,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                             WordLen += LetterLen;
 
                             // Если текущий символ с переносом, например, дефис, тогда на нем заканчивается слово
-                            if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                            if (Item.Flags & AscCommon.PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
                             {
                                 // Добавляем длину пробелов до слова и ширину самого слова.
                                 X += SpaceLen + WordLen;
@@ -2716,7 +2729,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                     if (true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape())
                     {
                         if (true !== Item.Is_Inline())
-                            Item.Set_DrawingType(drawing_Inline);
+                            Item.Set_DrawingType(AscCommon.drawing_Inline);
 
                         if (true === StartWord)
                             FirstItemOnLine = false;
@@ -2884,7 +2897,7 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
 
                     // Если таб не левый, значит он не может быть сразу рассчитан, а если левый, тогда
                     // рассчитываем его сразу здесь
-                    if (tab_Left !== TabValue)
+                    if (AscCommon.tab_Left !== TabValue)
                     {
                         PRS.LastTab.TabPos = NewX;
                         PRS.LastTab.Value = TabValue;
@@ -2953,13 +2966,13 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                         SpaceLen = 0;
                     }
 
-                    if (break_Page === Item.BreakType || break_Column === Item.BreakType)
+                    if (AscCommon.break_Page === Item.BreakType || AscCommon.break_Column === Item.BreakType)
                     {
                         PRS.BreakPageLine = true;
-                        if (break_Page === Item.BreakType)
+                        if (AscCommon.break_Page === Item.BreakType)
                             PRS.BreakRealPageLine = true;
 
-                        if (break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
+                        if (AscCommon.break_Page === Item.BreakType && true === Para.Check_BreakPageEnd(Item))
                             continue;
 
                         Item.Flags.NewLine = true;
@@ -3135,7 +3148,7 @@ ParaRun.prototype.Recalculate_LineMetrics = function(PRS, ParaPr, _CurLine, _Cur
 
         switch (Item.Type)
         {
-            case para_Sym:
+            case AscCommon.para_Sym:
             case para_Text:
             case para_PageNum:
             {
@@ -3233,7 +3246,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
 
         switch( ItemType )
         {
-            case para_Sym:
+            case AscCommon.para_Sym:
             case para_Text:
             {
                 PRSC.Letters++;
@@ -3258,7 +3271,7 @@ ParaRun.prototype.Recalculate_Range_Width = function(PRSC, _CurLine, _CurRange)
                 PRSC.SpacesCount = 0;
 
                 // Если текущий символ, например, дефис, тогда на нем заканчивается слово
-                if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
+                if (Item.Flags & AscCommon.PARATEXT_FLAGS_SPACEAFTER)//if ( true === Item.Is_SpaceAfter() )
                     PRSC.Word = false;
 
                 break;
@@ -3383,7 +3396,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
         switch( ItemType )
         {
-            case para_Sym:
+            case AscCommon.para_Sym:
             case para_Text:
             {
                 var WidthVisible = 0;
@@ -3516,7 +3529,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
 
                 if ( true === Item.Is_Inline() || true === Para.Parent.Is_DrawingShape() )
                 {
-                    Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                    Item.Update_Position(PRSA.Paragraph, new AscCommon.CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
                     Item.Reset_SavedPosition();
 
                     PRSA.X    += Item.WidthVisible;
@@ -3537,7 +3550,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                     {
                         // Тут мы должны сравнить положение картинок
                         var oRecalcObj = Item.Save_RecalculateObject();
-                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                        Item.Update_Position(PRSA.Paragraph, new AscCommon.CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                         if (Math.abs(Item.X - oRecalcObj.X) > 0.001 || Math.abs(Item.Y - oRecalcObj.Y) > 0.001 || Item.PageNum !== oRecalcObj.PageNum)
                         {
@@ -3560,7 +3573,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                         if ( true === LDRecalcInfo.Can_RecalcObject() )
                         {
                             // Обновляем позицию объекта
-                            Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                            Item.Update_Position(PRSA.Paragraph, new AscCommon.CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
                             LDRecalcInfo.Set_FlowObject( Item, 0, AscCommon.recalcresult_NextElement, -1 );
 
                             // TODO: Добавить проверку на не попадание в предыдущие колонки
@@ -3594,7 +3607,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                                 // мы пересчитываем заново текущую страницу, а не предыдущую
 
                                 // Обновляем позицию объекта
-                                Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y, PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
+                                Item.Update_Position(PRSA.Paragraph, new AscCommon.CParagraphLayout( PRSA.X, PRSA.Y, PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, Para.Pages[CurPage].Y), PageLimits, PageLimitsOrigin, _CurLine);
 
                                 LDRecalcInfo.Set_FlowObject( Item, 0, AscCommon.recalcresult_NextElement, -1 );
                                 LDRecalcInfo.Set_PageBreakBefore( false );
@@ -3621,7 +3634,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
                         // Картинка ложится на или под текст, в данном случае пересчет можно спокойно продолжать
                         // Здесь под верхом параграфа понимаем верх первой строки, а не значение, с которого начинается пересчет.
                         var ParagraphTop = Para.Lines[Para.Pages[CurPage].StartLine].Top + Para.Pages[CurPage].Y;
-                        Item.Update_Position(PRSA.Paragraph, new CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, ParagraphTop), PageLimits, PageLimitsOrigin, _CurLine);
+                        Item.Update_Position(PRSA.Paragraph, new AscCommon.CParagraphLayout( PRSA.X, PRSA.Y , PageAbs, PRSA.LastW, ColumnStartX, ColumnEndX, X_Left_Margin, X_Right_Margin, Page_Width, Top_Margin, Bottom_Margin, Page_H, PageFields.X, PageFields.Y, Para.Pages[CurPage].Y + Para.Lines[CurLine].Y - Para.Lines[CurLine].Metrics.Ascent, ParagraphTop), PageLimits, PageLimitsOrigin, _CurLine);
                         Item.Reset_SavedPosition();
                     }
                 }
@@ -3665,7 +3678,7 @@ ParaRun.prototype.Recalculate_Range_Spaces = function(PRSA, _CurLine, _CurRange,
             }
             case para_NewLine:
             {
-                if (break_Page === Item.BreakType || break_Column === Item.BreakType)
+                if (AscCommon.break_Page === Item.BreakType || AscCommon.break_Column === Item.BreakType)
                     Item.Update_String( PRSA.XEnd - PRSA.X );
 
                 PRSA.X += Item.WidthVisible;
@@ -3708,9 +3721,9 @@ ParaRun.prototype.Internal_Recalculate_LastTab = function(LastTab, X, XEnd, Word
         var TabPos    = LastTab.TabPos;
 
         var TabCalcW = 0;
-        if ( tab_Right === TabValue )
+        if ( AscCommon.tab_Right === TabValue )
             TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW), 0 );
-        else if ( tab_Center === TabValue )
+        else if ( AscCommon.tab_Center === TabValue )
             TabCalcW = Math.max( TabPos - (TabStartX + TabRangeW / 2), 0 );
 
         if ( X + TabCalcW > XEnd )
@@ -3848,7 +3861,7 @@ ParaRun.prototype.Check_PageBreak = function()
     for (var Pos = 0; Pos < Count; Pos++)
     {
         var Item = this.Content[Pos];
-        if (para_NewLine === Item.Type && (break_Page === Item.BreakType || break_Column === Item.BreakType))
+        if (para_NewLine === Item.Type && (AscCommon.break_Page === Item.BreakType || AscCommon.break_Column === Item.BreakType))
             return true;
     }
 
@@ -3876,7 +3889,7 @@ ParaRun.prototype.Check_BreakPageEnd = function(PBChecker)
 
             if ( para_End === ItemType )
                 return true;
-            else if ( para_Drawing !== ItemType || drawing_Anchor !== Item.Get_DrawingType() )
+            else if ( para_Drawing !== ItemType || AscCommon.drawing_Anchor !== Item.Get_DrawingType() )
                 return false;
         }
     }
@@ -3917,7 +3930,7 @@ ParaRun.prototype.Recalculate_MinMaxContentWidth = function(MinMax)
                 {
                     nWordLen += ItemWidth;
 
-                    if (Item.Flags & PARATEXT_FLAGS_SPACEAFTER)
+                    if (Item.Flags & AscCommon.PARATEXT_FLAGS_SPACEAFTER)
                     {
                         if ( nMinWidth < nWordLen )
                             nMinWidth = nWordLen;
@@ -4142,7 +4155,7 @@ ParaRun.prototype.Get_Range_VisibleWidth = function(RangeW, _CurLine, _CurRange)
 
         switch( ItemType )
         {
-            case para_Sym:
+            case AscCommon.para_Sym:
             case para_Text:
             case para_Space:
             case para_Math_Text:
@@ -4281,7 +4294,7 @@ ParaRun.prototype.Draw_HighLights = function(PDSH)
             case para_Math_Placeholder:
             case para_Math_BreakOperator:
             case para_Math_Ampersand:
-            case para_Sym:
+            case AscCommon.para_Sym:
             {
                 if ( para_Drawing === ItemType && !Item.Is_Inline() )
                     break;
@@ -4464,7 +4477,7 @@ ParaRun.prototype.Draw_Elements = function(PDSE)
             case para_Drawing:
             case para_Tab:
             case para_Text:
-            case para_Sym:
+            case AscCommon.para_Sym:
             {
                 if (para_Tab === ItemType)
                 {
@@ -4734,7 +4747,7 @@ ParaRun.prototype.Draw_Lines = function(PDSL)
             case para_Drawing:
             case para_Tab:
             case para_Text:
-            case para_Sym:
+            case AscCommon.para_Sym:
             {
                 if ( para_Drawing != ItemType || Item.Is_Inline() )
                 {
@@ -5380,7 +5393,7 @@ ParaRun.prototype.Get_EndRangePos = function(_CurLine, _CurRange, SearchPos, Dep
     {
         var Item = this.Content[CurPos];
         var ItemType = Item.Type;
-        if ( !((para_Drawing === ItemType && true !== Item.Is_Inline()) || para_End === ItemType || (para_NewLine === ItemType && break_Line === Item.BreakType)))
+        if ( !((para_Drawing === ItemType && true !== Item.Is_Inline()) || para_End === ItemType || (para_NewLine === ItemType && AscCommon.break_Line === Item.BreakType)))
             LastPos = CurPos + 1;
     }
 
@@ -8629,7 +8642,7 @@ ParaRun.prototype.Load_Changes = function(Reader, Reader2, Color)
             for ( var Index = 0; Index < Count; Index++ )
             {
                 var Pos     = this.m_oContentChanges.Check( AscCommon.contentchanges_Add, Reader.GetLong() );
-                var Element = ParagraphContent_Read_FromBinary(Reader);
+                var Element = AscCommon.ParagraphContent_Read_FromBinary(Reader);
 
                 if ( null != Element )
                 {
@@ -9433,7 +9446,7 @@ ParaRun.prototype.Read_FromBinary2 = function(Reader)
         this.Content = [];
         for ( var Index = 0; Index < Count; Index++ )
         {
-            var Element = ParagraphContent_Read_FromBinary( Reader );
+            var Element = AscCommon.ParagraphContent_Read_FromBinary( Reader );
             if ( null !== Element )
                 this.Content.push( Element );
         }

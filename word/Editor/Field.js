@@ -45,7 +45,7 @@ function ParaField(FieldType, Arguments, Switches)
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type    = para_Field;
+    this.Type    = AscCommon.para_Field;
 
     this.FieldType = (undefined === FieldType ? fieldtype_UNKNOWN : FieldType);
     this.Arguments = (undefined === Arguments ? []                : Arguments);
@@ -111,8 +111,8 @@ ParaField.prototype.Add = function(Item)
 {
     switch (Item.Type)
     {
-        case para_Run      :
-        case para_Hyperlink:
+        case AscCommon.para_Run      :
+        case AscCommon.para_Hyperlink:
         {
             var TextPr = this.Get_FirstTextPr();
             Item.Select_All();
@@ -121,7 +121,7 @@ ParaField.prototype.Add = function(Item)
 
             var CurPos = this.State.ContentPos;
             var CurItem = this.Content[CurPos];
-            if (para_Run === CurItem.Type)
+            if (AscCommon.para_Run === CurItem.Type)
             {
                 var NewRun = CurItem.Split2(CurItem.State.ContentPos);
                 this.Add_ToContent(CurPos + 1, Item);
@@ -135,14 +135,14 @@ ParaField.prototype.Add = function(Item)
 
             break;
         }
-        case para_Math :
+        case AscCommon.para_Math :
         {
             var ContentPos = new AscCommon.CParagraphContentPos();
             this.Get_ParaContentPos(false, false, ContentPos);
             var CurPos = ContentPos.Get(0);
 
             // Ран формула делит на части, а в остальные элементы добавляется целиком
-            if (para_Run === this.Content[CurPos].Type)
+            if (AscCommon.para_Run === this.Content[CurPos].Type)
             {
                 // Разделяем текущий элемент (возвращается правая часть)
                 var NewElement = this.Content[CurPos].Split(ContentPos, 1);
@@ -164,7 +164,7 @@ ParaField.prototype.Add = function(Item)
 
             break;
         }
-        case para_Field:
+        case AscCommon.para_Field:
         {
             // Вместо добавления самого элемента добавляем его содержимое
             var Count = Item.Content.length;
@@ -351,9 +351,9 @@ ParaField.prototype.private_GetMappedRun = function(Value)
     {
         var Char = Value[Index], oText;
         if (0x20 === Char)
-            oText = new ParaSpace();
+            oText = new AscCommon.ParaSpace();
         else
-            oText = new ParaText(Value[Index]);
+            oText = new AscCommon.ParaText(Value[Index]);
 
         oRun.Add_ToContent(Index, oText);
     }
