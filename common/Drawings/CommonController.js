@@ -8732,6 +8732,18 @@ function getAbsoluteRectBoundsArr(aDrawings)
     return {arrBounds: arrBounds, minX: minX, maxX: maxX, minY: minY, maxY: maxY};
 }
 
+function CalcLiterByLength(aAlphaBet, nLength)
+{
+    var modulo = nLength;
+    var sResultLiter = '';
+    while(modulo > 0)
+    {
+        sResultLiter = aAlphaBet[modulo%aAlphaBet.length] + sResultLiter;
+        modulo = (modulo/aAlphaBet.length) >> 0;
+    }
+    return sResultLiter;
+}
+
     //--------------------------------------------------------export----------------------------------------------------
     window['AscFormat'] = window['AscFormat'] || {};
     window['AscFormat'].HANDLE_EVENT_MODE_HANDLE = HANDLE_EVENT_MODE_HANDLE;
@@ -8778,4 +8790,5 @@ function getAbsoluteRectBoundsArr(aDrawings)
     window['AscFormat'].GetMinSnapDistanceYObject = GetMinSnapDistanceYObject;
     window['AscFormat'].GetMinSnapDistanceXObjectByArrays = GetMinSnapDistanceXObjectByArrays;
     window['AscFormat'].GetMinSnapDistanceYObjectByArrays = GetMinSnapDistanceYObjectByArrays;
+    window['AscFormat'].CalcLiterByLength = CalcLiterByLength;
 })(window);
