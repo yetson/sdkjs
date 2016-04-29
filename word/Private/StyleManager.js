@@ -26,7 +26,6 @@
 
 // Import
 var CDocument = AscCommon.CDocument;
-var styletype_Paragraph = AscCommon.styletype_Paragraph;
 
 //----------------------------------------------------------------------------------------------------------------------
 //  asc_docs_api (Обращение из апи)
@@ -156,9 +155,9 @@ CDocument.prototype.Is_DefaultStyleChanged = function(sName)
 //----------------------------------------------------------------------------------------------------------------------
 //  CStyles
 //----------------------------------------------------------------------------------------------------------------------
-AscCommon.CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
+CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bCheckLink)
 {
-    var oStyle = new AscCommon.CStyle();
+    var oStyle = new CStyle();
 
     var BasedOnId = this.Get_StyleIdByName(oAscStyle.get_BasedOn(), false);
     oStyle.Set_BasedOn(BasedOnId);
@@ -224,7 +223,7 @@ AscCommon.CStyles.prototype.Create_StyleFromInterface = function(oAscStyle, bChe
     this.Add(oStyle);
     return oStyle;
 };
-AscCommon.CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
+CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
 {
     // Если этот стиль не один из стилей по умолчанию, тогда мы просто удаляем этот стиль
     // и очищаем все параграфы с сылкой на этот стиль.
@@ -237,22 +236,22 @@ AscCommon.CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
     }
     else if (StyleId == this.Default.Character)
     {
-        Style.Clear("Default Paragraph Font", null, null, AscCommon.styletype_Character);
+        Style.Clear("Default Paragraph Font", null, null, styletype_Character);
         Style.Create_Default_Character();
     }
     else if (StyleId == this.Default.Numbering)
     {
-        Style.Clear("No List", null, null, AscCommon.styletype_Numbering);
+        Style.Clear("No List", null, null, styletype_Numbering);
         Style.Create_Default_Numbering();
     }
     else if (StyleId == this.Default.Table)
     {
-        Style.Clear("Normal Table", null, null, AscCommon.styletype_Table);
+        Style.Clear("Normal Table", null, null, styletype_Table);
         Style.Create_NormalTable();
     }
     else if (StyleId == this.Default.TableGrid)
     {
-        Style.Clear("Table Grid", this.Default.Table, null, AscCommon.styletype_Table);
+        Style.Clear("Table Grid", this.Default.Table, null, styletype_Table);
         Style.Create_TableGrid();
     }
     else if (StyleId == this.Default.Headings[0])
@@ -317,7 +316,7 @@ AscCommon.CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
     }
     else if (StyleId == this.Default.Hyperlink)
     {
-        Style.Clear("Hyperlink", null, null, AscCommon.styletype_Character);
+        Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
     else
@@ -337,18 +336,18 @@ AscCommon.CStyles.prototype.Remove_StyleFromInterface = function(StyleId)
     }
     this.Update_Interface(StyleId);
 };
-AscCommon.CStyles.prototype.Remove_AllCustomStylesFromInterface = function()
+CStyles.prototype.Remove_AllCustomStylesFromInterface = function()
 {
     for (var StyleId in this.Style)
     {
         var Style = this.Style[StyleId];
-        if ((styletype_Paragraph === Style.Get_Type() || AscCommon.styletype_Character === Style.Get_Type()) && true === Style.Get_QFormat())
+        if ((styletype_Paragraph === Style.Get_Type() || styletype_Character === Style.Get_Type()) && true === Style.Get_QFormat())
         {
             this.Remove_StyleFromInterface(StyleId);
         }
     }
 };
-AscCommon.CStyles.prototype.Is_StyleDefault = function(sStyleName)
+CStyles.prototype.Is_StyleDefault = function(sStyleName)
 {
     var StyleId = this.Get_StyleIdByName(sStyleName, false);
     if (null === StyleId)
@@ -378,7 +377,7 @@ AscCommon.CStyles.prototype.Is_StyleDefault = function(sStyleName)
 
     return false;
 };
-AscCommon.CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
+CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
 {
     if (true != this.Is_StyleDefault(sStyleName))
         return false;
@@ -390,7 +389,7 @@ AscCommon.CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     var CurrentStyle = this.Style[StyleId];
     this.LogicDocument.TurnOffHistory();
 
-    var Style = new AscCommon.CStyle();
+    var Style = new CStyle();
     if (StyleId == this.Default.Paragraph)
     {
         Style.Clear("Normal", null, null, styletype_Paragraph);
@@ -398,22 +397,22 @@ AscCommon.CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     }
     else if (StyleId == this.Default.Character)
     {
-        Style.Clear("Default Paragraph Font", null, null, AscCommon.styletype_Character);
+        Style.Clear("Default Paragraph Font", null, null, styletype_Character);
         Style.Create_Default_Character();
     }
     else if (StyleId == this.Default.Numbering)
     {
-        Style.Clear("No List", null, null, AscCommon.styletype_Numbering);
+        Style.Clear("No List", null, null, styletype_Numbering);
         Style.Create_Default_Numbering();
     }
     else if (StyleId == this.Default.Table)
     {
-        Style.Clear("Normal Table", null, null, AscCommon.styletype_Table);
+        Style.Clear("Normal Table", null, null, styletype_Table);
         Style.Create_NormalTable();
     }
     else if (StyleId == this.Default.TableGrid)
     {
-        Style.Clear("Table Grid", this.Default.Table, null, AscCommon.styletype_Table);
+        Style.Clear("Table Grid", this.Default.Table, null, styletype_Table);
         Style.Create_TableGrid();
     }
     else if (StyleId == this.Default.Headings[0])
@@ -478,7 +477,7 @@ AscCommon.CStyles.prototype.Is_DefaultStyleChanged = function(sStyleName)
     }
     else if (StyleId == this.Default.Hyperlink)
     {
-        Style.Clear("Hyperlink", null, null, AscCommon.styletype_Character);
+        Style.Clear("Hyperlink", null, null, styletype_Character);
         Style.Create_Character_Hyperlink();
     }
 

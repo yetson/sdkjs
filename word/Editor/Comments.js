@@ -1457,7 +1457,7 @@ ParaComment.prototype.Get_CurrentParaPos = function()
 };
 ParaComment.prototype.Get_TextPr = function(ContentPos, Depth)
 {
-    return new AscCommon.CTextPr();
+    return new CTextPr();
 };
 //----------------------------------------------------------------------------------------------------------------------
 // Разное

@@ -32,7 +32,6 @@ var DecodeBase64Char = AscFonts.DecodeBase64Char;
 var b64_decode = AscFonts.b64_decode;
     
 var g_nodeAttributeEnd = AscCommon.g_nodeAttributeEnd;
-var CTextPr = AscCommon.CTextPr;
 
 var c_oAscShdClear = Asc.c_oAscShdClear;
 var c_oAscColor = Asc.c_oAscColor;
@@ -1069,7 +1068,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var _style = new AscCommon.CStyle("", null, null, AscCommon.styletype_Table);
+        var _style = new CStyle("", null, null, styletype_Table);
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetLong() + 4;
@@ -1132,7 +1131,7 @@ function BinaryPPTYLoader()
                                             {
                                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                                 {
-                                                    _style.TablePr.Shd = new AscCommon.CDocumentShd();
+                                                    _style.TablePr.Shd = new CDocumentShd();
                                                     _style.TablePr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _style.TablePr.Shd.Unifill = _unifill;
@@ -1148,7 +1147,7 @@ function BinaryPPTYLoader()
                             {
                                 if (undefined === _style.TablePr.Shd || null == _style.TablePr.Shd)
                                 {
-                                    _style.TablePr.Shd = new AscCommon.CDocumentShd();
+                                    _style.TablePr.Shd = new CDocumentShd();
                                     _style.TablePr.Shd.Value = c_oAscShdClear;
                                 }
                                 _style.TablePr.Shd.FillRef = this.ReadStyleRef();
@@ -1272,7 +1271,7 @@ function BinaryPPTYLoader()
     {
         var s = this.stream;
 
-        var _part = new AscCommon.CTableStylePr();
+        var _part = new CTableStylePr();
 
         var _rec_start = s.cur;
         var _end_rec = _rec_start + s.GetLong() + 4;
@@ -1377,7 +1376,7 @@ function BinaryPPTYLoader()
                             {
                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                 {
-                                    _part.TableCellPr.Shd = new AscCommon.CDocumentShd();
+                                    _part.TableCellPr.Shd = new CDocumentShd();
                                     _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                 }
                                 _part.TableCellPr.Shd.FillRef = this.ReadStyleRef();
@@ -1398,7 +1397,7 @@ function BinaryPPTYLoader()
                                             {
                                                 if (undefined === _part.TableCellPr.Shd || null == _part.TableCellPr.Shd)
                                                 {
-                                                    _part.TableCellPr.Shd = new AscCommon.CDocumentShd();
+                                                    _part.TableCellPr.Shd = new CDocumentShd();
                                                     _part.TableCellPr.Shd.Value = c_oAscShdClear;
                                                 }
                                                 _part.TableCellPr.Shd.Unifill = _unifill;
@@ -1447,37 +1446,37 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    _part.TableCellPr.TableCellBorders.Left = new AscCommon.CDocumentBorder();
+                    _part.TableCellPr.TableCellBorders.Left = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TableCellPr.TableCellBorders.Left);
                     break;
                 }
                 case 1:
                 {
-                    _part.TableCellPr.TableCellBorders.Right = new AscCommon.CDocumentBorder();
+                    _part.TableCellPr.TableCellBorders.Right = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TableCellPr.TableCellBorders.Right);
                     break;
                 }
                 case 2:
                 {
-                    _part.TableCellPr.TableCellBorders.Top = new AscCommon.CDocumentBorder();
+                    _part.TableCellPr.TableCellBorders.Top = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TableCellPr.TableCellBorders.Top);
                     break;
                 }
                 case 3:
                 {
-                    _part.TableCellPr.TableCellBorders.Bottom = new AscCommon.CDocumentBorder();
+                    _part.TableCellPr.TableCellBorders.Bottom = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TableCellPr.TableCellBorders.Bottom);
                     break;
                 }
                 case 4:
                 {
-                    _part.TablePr.TableBorders.InsideH = new AscCommon.CDocumentBorder();
+                    _part.TablePr.TableBorders.InsideH = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TablePr.TableBorders.InsideH);
                     break;
                 }
                 case 5:
                 {
-                    _part.TablePr.TableBorders.InsideV = new AscCommon.CDocumentBorder();
+                    _part.TablePr.TableBorders.InsideV = new CDocumentBorder();
                     this.ReadTableBorderLineStyle(_part.TablePr.TableBorders.InsideV);
                     break;
                 }
@@ -1513,13 +1512,13 @@ function BinaryPPTYLoader()
                     _border.Unifill = ln.Fill;
                     _border.Size = (ln.w == null) ? 12700 : ((ln.w) >> 0);
                     _border.Size /= 36000;
-                    _border.Value = AscCommon.border_Single;
+                    _border.Value = border_Single;
                     break;
                 }
                 case 1:
                 {
                     _border.LineRef = this.ReadStyleRef();
-                    _border.Value = AscCommon.border_Single;
+                    _border.Value = border_Single;
                     break;
                 }
                 default:
@@ -5512,7 +5511,7 @@ function BinaryPPTYLoader()
             _table.Set_Pr(props.props);
             _table.Set_TableLook(props.look);
         }
-        _table.Set_TableLayout(AscCommon.tbllayout_Fixed);
+        _table.Set_TableLayout(tbllayout_Fixed);
 
         s.Seek2(_return_to_rows);
 
@@ -5652,7 +5651,7 @@ function BinaryPPTYLoader()
                     var rowSpan = s.GetULong();
                     if (1 < rowSpan)
                     {
-                        cell.Set_VMerge(AscCommon.vmerge_Restart);
+                        cell.Set_VMerge(vmerge_Restart);
                     }
                     break;
                 }
@@ -5674,9 +5673,9 @@ function BinaryPPTYLoader()
                 case 4:
                 {
                     var bIsVMerge = s.GetBool();
-                    if (bIsVMerge && cell.Pr.VMerge != AscCommon.vmerge_Restart)
+                    if (bIsVMerge && cell.Pr.VMerge != vmerge_Restart)
                     {
-                        cell.Set_VMerge(AscCommon.vmerge_Continue);
+                        cell.Set_VMerge(vmerge_Continue);
                     }
                     break;
                 }
@@ -5692,7 +5691,7 @@ function BinaryPPTYLoader()
             {
                 case 0:
                 {
-                    var props = new AscCommon.CTableCellPr();
+                    var props = new CTableCellPr();
                     this.ReadCellProps(props);
                     props.Merge(cell.Pr);
                     cell.Set_Pr(props);
@@ -5741,7 +5740,7 @@ function BinaryPPTYLoader()
                 {
                     if(props.TableCellMar == null)
                         props.TableCellMar = {};
-                    props.TableCellMar.Left   = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, s.GetULong() / 36000);
+                    props.TableCellMar.Left   = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
                     //props.TableCellMar.Left.W = s.GetULong() / 36000;
                     break;
                 }
@@ -5749,7 +5748,7 @@ function BinaryPPTYLoader()
                 {
                     if(props.TableCellMar == null)
                         props.TableCellMar = {};
-                    props.TableCellMar.Top = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, s.GetULong() / 36000);
+                    props.TableCellMar.Top = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
 
                     //  props.TableCellMar.Top.W = s.GetULong() / 36000;
                     break;
@@ -5758,7 +5757,7 @@ function BinaryPPTYLoader()
                 {
                     if(props.TableCellMar == null)
                         props.TableCellMar = {};
-                    props.TableCellMar.Right   = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, s.GetULong() / 36000);
+                    props.TableCellMar.Right   = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
                     // props.TableCellMar.Right.W = s.GetULong() / 36000;
                     break;
                 }
@@ -5766,7 +5765,7 @@ function BinaryPPTYLoader()
                 {
                     if(props.TableCellMar == null)
                         props.TableCellMar = {};
-                    props.TableCellMar.Bottom   = new AscCommon.CTableMeasurement(AscCommon.tblwidth_Mm, s.GetULong() / 36000);
+                    props.TableCellMar.Bottom   = new CTableMeasurement(tblwidth_Mm, s.GetULong() / 36000);
 
                     //props.TableCellMar.Bottom.W = s.GetULong() / 36000;
                     break;
@@ -5788,19 +5787,19 @@ function BinaryPPTYLoader()
                     {
                         case 0://bottom
                         {
-                            props.VAlign = AscCommon.vertalignjc_Bottom;
+                            props.VAlign = vertalignjc_Bottom;
                             break;
                         }
                         case 1://ctr
                         case 2://dist
                         case 3: //just
                         {
-                            props.VAlign = AscCommon.vertalignjc_Center;
+                            props.VAlign = vertalignjc_Center;
                             break;
                         }
                         case 4://top
                         {
-                            props.VAlign = AscCommon.vertalignjc_Top;
+                            props.VAlign = vertalignjc_Top;
                             break;
                         }
                     }
@@ -5875,7 +5874,7 @@ function BinaryPPTYLoader()
 
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
-                        props.Shd = new AscCommon.CDocumentShd();
+                        props.Shd = new CDocumentShd();
                         props.Shd.Value = c_oAscShdClear;
                         props.Shd.Unifill = _unifill;
                     }
@@ -5901,12 +5900,12 @@ function BinaryPPTYLoader()
     {
         var ln = this.ReadLn();
 
-        var border = new AscCommon.CDocumentBorder();
+        var border = new CDocumentBorder();
         border.Unifill = ln.Fill;
         border.Size = (ln.w == null) ? 12700 : ((ln.w) >> 0);
         border.Size /= 36000;
 
-        border.Value = AscCommon.border_Single;
+        border.Value = border_Single;
 
         return border;
     }
@@ -5921,7 +5920,7 @@ function BinaryPPTYLoader()
         s.Skip2(1); // start attributes
 
         var obj = {};
-        obj.props = new AscCommon.CTablePr();
+        obj.props = new CTablePr();
         obj.look = new CTableLook(false, false, false, false, false, false);
         obj.style = -1;
 
@@ -5990,7 +5989,7 @@ function BinaryPPTYLoader()
                     var _unifill = this.ReadUniFill();
                     if (_unifill.fill !== undefined && _unifill.fill != null)
                     {
-                        obj.props.Shd = new AscCommon.CDocumentShd();
+                        obj.props.Shd = new CDocumentShd();
                         obj.props.Shd.Value = c_oAscShdClear;
                         obj.props.Shd.Unifill = _unifill;
                     }
@@ -6680,7 +6679,7 @@ function BinaryPPTYLoader()
     this.ReadTextParagraphPr = function(par)
     {
 
-        var para_pr = new AscCommon.CParaPr();
+        var para_pr = new CParaPr();
         var s = this.stream;
         var _end_rec = s.cur + s.GetULong() + 4;
 
@@ -7019,7 +7018,7 @@ function BinaryPPTYLoader()
 
                     if (0 != _c)
                     {
-                        para_pr.Tabs = new AscCommon.CParaTabs();
+                        para_pr.Tabs = new CParaTabs();
                         var _value, _pos;
                         for (var i = 0; i < _c; i++)
                         {
@@ -7056,7 +7055,7 @@ function BinaryPPTYLoader()
                                         break;
                                 }
                             }
-                            para_pr.Tabs.Add(new AscCommon.CParaTab(_value, _pos))
+                            para_pr.Tabs.Add(new CParaTab(_value, _pos))
                         }
                     }
                     break;

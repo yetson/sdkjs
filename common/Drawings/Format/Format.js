@@ -326,7 +326,7 @@ function checkObjectUnifill(obj, theme, colorMap)
     {
         obj.Unifill.check(theme, colorMap);
         var rgba = obj.Unifill.getRGBAColor();
-        obj.Color = new AscCommon.CDocumentColor(rgba.R, rgba.G, rgba.B, false);
+        obj.Color = new CDocumentColor(rgba.R, rgba.G, rgba.B, false);
     }
 }
 function checkTableCellPr(cellPr, slide, layout, master, theme)
@@ -10410,8 +10410,8 @@ function CTextParagraphPr()
 {
     this.bullet = new CBullet();
     this.lvl = null;
-    this.pPr = new AscCommon.CParaPr();
-    this.rPr = new AscCommon.CTextPr();
+    this.pPr = new CParaPr();
+    this.rPr = new CTextPr();
 }
 
 
@@ -10547,7 +10547,7 @@ CBullet.prototype =
 
     getPresentationBullet: function()
     {
-        var para_pr = new AscCommon.CParaPr();
+        var para_pr = new CParaPr();
         para_pr.Bullet = this;
         return para_pr.Get_PresentationBullet();
     },
@@ -10923,7 +10923,7 @@ TextListStyle.prototype =
         {
             if(r.GetBool())
             {
-                this.levels[i] = new AscCommon.CParaPr();
+                this.levels[i] = new CParaPr();
                 this.levels[i].Read_FromBinary(r);
             }
             else
