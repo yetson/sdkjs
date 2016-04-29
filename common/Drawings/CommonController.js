@@ -362,8 +362,13 @@ function checkObjectInArray(aObjects, oObject)
 }
 function getValOrDefault(val, defaultVal)
 {
+
     if(val !== null && val !== undefined)
+    {
+        if(val > 558.7)
+            return 0;
         return val;
+    }
     return defaultVal;
 }
 
