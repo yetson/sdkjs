@@ -640,7 +640,7 @@ CChartSpace.prototype =
     paragraphAdd: function(paraItem, bRecalculate)
     {
         var content;
-        if(paraItem.Type === AscCommon.para_TextPr)
+        if(paraItem.Type === para_TextPr)
         {
             var _paraItem;
             if(paraItem.Value.Unifill && paraItem.Value.Unifill.checkWordMods())
@@ -8508,7 +8508,7 @@ CChartSpace.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent instanceof AscCommon.ParaDrawing)
+            if(this.parent instanceof ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }

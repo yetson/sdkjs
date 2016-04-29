@@ -244,7 +244,7 @@ function CopyRunToPPTX(Run, Paragraph, bHyper)
     for ( var CurPos = 0; CurPos < Run.Content.length; CurPos++ )
     {
         var Item = Run.Content[CurPos];
-        if ( AscCommon.para_End !== Item.Type && Item.Type !== AscCommon.para_Drawing && Item.Type !== AscCommon.para_Comment)
+        if ( para_End !== Item.Type && Item.Type !== para_Drawing && Item.Type !== para_Comment)
         {
             NewRun.Add_ToContent( PosToAdd, Item.Copy(), false );
             ++PosToAdd;
@@ -295,17 +295,17 @@ function ConvertParagraphToPPTX(paragraph, drawingDocument, newParent)
     for ( var Index = 0; Index < Count; Index++ )
     {
         var Item = paragraph.Content[Index];
-        if(Item.Type === AscCommon.para_Run)
+        if(Item.Type === para_Run)
         {
             new_paragraph.Internal_Content_Add(new_paragraph.Content.length, CopyRunToPPTX(Item, new_paragraph), false);
         }
-        else if(Item.Type === AscCommon.para_Hyperlink)
+        else if(Item.Type === para_Hyperlink)
         {
             new_paragraph.Internal_Content_Add(new_paragraph.Content.length, ConvertHyperlinkToPPTX(Item, new_paragraph), false);
         }
     }
     var EndRun = new ParaRun(new_paragraph);
-    EndRun.Add_ToContent( 0, new AscCommon.ParaEnd() );
+    EndRun.Add_ToContent( 0, new ParaEnd() );
     new_paragraph.Internal_Content_Add( new_paragraph.Content.length, EndRun, false );
     return new_paragraph;
 }
@@ -318,11 +318,11 @@ function ConvertHyperlinkToPPTX(hyperlink, paragraph)
     for(i = 0; i < hyperlink.Content.length; ++i)
     {
         item = hyperlink.Content[i];
-        if(item.Type === AscCommon.para_Run)
+        if(item.Type === para_Run)
         {
             hyperlink_ret.Add_ToContent(pos++, CopyRunToPPTX(item, paragraph, true));
         }
-        else if(item.Type === AscCommon.para_Hyperlink)
+        else if(item.Type === para_Hyperlink)
         {
             hyperlink_ret.Add_ToContent(pos++, ConvertHyperlinkToPPTX(item, paragraph));
         }
@@ -423,7 +423,7 @@ function CheckWordParagraphContent(aContent)
         var oItem = aContent[i];
         switch(oItem.Type)
         {
-            case AscCommon.para_Run:
+            case para_Run:
             {
                 var NewRPr = CheckWordRunPr(oItem.Pr);
                 if(NewRPr)
@@ -432,7 +432,7 @@ function CheckWordParagraphContent(aContent)
                 }
                 break;
             }
-            case AscCommon.para_Hyperlink:
+            case para_Hyperlink:
             {
                 CheckWordParagraphContent(oItem.Content);
                 break;
@@ -478,7 +478,7 @@ function RecalculateDocContentByMaxLine(oDocContent, dMaxWidth, bNeedRecalcAllDr
         {
             if(oDocContent.Content[0] && oDocContent.Content[0].Content[0] && oDocContent.Content[0].Content[0].Content[0])
             {
-                return oDocContent.Content[0].Content[0].Content[0].WidthVisible/AscCommon.TEXTWIDTH_DIVIDER;
+                return oDocContent.Content[0].Content[0].Content[0].WidthVisible/TEXTWIDTH_DIVIDER;
             }
         }
         return 0.001;
@@ -4278,7 +4278,7 @@ CShape.prototype =
         if(!this.group)
         {
             var oLock;
-            if(this.parent instanceof AscCommon.ParaDrawing)
+            if(this.parent instanceof ParaDrawing)
             {
                 oLock = this.parent.Lock;
             }
@@ -5538,14 +5538,14 @@ CShape.prototype =
     {
         for(var j = 0; j < aContent.length; ++j)
         {
-            if(aContent[j].Type === AscCommon.para_Run)
+            if(aContent[j].Type === para_Run)
             {
                 if(fCallback(aContent[j]))
                 {
                     return true;
                 }
             }
-            else if(aContent[j].Type === AscCommon.para_Hyperlink)
+            else if(aContent[j].Type === para_Hyperlink)
             {
                 if(this.checkRunWordArtContent(aContent[j].Content, fCallback))
                 {
@@ -5856,7 +5856,7 @@ function getParaDrawing(oDrawing)
     {
         oCurDrawing = oCurDrawing.group;
     }
-    if(oCurDrawing.parent instanceof AscCommon.ParaDrawing)
+    if(oCurDrawing.parent instanceof ParaDrawing)
     {
         return oCurDrawing.parent;
     }

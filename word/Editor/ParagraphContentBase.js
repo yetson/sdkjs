@@ -430,7 +430,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Get_FirstTextPr = function(b
 
     if (null !== oElement && undefined !== oElement)
     {
-        if (AscCommon.para_Run === this.Content[0].Type)
+        if (para_Run === this.Content[0].Type)
             return this.Content[0].Get_TextPr();
         else
             return this.Content[0].Get_FirstTextPr();
@@ -785,7 +785,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(Text
             {
                 var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
 
-                if ( AscCommon.para_Run === this.Content[EndPos].Type )
+                if ( para_Run === this.Content[EndPos].Type )
                 {
                     var CenterRunPos = this.private_ReplaceRun( EndPos, NewElements );
 
@@ -816,11 +816,11 @@ CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(Text
 
 
                 var NewElements = this.Content[EndPos].Apply_TextPr( TextPr, IncFontSize, false );
-                if ( AscCommon.para_Run === this.Content[EndPos].Type )
+                if ( para_Run === this.Content[EndPos].Type )
                     this.private_ReplaceRun( EndPos, NewElements );
 
                 var NewElements = this.Content[StartPos].Apply_TextPr( TextPr, IncFontSize, false );
-                if ( AscCommon.para_Run === this.Content[StartPos].Type )
+                if ( para_Run === this.Content[StartPos].Type )
                     this.private_ReplaceRun( StartPos, NewElements );
 
                 // Подправим селект. Заметим, что метки выделения изменяются внутри функции Add_ToContent
@@ -842,7 +842,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Apply_TextPr = function(Text
             var Element = this.Content[Pos];
             var NewElements = Element.Apply_TextPr( TextPr, IncFontSize, false );
 
-            if ( AscCommon.para_Run === Element.Type )
+            if ( para_Run === Element.Type )
             {
                 var CenterRunPos = this.private_ReplaceRun( Pos, NewElements );
                 this.State.ContentPos = CenterRunPos;
@@ -1213,7 +1213,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Recalculate_Range = function
     {
         var Item = this.Content[Pos];
 
-        if (AscCommon.para_Math === Item.Type)
+        if (para_Math === Item.Type)
             Item.Set_Inline(true);
 
         if ( ( 0 === Pos && 0 === CurLine && 0 === CurRange ) || Pos !== RangeStartPos )
@@ -2416,7 +2416,7 @@ CParagraphContentWithParagraphLikeContent.prototype.Set_ReviewType = function(Re
     for (var Index = 0, Count = this.Content.length; Index < Count; Index++)
     {
         var Element = this.Content[Index];
-        if (AscCommon.para_Run === Element.Type)
+        if (para_Run === Element.Type)
         {
             Element.Set_ReviewType(ReviewType);
 

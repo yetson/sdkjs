@@ -99,11 +99,11 @@ CMathBaseText.prototype.Get_Width = function() // работаем через ф
     if(this.bEmptyGapRight == false)
         Width += this.GapRight;
 
-    return (Width*AscCommon.TEXTWIDTH_DIVIDER) | 0;
+    return (Width*TEXTWIDTH_DIVIDER) | 0;
 };
 CMathBaseText.prototype.Get_Width2 = function() // работаем через функцию, т.к. поля  GapLeft и GapRight могут измениться из-за изменения переноса, а пересчет (Measure) в этом случае не прийдет
 {
-    return ( (this.size.width + this.GapLeft + this.GapRight)* AscCommon.TEXTWIDTH_DIVIDER ) | 0;
+    return ( (this.size.width + this.GapLeft + this.GapRight)* TEXTWIDTH_DIVIDER ) | 0;
 };
 CMathBaseText.prototype.Get_WidthVisible = function()
 {
@@ -136,7 +136,7 @@ CMathBaseText.prototype.GetLocationOfLetter = function()
 };
 CMathBaseText.prototype.IsPlaceholder = function()
 {
-    return this.Type == AscCommon.para_Math_Placeholder;
+    return this.Type == para_Math_Placeholder;
 };
 CMathBaseText.prototype.IsJustDraw = function()
 {
@@ -145,7 +145,7 @@ CMathBaseText.prototype.IsJustDraw = function()
 // For ParaRun
 CMathBaseText.prototype.Is_Punctuation = function()
 {
-    var bPunc     = 1 === AscCommon.g_aPunctuation[this.value],
+    var bPunc     = 1 === g_aPunctuation[this.value],
         bMathSign = this.value ==  0x2217 || this.value == 0x2212;
 
     return bPunc || bMathSign;
@@ -182,7 +182,7 @@ function CMathText(bJDraw)
 {
     CMathText.superclass.constructor.call(this);
 
-    this.Type           = AscCommon.para_Math_Text;
+    this.Type           = para_Math_Text;
     this.bJDraw         = (undefined === bJDraw ? false : bJDraw);
 
     this.RecalcInfo =
@@ -218,7 +218,7 @@ CMathText.prototype.add = function(code)
     this.value = code;
 
     if( this.private_Is_BreakOperator(code) )
-        this.Type = AscCommon.para_Math_BreakOperator;
+        this.Type = para_Math_BreakOperator;
 };
 CMathText.prototype.addTxt = function(txt)
 {
@@ -235,7 +235,7 @@ CMathText.prototype.private_getCode = function()
 
     var bNormal = this.bJDraw ? null : this.Parent.IsNormalText();
 
-    if(this.Type === AscCommon.para_Math_Placeholder || this.bJDraw || bNormal)
+    if(this.Type === para_Math_Placeholder || this.bJDraw || bNormal)
         return code;
 
     var Compiled_MPrp = this.Parent.GetCompiled_ScrStyles();
@@ -678,7 +678,7 @@ CMathText.prototype.private_getCode = function()
 };
 CMathText.prototype.fillPlaceholders = function()
 {
-    this.Type = AscCommon.para_Math_Placeholder;
+    this.Type = para_Math_Placeholder;
     this.value = StartTextElement;
 };
 CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
@@ -779,7 +779,7 @@ CMathText.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
     this.size.height = height;
     this.size.ascent = ascent;
 
-    this.Width = (this.size.width * AscCommon.TEXTWIDTH_DIVIDER) | 0;
+    this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
 
 };
 CMathText.prototype.PreRecalc = function(Parent, ParaMath)
@@ -1016,7 +1016,7 @@ function CMathAmp()
     CMathAmp.superclass.constructor.call(this);
 
     this.bAlignPoint = false;
-    this.Type = AscCommon.para_Math_Ampersand;
+    this.Type = para_Math_Ampersand;
 
     this.value = 0x26;
 
@@ -1042,7 +1042,7 @@ CMathAmp.prototype.Measure = function(oMeasure, TextPr, InfoMathText)
         this.size.ascent  = this.AmpText.size.ascent;
     }
 
-    this.Width = (this.size.width * AscCommon.TEXTWIDTH_DIVIDER) | 0;
+    this.Width = (this.size.width * TEXTWIDTH_DIVIDER) | 0;
 };
 CMathAmp.prototype.PreRecalc = function(Parent, ParaMath, ArgSize, RPI)
 {
