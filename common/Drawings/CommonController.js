@@ -1622,7 +1622,7 @@ DrawingObjectsController.prototype =
             {
                 this.parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (AscCommon.docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this.document.DrawingObjects))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -1631,7 +1631,7 @@ DrawingObjectsController.prototype =
             {
                 this.selectedObjects[0].parent.GoTo_Text();
                 this.resetSelection();
-                if(this.document && (AscCommon.docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
+                if(this.document && (docpostype_DrawingObjects !== this.document.CurPos.Type || isRealObject(getTargetTextObject(this))) && CDocumentContent.prototype.Add_NewParagraph === docContentFunction)
                 {
                     this.document.Add_NewParagraph(args[0]);
                 }
@@ -7119,9 +7119,9 @@ DrawingObjectsController.prototype =
                 oContent.Selection.Use      = false;
                 oContent.Selection.StartPos = 0;
                 oContent.Selection.EndPos   = 0;
-                oContent.Selection.Flag     = AscCommon.selectionflag_Common;
+                oContent.Selection.Flag     = selectionflag_Common;
 
-                oContent.CurPos.Type       = AscCommon.docpostype_Content;
+                oContent.CurPos.Type       = docpostype_Content;
                 oContent.CurPos.ContentPos = 0;
                 oShape.bSelectedText = true;
             }
@@ -7138,7 +7138,7 @@ DrawingObjectsController.prototype =
             var oTargetDocContent = this.getTargetDocContent();
             if(oTargetDocContent && oTargetDocContent.Selection.Use)
             {
-                oSelectedContent = new AscCommon.CSelectedContent();
+                oSelectedContent = new CSelectedContent();
                 oTargetDocContent.Get_SelectedContent(oSelectedContent);
                 oSelectedContent.MoveDrawing = true;
 

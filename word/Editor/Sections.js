@@ -316,7 +316,7 @@ CSectionPr.prototype =
                 
                 this.Set_PageSize(H, W);
                 
-                if ( Asc.c_oAscPageOrientation.PagePortrait === Orient )
+                if ( orientation_Portrait === Orient )
                     this.Set_PageMargins( T, R, B, L );
                 else
                     this.Set_PageMargins( B, L, T, R );
@@ -1733,7 +1733,7 @@ function CSectionPageSize()
 {
     this.W      = 210;
     this.H      = 297;
-    this.Orient = Asc.c_oAscPageOrientation.PagePortrait;
+    this.Orient = orientation_Portrait;
 }
 
 CSectionPageSize.prototype =
