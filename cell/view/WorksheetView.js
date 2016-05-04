@@ -13203,7 +13203,7 @@
 				}
 				case c_oAscDeleteOptions.DeleteCellsAndShiftLeft:
 				{
-					if(isPartTablePartsUnderRange)
+					if(isPartTablePartsRightRange)
 					{
 						res = false;
 					}
