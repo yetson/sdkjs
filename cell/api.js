@@ -80,6 +80,7 @@ var editor;
     this.fontRenderingMode = Asc.c_oAscFontRenderingModeType.hintingAndSubpixeling;
     this.wb = null;
     this.wbModel = null;
+    this.tmpLocale = null;
 
     this.documentFormatSave = c_oAscFileType.XLSX;
 
@@ -462,6 +463,9 @@ var editor;
   spreadsheet_api.prototype.asc_setLocale = function(val) {
     if (!this.isLoadFullApi) {
       this.tmpLocale = val;
+      return;
+    }
+    if (null === val) {
       return;
     }
     AscCommon.setCurrentCultureInfo(val);
