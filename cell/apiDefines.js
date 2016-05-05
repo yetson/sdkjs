@@ -33,7 +33,6 @@ function (window, undefined) {
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
 
-
   // Import
   var CColor = AscCommon.CColor;
 
@@ -293,6 +292,12 @@ var c_oAscPopUpSelectorType = {
   Table: 3
 };
 
+  /** @enum */
+  var c_oSerFormat = {
+    Version		: 2, //1.0.0.2
+    Signature	: "XLSY"
+  };
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -314,6 +319,10 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscFormulaRangeBorderColor = c_oAscFormulaRangeBorderColor;
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
+
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].c_oSerFormat = c_oSerFormat;
+  window['AscCommon'].CurFileVersion = c_oSerFormat.Version;
 
   var prot;
   window['Asc'] = window['Asc'] || {};

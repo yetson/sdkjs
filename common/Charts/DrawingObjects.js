@@ -3719,8 +3719,7 @@ function DrawingObjects() {
 //-----------------------------------------------------------------------------------
 
 function ObjectLocker(ws) {
-    var asc = window["Asc"];
-    var asc_applyFunction = asc.applyFunction;
+    var asc_applyFunction = AscCommonExcel.applyFunction;
 
     var _t = this;
     _t.bLock = true;

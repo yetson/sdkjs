@@ -29,11 +29,10 @@
 		 * Import
 		 * -----------------------------------------------------------------------------
 		 */
-		var asc_applyFunction	= Asc.applyFunction;
+		var asc_applyFunction	= AscCommonExcel.applyFunction;
 		var asc_Range			= Asc.Range;
 
 		var c_oAscLockTypes = AscCommon.c_oAscLockTypes;
-		var History = AscCommon.History;
 
 		var c_oAscRecalcIndexTypes = AscCommonExcel.c_oAscRecalcIndexTypes;
 		var c_oAscLockTypeElemSubType = AscCommonExcel.c_oAscLockTypeElemSubType;
@@ -44,7 +43,7 @@
 		 * -----------------------------------------------------------------------------
 		 *
 		 * @constructor
-		 * @memberOf Asc
+		 * @memberOf AscCommonExcel
 		 */
 		function CCollaborativeEditing (handlers, isViewerMode) {
 			if ( !(this instanceof CCollaborativeEditing) ) {
@@ -300,7 +299,7 @@
 				this.clearRecalcIndex();
 
 				// Чистим Undo/Redo
-				History.Clear();
+				AscCommon.History.Clear();
 
 				// Перерисовываем
 				if (bCheckRedraw) {
@@ -321,7 +320,7 @@
 					this.m_nUseType = 1;
 			} else {
 				// Обновляем точку последнего сохранения в истории
-				History.Reset_SavedIndex(IsUserSave);
+				AscCommon.History.Reset_SavedIndex(IsUserSave);
 			}
 		};
 
@@ -1069,7 +1068,7 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window['AscCommonExcel'].CLock = CLock;
 
-		window['Asc'].CCollaborativeEditing = CCollaborativeEditing;
+		window['AscCommonExcel'].CCollaborativeEditing = CCollaborativeEditing;
 		window['Asc'].CRecalcIndexElement = CRecalcIndexElement;
 		window['Asc'].CRecalcIndex = CRecalcIndex;
 	}

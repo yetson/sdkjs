@@ -30,7 +30,6 @@
 	 * @param {undefined} undefined
 	 */
 	function (window, undefined) {
-
 		/*
 		 * Import
 		 * -----------------------------------------------------------------------------
@@ -93,7 +92,7 @@
 			return false;
 		};
 
-		//------------------------------------------------------------export---------------------------------------------------
+		//---------------------------------------------------------export---------------------------------------------------
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		AscCommonExcel.asc_CHandlersList = asc_CHandlersList;
 	}
