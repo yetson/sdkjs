@@ -2652,7 +2652,6 @@ CUserCacheColor.prototype.init = function(nColor) {
   this.Dark  = new CColor(R, G, B, 255);
 };
 
-  var isLoadSdk = false;
   function loadScript(url, callback) {
     var script = document.createElement('script');
     script.type = 'text/javascript';
@@ -2665,7 +2664,11 @@ CUserCacheColor.prototype.init = function(nColor) {
     document.head.appendChild(script);
   }
   function loadSdk(sdkName, callback) {
-    loadScript('/sdkjs/' + sdkName + '/sdk-all.js', callback);
+    if (window['AscNotLoadAllScript']) {
+      setTimeout(callback, 1);
+    } else {
+      loadScript('/sdkjs/' + sdkName + '/sdk-all.js', callback);
+    }
   }
 
 var g_oIdCounter = new CIdCounter();
