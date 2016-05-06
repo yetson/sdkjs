@@ -278,6 +278,7 @@ function asc_docs_api(name)
     this.isImageChangeUrl = false;
     this.isShapeImageChangeUrl = false;
 
+  this.tmpFontRenderingMode = null;
     this.FontAsyncLoadType = 0;
     this.FontAsyncLoadParam = null;
 	
@@ -1973,6 +1974,11 @@ asc_docs_api.prototype.asc_setAdvancedOptions = function(idOption, option) {
 };
 asc_docs_api.prototype.SetFontRenderingMode = function(mode)
 {
+  if (!this.isLoadFullApi) {
+    this.tmpFontRenderingMode = mode;
+    return;
+  }
+
     if (c_oAscFontRenderingModeType.noHinting === mode)
       AscCommon.SetHintsProps(false, false);
     else if (c_oAscFontRenderingModeType.hinting === mode)
@@ -7087,6 +7093,10 @@ asc_docs_api.prototype._onEndLoadSdk = function() {
 
   this.CreateComponents();
   this.WordControl.Init();
+
+  if (this.tmpFontRenderingMode) {
+    this.SetFontRenderingMode(this.tmpFontRenderingMode);
+  }
 
   this.asc_setViewMode(this.isViewMode);
   this.asc_setDrawCollaborationMarks(this.tmpCoMarksDraw);
