@@ -9789,3 +9789,7 @@ CDocumentRecalculateObject.prototype =
     }
         
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDocumentContent = CDocumentContent;

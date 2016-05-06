@@ -4258,6 +4258,15 @@ CStyles.prototype =
 
         return Styles;
     },
+    
+    CopyStyle : function()
+    {
+        var res = [];
+        for (var StyleId in this.Style)
+        {
+            res[StyleId] = this.Style[StyleId].Copy();
+        }
+    },
 
     Get_DefaultParaPr : function()
     {
@@ -10732,10 +10741,9 @@ asc_CStyle.prototype.get_TextPr = function()
     return this.TextPr;
 };
 
-/*
- * Export
- * -----------------------------------------------------------------------------
- */
+//---------------------------------------------------------export---------------------------------------------------
+window['Asc'] = window['Asc'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
 window["Asc"]["asc_CStyle"] = window["Asc"].asc_CStyle = asc_CStyle;
 asc_CStyle.prototype["get_Name"]    = asc_CStyle.prototype.get_Name;
 asc_CStyle.prototype["put_Name"]    = asc_CStyle.prototype.put_Name;
@@ -10748,4 +10756,8 @@ asc_CStyle.prototype["put_Type"]    = asc_CStyle.prototype.put_Type;
 asc_CStyle.prototype["get_Link"]    = asc_CStyle.prototype.get_Link;
 asc_CStyle.prototype["put_Link"]    = asc_CStyle.prototype.put_Link;
 
-
+window["AscCommonWord"].CDocumentColor = CDocumentColor;
+window["AscCommonWord"].CStyle = CStyle;
+window["AscCommonWord"].Default_Tab_Stop = Default_Tab_Stop;
+window["AscCommonWord"].highlight_None = highlight_None;
+window["AscCommonWord"].spacing_Auto = spacing_Auto;

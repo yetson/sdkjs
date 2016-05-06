@@ -26,11 +26,6 @@
 
 (function(window, undefined){
 
-// Import
-var g_memory = AscFonts.g_memory;
-var DecodeBase64Char = AscFonts.DecodeBase64Char;
-var b64_decode = AscFonts.b64_decode;
-
 var FOREIGN_CURSOR_LABEL_HIDETIME = 1500;
 
 function CCollaborativeChanges()
@@ -134,7 +129,7 @@ CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, sr
 
     var dstLen = parseInt(dst_len);
 
-    var pointer = g_memory.Alloc(dstLen);
+    var pointer = AscFonts.g_memory.Alloc(dstLen);
     var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
     stream.obj = pointer.obj;
 
@@ -151,7 +146,7 @@ CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, sr
             {
                 if (index >= srcLen)
                     break;
-                var nCh = DecodeBase64Char(szSrc.charCodeAt(index++));
+                var nCh = AscFonts.DecodeBase64Char(szSrc.charCodeAt(index++));
                 if (nCh == -1)
                 {
                     i--;
@@ -172,7 +167,7 @@ CCollaborativeChanges.prototype.Internal_Load_Data2 = function(szSrc, offset, sr
     }
     else
     {
-        var p = b64_decode;
+        var p = AscFonts.b64_decode;
         while (index < srcLen)
         {
             var dwCurr = 0;
@@ -212,6 +207,7 @@ CCollaborativeChanges.prototype.Internal_Save_Data = function(Class, Data, Binar
 
     if ( "undefined" != typeof(Class.Save_Changes2) )
     {
+        AscCommon.CollaborativeEditing.InitMemory();
         var Writer2 = AscCommon.CollaborativeEditing.m_oMemory;
         Writer2.Seek(0);
         if ( true === Class.Save_Changes2( Data, Writer2 ) )
@@ -248,7 +244,7 @@ function CCollaborativeEditingBase()
     this.m_aDC          = {}; // Массив(ассоциативный) классов DocumentContent
     this.m_aChangedClasses = {}; // Массив(ассоциативный) классов, в которых есть изменения выделенные цветом
 
-    this.m_oMemory      = new AscCommon.CMemory(); // Глобальные класс для сохранения
+    this.m_oMemory      = null; // Глобальные класс для сохранения (создадим позднее, когда понадобится)
 
     this.m_aCursorsToUpdate        = {}; // Курсоры, которые нужно обновить после принятия изменений
     this.m_aCursorsToUpdateShortId = {};
@@ -716,6 +712,11 @@ CCollaborativeEditingBase.prototype.Update_DocumentPosition = function(DocPos){
 CCollaborativeEditingBase.prototype.Update_ForeignCursorsPositions = function(){
 
 };
+CCollaborativeEditingBase.prototype.InitMemory = function() {
+    if (!this.m_oMemory) {
+        this.m_oMemory = new AscCommon.CMemory();
+    }
+};
 
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -831,7 +832,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
     }
 
     // Нашли результирующую позицию. Проверим является ли она валидной для документа.
-    if (NewDocPos !== DocPos && NewDocPos.length === 1 && NewDocPos[0].Class instanceof ParaRun)
+    if (NewDocPos !== DocPos && NewDocPos.length === 1 && NewDocPos[0].Class instanceof AscCommonWord.ParaRun)
     {
         var Run = NewDocPos[0].Class;
         var Para = Run.Get_Paragraph();
@@ -843,7 +844,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
         }
     }
     // Возможно ран с позицией переместился в другой класс
-    else if (DocPos.length > 0 && DocPos[DocPos.length - 1].Class instanceof ParaRun)
+    else if (DocPos.length > 0 && DocPos[DocPos.length - 1].Class instanceof AscCommonWord.ParaRun)
     {
         var Run = DocPos[DocPos.length - 1].Class;
         var RunPos = DocPos[DocPos.length - 1].Position;

@@ -316,7 +316,7 @@ CSectionPr.prototype =
                 
                 this.Set_PageSize(H, W);
                 
-                if ( orientation_Portrait === Orient )
+                if ( Asc.c_oAscPageOrientation.PagePortrait === Orient )
                     this.Set_PageMargins( T, R, B, L );
                 else
                     this.Set_PageMargins( B, L, T, R );
@@ -1733,7 +1733,7 @@ function CSectionPageSize()
 {
     this.W      = 210;
     this.H      = 297;
-    this.Orient = orientation_Portrait;
+    this.Orient = Asc.c_oAscPageOrientation.PagePortrait;
 }
 
 CSectionPageSize.prototype =
@@ -2046,3 +2046,7 @@ function CSectionLayoutInfo(X, Y, XLimit, YLimit)
     this.YLimit  = YLimit;
     this.Columns = [];
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CSectionPr = CSectionPr;

@@ -11036,3 +11036,7 @@ CReviewInfo.prototype.Get_UserId = function()
 {
     return this.UserId;
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaRun = ParaRun;

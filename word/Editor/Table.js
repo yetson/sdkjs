@@ -13820,3 +13820,7 @@ CTableAnchorPosition.prototype =
         return Value;
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CTable = CTable;

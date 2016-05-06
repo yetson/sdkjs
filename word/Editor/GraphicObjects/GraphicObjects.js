@@ -3338,3 +3338,7 @@ function ComparisonByZIndexSimple(obj1, obj2)
         return 1;
     return 0;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CGraphicObjects = CGraphicObjects;

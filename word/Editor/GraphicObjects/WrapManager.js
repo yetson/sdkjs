@@ -1100,3 +1100,7 @@ TrackPointWrapPointWrapPolygon.prototype =
         overlay.ds();
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CWrapPolygon = CWrapPolygon;

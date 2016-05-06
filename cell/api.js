@@ -494,7 +494,7 @@ var editor;
     var wb = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
     this.wbModel = wb;
-    var oBinaryFileReader = new Asc.BinaryFileReader();
+    var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
     oBinaryFileReader.Read(data, wb);
     g_oIdCounter.Set_Load(false);
     return wb;
@@ -736,7 +736,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_setViewMode = function(isViewerMode) {
-    if (false === this.isLoadFullApi) {
+    if (!this.isLoadFullApi) {
       this.isViewMode = isViewerMode;
       return;
     }
@@ -862,7 +862,7 @@ var editor;
   };
 
   spreadsheet_api.prototype._asc_save2 = function() {
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     var dataContainer = {data: null, part: null, index: 0, count: 0};
     dataContainer.data = oBinaryFileWriter.Write();
     var filetype = 0x1002;
@@ -938,7 +938,7 @@ var editor;
       return;
     } else {
       this.wb._initCommentsToSave();
-      var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+      var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
       if (c_oAscFileType.CSV === sFormat) {
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
           oAdditionalData["codepage"] = options.CSVOptions.asc_getCodePage();
@@ -1053,17 +1053,6 @@ var editor;
       this.handlers.trigger("asc_onInitEditorShapes", AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes);
     } else if ("asc_onInitEditorTextArts" === name) {
       this.handlers.trigger("asc_onInitEditorTextArts", [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes]);
-    } else if ("asc_onInitStandartTextures" === name) {
-      var _count = AscCommon.g_oUserTexturePresets.length;
-      var arr = new Array(_count);
-      for (var i = 0; i < _count; ++i) {
-        arr[i] = new AscCommon.asc_CTexture();
-        arr[i].Id = i;
-        arr[i].Image = AscCommon.g_oUserTexturePresets[i];
-        this.ImageLoader.LoadImage(AscCommon.g_oUserTexturePresets[i], 1);
-      }
-
-      this.handlers.trigger("asc_onInitStandartTextures", arr);
     }
   };
 
@@ -1560,6 +1549,8 @@ var editor;
     this.asc_CheckGuiControlColors();
     this.asc_SendThemeColorScheme();
     this.asc_ApplyColorScheme(false);
+
+    this.sendStandartTextures();
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();
@@ -2337,7 +2328,7 @@ var editor;
   // Для вставки диаграмм в Word
   spreadsheet_api.prototype.asc_getBinaryFileWriter = function() {
     this.wb._initCommentsToSave();
-    return new Asc.BinaryFileWriter(this.wbModel);
+    return new AscCommonExcel.BinaryFileWriter(this.wbModel);
   };
 
   spreadsheet_api.prototype.asc_getWordChartObject = function() {
@@ -2578,10 +2569,6 @@ var editor;
   spreadsheet_api.prototype.asc_getOriginalImageSize = function() {
     var ws = this.wb.getWorksheet();
     return ws.objectRender.getOriginalImageSize();
-  };
-
-  spreadsheet_api.prototype.asc_setInterfaceDrawImagePlaceShape = function(elementId) {
-    this.shapeElementId = elementId;
   };
 
   spreadsheet_api.prototype.asc_setInterfaceDrawImagePlaceTextArt = function(elementId) {
@@ -3171,7 +3158,7 @@ var editor;
     this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
 
-    var oBinaryFileReader = new Asc.BinaryFileReader();
+    var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
 
     if (undefined === version) {
       oBinaryFileReader.Read(base64File, this.wbModel);
@@ -3208,12 +3195,12 @@ var editor;
 
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
     this.wb._initCommentsToSave();
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     this.wb._initCommentsToSave();
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write2();
 
     var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition());

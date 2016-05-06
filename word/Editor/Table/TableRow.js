@@ -1486,3 +1486,7 @@ CTableRowRecalculateObject.prototype =
         }
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CTableRow = CTableRow;

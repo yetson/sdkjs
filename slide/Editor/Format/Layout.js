@@ -1033,3 +1033,7 @@ function CLayoutThumbnailDrawer()
         return "";
     }
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].SlideLayout = SlideLayoutSlide;

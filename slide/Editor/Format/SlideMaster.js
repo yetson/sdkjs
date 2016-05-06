@@ -951,3 +951,7 @@ function CMasterThumbnailDrawer()
         return "";
     }
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].MasterSlide = MasterSlide;
