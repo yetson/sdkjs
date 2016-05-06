@@ -3086,6 +3086,10 @@ function CDemonstrationManager(htmlpage)
                 if (oThis.IsPlayMode)
                 {
                     oThis.SlideNum++;
+                    if(oThis.SlideNum === oThis.SlidesCount && oThis.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
+                    {
+                        oThis.SlideNum = 0;
+                    }
                     oThis.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(oThis.SlideNum);
                     oThis.StartSlide(true, false);
                 }
@@ -3145,7 +3149,7 @@ function CDemonstrationManager(htmlpage)
 
         if (this.SlideNum >= this.SlidesCount)
         {
-            if (this.HtmlPage.m_oApi.m_oLogicDocument.isLoopShowMode())
+            if (this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
                 this.SlideNum = 0;
             else
             {
@@ -3168,6 +3172,13 @@ function CDemonstrationManager(htmlpage)
             this.CorrectSlideNum();
 
             // TODO: backward transition
+            this.StartSlideBackward();
+            this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
+        }
+        else if(this.HtmlPage.m_oApi.WordControl.m_oLogicDocument.isLoopShowMode())
+        {
+            this.CorrectSlideNum();
+            this.SlideNum = this.SlidesCount;
             this.StartSlideBackward();
             this.HtmlPage.m_oApi.sync_DemonstrationSlideChanged(this.SlideNum);
         }
