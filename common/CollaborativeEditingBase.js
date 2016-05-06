@@ -352,7 +352,7 @@ CCollaborativeEditingBase.prototype.Apply_Changes = function()
     // Если нет чужих изменений, тогда и делать ничего не надо
     if (true === OtherChanges)
     {
-        editor.WordControl.m_oLogicDocument.Stop_Recalculate();
+        editor.Stop_Recalculate();
         editor.WordControl.m_oLogicDocument.EndPreview_MailMergeResult();
 
         editor.sync_StartAction(Asc.c_oAscAsyncActionType.BlockInteraction, Asc.c_oAscAsyncAction.ApplyChanges);
@@ -836,7 +836,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
     {
         var Run = NewDocPos[0].Class;
         var Para = Run.Get_Paragraph();
-        if (Para && true === Para.Is_UseInDocument() && true === Run.Is_UseInParagraph())
+        if (AscCommonWord.CanUpdatePosition(Para, Run))
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : NewDocPos[0].Position});
@@ -849,7 +849,7 @@ CDocumentPositionsManager.prototype.Update_DocumentPosition = function(DocPos)
         var Run = DocPos[DocPos.length - 1].Class;
         var RunPos = DocPos[DocPos.length - 1].Position;
         var Para = Run.Get_Paragraph();
-        if (Para && true === Para.Is_UseInDocument() && true === Run.Is_UseInParagraph())
+        if (AscCommonWord.CanUpdatePosition(Para, Run))
         {
             DocPos.length = 0;
             DocPos.push({Class : Run, Position : RunPos});
