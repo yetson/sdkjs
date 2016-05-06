@@ -1036,4 +1036,4 @@ function CLayoutThumbnailDrawer()
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommonSlide'] = window['AscCommonSlide'] || {};
-window['AscCommonSlide'].SlideLayout = SlideLayoutSlide;
+window['AscCommonSlide'].SlideLayout = SlideLayout;
