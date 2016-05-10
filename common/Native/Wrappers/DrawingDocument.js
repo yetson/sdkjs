@@ -2005,7 +2005,7 @@ CDrawingDocument.prototype =
 
     CheckTableStylesOne : function()
     {
-        var _tableLook = new CTablePropLook(undefined);
+        var _tableLook = new Asc.CTablePropLook(undefined);
 
         _tableLook.FirstRow = true;
         _tableLook.BandHor = true;
@@ -2039,7 +2039,7 @@ CDrawingDocument.prototype =
         var bIsChanged = false;
         if (null == this.TableStylesLastLook)
         {
-            this.TableStylesLastLook = new CTablePropLook();
+            this.TableStylesLastLook = new Asc.CTablePropLook();
 
             this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
             this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
