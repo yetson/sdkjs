@@ -12569,3 +12569,4 @@ OpenParStruct.prototype = {
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window["AscCommonWord"].BinaryFileReader = BinaryFileReader;
 window["AscCommonWord"].BinaryFileWriter = BinaryFileWriter;
+window["AscCommonWord"].EThemeColor = EThemeColor;
