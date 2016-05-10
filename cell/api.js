@@ -3573,5 +3573,3 @@ var editor;
   prot['asc_isOffline'] = prot.asc_isOffline;
   prot['asc_getUrlType'] = prot.asc_getUrlType;
 })(window);
-// don't delete this line!!! This line used for split minimize files
-window['split']='split';
