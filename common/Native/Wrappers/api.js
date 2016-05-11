@@ -1079,7 +1079,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
     {
         case 1: // ASC_MENU_EVENT_TYPE_TEXTPR
         {
-            var _textPr = new CTextPr();
+            var _textPr = new AscCommonWord.CTextPr();
             while (_continue)
             {
                 var _attr = _params[_current.pos++];
@@ -1282,7 +1282,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 15:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         if (true == _params[_current.pos++])
                             _textPr.VertAlign = AscCommon.vertalign_SubScript;
                         else
@@ -1292,7 +1292,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 16:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         if (true == _params[_current.pos++])
                             _textPr.VertAlign = AscCommon.vertalign_SuperScript;
                         else
@@ -1302,7 +1302,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 17:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.SmallCaps = _params[_current.pos++];
                         _textPr.Caps   = false;
                         break;
@@ -1310,7 +1310,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 18:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.Caps = _params[_current.pos++];
                         if (true == _textPr.Caps)
                             _textPr.SmallCaps = false;
@@ -1319,7 +1319,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 19:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.Strikeout  = _params[_current.pos++];
                         _textPr.DStrikeout = false;
                         break;
@@ -1327,7 +1327,7 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 20:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.DStrikeout  = _params[_current.pos++];
                         if (true == _textPr.DStrikeout)
                             _textPr.Strikeout = false;
@@ -1336,14 +1336,14 @@ Asc['asc_docs_api'].prototype["Call_Menu_Event"] = function(type, _params)
                     case 21:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.TextSpacing = _params[_current.pos++];
                         break;
                     }
                     case 22:
                     {
                         if (_textPr === undefined)
-                            _textPr = new CTextPr();
+                            _textPr = new AscCommonWord.CTextPr();
                         _textPr.Position = _params[_current.pos++];
                         break;
                     }
