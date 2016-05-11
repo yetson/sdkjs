@@ -2055,7 +2055,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_enableKeyEvents = function(isEnabled) {
     if (!this.isLoadFullApi) {
-      this.tmpFocus = value;
+      this.tmpFocus = isEnabled;
       return;
     }
 
