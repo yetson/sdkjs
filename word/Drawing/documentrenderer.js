@@ -3414,3 +3414,7 @@ CDocMeta.prototype =
         editor.WordControl.ToSearchResult();
     }
 };
+
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDocMeta = CDocMeta;
