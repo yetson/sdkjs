@@ -2186,9 +2186,9 @@
 						{
 							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r2, tablePart.Ref.c1, tablePart.Ref.r2, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
-							tablePart.changeRef(null, -1);
 							
 							tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+							tablePart.changeRef(null, -1);
 						}
 						else
 						{
@@ -2196,19 +2196,19 @@
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1); 
 							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
-								tablePart.changeRef(null, 1);
 								isSetValue = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1);
 							}
 							else
 							{
 								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
 									
-								tablePart.changeRef(null, 1);
 								isSetValue = true;
 								
 								tablePart.TotalsRowCount = tablePart.TotalsRowCount === null ? 1 : null;
+								tablePart.changeRef(null, 1);
 							}
 							
 							if(val === true)
@@ -2225,9 +2225,9 @@
 						{
 							var clearRange = new AscCommonExcel.Range(worksheet, tablePart.Ref.r1, tablePart.Ref.c1, tablePart.Ref.r1, tablePart.Ref.c2);
 							this._clearRange(clearRange, true);
-							tablePart.changeRef(null, 1, true);
 							
 							tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+							tablePart.changeRef(null, 1, true);
 						}
 						else
 						{
@@ -2235,21 +2235,20 @@
 							var rangeUpTable = new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 - 1, tablePart.Ref.c2, tablePart.Ref.r1 - 1); 
 							if(this._isEmptyCurrentRange(rangeUpTable) && this.searchRangeInTableParts(rangeUpTable) === -1)
 							{
-								tablePart.changeRef(null, -1, true);
 								isSetValue = true;
 								
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+								tablePart.changeRef(null, -1, true);
 							}
 							else
 							{
 								worksheet.getRange3(tablePart.Ref.r2 + 1, tablePart.Ref.c1, tablePart.Ref.r2 + 1, tablePart.Ref.c2).addCellsShiftBottom();
 								worksheet._moveRange(tablePart.Ref,  new Asc.Range(tablePart.Ref.c1, tablePart.Ref.r1 + 1, tablePart.Ref.c2, tablePart.Ref.r2 + 1));
 									
-								tablePart.changeRef(null, -1, true);
 								isSetValue = true;
 								
-								
 								tablePart.HeaderRowCount = tablePart.HeaderRowCount === null ? 0 : null;
+								tablePart.changeRef(null, -1, true);
 							}
 						}
 						
@@ -3944,12 +3943,21 @@
 									range.setType(CellValueType.String);
 								}
 								
-								if(tableColumn !== null && tableColumn.TotalsRowLabel !== null && totalsRowCount > 0)
+								if(tableColumn !== null && totalsRowCount > 0)
 								{
 									range = worksheet.getCell3(bbox.r2, ncol);
-									range.setValue(tableColumn.TotalsRowLabel);
-									range.setType(CellValueType.String);
-									//TODO + далее необходимо добавлять формулу 
+									
+									if(null !== tableColumn.TotalsRowLabel)
+									{
+										range.setValue(tableColumn.TotalsRowLabel);
+										range.setType(CellValueType.String);
+									}
+									
+									var formula = tableColumn.getTotalRowFormula(options);
+									if(null !== formula)
+									{
+										range.setValue(formula);
+									}
 								}
 							}
 						}
