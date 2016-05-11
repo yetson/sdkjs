@@ -134,6 +134,8 @@ function baseEditorsApi(name, editorId) {
   // Использовать ли обрезанные шрифты
   this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
+  this.tmpFocus = null;
+
   this.fCurCallback = null;
 
   return this;
@@ -255,10 +257,10 @@ baseEditorsApi.prototype.sync_EndAction = function(type, id) {
     this.decrementCounterLongAction();
   }
 };
-baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
-{
+baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function() {
   this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };
+baseEditorsApi.prototype.asc_enableKeyEvents = function(val) {};
 baseEditorsApi.prototype.asc_setViewMode = function() {
 };
 baseEditorsApi.prototype.getViewMode = function() {
@@ -654,6 +656,10 @@ baseEditorsApi.prototype.asc_getUrlType = function(url) {
     this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
 
     AscFormat.initStyleManager();
+
+    if (null !== this.tmpFocus) {
+      this.asc_enableKeyEvents(this.tmpFocus);
+    }
   };
 
   baseEditorsApi.prototype.sendStandartTextures = function() {
