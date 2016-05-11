@@ -1706,7 +1706,7 @@ parserHelper.prototype.setDigitSeparator = function( sep ){
     }
     return res;
   };
-  parserHelper.prototype.getColumnNameByType = function(value) {
+  parserHelper.prototype.getColumnNameByType = function(value, local) {
     switch (value) {
       case FormulaTablePartInfo.all:
       {
