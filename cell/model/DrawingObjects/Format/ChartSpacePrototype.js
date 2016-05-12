@@ -24,6 +24,13 @@
 */
 "use strict";
 
+(function(window, undefined){
+
+// Import
+var CShape = AscFormat.CShape;
+var CChartSpace = AscFormat.CChartSpace;
+
+    // ToDo перенести в один файл!
 function getChartTranslateManager()
 {
     return window["Asc"]["editor"].chartTranslate;
@@ -62,7 +69,6 @@ CChartSpace.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CChartSpace.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CChartSpace.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
-CChartSpace.prototype.normalize = CShape.prototype.normalize;
 CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.setWorksheet = CShape.prototype.setWorksheet;
@@ -107,7 +113,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.chartObj = null;
-    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -216,7 +222,7 @@ CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransfo
 CChartSpace.prototype.recalculateChart = function()
 {
     if(this.chartObj == null)
-        this.chartObj =  new CChartsDrawer();
+        this.chartObj =  new AscFormat.CChartsDrawer();
     this.chartObj.reCalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
@@ -266,7 +272,7 @@ CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.updateLinks();
 
@@ -282,7 +288,7 @@ CChartSpace.prototype.recalculate = function()
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
-            this.calculateSnapArrays();
+            this.recalculateSnapArrays();
             this.rectGeometry.Recalculate(this.extX, this.extY);
             this.recalcInfo.recalculateTransform = false;
             b_transform = true;
@@ -459,8 +465,18 @@ CChartSpace.prototype.recalculate = function()
 
         if(b_recalc_legend && this.chart && this.chart.legend)
         {
+            var bResetLegendPos = false;
+            if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
+            {
+                this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
+                bResetLegendPos = true;
+            }
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
+            if(bResetLegendPos)
+            {
+                this.chart.legend.legendPos = null;
+            }
         }
 
         if(this.recalcInfo.recalculateBounds)
@@ -493,3 +509,8 @@ CChartSpace.prototype.recalculateLocalTransform = CShape.prototype.recalculateLo
 
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
 CChartSpace.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].getChartTranslateManager = getChartTranslateManager;
+})(window);

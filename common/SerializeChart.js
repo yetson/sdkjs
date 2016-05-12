@@ -23,6 +23,18 @@
  *
 */
 "use strict";
+
+(function(window, undefined){
+
+// Import
+var c_oSerConstants = AscCommon.c_oSerConstants;
+
+var c_oAscTickMark = Asc.c_oAscTickMark;
+var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
+var c_oAscChartDataLabelsPos = Asc.c_oAscChartDataLabelsPos;
+var c_oAscValAxUnits = Asc.c_oAscValAxUnits;
+var c_oAscChartLegendShowSettings = Asc.c_oAscChartLegendShowSettings;
+
 //Generated code
 
 var st_pagesetuporientationDEFAULT = 0;
@@ -966,9 +978,55 @@ var c_oseralternatecontentchoiceREQUIRES = 1;
 
 var c_oseralternatecontentfallbackSTYLE = 0;
 
+var SIZE_REPRESENTS_AREA = 0;
+var SIZE_REPRESENTS_W = 1;
+
+var ERR_BAR_TYPE_BOTH = 0;
+var ERR_BAR_TYPE_MINUS = 1;
+var ERR_BAR_TYPE_PLUS = 2;
+
+var ERR_DIR_X = 0;
+var ERR_DIR_Y = 1;
+
+var ERR_VAL_TYPE_CUST = 0;
+var ERR_VAL_TYPE_FIXED_VAL = 1;
+var ERR_VAL_TYPE_PERCENTAGE = 2;
+var ERR_VAL_TYPE_STD_DEV = 3;
+var ERR_VAL_TYPE_STD_ERR = 4;
+
+var LAYOUT_TARGET_INNER = 0;
+var LAYOUT_TARGET_OUTER = 1;
+
+var LAYOUT_MODE_EDGE = 0;
+var LAYOUT_MODE_FACTOR = 1;
+
+var OF_PIE_TYPE_BAR = 0;
+var OF_PIE_TYPE_PIE = 1;
+
+var SPLIT_TYPE_AUTO = 0;
+var SPLIT_TYPE_CUST = 1;
+var SPLIT_TYPE_PERCENT = 2;
+var SPLIT_TYPE_POS = 3;
+var SPLIT_TYPE_VAL = 4;
+
+var PICTURE_FORMAT_STACK = 0;
+var PICTURE_FORMAT_STACK_SCALE = 1;
+var PICTURE_FORMAT_STACK_STRETCH = 2;
+
+var RADAR_STYLE_STANDARD = 0;
+var RADAR_STYLE_MARKER = 1;
+var RADAR_STYLE_FILLED = 2;
+
+var TRENDLINE_TYPE_EXP = 0;
+var TRENDLINE_TYPE_LINEAR = 1;
+var TRENDLINE_TYPE_LOG = 2;
+var TRENDLINE_TYPE_MOVING_AVG = 3;
+var TRENDLINE_TYPE_POLY = 4;
+var TRENDLINE_TYPE_POWER = 5;
+
 function BinaryChartWriter(memory) {
     this.memory = memory;
-    this.bs = new BinaryCommonWriter(this.memory);
+    this.bs = new AscCommon.BinaryCommonWriter(this.memory);
 }
 BinaryChartWriter.prototype.WriteCT_extLst = function (oVal) {
     var oThis = this;
@@ -1073,13 +1131,13 @@ BinaryChartWriter.prototype.WriteCT_ChartSpace = function (oVal) {
     // });
     // }
     if (null != oVal.themeOverride)
-	    this.bs.WriteItem(c_oserct_chartspaceTHEMEOVERRIDE, function () { window.global_pptx_content_writer.WriteTheme(oThis.memory, oVal.themeOverride); });
+	    this.bs.WriteItem(c_oserct_chartspaceTHEMEOVERRIDE, function () { AscCommon.pptx_content_writer.WriteTheme(oThis.memory, oVal.themeOverride); });
 }
 BinaryChartWriter.prototype.WriteSpPr = function (oVal) {
-    window.global_pptx_content_writer.WriteSpPr(this.memory, oVal);
+  AscCommon.pptx_content_writer.WriteSpPr(this.memory, oVal);
 }
 BinaryChartWriter.prototype.WriteTxPr = function (oVal) {
-    window.global_pptx_content_writer.WriteTextBody(this.memory, oVal);
+  AscCommon.pptx_content_writer.WriteTextBody(this.memory, oVal);
 }
 BinaryChartWriter.prototype.percentToString = function (val, bInteger, bSign) {
     var sRes;
@@ -1143,9 +1201,9 @@ BinaryChartWriter.prototype.WriteCT_PageSetup = function (oVal) {
     if (null != oVal.orientation) {
         var nVal = null;
         switch (oVal.orientation) {
-            case PAGE_SETUP_ORIENTATION_DEFAULT: nVal = st_pagesetuporientationDEFAULT; break;
-            case PAGE_SETUP_ORIENTATION_PORTRAIT: nVal = st_pagesetuporientationPORTRAIT; break;
-            case PAGE_SETUP_ORIENTATION_LANDSCAPE: nVal = st_pagesetuporientationLANDSCAPE; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_DEFAULT: nVal = st_pagesetuporientationDEFAULT; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_PORTRAIT: nVal = st_pagesetuporientationPORTRAIT; break;
+            case AscFormat.PAGE_SETUP_ORIENTATION_LANDSCAPE: nVal = st_pagesetuporientationLANDSCAPE; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_pagesetupORIENTATION, function () {
@@ -1304,9 +1362,9 @@ BinaryChartWriter.prototype.WriteCT_DispBlanksAs = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case DISP_BLANKS_AS_SPAN: nVal = st_dispblanksasSPAN; break;
-            case DISP_BLANKS_AS_GAP: nVal = st_dispblanksasGAP; break;
-            case DISP_BLANKS_AS_ZERO: nVal = st_dispblanksasZERO; break;
+            case AscFormat.DISP_BLANKS_AS_SPAN: nVal = st_dispblanksasSPAN; break;
+            case AscFormat.DISP_BLANKS_AS_GAP: nVal = st_dispblanksasGAP; break;
+            case AscFormat.DISP_BLANKS_AS_ZERO: nVal = st_dispblanksasZERO; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_dispblanksasVAL, function () {
@@ -1367,11 +1425,15 @@ BinaryChartWriter.prototype.WriteCT_LegendPos = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case LEGEND_POS_B: nVal = st_legendposB; break;
-            case LEGEND_POS_TR: nVal = st_legendposTR; break;
-            case LEGEND_POS_L: nVal = st_legendposL; break;
-            case LEGEND_POS_R: nVal = st_legendposR; break;
-            case LEGEND_POS_T: nVal = st_legendposT; break;
+            case c_oAscChartLegendShowSettings.bottom: nVal = st_legendposB; break;
+            case c_oAscChartLegendShowSettings.topRight: nVal = st_legendposTR; break;
+            case c_oAscChartLegendShowSettings.left:
+            case c_oAscChartLegendShowSettings.leftOverlay:
+              nVal = st_legendposL; break;
+            case c_oAscChartLegendShowSettings.right:
+            case c_oAscChartLegendShowSettings.rightOverlay:
+              nVal = st_legendposR; break;
+            case c_oAscChartLegendShowSettings.top: nVal = st_legendposT; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_legendposVAL, function () {
@@ -1708,8 +1770,8 @@ BinaryChartWriter.prototype.WriteCT_Orientation = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case ORIENTATION_MAX_MIN: nVal = st_orientationMAXMIN; break;
-            case ORIENTATION_MIN_MAX: nVal = st_orientationMINMAX; break;
+            case AscFormat.ORIENTATION_MAX_MIN: nVal = st_orientationMAXMIN; break;
+            case AscFormat.ORIENTATION_MIN_MAX: nVal = st_orientationMINMAX; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_orientationVAL, function () {
@@ -1723,10 +1785,10 @@ BinaryChartWriter.prototype.WriteCT_AxPos = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case AX_POS_B: nVal = st_axposB; break;
-            case AX_POS_L: nVal = st_axposL; break;
-            case AX_POS_R: nVal = st_axposR; break;
-            case AX_POS_T: nVal = st_axposT; break;
+            case AscFormat.AX_POS_B: nVal = st_axposB; break;
+            case AscFormat.AX_POS_L: nVal = st_axposL; break;
+            case AscFormat.AX_POS_R: nVal = st_axposR; break;
+            case AscFormat.AX_POS_T: nVal = st_axposT; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_axposVAL, function () {
@@ -1862,10 +1924,10 @@ BinaryChartWriter.prototype.WriteCT_TickMark = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case TICK_MARK_CROSS: nVal = st_tickmarkCROSS; break;
-            case TICK_MARK_IN: nVal = st_tickmarkIN; break;
-            case TICK_MARK_NONE: nVal = st_tickmarkNONE; break;
-            case TICK_MARK_OUT: nVal = st_tickmarkOUT; break;
+            case c_oAscTickMark.TICK_MARK_CROSS: nVal = st_tickmarkCROSS; break;
+            case c_oAscTickMark.TICK_MARK_IN: nVal = st_tickmarkIN; break;
+            case c_oAscTickMark.TICK_MARK_NONE: nVal = st_tickmarkNONE; break;
+            case c_oAscTickMark.TICK_MARK_OUT: nVal = st_tickmarkOUT; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_tickmarkVAL, function () {
@@ -1879,10 +1941,10 @@ BinaryChartWriter.prototype.WriteCT_TickLblPos = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case TICK_LABEL_POSITION_HIGH: nVal = st_ticklblposHIGH; break;
-            case TICK_LABEL_POSITION_LOW: nVal = st_ticklblposLOW; break;
-            case TICK_LABEL_POSITION_NEXT_TO: nVal = st_ticklblposNEXTTO; break;
-            case TICK_LABEL_POSITION_NONE: nVal = st_ticklblposNONE; break;
+            case c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH: nVal = st_ticklblposHIGH; break;
+            case c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW: nVal = st_ticklblposLOW; break;
+            case c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO: nVal = st_ticklblposNEXTTO; break;
+            case c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE: nVal = st_ticklblposNONE; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_ticklblposVAL, function () {
@@ -1896,9 +1958,9 @@ BinaryChartWriter.prototype.WriteCT_Crosses = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case CROSSES_AUTO_ZERO: nVal = st_crossesAUTOZERO; break;
-            case CROSSES_MAX: nVal = st_crossesMAX; break;
-            case CROSSES_MIN: nVal = st_crossesMIN; break;
+            case AscFormat.CROSSES_AUTO_ZERO: nVal = st_crossesAUTOZERO; break;
+            case AscFormat.CROSSES_MAX: nVal = st_crossesMAX; break;
+            case AscFormat.CROSSES_MIN: nVal = st_crossesMIN; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_crossesVAL, function () {
@@ -1920,9 +1982,9 @@ BinaryChartWriter.prototype.WriteCT_TimeUnit = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case TIME_UNIT_DAYS: nVal = st_timeunitDAYS; break;
-            case TIME_UNIT_MONTHS: nVal = st_timeunitMONTHS; break;
-            case TIME_UNIT_YEARS: nVal = st_timeunitYEARS; break;
+            case AscFormat.TIME_UNIT_DAYS: nVal = st_timeunitDAYS; break;
+            case AscFormat.TIME_UNIT_MONTHS: nVal = st_timeunitMONTHS; break;
+            case AscFormat.TIME_UNIT_YEARS: nVal = st_timeunitYEARS; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_timeunitVAL, function () {
@@ -2076,9 +2138,9 @@ BinaryChartWriter.prototype.WriteCT_LblAlgn = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case LBL_ALG_CTR: nVal = st_lblalgnCTR; break;
-            case LBL_ALG_L: nVal = st_lblalgnL; break;
-            case LBL_ALG_R: nVal = st_lblalgnR; break;
+            case AscFormat.LBL_ALG_CTR: nVal = st_lblalgnCTR; break;
+            case AscFormat.LBL_ALG_L: nVal = st_lblalgnL; break;
+            case AscFormat.LBL_ALG_R: nVal = st_lblalgnR; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_lblalgnVAL, function () {
@@ -2233,15 +2295,15 @@ BinaryChartWriter.prototype.WriteCT_BuiltInUnit = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case BUILT_IN_UNIT_HUNDREDS: nVal = st_builtinunitHUNDREDS; break;
-            case BUILT_IN_UNIT_THOUSANDS: nVal = st_builtinunitTHOUSANDS; break;
-            case BUILT_IN_UNIT_TEN_THOUSANDS: nVal = st_builtinunitTENTHOUSANDS; break;
-            case BUILT_IN_UNIT_HUNDRED_THOUSANDS: nVal = st_builtinunitHUNDREDTHOUSANDS; break;
-            case BUILT_IN_UNIT_MILLIONS: nVal = st_builtinunitMILLIONS; break;
-            case BUILT_IN_UNIT_TEN_MILLIONS: nVal = st_builtinunitTENMILLIONS; break;
-            case BUILT_IN_UNIT_HUNDRED_MILLIONS: nVal = st_builtinunitHUNDREDMILLIONS; break;
-            case BUILT_IN_UNIT_BILLIONS: nVal = st_builtinunitBILLIONS; break;
-            case BUILT_IN_UNIT_TRILLIONS: nVal = st_builtinunitTRILLIONS; break;
+            case c_oAscValAxUnits.HUNDREDS: nVal = st_builtinunitHUNDREDS; break;
+            case c_oAscValAxUnits.THOUSANDS: nVal = st_builtinunitTHOUSANDS; break;
+            case c_oAscValAxUnits.TEN_THOUSANDS: nVal = st_builtinunitTENTHOUSANDS; break;
+            case c_oAscValAxUnits.HUNDRED_THOUSANDS: nVal = st_builtinunitHUNDREDTHOUSANDS; break;
+            case c_oAscValAxUnits.MILLIONS: nVal = st_builtinunitMILLIONS; break;
+            case c_oAscValAxUnits.TEN_MILLIONS: nVal = st_builtinunitTENMILLIONS; break;
+            case c_oAscValAxUnits.HUNDRED_MILLIONS: nVal = st_builtinunitHUNDREDMILLIONS; break;
+            case c_oAscValAxUnits.BILLIONS: nVal = st_builtinunitBILLIONS; break;
+            case c_oAscValAxUnits.TRILLIONS: nVal = st_builtinunitTRILLIONS; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_builtinunitVAL, function () {
@@ -2279,8 +2341,8 @@ BinaryChartWriter.prototype.WriteCT_CrossBetween = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case CROSS_BETWEEN_BETWEEN: nVal = st_crossbetweenBETWEEN; break;
-            case CROSS_BETWEEN_MID_CAT: nVal = st_crossbetweenMIDCAT; break;
+            case AscFormat.CROSS_BETWEEN_BETWEEN: nVal = st_crossbetweenBETWEEN; break;
+            case AscFormat.CROSS_BETWEEN_MID_CAT: nVal = st_crossbetweenMIDCAT; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_crossbetweenVAL, function () {
@@ -2588,17 +2650,17 @@ BinaryChartWriter.prototype.WriteCT_MarkerStyle = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case SYMBOL_CIRCLE: nVal = st_markerstyleCIRCLE; break;
-            case SYMBOL_DASH: nVal = st_markerstyleDASH; break;
-            case SYMBOL_DIAMOND: nVal = st_markerstyleDIAMOND; break;
-            case SYMBOL_DOT: nVal = st_markerstyleDOT; break;
-            case SYMBOL_NONE: nVal = st_markerstyleNONE; break;
-            case SYMBOL_PICTURE: nVal = st_markerstylePICTURE; break;
-            case SYMBOL_PLUS: nVal = st_markerstylePLUS; break;
-            case SYMBOL_SQUARE: nVal = st_markerstyleSQUARE; break;
-            case SYMBOL_STAR: nVal = st_markerstyleSTAR; break;
-            case SYMBOL_TRIANGLE: nVal = st_markerstyleTRIANGLE; break;
-            case SYMBOL_X: nVal = st_markerstyleX; break;
+            case AscFormat.SYMBOL_CIRCLE: nVal = st_markerstyleCIRCLE; break;
+            case AscFormat.SYMBOL_DASH: nVal = st_markerstyleDASH; break;
+            case AscFormat.SYMBOL_DIAMOND: nVal = st_markerstyleDIAMOND; break;
+            case AscFormat.SYMBOL_DOT: nVal = st_markerstyleDOT; break;
+            case AscFormat.SYMBOL_NONE: nVal = st_markerstyleNONE; break;
+            case AscFormat.SYMBOL_PICTURE: nVal = st_markerstylePICTURE; break;
+            case AscFormat.SYMBOL_PLUS: nVal = st_markerstylePLUS; break;
+            case AscFormat.SYMBOL_SQUARE: nVal = st_markerstyleSQUARE; break;
+            case AscFormat.SYMBOL_STAR: nVal = st_markerstyleSTAR; break;
+            case AscFormat.SYMBOL_TRIANGLE: nVal = st_markerstyleTRIANGLE; break;
+            case AscFormat.SYMBOL_X: nVal = st_markerstyleX; break;
             // case : nVal = st_markerstyleAUTO; break;
         }
         if (null != nVal) {
@@ -2844,15 +2906,15 @@ BinaryChartWriter.prototype.WriteCT_DLblPos = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case DLBL_POS_BEST_FIT: nVal = st_dlblposBESTFIT; break;
-            case DLBL_POS_B: nVal = st_dlblposB; break;
-            case DLBL_POS_CTR: nVal = st_dlblposCTR; break;
-            case DLBL_POS_IN_BASE: nVal = st_dlblposINBASE; break;
-            case DLBL_POS_IN_END: nVal = st_dlblposINEND; break;
-            case DLBL_POS_L: nVal = st_dlblposL; break;
-            case DLBL_POS_OUT_END: nVal = st_dlblposOUTEND; break;
-            case DLBL_POS_R: nVal = st_dlblposR; break;
-            case DLBL_POS_T: nVal = st_dlblposT; break;
+            case c_oAscChartDataLabelsPos.bestFit: nVal = st_dlblposBESTFIT; break;
+            case c_oAscChartDataLabelsPos.b: nVal = st_dlblposB; break;
+            case c_oAscChartDataLabelsPos.ctr: nVal = st_dlblposCTR; break;
+            case c_oAscChartDataLabelsPos.inBase: nVal = st_dlblposINBASE; break;
+            case c_oAscChartDataLabelsPos.inEnd: nVal = st_dlblposINEND; break;
+            case c_oAscChartDataLabelsPos.l: nVal = st_dlblposL; break;
+            case c_oAscChartDataLabelsPos.outEnd: nVal = st_dlblposOUTEND; break;
+            case c_oAscChartDataLabelsPos.r: nVal = st_dlblposR; break;
+            case c_oAscChartDataLabelsPos.t: nVal = st_dlblposT; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_dlblposVAL, function () {
@@ -3706,8 +3768,8 @@ BinaryChartWriter.prototype.WriteCT_BarDir = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case BAR_DIR_BAR: nVal = st_bardirBAR; break;
-            case BAR_DIR_COL: nVal = st_bardirCOL; break;
+            case AscFormat.BAR_DIR_BAR: nVal = st_bardirBAR; break;
+            case AscFormat.BAR_DIR_COL: nVal = st_bardirCOL; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_bardirVAL, function () {
@@ -3721,10 +3783,10 @@ BinaryChartWriter.prototype.WriteCT_BarGrouping = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case BAR_GROUPING_PERCENT_STACKED: nVal = st_bargroupingPERCENTSTACKED; break;
-            case BAR_GROUPING_CLUSTERED: nVal = st_bargroupingCLUSTERED; break;
-            case BAR_GROUPING_STANDARD: nVal = st_bargroupingSTANDARD; break;
-            case BAR_GROUPING_STACKED: nVal = st_bargroupingSTACKED; break;
+            case AscFormat.BAR_GROUPING_PERCENT_STACKED: nVal = st_bargroupingPERCENTSTACKED; break;
+            case AscFormat.BAR_GROUPING_CLUSTERED: nVal = st_bargroupingCLUSTERED; break;
+            case AscFormat.BAR_GROUPING_STANDARD: nVal = st_bargroupingSTANDARD; break;
+            case AscFormat.BAR_GROUPING_STACKED: nVal = st_bargroupingSTACKED; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_bargroupingVAL, function () {
@@ -3818,12 +3880,12 @@ BinaryChartWriter.prototype.WriteCT_Shape = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case BAR_SHAPE_CONE: nVal = st_shapeCONE; break;
-            case BAR_SHAPE_CONETOMAX: nVal = st_shapeCONETOMAX; break;
-            case BAR_SHAPE_BOX: nVal = st_shapeBOX; break;
-            case BAR_SHAPE_CYLINDER: nVal = st_shapeCYLINDER; break;
-            case BAR_SHAPE_PYRAMID: nVal = st_shapePYRAMID; break;
-            case BAR_SHAPE_PYRAMIDTOMAX: nVal = st_shapePYRAMIDTOMAX; break;
+            case AscFormat.BAR_SHAPE_CONE: nVal = st_shapeCONE; break;
+            case AscFormat.BAR_SHAPE_CONETOMAX: nVal = st_shapeCONETOMAX; break;
+            case AscFormat.BAR_SHAPE_BOX: nVal = st_shapeBOX; break;
+            case AscFormat.BAR_SHAPE_CYLINDER: nVal = st_shapeCYLINDER; break;
+            case AscFormat.BAR_SHAPE_PYRAMID: nVal = st_shapePYRAMID; break;
+            case AscFormat.BAR_SHAPE_PYRAMIDTOMAX: nVal = st_shapePYRAMIDTOMAX; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_shapeVAL, function () {
@@ -4104,12 +4166,12 @@ BinaryChartWriter.prototype.WriteCT_ScatterStyle = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case SCATTER_STYLE_NONE: nVal = st_scatterstyleNONE; break;
-            case SCATTER_STYLE_LINE: nVal = st_scatterstyleLINE; break;
-            case SCATTER_STYLE_LINE_MARKER: nVal = st_scatterstyleLINEMARKER; break;
-            case SCATTER_STYLE_MARKER: nVal = st_scatterstyleMARKER; break;
-            case SCATTER_STYLE_SMOOTH: nVal = st_scatterstyleSMOOTH; break;
-            case SCATTER_STYLE_SMOOTH_MARKER: nVal = st_scatterstyleSMOOTHMARKER; break;
+            case AscFormat.SCATTER_STYLE_NONE: nVal = st_scatterstyleNONE; break;
+            case AscFormat.SCATTER_STYLE_LINE: nVal = st_scatterstyleLINE; break;
+            case AscFormat.SCATTER_STYLE_LINE_MARKER: nVal = st_scatterstyleLINEMARKER; break;
+            case AscFormat.SCATTER_STYLE_MARKER: nVal = st_scatterstyleMARKER; break;
+            case AscFormat.SCATTER_STYLE_SMOOTH: nVal = st_scatterstyleSMOOTH; break;
+            case AscFormat.SCATTER_STYLE_SMOOTH_MARKER: nVal = st_scatterstyleSMOOTHMARKER; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_scatterstyleVAL, function () {
@@ -4496,9 +4558,9 @@ BinaryChartWriter.prototype.WriteCT_Grouping = function (oVal) {
     if (null != oVal) {
         var nVal = null;
         switch (oVal) {
-            case GROUPING_PERCENT_STACKED: nVal = st_groupingPERCENTSTACKED; break;
-            case GROUPING_STANDARD: nVal = st_groupingSTANDARD; break;
-            case GROUPING_STACKED: nVal = st_groupingSTACKED; break;
+            case AscFormat.GROUPING_PERCENT_STACKED: nVal = st_groupingPERCENTSTACKED; break;
+            case AscFormat.GROUPING_STANDARD: nVal = st_groupingSTANDARD; break;
+            case AscFormat.GROUPING_STACKED: nVal = st_groupingSTACKED; break;
         }
         if (null != nVal) {
             this.bs.WriteItem(c_oserct_groupingVAL, function () {
@@ -4757,7 +4819,7 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
     });
     for (var i = 0, length = oVal.charts.length; i < length; ++i) {
         var chart = oVal.charts[i];
-        if (chart instanceof CAreaChart) {
+        if (chart instanceof AscFormat.CAreaChart) {
             this.bs.WriteItem(c_oserct_plotareaAREACHART, function () {
                 oThis.WriteCT_AreaChart(chart);
             });
@@ -4768,7 +4830,7 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
         // oThis.WriteCT_Area3DChart(chart);
         // });
         // }
-        else if (chart instanceof CBarChart) {
+        else if (chart instanceof AscFormat.CBarChart) {
             if(chart.b3D){
                 this.bs.WriteItem(c_oserct_plotareaBAR3DCHART, function () {
                     oThis.WriteCT_Bar3DChart(chart);
@@ -4780,17 +4842,17 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
                 });
             }
         }
-        else if (chart instanceof CBubbleChart) {
+        else if (chart instanceof AscFormat.CBubbleChart) {
             this.bs.WriteItem(c_oserct_plotareaBUBBLECHART, function () {
                 oThis.WriteCT_BubbleChart(chart);
             });
         }
-        else if (chart instanceof CDoughnutChart) {
+        else if (chart instanceof AscFormat.CDoughnutChart) {
             this.bs.WriteItem(c_oserct_plotareaDOUGHNUTCHART, function () {
                 oThis.WriteCT_DoughnutChart(chart);
             });
         }
-        else if (chart instanceof CLineChart) {
+        else if (chart instanceof AscFormat.CLineChart) {
             if(!oChart.view3D) {
                 this.bs.WriteItem(c_oserct_plotareaLINECHART, function () {
                     oThis.WriteCT_LineChart(chart);
@@ -4808,12 +4870,12 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
         // oThis.WriteCT_Line3DChart(chart);
         // });
         // }
-        else if (chart instanceof COfPieChart) {
+        else if (chart instanceof AscFormat.COfPieChart) {
             this.bs.WriteItem(c_oserct_plotareaOFPIECHART, function () {
                 oThis.WriteCT_OfPieChart(chart);
             });
         }
-        else if (chart instanceof CPieChart) {
+        else if (chart instanceof AscFormat.CPieChart) {
             if(!oChart.view3D) {
                 this.bs.WriteItem(c_oserct_plotareaPIECHART, function () {
                     oThis.WriteCT_PieChart(chart);
@@ -4831,22 +4893,22 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
         // oThis.WriteCT_Pie3DChart(chart);
         // });
         // }
-        else if (chart instanceof CRadarChart) {
+        else if (chart instanceof AscFormat.CRadarChart) {
             this.bs.WriteItem(c_oserct_plotareaRADARCHART, function () {
                 oThis.WriteCT_RadarChart(chart);
             });
         }
-        else if (chart instanceof CScatterChart) {
+        else if (chart instanceof AscFormat.CScatterChart) {
             this.bs.WriteItem(c_oserct_plotareaSCATTERCHART, function () {
                 oThis.WriteCT_ScatterChart(chart);
             });
         }
-        else if (chart instanceof CStockChart) {
+        else if (chart instanceof AscFormat.CStockChart) {
             this.bs.WriteItem(c_oserct_plotareaSTOCKCHART, function () {
                 oThis.WriteCT_StockChart(chart);
             });
         }
-        else if (chart instanceof CSurfaceChart) {
+        else if (chart instanceof AscFormat.CSurfaceChart) {
             this.bs.WriteItem(c_oserct_plotareaSURFACECHART, function () {
                 oThis.WriteCT_SurfaceChart(chart);
             });
@@ -4860,22 +4922,22 @@ BinaryChartWriter.prototype.WriteCT_PlotArea = function (oVal, oChart) {
     }
     for (var i = 0, length = oVal.axId.length; i < length; ++i) {
         var axis = oVal.axId[i];
-        if (axis instanceof CCatAx) {
+        if (axis instanceof AscFormat.CCatAx) {
             this.bs.WriteItem(c_oserct_plotareaCATAX, function () {
                 oThis.WriteCT_CatAx(axis);
             });
         }
-        else if (axis instanceof CValAx) {
+        else if (axis instanceof AscFormat.CValAx) {
             this.bs.WriteItem(c_oserct_plotareaVALAX, function () {
                 oThis.WriteCT_ValAx(axis);
             });
         }
-        else if (axis instanceof CDateAx) {
+        else if (axis instanceof AscFormat.CDateAx) {
             this.bs.WriteItem(c_oserct_plotareaDATEAX, function () {
                 oThis.WriteCT_DateAx(axis);
             });
         }
-        else if (axis instanceof CSerAx) {
+        else if (axis instanceof AscFormat.CSerAx) {
             this.bs.WriteItem(c_oserct_plotareaSERAX, function () {
                 oThis.WriteCT_SerAx(axis);
             });
@@ -5246,7 +5308,7 @@ BinaryChartWriter.prototype.WriteAlternateContentFallback = function (oVal) {
 }
 function BinaryChartReader(stream) {
     this.stream = stream;
-    this.bcr = new Binary_CommonReader(this.stream);
+    this.bcr = new AscCommon.Binary_CommonReader(this.stream);
 }
 BinaryChartReader.prototype.ReadCT_extLst = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
@@ -5330,21 +5392,21 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
         val.setClrMapOvr(this.ReadClrOverride(length));
     }
     else if (c_oserct_chartspacePIVOTSOURCE === type) {
-        var oNewVal = new CPivotSource();
+        var oNewVal = new AscFormat.CPivotSource();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PivotSource(t, l, oNewVal);
         });
         val.setPivotSource(oNewVal);
     }
     else if (c_oserct_chartspacePROTECTION === type) {
-        var oNewVal = new CProtection();
+        var oNewVal = new AscFormat.CProtection();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Protection(t, l, oNewVal);
         });
         val.setProtection(oNewVal);
     }
     else if (c_oserct_chartspaceCHART === type) {
-        var oNewVal = new CChart();
+        var oNewVal = new AscFormat.CChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Chart(t, l, oNewVal);
         });
@@ -5367,7 +5429,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
     //    val.m_externalData = oNewVal;
     //}
     else if (c_oserct_chartspacePRINTSETTINGS === type) {
-        var oNewVal = new CPrintSettings();
+        var oNewVal = new AscFormat.CPrintSettings();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PrintSettings(t, l, oNewVal);
         });
@@ -5390,7 +5452,7 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
         // val.m_extLst = oNewVal;
     }
     else if (c_oserct_chartspaceTHEMEOVERRIDE === type) {
-        var theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+        var theme = AscCommon.pptx_content_loader.ReadTheme(this, this.stream);
         if (null != theme)
             val.setThemeOverride(theme);
         res = c_oSerConstants.ReadUnknown;
@@ -5400,14 +5462,14 @@ BinaryChartReader.prototype.ReadCT_ChartSpace = function (type, length, val, cur
     return res;
 }
 BinaryChartReader.prototype.ReadSpPr = function (length) {
-    return window.global_pptx_content_loader.ReadShapeProperty(this.stream);
+    return AscCommon.pptx_content_loader.ReadShapeProperty(this.stream);
 }
 
 BinaryChartReader.prototype.ReadClrOverride = function(lenght)
 {
-    var loader = new BinaryPPTYLoader();
+    var loader = new AscCommon.BinaryPPTYLoader();
 
-    loader.stream = new FileStream();
+    loader.stream = new AscCommon.FileStream();
     loader.stream.obj    = this.stream.obj;
     loader.stream.data   = this.stream.data;
     loader.stream.size   = this.stream.size;
@@ -5417,7 +5479,7 @@ BinaryChartReader.prototype.ReadClrOverride = function(lenght)
     var s = loader.stream;
     var _main_type = s.GetUChar(); // 0!!!
 
-    var clr_map =  new ClrMap();
+    var clr_map =  new AscFormat.ClrMap();
     loader.ReadClrMap(clr_map);
 
     this.stream.pos = s.pos;
@@ -5428,7 +5490,7 @@ BinaryChartReader.prototype.ReadClrOverride = function(lenght)
 
 BinaryChartReader.prototype.ReadTxPr = function (length) {
     var cur = this.stream.cur;
-    var ret = window.global_pptx_content_loader.ReadTextBody(null, this.stream, null, this.curWorksheet);
+    var ret = AscCommon.pptx_content_loader.ReadTextBody(null, this.stream, null, this.curWorksheet);
     this.stream.cur = cur + length;
     return ret;
 }
@@ -5457,12 +5519,12 @@ BinaryChartReader.prototype.ParseMetric = function (val) {
     return nRes;
 }
 BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface, aChartWithAxis) {
-    var oLine = new CLineChart();
-    oLine.setGrouping(GROUPING_STANDARD);
+    var oLine = new AscFormat.CLineChart();
+    oLine.setGrouping(AscFormat.GROUPING_STANDARD);
     oLine.setVaryColors(false);
     for (var i = 0, length = oSurface.series.length; i < length; ++i) {
         var surfaceSer = oSurface.series[i];
-        var lineSer = new CLineSeries();
+        var lineSer = new AscFormat.CLineSeries();
         if (null != surfaceSer.idx)
             lineSer.setIdx(surfaceSer.idx);
         if (null != surfaceSer.order)
@@ -5475,13 +5537,13 @@ BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface, aChartWit
             lineSer.setCat(surfaceSer.cat);
         if (null != surfaceSer.val)
             lineSer.setVal(surfaceSer.val);
-        var marker = new CMarker();
-        marker.setSymbol(SYMBOL_NONE);
+        var marker = new AscFormat.CMarker();
+        marker.setSymbol(AscFormat.SYMBOL_NONE);
         lineSer.setMarker(marker);
         lineSer.setSmooth(false);
         oLine.addSer(lineSer);
     }
-    var dLbls = new CDLbls();
+    var dLbls = new AscFormat.CDLbls();
     dLbls.setShowLegendKey(false);
     dLbls.setShowVal(false);
     dLbls.setShowCatName(false);
@@ -5495,20 +5557,20 @@ BinaryChartReader.prototype.ConvertSurfaceToLine = function (oSurface, aChartWit
     return oLine;
 };
 BinaryChartReader.prototype.ConvertSurfaceValAxToLineValAx = function (oSurfaceValAx) {
-    oSurfaceValAx.setCrossBetween(CROSS_BETWEEN_BETWEEN);
-    oSurfaceValAx.setTickLblPos(TICK_LABEL_POSITION_NEXT_TO);
+    oSurfaceValAx.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
+    oSurfaceValAx.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO);
 }
 BinaryChartReader.prototype.ConvertRadarToLine = function (oRadar, aChartWithAxis) {
     var bMarkerNull = RADAR_STYLE_FILLED == oRadar.radarStyle;
-    var oLine = new CLineChart();
-    oLine.setGrouping(GROUPING_STANDARD);
+    var oLine = new AscFormat.CLineChart();
+    oLine.setGrouping(AscFormat.GROUPING_STANDARD);
     if (null != oRadar.varyColors)
         oLine.setVaryColors(oRadar.varyColors);
     if (null != oRadar.dLbls)
         oLine.setDLbls(oRadar.dLbls);
     for (var i = 0, length = oRadar.series.length; i < length; ++i) {
         var radarSer = oRadar.series[i];
-        var lineSer = new CLineSeries();
+        var lineSer = new AscFormat.CLineSeries();
         if (null != radarSer.idx)
             lineSer.setIdx(radarSer.idx);
         if (null != radarSer.order)
@@ -5520,8 +5582,8 @@ BinaryChartReader.prototype.ConvertRadarToLine = function (oRadar, aChartWithAxi
         if (null != radarSer.marker)
             lineSer.setMarker(radarSer.marker);
         else if(bMarkerNull){
-            var marker = new CMarker();
-            marker.setSymbol(SYMBOL_NONE);
+            var marker = new AscFormat.CMarker();
+            marker.setSymbol(AscFormat.SYMBOL_NONE);
             lineSer.setMarker(marker);
         }
         
@@ -5543,15 +5605,15 @@ BinaryChartReader.prototype.ConvertRadarToLine = function (oRadar, aChartWithAxi
     return oLine;
 };
 BinaryChartReader.prototype.ConvertBubbleToScatter = function (oBubble, aChartWithAxis) {
-    var oScatter = new CScatterChart();
-    oScatter.setScatterStyle(SCATTER_STYLE_LINE_MARKER);
+    var oScatter = new AscFormat.CScatterChart();
+    oScatter.setScatterStyle(AscFormat.SCATTER_STYLE_LINE_MARKER);
     if (null != oBubble.varyColors)
         oScatter.setVaryColors(oBubble.varyColors);
     if (null != oBubble.dLbls)
         oScatter.setDLbls(oBubble.dLbls);
     for (var i = 0, length = oBubble.series.length; i < length; ++i) {
         var bubbleSer = oBubble.series[i];
-        var scatterSer = new CScatterSeries();
+        var scatterSer = new AscFormat.CScatterSeries();
         if (null != bubbleSer.idx)
             scatterSer.setIdx(bubbleSer.idx);
         if (null != bubbleSer.order)
@@ -5573,11 +5635,11 @@ BinaryChartReader.prototype.ConvertBubbleToScatter = function (oBubble, aChartWi
             scatterSer.setXVal(bubbleSer.xVal);
         if (null != bubbleSer.yVal)
             scatterSer.setYVal(bubbleSer.yVal);
-        var spPr = new CSpPr();
-        var ln = new CLn();
+        var spPr = new AscFormat.CSpPr();
+        var ln = new AscFormat.CLn();
         ln.setW(28575);
-        var uni_fill = new CUniFill();
-        uni_fill.setFill(new CNoFill());
+        var uni_fill = new AscFormat.CUniFill();
+        uni_fill.setFill(new AscFormat.CNoFill());
         ln.setFill(uni_fill);
         spPr.setLn(ln);
         scatterSer.setSpPr(spPr);
@@ -5588,7 +5650,7 @@ BinaryChartReader.prototype.ConvertBubbleToScatter = function (oBubble, aChartWi
     return oScatter;
 };
 BinaryChartReader.prototype.ConvertOfPieToPie = function (oOfPie, aChartWithAxis) {
-    var oPie = new CPieChart();
+    var oPie = new AscFormat.CPieChart();
     if (null != oOfPie.varyColors)
         oPie.setVaryColors(oOfPie.varyColors);
     if (null != oOfPie.dLbls)
@@ -5661,9 +5723,9 @@ BinaryChartReader.prototype.ReadCT_PageSetup = function (type, length, val) {
     }
     else if (c_oserct_pagesetupORIENTATION === type) {
         switch (this.stream.GetUChar()) {
-            case st_pagesetuporientationDEFAULT: val.setOrientation(PAGE_SETUP_ORIENTATION_DEFAULT); break;
-            case st_pagesetuporientationPORTRAIT: val.setOrientation(PAGE_SETUP_ORIENTATION_PORTRAIT); break;
-            case st_pagesetuporientationLANDSCAPE: val.setOrientation(PAGE_SETUP_ORIENTATION_LANDSCAPE); break;
+            case st_pagesetuporientationDEFAULT: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_DEFAULT); break;
+            case st_pagesetuporientationPORTRAIT: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_PORTRAIT); break;
+            case st_pagesetuporientationLANDSCAPE: val.setOrientation(AscFormat.PAGE_SETUP_ORIENTATION_LANDSCAPE); break;
         }
     }
     else if (c_oserct_pagesetupBLACKANDWHITE === type) {
@@ -5751,21 +5813,21 @@ BinaryChartReader.prototype.ReadCT_PrintSettings = function (type, length, val) 
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_printsettingsHEADERFOOTER === type) {
-        var oNewVal = new CHeaderFooterChart();
+        var oNewVal = new AscFormat.CHeaderFooterChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_HeaderFooter(t, l, oNewVal);
         });
         val.setHeaderFooter(oNewVal);
     }
     else if (c_oserct_printsettingsPAGEMARGINS === type) {
-        var oNewVal = new CPageMarginsChart();
+        var oNewVal = new AscFormat.CPageMarginsChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PageMargins(t, l, oNewVal);
         });
         val.setPageMargins(oNewVal);
     }
     else if (c_oserct_printsettingsPAGESETUP === type) {
-        var oNewVal = new CPageSetup();
+        var oNewVal = new AscFormat.CPageSetup();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PageSetup(t, l, oNewVal);
         });
@@ -5801,9 +5863,9 @@ BinaryChartReader.prototype.ReadCT_DispBlanksAs = function (type, length, val) {
     var oThis = this;
     if (c_oserct_dispblanksasVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_dispblanksasSPAN: val.m_val = DISP_BLANKS_AS_SPAN; break;
-            case st_dispblanksasGAP: val.m_val = DISP_BLANKS_AS_GAP; break;
-            case st_dispblanksasZERO: val.m_val = DISP_BLANKS_AS_ZERO; break;
+            case st_dispblanksasSPAN: val.m_val = AscFormat.DISP_BLANKS_AS_SPAN; break;
+            case st_dispblanksasGAP: val.m_val = AscFormat.DISP_BLANKS_AS_GAP; break;
+            case st_dispblanksasZERO: val.m_val = AscFormat.DISP_BLANKS_AS_ZERO; break;
         }
     }
     else
@@ -5879,11 +5941,11 @@ BinaryChartReader.prototype.ReadCT_LegendPos = function (type, length, val) {
     var oThis = this;
     if (c_oserct_legendposVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_legendposB: val.m_val = LEGEND_POS_B; break;
-            case st_legendposTR: val.m_val = LEGEND_POS_TR; break;
-            case st_legendposL: val.m_val = LEGEND_POS_L; break;
-            case st_legendposR: val.m_val = LEGEND_POS_R; break;
-            case st_legendposT: val.m_val = LEGEND_POS_T; break;
+            case st_legendposB: val.m_val = c_oAscChartLegendShowSettings.bottom; break;
+            case st_legendposTR: val.m_val = c_oAscChartLegendShowSettings.topRight; break;
+            case st_legendposL: val.m_val = c_oAscChartLegendShowSettings.left; break;
+            case st_legendposR: val.m_val = c_oAscChartLegendShowSettings.right; break;
+            case st_legendposT: val.m_val = c_oAscChartLegendShowSettings.top; break;
         }
     }
     else
@@ -5902,7 +5964,7 @@ BinaryChartReader.prototype.ReadCT_Legend = function (type, length, val) {
             val.setLegendPos(oNewVal.m_val);
     }
     else if (c_oserct_legendLEGENDENTRY === type) {
-        var oNewVal = new CLegendEntry();
+        var oNewVal = new AscFormat.CLegendEntry();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LegendEntry(t, l, oNewVal);
         });
@@ -5944,7 +6006,7 @@ BinaryChartReader.prototype.ReadCT_Layout = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_layoutMANUALLAYOUT === type) {
-        var oNewVal = new CLayout();
+        var oNewVal = new AscFormat.CLayout();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ManualLayout(t, l, oNewVal);
         });
@@ -6153,7 +6215,7 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
             val.setAxId(oNewVal.m_val);
     }
     else if (c_oserct_seraxSCALING === type) {
-        var oNewVal = new CScaling();
+        var oNewVal = new AscFormat.CScaling();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Scaling(t, l, oNewVal);
         });
@@ -6183,7 +6245,7 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMajorGridlines(oNewVal.spPr);
         else
-            val.setMajorGridlines(new CSpPr());
+            val.setMajorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_seraxMINORGRIDLINES === type) {
         var oNewVal = { spPr: null };
@@ -6193,21 +6255,21 @@ BinaryChartReader.prototype.ReadCT_SerAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMinorGridlines(oNewVal.spPr);
         else
-            val.setMinorGridlines(new CSpPr());
+            val.setMinorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_seraxTITLE === type) {
-        var oNewVal = new CTitle();
+        var oNewVal = new AscFormat.CTitle();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
-        if(!isRealBool(oNewVal.overlay))
+        if(!AscFormat.isRealBool(oNewVal.overlay))
         {
             oNewVal.setOverlay(false);
         }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_seraxNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -6363,8 +6425,8 @@ BinaryChartReader.prototype.ReadCT_Orientation = function (type, length, val) {
     var oThis = this;
     if (c_oserct_orientationVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_orientationMAXMIN: val.m_val = ORIENTATION_MAX_MIN; break;
-            case st_orientationMINMAX: val.m_val = ORIENTATION_MIN_MAX; break;
+            case st_orientationMAXMIN: val.m_val = AscFormat.ORIENTATION_MAX_MIN; break;
+            case st_orientationMINMAX: val.m_val = AscFormat.ORIENTATION_MIN_MAX; break;
         }
     }
     else
@@ -6376,10 +6438,10 @@ BinaryChartReader.prototype.ReadCT_AxPos = function (type, length, val) {
     var oThis = this;
     if (c_oserct_axposVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_axposB: val.m_val = AX_POS_B; break;
-            case st_axposL: val.m_val = AX_POS_L; break;
-            case st_axposR: val.m_val = AX_POS_R; break;
-            case st_axposT: val.m_val = AX_POS_T; break;
+            case st_axposB: val.m_val = AscFormat.AX_POS_B; break;
+            case st_axposL: val.m_val = AscFormat.AX_POS_L; break;
+            case st_axposR: val.m_val = AscFormat.AX_POS_R; break;
+            case st_axposT: val.m_val = AscFormat.AX_POS_T; break;
         }
     }
     else
@@ -6400,7 +6462,7 @@ BinaryChartReader.prototype.ReadCT_Title = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_titleTX === type) {
-        var oNewVal = new CChartText();
+        var oNewVal = new AscFormat.CChartText();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Tx(t, l, oNewVal);
         });
@@ -6447,7 +6509,7 @@ BinaryChartReader.prototype.ReadCT_Tx = function (type, length, val) {
         val.rich.setParent(val);
     }
     else if (c_oserct_txSTRREF === type) {
-        var oNewVal = new CStrRef();
+        var oNewVal = new AscFormat.CStrRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrRef(t, l, oNewVal);
         });
@@ -6464,7 +6526,7 @@ BinaryChartReader.prototype.ReadCT_StrRef = function (type, length, val) {
         val.setF(this.stream.GetString2LE(length));
     }
     else if (c_oserct_strrefSTRCACHE === type) {
-        var oNewVal = new CStrCache();
+        var oNewVal = new AscFormat.CStrCache();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrData(t, l, oNewVal);
         });
@@ -6494,7 +6556,7 @@ BinaryChartReader.prototype.ReadCT_StrData = function (type, length, val) {
             val.setPtCount(oNewVal.m_val);
     }
     else if (c_oserct_strdataPT === type) {
-        var oNewVal = new CStringPoint();
+        var oNewVal = new AscFormat.CStringPoint();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrVal(t, l, oNewVal);
         });
@@ -6543,10 +6605,10 @@ BinaryChartReader.prototype.ReadCT_TickMark = function (type, length, val) {
     var oThis = this;
     if (c_oserct_tickmarkVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_tickmarkCROSS: val.m_val = TICK_MARK_CROSS; break;
-            case st_tickmarkIN: val.m_val = TICK_MARK_IN; break;
-            case st_tickmarkNONE: val.m_val = TICK_MARK_NONE; break;
-            case st_tickmarkOUT: val.m_val = TICK_MARK_OUT; break;
+            case st_tickmarkCROSS: val.m_val = c_oAscTickMark.TICK_MARK_CROSS; break;
+            case st_tickmarkIN: val.m_val = c_oAscTickMark.TICK_MARK_IN; break;
+            case st_tickmarkNONE: val.m_val = c_oAscTickMark.TICK_MARK_NONE; break;
+            case st_tickmarkOUT: val.m_val = c_oAscTickMark.TICK_MARK_OUT; break;
         }
     }
     else
@@ -6558,10 +6620,10 @@ BinaryChartReader.prototype.ReadCT_TickLblPos = function (type, length, val) {
     var oThis = this;
     if (c_oserct_ticklblposVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_ticklblposHIGH: val.m_val = TICK_LABEL_POSITION_HIGH; break;
-            case st_ticklblposLOW: val.m_val = TICK_LABEL_POSITION_LOW; break;
-            case st_ticklblposNEXTTO: val.m_val = TICK_LABEL_POSITION_NEXT_TO; break;
-            case st_ticklblposNONE: val.m_val = TICK_LABEL_POSITION_NONE; break;
+            case st_ticklblposHIGH: val.m_val = c_oAscTickLabelsPos.TICK_LABEL_POSITION_HIGH; break;
+            case st_ticklblposLOW: val.m_val = c_oAscTickLabelsPos.TICK_LABEL_POSITION_LOW; break;
+            case st_ticklblposNEXTTO: val.m_val = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NEXT_TO; break;
+            case st_ticklblposNONE: val.m_val = c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE; break;
         }
     }
     else
@@ -6573,9 +6635,9 @@ BinaryChartReader.prototype.ReadCT_Crosses = function (type, length, val) {
     var oThis = this;
     if (c_oserct_crossesVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_crossesAUTOZERO: val.m_val = CROSSES_AUTO_ZERO; break;
-            case st_crossesMAX: val.m_val = CROSSES_MAX; break;
-            case st_crossesMIN: val.m_val = CROSSES_MIN; break;
+            case st_crossesAUTOZERO: val.m_val = AscFormat.CROSSES_AUTO_ZERO; break;
+            case st_crossesMAX: val.m_val = AscFormat.CROSSES_MAX; break;
+            case st_crossesMIN: val.m_val = AscFormat.CROSSES_MIN; break;
         }
     }
     else
@@ -6599,9 +6661,9 @@ BinaryChartReader.prototype.ReadCT_TimeUnit = function (type, length, val) {
     var oThis = this;
     if (c_oserct_timeunitVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_timeunitDAYS: val.m_val = TIME_UNIT_DAYS; break;
-            case st_timeunitMONTHS: val.m_val = TIME_UNIT_MONTHS; break;
-            case st_timeunitYEARS: val.m_val = TIME_UNIT_YEARS; break;
+            case st_timeunitDAYS: val.m_val = AscFormat.TIME_UNIT_DAYS; break;
+            case st_timeunitMONTHS: val.m_val = AscFormat.TIME_UNIT_MONTHS; break;
+            case st_timeunitYEARS: val.m_val = AscFormat.TIME_UNIT_YEARS; break;
         }
     }
     else
@@ -6620,7 +6682,7 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
             val.setAxId(oNewVal.m_val);
     }
     else if (c_oserct_dateaxSCALING === type) {
-        var oNewVal = new CScaling();
+        var oNewVal = new AscFormat.CScaling();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Scaling(t, l, oNewVal);
         });
@@ -6650,7 +6712,7 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMajorGridlines(oNewVal.spPr);
         else
-            val.setMajorGridlines(new CSpPr());
+            val.setMajorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_dateaxMINORGRIDLINES === type) {
         var oNewVal = { spPr: null };
@@ -6660,21 +6722,21 @@ BinaryChartReader.prototype.ReadCT_DateAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMinorGridlines(oNewVal.spPr);
         else
-            val.setMinorGridlines(new CSpPr());
+            val.setMinorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_dateaxTITLE === type) {
-        var oNewVal = new CTitle();
+        var oNewVal = new AscFormat.CTitle();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
-        if(!isRealBool(oNewVal.overlay))
+        if(!AscFormat.isRealBool(oNewVal.overlay))
         {
             oNewVal.setOverlay(false);
         }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_dateaxNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -6833,9 +6895,9 @@ BinaryChartReader.prototype.ReadCT_LblAlgn = function (type, length, val) {
     var oThis = this;
     if (c_oserct_lblalgnVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_lblalgnCTR: val.m_val = LBL_ALG_CTR; break;
-            case st_lblalgnL: val.m_val = LBL_ALG_L; break;
-            case st_lblalgnR: val.m_val = LBL_ALG_R; break;
+            case st_lblalgnCTR: val.m_val = AscFormat.LBL_ALG_CTR; break;
+            case st_lblalgnL: val.m_val = AscFormat.LBL_ALG_L; break;
+            case st_lblalgnR: val.m_val = AscFormat.LBL_ALG_R; break;
         }
     }
     else
@@ -6854,7 +6916,7 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
             val.setAxId(oNewVal.m_val);
     }
     else if (c_oserct_cataxSCALING === type) {
-        var oNewVal = new CScaling();
+        var oNewVal = new AscFormat.CScaling();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Scaling(t, l, oNewVal);
         });
@@ -6884,7 +6946,7 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMajorGridlines(oNewVal.spPr);
         else
-            val.setMajorGridlines(new CSpPr());
+            val.setMajorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_cataxMINORGRIDLINES === type) {
         var oNewVal = { spPr: null };
@@ -6894,21 +6956,21 @@ BinaryChartReader.prototype.ReadCT_CatAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMinorGridlines(oNewVal.spPr);
         else
-            val.setMinorGridlines(new CSpPr());
+            val.setMinorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_cataxTITLE === type) {
-        var oNewVal = new CTitle();
+        var oNewVal = new AscFormat.CTitle();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
-        if(!isRealBool(oNewVal.overlay))
+        if(!AscFormat.isRealBool(oNewVal.overlay))
         {
             oNewVal.setOverlay(true);
         }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_cataxNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -7040,7 +7102,7 @@ BinaryChartReader.prototype.ReadCT_DispUnitsLbl = function (type, length, val) {
         });
     }
     else if (c_oserct_dispunitslblTX === type) {
-        var oNewVal = new CChartText();
+        var oNewVal = new AscFormat.CChartText();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Tx(t, l, oNewVal);
         });
@@ -7062,15 +7124,15 @@ BinaryChartReader.prototype.ReadCT_BuiltInUnit = function (type, length, val) {
     var oThis = this;
     if (c_oserct_builtinunitVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_builtinunitHUNDREDS: val.m_val = BUILT_IN_UNIT_HUNDREDS; break;
-            case st_builtinunitTHOUSANDS: val.m_val = BUILT_IN_UNIT_THOUSANDS; break;
-            case st_builtinunitTENTHOUSANDS: val.m_val = BUILT_IN_UNIT_TEN_THOUSANDS; break;
-            case st_builtinunitHUNDREDTHOUSANDS: val.m_val = BUILT_IN_UNIT_HUNDRED_THOUSANDS; break;
-            case st_builtinunitMILLIONS: val.m_val = BUILT_IN_UNIT_MILLIONS; break;
-            case st_builtinunitTENMILLIONS: val.m_val = BUILT_IN_UNIT_TEN_MILLIONS; break;
-            case st_builtinunitHUNDREDMILLIONS: val.m_val = BUILT_IN_UNIT_HUNDRED_MILLIONS; break;
-            case st_builtinunitBILLIONS: val.m_val = BUILT_IN_UNIT_BILLIONS; break;
-            case st_builtinunitTRILLIONS: val.m_val = BUILT_IN_UNIT_TRILLIONS; break;
+            case st_builtinunitHUNDREDS: val.m_val = c_oAscValAxUnits.HUNDREDS; break;
+            case st_builtinunitTHOUSANDS: val.m_val = c_oAscValAxUnits.THOUSANDS; break;
+            case st_builtinunitTENTHOUSANDS: val.m_val = c_oAscValAxUnits.TEN_THOUSANDS; break;
+            case st_builtinunitHUNDREDTHOUSANDS: val.m_val = c_oAscValAxUnits.HUNDRED_THOUSANDS; break;
+            case st_builtinunitMILLIONS: val.m_val = c_oAscValAxUnits.MILLIONS; break;
+            case st_builtinunitTENMILLIONS: val.m_val = c_oAscValAxUnits.TEN_MILLIONS; break;
+            case st_builtinunitHUNDREDMILLIONS: val.m_val = c_oAscValAxUnits.HUNDRED_MILLIONS; break;
+            case st_builtinunitBILLIONS: val.m_val = c_oAscValAxUnits.BILLIONS; break;
+            case st_builtinunitTRILLIONS: val.m_val = c_oAscValAxUnits.TRILLIONS; break;
         }
     }
     else
@@ -7097,7 +7159,7 @@ BinaryChartReader.prototype.ReadCT_DispUnits = function (type, length, val) {
             val.setCustUnit(oNewVal.m_val);
     }
     else if (c_oserct_dispunitsDISPUNITSLBL === type) {
-        var oNewVal = new CDLbl();
+        var oNewVal = new AscFormat.CDLbl();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DispUnitsLbl(t, l, oNewVal);
         });
@@ -7120,8 +7182,8 @@ BinaryChartReader.prototype.ReadCT_CrossBetween = function (type, length, val) {
     var oThis = this;
     if (c_oserct_crossbetweenVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_crossbetweenBETWEEN: val.m_val = CROSS_BETWEEN_BETWEEN; break;
-            case st_crossbetweenMIDCAT: val.m_val = CROSS_BETWEEN_MID_CAT; break;
+            case st_crossbetweenBETWEEN: val.m_val = AscFormat.CROSS_BETWEEN_BETWEEN; break;
+            case st_crossbetweenMIDCAT: val.m_val = AscFormat.CROSS_BETWEEN_MID_CAT; break;
         }
     }
     else
@@ -7140,7 +7202,7 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
             val.setAxId(oNewVal.m_val);
     }
     else if (c_oserct_valaxSCALING === type) {
-        var oNewVal = new CScaling();
+        var oNewVal = new AscFormat.CScaling();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Scaling(t, l, oNewVal);
         });
@@ -7170,7 +7232,7 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMajorGridlines(oNewVal.spPr);
         else
-            val.setMajorGridlines(new CSpPr());
+            val.setMajorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_valaxMINORGRIDLINES === type) {
         var oNewVal = { spPr: null };
@@ -7180,21 +7242,21 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setMinorGridlines(oNewVal.spPr);
         else
-            val.setMinorGridlines(new CSpPr());
+            val.setMinorGridlines(new AscFormat.CSpPr());
     }
     else if (c_oserct_valaxTITLE === type) {
-        var oNewVal = new CTitle();
+        var oNewVal = new AscFormat.CTitle();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
-        if(!isRealBool(oNewVal.overlay))
+        if(!AscFormat.isRealBool(oNewVal.overlay))
         {
             oNewVal.setOverlay(true);
         }
         val.setTitle(oNewVal);
     }
     else if (c_oserct_valaxNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -7282,7 +7344,7 @@ BinaryChartReader.prototype.ReadCT_ValAx = function (type, length, val) {
             val.setMinorUnit(oNewVal.m_val);
     }
     else if (c_oserct_valaxDISPUNITS === type) {
-        var oNewVal = new CDispUnits();
+        var oNewVal = new AscFormat.CDispUnits();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DispUnits(t, l, oNewVal);
         });
@@ -7343,7 +7405,7 @@ BinaryChartReader.prototype.ReadCT_BubbleSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_bubbleserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -7361,14 +7423,14 @@ BinaryChartReader.prototype.ReadCT_BubbleSer = function (type, length, val) {
             val.setInvertIfNegative(oNewVal.m_val);
     }
     else if (c_oserct_bubbleserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_bubbleserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -7376,7 +7438,7 @@ BinaryChartReader.prototype.ReadCT_BubbleSer = function (type, length, val) {
     }
     else if (c_oserct_bubbleserTRENDLINE === type) {
         //todo array
-        var oNewVal = new CTrendLine();
+        var oNewVal = new AscFormat.CTrendLine();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Trendline(t, l, oNewVal);
         });
@@ -7384,28 +7446,28 @@ BinaryChartReader.prototype.ReadCT_BubbleSer = function (type, length, val) {
     }
     else if (c_oserct_bubbleserERRBARS === type) {
         //todo array
-        var oNewVal = new CErrBars();
+        var oNewVal = new AscFormat.CErrBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ErrBars(t, l, oNewVal);
         });
         val.setErrBars(oNewVal);
     }
     else if (c_oserct_bubbleserXVAL === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setXVal(oNewVal);
     }
     else if (c_oserct_bubbleserYVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
         val.setYVal(oNewVal);
     }
     else if (c_oserct_bubbleserBUBBLESIZE === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -7435,7 +7497,7 @@ BinaryChartReader.prototype.ReadCT_SerTx = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_sertxSTRREF === type) {
-        var oNewVal = new CStrRef();
+        var oNewVal = new AscFormat.CStrRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrRef(t, l, oNewVal);
         });
@@ -7468,7 +7530,7 @@ BinaryChartReader.prototype.ReadCT_DPt = function (type, length, val) {
             val.setInvertIfNegative(oNewVal.m_val);
     }
     else if (c_oserct_dptMARKER === type) {
-        var oNewVal = new CMarker();
+        var oNewVal = new AscFormat.CMarker();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Marker(t, l, oNewVal);
         });
@@ -7494,7 +7556,7 @@ BinaryChartReader.prototype.ReadCT_DPt = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_dptPICTUREOPTIONS === type) {
-        var oNewVal = new CPictureOptions();
+        var oNewVal = new AscFormat.CPictureOptions();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PictureOptions(t, l, oNewVal);
         });
@@ -7551,17 +7613,17 @@ BinaryChartReader.prototype.ReadCT_MarkerStyle = function (type, length, val) {
     var oThis = this;
     if (c_oserct_markerstyleVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_markerstyleCIRCLE: val.m_val = SYMBOL_CIRCLE; break;
-            case st_markerstyleDASH: val.m_val = SYMBOL_DASH; break;
-            case st_markerstyleDIAMOND: val.m_val = SYMBOL_DIAMOND; break;
-            case st_markerstyleDOT: val.m_val = SYMBOL_DOT; break;
-            case st_markerstyleNONE: val.m_val = SYMBOL_NONE; break;
-            case st_markerstylePICTURE: val.m_val = SYMBOL_PICTURE; break;
-            case st_markerstylePLUS: val.m_val = SYMBOL_PLUS; break;
-            case st_markerstyleSQUARE: val.m_val = SYMBOL_SQUARE; break;
-            case st_markerstyleSTAR: val.m_val = SYMBOL_STAR; break;
-            case st_markerstyleTRIANGLE: val.m_val = SYMBOL_TRIANGLE; break;
-            case st_markerstyleX: val.m_val = SYMBOL_X; break;
+            case st_markerstyleCIRCLE: val.m_val = AscFormat.SYMBOL_CIRCLE; break;
+            case st_markerstyleDASH: val.m_val = AscFormat.SYMBOL_DASH; break;
+            case st_markerstyleDIAMOND: val.m_val = AscFormat.SYMBOL_DIAMOND; break;
+            case st_markerstyleDOT: val.m_val = AscFormat.SYMBOL_DOT; break;
+            case st_markerstyleNONE: val.m_val = AscFormat.SYMBOL_NONE; break;
+            case st_markerstylePICTURE: val.m_val = AscFormat.SYMBOL_PICTURE; break;
+            case st_markerstylePLUS: val.m_val = AscFormat.SYMBOL_PLUS; break;
+            case st_markerstyleSQUARE: val.m_val = AscFormat.SYMBOL_SQUARE; break;
+            case st_markerstyleSTAR: val.m_val = AscFormat.SYMBOL_STAR; break;
+            case st_markerstyleTRIANGLE: val.m_val = AscFormat.SYMBOL_TRIANGLE; break;
+            case st_markerstyleX: val.m_val = AscFormat.SYMBOL_X; break;
             case st_markerstyleAUTO: break;
         }
     }
@@ -7658,7 +7720,7 @@ BinaryChartReader.prototype.ReadCT_DLbls = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_dlblsDLBL === type) {
-        var oNewVal = new CDLbl();
+        var oNewVal = new AscFormat.CDLbl();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbl(t, l, oNewVal);
         });
@@ -7688,10 +7750,10 @@ BinaryChartReader.prototype.ReadCT_DLbls = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setLeaderLines(oNewVal.spPr);
         else
-            val.setLeaderLines(new CSpPr());
+            val.setLeaderLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_dlblsNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -7808,7 +7870,7 @@ BinaryChartReader.prototype.ReadCT_DLbl = function (type, length, val) {
         });
     }
     else if (c_oserct_dlblNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -7869,7 +7931,7 @@ BinaryChartReader.prototype.ReadCT_DLbl = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_dlblTX === type) {
-        var oNewVal = new CChartText();
+        var oNewVal = new AscFormat.CChartText();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Tx(t, l, oNewVal);
         });
@@ -7896,15 +7958,15 @@ BinaryChartReader.prototype.ReadCT_DLblPos = function (type, length, val) {
     var oThis = this;
     if (c_oserct_dlblposVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_dlblposBESTFIT: val.m_val = DLBL_POS_BEST_FIT; break;
-            case st_dlblposB: val.m_val = DLBL_POS_B; break;
-            case st_dlblposCTR: val.m_val = DLBL_POS_CTR; break;
-            case st_dlblposINBASE: val.m_val = DLBL_POS_IN_BASE; break;
-            case st_dlblposINEND: val.m_val = DLBL_POS_IN_END; break;
-            case st_dlblposL: val.m_val = DLBL_POS_L; break;
-            case st_dlblposOUTEND: val.m_val = DLBL_POS_OUT_END; break;
-            case st_dlblposR: val.m_val = DLBL_POS_R; break;
-            case st_dlblposT: val.m_val = DLBL_POS_T; break;
+            case st_dlblposBESTFIT: val.m_val = c_oAscChartDataLabelsPos.bestFit; break;
+            case st_dlblposB: val.m_val = c_oAscChartDataLabelsPos.b; break;
+            case st_dlblposCTR: val.m_val = c_oAscChartDataLabelsPos.ctr; break;
+            case st_dlblposINBASE: val.m_val = c_oAscChartDataLabelsPos.inBase; break;
+            case st_dlblposINEND: val.m_val = c_oAscChartDataLabelsPos.inEnd; break;
+            case st_dlblposL: val.m_val = c_oAscChartDataLabelsPos.l; break;
+            case st_dlblposOUTEND: val.m_val = c_oAscChartDataLabelsPos.outEnd; break;
+            case st_dlblposR: val.m_val = c_oAscChartDataLabelsPos.r; break;
+            case st_dlblposT: val.m_val = c_oAscChartDataLabelsPos.t; break;
         }
     }
     else
@@ -7985,7 +8047,7 @@ BinaryChartReader.prototype.ReadCT_Trendline = function (type, length, val) {
             val.setDispEq(oNewVal.m_val);
     }
     else if (c_oserct_trendlineTRENDLINELBL === type) {
-        var oNewVal = new CDLbl();
+        var oNewVal = new AscFormat.CDLbl();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_TrendlineLbl(t, l, oNewVal);
         });
@@ -8053,14 +8115,14 @@ BinaryChartReader.prototype.ReadCT_TrendlineLbl = function (type, length, val) {
         });
     }
     else if (c_oserct_trendlinelblTX === type) {
-        var oNewVal = new CChartText();
+        var oNewVal = new AscFormat.CChartText();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Tx(t, l, oNewVal);
         });
         val.setTx(oNewVal);
     }
     else if (c_oserct_trendlinelblNUMFMT === type) {
-        var oNewVal = new CNumFmt();
+        var oNewVal = new AscFormat.CNumFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumFmt(t, l, oNewVal);
         });
@@ -8121,14 +8183,14 @@ BinaryChartReader.prototype.ReadCT_ErrBars = function (type, length, val) {
             val.setNoEndCap(oNewVal.m_val);
     }
     else if (c_oserct_errbarsPLUS === type) {
-        var oNewVal = new CMinusPlus();
+        var oNewVal = new AscFormat.CMinusPlus();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
         val.setPlus(oNewVal);
     }
     else if (c_oserct_errbarsMINUS === type) {
-        var oNewVal = new CMinusPlus();;
+        var oNewVal = new AscFormat.CMinusPlus();;
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -8204,14 +8266,14 @@ BinaryChartReader.prototype.ReadCT_NumDataSource = function (type, length, val) 
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_numdatasourceNUMLIT === type) {
-        var oNewVal = new CNumLit();
+        var oNewVal = new AscFormat.CNumLit();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumData(t, l, oNewVal);
         });
         val.setNumLit(oNewVal);
     }
     else if (c_oserct_numdatasourceNUMREF === type) {
-        var oNewVal = new CNumRef();
+        var oNewVal = new AscFormat.CNumRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumRef(t, l, oNewVal);
         });
@@ -8236,7 +8298,7 @@ BinaryChartReader.prototype.ReadCT_NumData = function (type, length, val) {
             val.setPtCount(oNewVal.m_val);
     }
     else if (c_oserct_numdataPT === type) {
-        var oNewVal = new CNumericPoint();
+        var oNewVal = new AscFormat.CNumericPoint();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumVal(t, l, oNewVal);
         });
@@ -8280,7 +8342,7 @@ BinaryChartReader.prototype.ReadCT_NumRef = function (type, length, val) {
         val.setF(this.stream.GetString2LE(length));
     }
     else if (c_oserct_numrefNUMCACHE === type) {
-        var oNewVal = new CNumLit();
+        var oNewVal = new AscFormat.CNumLit();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumData(t, l, oNewVal);
         });
@@ -8301,35 +8363,35 @@ BinaryChartReader.prototype.ReadCT_AxDataSource = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_axdatasourceMULTILVLSTRREF === type) {
-        var oNewVal = new CMultiLvlStrRef();
+        var oNewVal = new AscFormat.CMultiLvlStrRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_MultiLvlStrRef(t, l, oNewVal);
         });
         val.setMultiLvlStrRef(oNewVal);
     }
     else if (c_oserct_axdatasourceNUMLIT === type) {
-        var oNewVal = new CNumLit();
+        var oNewVal = new AscFormat.CNumLit();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumData(t, l, oNewVal);
         });
         val.setNumLit(oNewVal);
     }
     else if (c_oserct_axdatasourceNUMREF === type) {
-        var oNewVal = new CNumRef();
+        var oNewVal = new AscFormat.CNumRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumRef(t, l, oNewVal);
         });
         val.setNumRef(oNewVal);
     }
     else if (c_oserct_axdatasourceSTRLIT === type) {
-        var oNewVal = new CStrCache();
+        var oNewVal = new AscFormat.CStrCache();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrData(t, l, oNewVal);
         });
         val.setStrLit(oNewVal);
     }
     else if (c_oserct_axdatasourceSTRREF === type) {
-        var oNewVal = new CStrRef();
+        var oNewVal = new AscFormat.CStrRef();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrRef(t, l, oNewVal);
         });
@@ -8346,7 +8408,7 @@ BinaryChartReader.prototype.ReadCT_MultiLvlStrRef = function (type, length, val)
         val.setF(this.stream.GetString2LE(length));
     }
     else if (c_oserct_multilvlstrrefMULTILVLSTRCACHE === type) {
-        var oNewVal = new CMultiLvlStrCache();
+        var oNewVal = new AscFormat.CMultiLvlStrCache();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_MultiLvlStrData(t, l, oNewVal);
         });
@@ -8368,7 +8430,7 @@ BinaryChartReader.prototype.ReadCT_lvl = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_lvlPT === type) {
-        var oNewVal = new CStringPoint();
+        var oNewVal = new AscFormat.CStringPoint();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StrVal(t, l, oNewVal);
         });
@@ -8423,14 +8485,14 @@ BinaryChartReader.prototype.ReadCT_BubbleChart = function (type, length, val, aC
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_bubblechartSER === type) {
-        var oNewVal = new CBubbleSeries();
+        var oNewVal = new AscFormat.CBubbleSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BubbleSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_bubblechartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -8491,7 +8553,7 @@ BinaryChartReader.prototype.ReadCT_bandFmts = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_bandfmtsBANDFMT === type) {
-        var oNewVal = new CBandFmt();
+        var oNewVal = new AscFormat.CBandFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BandFmt(t, l, oNewVal);
         });
@@ -8513,7 +8575,7 @@ BinaryChartReader.prototype.ReadCT_Surface3DChart = function (type, length, val,
             val.setWireframe(oNewVal.m_val);
     }
     else if (c_oserct_surface3dchartSER === type) {
-        var oNewVal = new CSurfaceSeries();
+        var oNewVal = new AscFormat.CSurfaceSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SurfaceSer(t, l, oNewVal);
         });
@@ -8563,7 +8625,7 @@ BinaryChartReader.prototype.ReadCT_SurfaceSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_surfaceserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -8573,14 +8635,14 @@ BinaryChartReader.prototype.ReadCT_SurfaceSer = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_surfaceserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_surfaceserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -8627,7 +8689,7 @@ BinaryChartReader.prototype.ReadCT_SurfaceChart = function (type, length, val, a
             val.setWireframe(oNewVal.m_val);
     }
     else if (c_oserct_surfacechartSER === type) {
-        var oNewVal = new CSurfaceSeries();
+        var oNewVal = new AscFormat.CSurfaceSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SurfaceSer(t, l, oNewVal);
         });
@@ -8732,14 +8794,14 @@ BinaryChartReader.prototype.ReadCT_OfPieChart = function (type, length, val, aCh
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_ofpiechartSER === type) {
-        var oNewVal = new CPieSeries();
+        var oNewVal = new AscFormat.CPieSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PieSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_ofpiechartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -8790,7 +8852,7 @@ BinaryChartReader.prototype.ReadCT_OfPieChart = function (type, length, val, aCh
         if (null != oNewVal.spPr)
             val.setSerLines(oNewVal.spPr);
         else
-            val.setSerLines(new CSpPr());
+            val.setSerLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_ofpiechartEXTLST === type) {
         var oNewVal;
@@ -8824,7 +8886,7 @@ BinaryChartReader.prototype.ReadCT_PieSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_pieserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -8842,28 +8904,28 @@ BinaryChartReader.prototype.ReadCT_PieSer = function (type, length, val) {
             val.setExplosion(oNewVal.m_val);
     }
     else if (c_oserct_pieserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_pieserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
         val.setDLbls(oNewVal);;
     }
     else if (c_oserct_pieserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_pieserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -8918,14 +8980,14 @@ BinaryChartReader.prototype.ReadCT_Bar3DChart = function (type, length, val, aCh
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_bar3dchartSER === type) {
-        var oNewVal = new CBarSeries();
+        var oNewVal = new AscFormat.CBarSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BarSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_bar3dchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -8981,8 +9043,8 @@ BinaryChartReader.prototype.ReadCT_BarDir = function (type, length, val) {
     var oThis = this;
     if (c_oserct_bardirVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_bardirBAR: val.m_val = BAR_DIR_BAR; break;
-            case st_bardirCOL: val.m_val = BAR_DIR_COL; break;
+            case st_bardirBAR: val.m_val = AscFormat.BAR_DIR_BAR; break;
+            case st_bardirCOL: val.m_val = AscFormat.BAR_DIR_COL; break;
         }
     }
     else
@@ -8994,10 +9056,10 @@ BinaryChartReader.prototype.ReadCT_BarGrouping = function (type, length, val) {
     var oThis = this;
     if (c_oserct_bargroupingVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_bargroupingPERCENTSTACKED: val.m_val = BAR_GROUPING_PERCENT_STACKED; break;
-            case st_bargroupingCLUSTERED: val.m_val = BAR_GROUPING_CLUSTERED; break;
-            case st_bargroupingSTANDARD: val.m_val = BAR_GROUPING_STANDARD; break;
-            case st_bargroupingSTACKED: val.m_val = BAR_GROUPING_STACKED; break;
+            case st_bargroupingPERCENTSTACKED: val.m_val = AscFormat.BAR_GROUPING_PERCENT_STACKED; break;
+            case st_bargroupingCLUSTERED: val.m_val = AscFormat.BAR_GROUPING_CLUSTERED; break;
+            case st_bargroupingSTANDARD: val.m_val = AscFormat.BAR_GROUPING_STANDARD; break;
+            case st_bargroupingSTACKED: val.m_val = AscFormat.BAR_GROUPING_STACKED; break;
         }
     }
     else
@@ -9024,7 +9086,7 @@ BinaryChartReader.prototype.ReadCT_BarSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_barserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -9042,21 +9104,21 @@ BinaryChartReader.prototype.ReadCT_BarSer = function (type, length, val) {
             val.setInvertIfNegative(oNewVal.m_val);
     }
     else if (c_oserct_barserPICTUREOPTIONS === type) {
-        var oNewVal = new CPictureOptions();
+        var oNewVal = new AscFormat.CPictureOptions();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PictureOptions(t, l, oNewVal);
         });
         val.setPictureOptions(oNewVal);
     }
     else if (c_oserct_barserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_barserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9064,28 +9126,28 @@ BinaryChartReader.prototype.ReadCT_BarSer = function (type, length, val) {
     }
     else if (c_oserct_barserTRENDLINE === type) {
         //todo array
-        var oNewVal = new CTrendLine();
+        var oNewVal = new AscFormat.CTrendLine();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Trendline(t, l, oNewVal);
         });
         val.setTrendline(oNewVal);
     }
     else if (c_oserct_barserERRBARS === type) {
-        var oNewVal = new CErrBars();
+        var oNewVal = new AscFormat.CErrBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ErrBars(t, l, oNewVal);
         });
         val.setErrBars(oNewVal);
     }
     else if (c_oserct_barserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_barserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -9115,12 +9177,12 @@ BinaryChartReader.prototype.ReadCT_Shape = function (type, length, val) {
     var oThis = this;
     if (c_oserct_shapeVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_shapeCONE: val.m_val = BAR_SHAPE_CONE; break;
-            case st_shapeCONETOMAX: val.m_val = BAR_SHAPE_CONETOMAX; break;
-            case st_shapeBOX: val.m_val = BAR_SHAPE_BOX; break;
-            case st_shapeCYLINDER: val.m_val = BAR_SHAPE_CYLINDER; break;
-            case st_shapePYRAMID: val.m_val = BAR_SHAPE_PYRAMID; break;
-            case st_shapePYRAMIDTOMAX: val.m_val = BAR_SHAPE_PYRAMIDTOMAX; break;
+            case st_shapeCONE: val.m_val = AscFormat.BAR_SHAPE_CONE; break;
+            case st_shapeCONETOMAX: val.m_val = AscFormat.BAR_SHAPE_CONETOMAX; break;
+            case st_shapeBOX: val.m_val = AscFormat.BAR_SHAPE_BOX; break;
+            case st_shapeCYLINDER: val.m_val = AscFormat.BAR_SHAPE_CYLINDER; break;
+            case st_shapePYRAMID: val.m_val = AscFormat.BAR_SHAPE_PYRAMID; break;
+            case st_shapePYRAMIDTOMAX: val.m_val = AscFormat.BAR_SHAPE_PYRAMIDTOMAX; break;
         }
     }
     else
@@ -9165,14 +9227,14 @@ BinaryChartReader.prototype.ReadCT_BarChart = function (type, length, val, aChar
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_barchartSER === type) {
-        var oNewVal = new CBarSeries();
+        var oNewVal = new AscFormat.CBarSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BarSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_barchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9203,7 +9265,7 @@ BinaryChartReader.prototype.ReadCT_BarChart = function (type, length, val, aChar
         if (null != oNewVal.spPr)
             val.setSerLines(oNewVal.spPr);
         else
-            val.setSerLines(new CSpPr());
+            val.setSerLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_barchartAXID === type) {
         var oNewVal = { m_val: null };
@@ -9247,14 +9309,14 @@ BinaryChartReader.prototype.ReadCT_DoughnutChart = function (type, length, val, 
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_doughnutchartSER === type) {
-        var oNewVal = new CPieSeries();
+        var oNewVal = new AscFormat.CPieSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PieSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_doughnutchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9311,14 +9373,14 @@ BinaryChartReader.prototype.ReadCT_Pie3DChart = function (type, length, val, aCh
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_pie3dchartSER === type) {
-        var oNewVal = new CPieSeries();
+        var oNewVal = new AscFormat.CPieSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PieSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_pie3dchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9347,14 +9409,14 @@ BinaryChartReader.prototype.ReadCT_PieChart = function (type, length, val, aChar
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_piechartSER === type) {
-        var oNewVal = new CPieSeries();
+        var oNewVal = new AscFormat.CPieSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PieSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_piechartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9399,7 +9461,7 @@ BinaryChartReader.prototype.ReadCT_ScatterSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_scatterserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -9409,21 +9471,21 @@ BinaryChartReader.prototype.ReadCT_ScatterSer = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_scatterserMARKER === type) {
-        var oNewVal = new CMarker();
+        var oNewVal = new AscFormat.CMarker();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Marker(t, l, oNewVal);
         });
         val.setMarker(oNewVal);
     }
     else if (c_oserct_scatterserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_scatterserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9431,7 +9493,7 @@ BinaryChartReader.prototype.ReadCT_ScatterSer = function (type, length, val) {
     }
     else if (c_oserct_scatterserTRENDLINE === type) {
         //todo array
-        var oNewVal = new CTrendLine();
+        var oNewVal = new AscFormat.CTrendLine();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Trendline(t, l, oNewVal);
         });
@@ -9439,21 +9501,21 @@ BinaryChartReader.prototype.ReadCT_ScatterSer = function (type, length, val) {
     }
     else if (c_oserct_scatterserERRBARS === type) {
         //todo array
-        var oNewVal = new CErrBars();
+        var oNewVal = new AscFormat.CErrBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ErrBars(t, l, oNewVal);
         });
         val.setErrBars(oNewVal);
     }
     else if (c_oserct_scatterserXVAL === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setXVal(oNewVal);
     }
     else if (c_oserct_scatterserYVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -9483,12 +9545,12 @@ BinaryChartReader.prototype.ReadCT_ScatterStyle = function (type, length, val) {
     var oThis = this;
     if (c_oserct_scatterstyleVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_scatterstyleNONE: val.m_val = SCATTER_STYLE_NONE; break;
-            case st_scatterstyleLINE: val.m_val = SCATTER_STYLE_LINE; break;
-            case st_scatterstyleLINEMARKER: val.m_val = SCATTER_STYLE_LINE_MARKER; break;
-            case st_scatterstyleMARKER: val.m_val = SCATTER_STYLE_MARKER; break;
-            case st_scatterstyleSMOOTH: val.m_val = SCATTER_STYLE_SMOOTH; break;
-            case st_scatterstyleSMOOTHMARKER: val.m_val = SCATTER_STYLE_SMOOTH_MARKER; break;
+            case st_scatterstyleNONE: val.m_val = AscFormat.SCATTER_STYLE_NONE; break;
+            case st_scatterstyleLINE: val.m_val = AscFormat.SCATTER_STYLE_LINE; break;
+            case st_scatterstyleLINEMARKER: val.m_val = AscFormat.SCATTER_STYLE_LINE_MARKER; break;
+            case st_scatterstyleMARKER: val.m_val = AscFormat.SCATTER_STYLE_MARKER; break;
+            case st_scatterstyleSMOOTH: val.m_val = AscFormat.SCATTER_STYLE_SMOOTH; break;
+            case st_scatterstyleSMOOTHMARKER: val.m_val = AscFormat.SCATTER_STYLE_SMOOTH_MARKER; break;
         }
     }
     else
@@ -9515,14 +9577,14 @@ BinaryChartReader.prototype.ReadCT_ScatterChart = function (type, length, val, a
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_scatterchartSER === type) {
-        var oNewVal = new CScatterSeries();
+        var oNewVal = new AscFormat.CScatterSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ScatterSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_scatterchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9567,7 +9629,7 @@ BinaryChartReader.prototype.ReadCT_RadarSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_radarserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -9577,35 +9639,35 @@ BinaryChartReader.prototype.ReadCT_RadarSer = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_radarserMARKER === type) {
-        var oNewVal = new CMarker();
+        var oNewVal = new AscFormat.CMarker();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Marker(t, l, oNewVal);
         });
         val.setMarker(oNewVal);
     }
     else if (c_oserct_radarserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_radarserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
         val.setDLbls(oNewVal);
     }
     else if (c_oserct_radarserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_radarserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -9657,14 +9719,14 @@ BinaryChartReader.prototype.ReadCT_RadarChart = function (type, length, val, aCh
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_radarchartSER === type) {
-        var oNewVal = new CRadarSeries();
+        var oNewVal = new AscFormat.CRadarSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_RadarSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_radarchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9693,14 +9755,14 @@ BinaryChartReader.prototype.ReadCT_StockChart = function (type, length, val, aCh
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_stockchartSER === type) {
-        var oNewVal = new CLineSeries();
+        var oNewVal = new AscFormat.CLineSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LineSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_stockchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9714,7 +9776,7 @@ BinaryChartReader.prototype.ReadCT_StockChart = function (type, length, val, aCh
         if (null != oNewVal.spPr)
             val.setDropLines(oNewVal.spPr);
         else
-            val.setDropLines(new CSpPr());
+            val.setDropLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_stockchartHILOWLINES === type) {
         var oNewVal = { spPr: null };
@@ -9724,10 +9786,10 @@ BinaryChartReader.prototype.ReadCT_StockChart = function (type, length, val, aCh
         if (null != oNewVal.spPr)
             val.setHiLowLines(oNewVal.spPr);
         else
-            val.setHiLowLines(new CSpPr());
+            val.setHiLowLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_stockchartUPDOWNBARS === type) {
-        var oNewVal = new CUpDownBars();
+        var oNewVal = new AscFormat.CUpDownBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_UpDownBars(t, l, oNewVal);
         });
@@ -9772,7 +9834,7 @@ BinaryChartReader.prototype.ReadCT_LineSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_lineserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -9782,21 +9844,21 @@ BinaryChartReader.prototype.ReadCT_LineSer = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_lineserMARKER === type) {
-        var oNewVal = new CMarker();
+        var oNewVal = new AscFormat.CMarker();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Marker(t, l, oNewVal);
         });
         val.setMarker(oNewVal);
     }
     else if (c_oserct_lineserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_lineserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9804,28 +9866,28 @@ BinaryChartReader.prototype.ReadCT_LineSer = function (type, length, val) {
     }
     else if (c_oserct_lineserTRENDLINE === type) {
         //todo array
-        var oNewVal = new CTrendLine();
+        var oNewVal = new AscFormat.CTrendLine();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Trendline(t, l, oNewVal);
         });
         val.setTrendline(oNewVal);
     }
     else if (c_oserct_lineserERRBARS === type) {
-        var oNewVal = new CErrBars();
+        var oNewVal = new AscFormat.CErrBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ErrBars(t, l, oNewVal);
         });
         val.setErrBars(oNewVal);
     }
     else if (c_oserct_lineserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_lineserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -9869,7 +9931,7 @@ BinaryChartReader.prototype.ReadCT_UpDownBars = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setUpBars(oNewVal.spPr);
         else
-            val.setUpBars(new CSpPr());
+            val.setUpBars(new AscFormat.CSpPr());
     }
     else if (c_oserct_updownbarsDOWNBARS === type) {
         var oNewVal = { spPr: null };
@@ -9879,7 +9941,7 @@ BinaryChartReader.prototype.ReadCT_UpDownBars = function (type, length, val) {
         if (null != oNewVal.spPr)
             val.setDownBars(oNewVal.spPr);
         else
-            val.setDownBars(new CSpPr());
+            val.setDownBars(new AscFormat.CSpPr());
     }
     else if (c_oserct_updownbarsEXTLST === type) {
         var oNewVal = {};
@@ -9922,14 +9984,14 @@ BinaryChartReader.prototype.ReadCT_Line3DChart = function (type, length, val, aC
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_line3dchartSER === type) {
-        var oNewVal = new CLineSeries();
+        var oNewVal = new AscFormat.CLineSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LineSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_line3dchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -9943,7 +10005,7 @@ BinaryChartReader.prototype.ReadCT_Line3DChart = function (type, length, val, aC
         if (null != oNewVal.spPr)
             val.setDropLines(oNewVal.spPr);
         else
-            val.setDropLines(new CSpPr());
+            val.setDropLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_line3dchartGAPDEPTH === type) {
         var oNewVal;
@@ -9977,9 +10039,9 @@ BinaryChartReader.prototype.ReadCT_Grouping = function (type, length, val) {
     var oThis = this;
     if (c_oserct_groupingVAL === type) {
         switch (this.stream.GetUChar()) {
-            case st_groupingPERCENTSTACKED: val.m_val = GROUPING_PERCENT_STACKED; break;
-            case st_groupingSTANDARD: val.m_val = GROUPING_STANDARD; break;
-            case st_groupingSTACKED: val.m_val = GROUPING_STACKED; break;
+            case st_groupingPERCENTSTACKED: val.m_val = AscFormat.GROUPING_PERCENT_STACKED; break;
+            case st_groupingSTANDARD: val.m_val = AscFormat.GROUPING_STANDARD; break;
+            case st_groupingSTACKED: val.m_val = AscFormat.GROUPING_STACKED; break;
         }
     }
     else
@@ -10006,14 +10068,14 @@ BinaryChartReader.prototype.ReadCT_LineChart = function (type, length, val, aCha
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_linechartSER === type) {
-        var oNewVal = new CLineSeries();
+        var oNewVal = new AscFormat.CLineSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LineSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_linechartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -10027,7 +10089,7 @@ BinaryChartReader.prototype.ReadCT_LineChart = function (type, length, val, aCha
         if (null != oNewVal.spPr)
             val.setDropLines(oNewVal.spPr);
         else
-            val.setDropLines(new CSpPr());
+            val.setDropLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_linechartHILOWLINES === type) {
         var oNewVal = { spPr: null };
@@ -10037,10 +10099,10 @@ BinaryChartReader.prototype.ReadCT_LineChart = function (type, length, val, aCha
         if (null != oNewVal.spPr)
             val.setHiLowLines(oNewVal.spPr);
         else
-            val.setHiLowLines(new CSpPr());
+            val.setHiLowLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_linechartUPDOWNBARS === type) {
-        var oNewVal = new CUpDownBars();
+        var oNewVal = new AscFormat.CUpDownBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_UpDownBars(t, l, oNewVal);
         });
@@ -10101,14 +10163,14 @@ BinaryChartReader.prototype.ReadCT_Area3DChart = function (type, length, val, aC
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_area3dchartSER === type) {
-        var oNewVal = new CAreaSeries();
+        var oNewVal = new AscFormat.CAreaSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AreaSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_area3dchartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -10122,7 +10184,7 @@ BinaryChartReader.prototype.ReadCT_Area3DChart = function (type, length, val, aC
         if (null != oNewVal.spPr)
             val.setDropLines(oNewVal.spPr);
         else
-            val.setDropLines(new CSpPr());
+            val.setDropLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_area3dchartGAPDEPTH === type) {
         var oNewVal;
@@ -10171,7 +10233,7 @@ BinaryChartReader.prototype.ReadCT_AreaSer = function (type, length, val) {
             val.setOrder(oNewVal.m_val);
     }
     else if (c_oserct_areaserTX === type) {
-        var oNewVal = new CTx();
+        var oNewVal = new AscFormat.CTx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerTx(t, l, oNewVal);
         });
@@ -10181,21 +10243,21 @@ BinaryChartReader.prototype.ReadCT_AreaSer = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_areaserPICTUREOPTIONS === type) {
-        var oNewVal = new CPictureOptions();
+        var oNewVal = new AscFormat.CPictureOptions();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PictureOptions(t, l, oNewVal);
         });
         val.setPictureOptions(oNewVal);
     }
     else if (c_oserct_areaserDPT === type) {
-        var oNewVal = new CDPt();
+        var oNewVal = new AscFormat.CDPt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DPt(t, l, oNewVal);
         });
         val.addDPt(oNewVal);
     }
     else if (c_oserct_areaserDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -10203,7 +10265,7 @@ BinaryChartReader.prototype.ReadCT_AreaSer = function (type, length, val) {
     }
     else if (c_oserct_areaserTRENDLINE === type) {
         //todo array
-        var oNewVal = new CTrendLine();
+        var oNewVal = new AscFormat.CTrendLine();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Trendline(t, l, oNewVal);
         });
@@ -10211,21 +10273,21 @@ BinaryChartReader.prototype.ReadCT_AreaSer = function (type, length, val) {
     }
     else if (c_oserct_areaserERRBARS === type) {
         //todo array
-        var oNewVal = new CErrBars();
+        var oNewVal = new AscFormat.CErrBars();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ErrBars(t, l, oNewVal);
         });
         val.setErrBars(oNewVal);
     }
     else if (c_oserct_areaserCAT === type) {
-        var oNewVal = new CCat();
+        var oNewVal = new AscFormat.CCat();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AxDataSource(t, l, oNewVal);
         });
         val.setCat(oNewVal);
     }
     else if (c_oserct_areaserVAL === type) {
-        var oNewVal = new CYVal();
+        var oNewVal = new AscFormat.CYVal();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_NumDataSource(t, l, oNewVal);
         });
@@ -10262,14 +10324,14 @@ BinaryChartReader.prototype.ReadCT_AreaChart = function (type, length, val, aCha
             val.setVaryColors(oNewVal.m_val);
     }
     else if (c_oserct_areachartSER === type) {
-        var oNewVal = new CAreaSeries();
+        var oNewVal = new AscFormat.CAreaSeries();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AreaSer(t, l, oNewVal);
         });
         val.addSer(oNewVal);
     }
     else if (c_oserct_areachartDLBLS === type) {
-        var oNewVal = new CDLbls();
+        var oNewVal = new AscFormat.CDLbls();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbls(t, l, oNewVal);
         });
@@ -10283,7 +10345,7 @@ BinaryChartReader.prototype.ReadCT_AreaChart = function (type, length, val, aCha
         if (null != oNewVal.spPr)
             val.setDropLines(oNewVal.spPr);
         else
-            val.setDropLines(new CSpPr());
+            val.setDropLines(new AscFormat.CSpPr());
     }
     else if (c_oserct_areachartAXID === type) {
         var oNewVal = { m_val: null };
@@ -10313,42 +10375,42 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         });
     }
     else if (c_oserct_plotareaAREA3DCHART === type) {
-        var oNewVal = new CAreaChart();
+        var oNewVal = new AscFormat.CAreaChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Area3DChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaAREACHART === type) {
-        var oNewVal = new CAreaChart();
+        var oNewVal = new AscFormat.CAreaChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_AreaChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaBAR3DCHART === type) {
-        var oNewVal = new CBarChart();
+        var oNewVal = new AscFormat.CBarChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Bar3DChart(t, l, oNewVal, aChartWithAxis);
         });
         oNewVal.set3D(true);
         //3d->2d
-        /*if (BAR_GROUPING_STANDARD == oNewVal.grouping)
-            oNewVal.setGrouping(BAR_GROUPING_CLUSTERED);
-        else if(BAR_GROUPING_CLUSTERED != oNewVal.grouping){
+        /*if (AscFormat.BAR_GROUPING_STANDARD == oNewVal.grouping)
+            oNewVal.setGrouping(AscFormat.BAR_GROUPING_CLUSTERED);
+        else if(AscFormat.BAR_GROUPING_CLUSTERED != oNewVal.grouping){
             oNewVal.setOverlap(100);
         }*/
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaBARCHART === type) {
-        var oNewVal = new CBarChart();
+        var oNewVal = new AscFormat.CBarChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BarChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaBUBBLECHART === type) {
-        var oNewVal = new CBubbleChart();
+        var oNewVal = new AscFormat.CBubbleChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_BubbleChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10357,14 +10419,14 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(scatter);
     }
     else if (c_oserct_plotareaDOUGHNUTCHART === type) {
-        var oNewVal = new CDoughnutChart();
+        var oNewVal = new AscFormat.CDoughnutChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DoughnutChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaLINE3DCHART === type) {
-        var oNewVal = new CLineChart();
+        var oNewVal = new AscFormat.CLineChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Line3DChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10374,22 +10436,22 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         for (var i = 0, length = oNewVal.series.length; i < length; ++i) {
             var seria = oNewVal.series[i];
             if (null == seria.marker) {
-                var marker = new CMarker();
-                marker.setSymbol(SYMBOL_NONE);
+                var marker = new AscFormat.CMarker();
+                marker.setSymbol(AscFormat.SYMBOL_NONE);
                 seria.setMarker(marker);
             }
         }
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaLINECHART === type) {
-        var oNewVal = new CLineChart();
+        var oNewVal = new AscFormat.CLineChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_LineChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaOFPIECHART === type) {
-        var oNewVal = new COfPieChart();
+        var oNewVal = new AscFormat.COfPieChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_OfPieChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10398,7 +10460,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(pie);
     }
     else if (c_oserct_plotareaPIE3DCHART === type) {
-        var oNewVal = new CPieChart();
+        var oNewVal = new AscFormat.CPieChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Pie3DChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10407,14 +10469,14 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaPIECHART === type) {
-        var oNewVal = new CPieChart();
+        var oNewVal = new AscFormat.CPieChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PieChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaRADARCHART === type) {
-        var oNewVal = new CRadarChart();
+        var oNewVal = new AscFormat.CRadarChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_RadarChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10423,21 +10485,21 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(line);
     }
     else if (c_oserct_plotareaSCATTERCHART === type) {
-        var oNewVal = new CScatterChart();
+        var oNewVal = new AscFormat.CScatterChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ScatterChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaSTOCKCHART === type) {
-        var oNewVal = new CStockChart();
+        var oNewVal = new AscFormat.CStockChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_StockChart(t, l, oNewVal, aChartWithAxis);
         });
         val.addChart(oNewVal);
     }
     else if (c_oserct_plotareaSURFACE3DCHART === type) {
-        var oNewVal = new CSurfaceChart();
+        var oNewVal = new AscFormat.CSurfaceChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface3DChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10446,7 +10508,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(line);
     }
     else if (c_oserct_plotareaSURFACECHART === type) {
-        var oNewVal = new CSurfaceChart();
+        var oNewVal = new AscFormat.CSurfaceChart();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SurfaceChart(t, l, oNewVal, aChartWithAxis);
         });
@@ -10455,7 +10517,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addChart(line);
     }
     else if (c_oserct_plotareaCATAX === type) {
-        var oNewVal = new CCatAx();
+        var oNewVal = new AscFormat.CCatAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_CatAx(t, l, oNewVal);
         });
@@ -10464,7 +10526,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addAxis(oNewVal);
     }
     else if (c_oserct_plotareaDATEAX === type) {
-        var oNewVal = new CDateAx();
+        var oNewVal = new AscFormat.CDateAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DateAx(t, l, oNewVal);
         });
@@ -10473,7 +10535,7 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addAxis(oNewVal);
     }
     else if (c_oserct_plotareaSERAX === type) {
-        var oNewVal = new CSerAx();
+        var oNewVal = new AscFormat.CSerAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_SerAx(t, l, oNewVal);
         });
@@ -10482,20 +10544,20 @@ BinaryChartReader.prototype.ReadCT_PlotArea = function (type, length, val, oIdTo
         val.addAxis(oNewVal);
     }
     else if (c_oserct_plotareaVALAX === type) {
-        var oNewVal = new CValAx();
+        var oNewVal = new AscFormat.CValAx();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_ValAx(t, l, oNewVal);
         });
         if (null != oNewVal.axId)
             oIdToAxisMap[oNewVal.axId] = oNewVal;
         val.addAxis(oNewVal);
-        //if(!isRealNumber(oNewVal.crossBetween))
+        //if(!AscFormat.isRealNumber(oNewVal.crossBetween))
         //{
-        //    oNewVal.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+        //    oNewVal.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
         //}
     }
     else if (c_oserct_plotareaDTABLE === type) {
-        var oNewVal = new CDTable();
+        var oNewVal = new AscFormat.CDTable();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DTable(t, l, oNewVal);
         });
@@ -10540,7 +10602,7 @@ BinaryChartReader.prototype.ReadCT_Surface = function (type, length, val) {
         val.setSpPr(this.ReadSpPr(length));
     }
     else if (c_oserct_surfacePICTUREOPTIONS === type) {
-        var oNewVal = new CPictureOptions();
+        var oNewVal = new AscFormat.CPictureOptions();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PictureOptions(t, l, oNewVal);
         });
@@ -10649,7 +10711,7 @@ BinaryChartReader.prototype.ReadCT_View3D = function (type, length, val) {
         });
         if (null != oNewVal.m_val){
             var nPercent = parseInt(oNewVal.m_val)
-            if(isRealNumber(nPercent)){
+            if(AscFormat.isRealNumber(nPercent)){
                 val.setDepthPercent(nPercent);
             }
         }
@@ -10700,14 +10762,14 @@ BinaryChartReader.prototype.ReadCT_PivotFmt = function (type, length, val) {
         val.txPr.setParent(val);
     }
     else if (c_oserct_pivotfmtMARKER === type) {
-        var oNewVal = new CMarker();
+        var oNewVal = new AscFormat.CMarker();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Marker(t, l, oNewVal);
         });
         val.setMarker(oNewVal);
     }
     else if (c_oserct_pivotfmtDLBL === type) {
-        var oNewVal = new CDLbl();
+        var oNewVal = new AscFormat.CDLbl();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_DLbl(t, l, oNewVal);
         });
@@ -10728,7 +10790,7 @@ BinaryChartReader.prototype.ReadCT_pivotFmts = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_pivotfmtsPIVOTFMT === type) {
-        var oNewVal = new CPivotFmt();
+        var oNewVal = new AscFormat.CPivotFmt();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_PivotFmt(t, l, oNewVal);
         });
@@ -10742,11 +10804,11 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
     var res = c_oSerConstants.ReadOk;
     var oThis = this;
     if (c_oserct_chartTITLE === type) {
-        var oNewVal = new CTitle();
+        var oNewVal = new AscFormat.CTitle();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Title(t, l, oNewVal);
         });
-        if(!isRealBool(oNewVal.overlay))
+        if(!AscFormat.isRealBool(oNewVal.overlay))
         {
             oNewVal.setOverlay(false);
         }
@@ -10766,35 +10828,35 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
         });
     }
     else if (c_oserct_chartVIEW3D === type) {
-        var oNewVal = new CView3d();
+        var oNewVal = new AscFormat.CView3d();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_View3D(t, l, oNewVal);
         });
         val.setView3D(oNewVal);
     }
     else if (c_oserct_chartFLOOR === type) {
-        var oNewVal = new CChartWall();
+        var oNewVal = new AscFormat.CChartWall();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface(t, l, oNewVal);
         });
         val.setFloor(oNewVal);
     }
     else if (c_oserct_chartSIDEWALL === type) {
-        var oNewVal = new CChartWall();
+        var oNewVal = new AscFormat.CChartWall();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface(t, l, oNewVal);
         });
         val.setSideWall(oNewVal);
     }
     else if (c_oserct_chartBACKWALL === type) {
-        var oNewVal = new CChartWall();
+        var oNewVal = new AscFormat.CChartWall();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Surface(t, l, oNewVal);
         });
         val.setBackWall(oNewVal);
     }
     else if (c_oserct_chartPLOTAREA === type) {
-        var oNewVal = new CPlotArea();
+        var oNewVal = new AscFormat.CPlotArea();
         var oIdToAxisMap = {};
         var aChartWithAxis = [];
         res = this.bcr.Read1(length, function (t, l) {
@@ -10822,25 +10884,26 @@ BinaryChartReader.prototype.ReadCT_Chart = function (type, length, val) {
             var oCurChartWithAxis = aChartWithAxis[nChartIndex];
             var axis = oIdToAxisMap[oCurChartWithAxis.axisId];
             oCurChartWithAxis.chart.addAxId(axis);
-            if(axis && axis.getObjectType() === historyitem_type_ValAx && !isRealNumber(axis.crossBetween))
+            if(axis && axis.getObjectType() === AscDFH.historyitem_type_ValAx && !AscFormat.isRealNumber(axis.crossBetween))
             {
-                if(oCurChartWithAxis.chart.getObjectType() === historyitem_type_AreaChart)
+                if(oCurChartWithAxis.chart.getObjectType() === AscDFH.historyitem_type_AreaChart)
                 {
-                    axis.setCrossBetween(CROSS_BETWEEN_MID_CAT);
+                    axis.setCrossBetween(AscFormat.CROSS_BETWEEN_MID_CAT);
                 }
                 else
                 {
-                    axis.setCrossBetween(CROSS_BETWEEN_BETWEEN);
+                    axis.setCrossBetween(AscFormat.CROSS_BETWEEN_BETWEEN);
                 }
             }
         }
         val.setPlotArea(oNewVal);
     }
     else if (c_oserct_chartLEGEND === type) {
-        var oNewVal = new CLegend();
+        var oNewVal = new AscFormat.CLegend();
         res = this.bcr.Read1(length, function (t, l) {
             return oThis.ReadCT_Legend(t, l, oNewVal);
         });
+        oNewVal.updateLegendPos();
         val.setLegend(oNewVal);
     }
     else if (c_oserct_chartPLOTVISONLY === type) {
@@ -11048,3 +11111,9 @@ BinaryChartReader.prototype.ReadAlternateContentFallback = function (type, lengt
         res = c_oSerConstants.ReadUnknown;
     return res;
 }
+
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].BinaryChartWriter = BinaryChartWriter;
+  window['AscCommon'].BinaryChartReader = BinaryChartReader;
+})(window);

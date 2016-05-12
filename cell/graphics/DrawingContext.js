@@ -24,17 +24,14 @@
 */
 "use strict";
 
-/* DrawingContext.js
- *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   Nov 21, 2011
- */
 (function (/** Window */window, undefined) {
 
 	/*
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
+	var FontStyle = AscFonts.FontStyle;
+	var g_fontApplication = AscFonts.g_fontApplication;
 
 	var asc = window["Asc"];
 	var asc_round = asc.round;
@@ -46,7 +43,7 @@
 		var g = color.getG();
 		var b = color.getB();
 		var bTheme = false;
-		if(color instanceof ThemeColor && null != color.theme)
+		if(color instanceof AscCommonExcel.ThemeColor && null != color.theme)
 		{
 			var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
 			var themePresentation = array_colors_types[color.theme];
@@ -54,8 +51,8 @@
 			if(null != color.tint)
 				tintExcel = color.tint;
 			var tintPresentation = 0;
-			var basecolor = g_oColorManager.getThemeColor(color.theme);
-			var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+			var basecolor = AscCommonExcel.g_oColorManager.getThemeColor(color.theme);
+			var oThemeColorTint = AscCommonExcel.g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
 			if(null != oThemeColorTint)
 			{
 				for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)
@@ -129,19 +126,9 @@
 		return (y + p + a) / ppi * 72;
 	}
 
-	function deg2rad(deg){
-		return deg * Math.PI / 180.0;
-	}
-
-	function rad2deg(rad){
-		return rad * 180.0 / Math.PI;
-	}
-
-
-
 	/** @const */
-	var MATRIX_ORDER_PREPEND = 0,
-		MATRIX_ORDER_APPEND  = 1;
+	var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
+	var MATRIX_ORDER_APPEND  = AscCommon.MATRIX_ORDER_APPEND;
 
 	/**
 	 * @constructor
@@ -227,7 +214,7 @@
 
 	Matrix.prototype.rotate = function (a, order) {
 		var m = new Matrix();
-		var rad = deg2rad(a);
+		var rad = AscCommon.deg2rad(a);
 		m.sx  = Math.cos(rad);
 		m.shx = Math.sin(rad);
 		m.shy = -Math.sin(rad);
@@ -279,7 +266,7 @@
 		this.transformPoint(x1, y1);
 		this.transformPoint(x2, y2);
 		var a = Math.atan2(y2-y1, x2-x1);
-		return rad2deg(a);
+		return AscCommon.rad2deg(a);
 	};
 
 	/**
@@ -735,7 +722,7 @@
 	};
 
 	/**
-	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+	 * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setFillStyle = function (val) {
@@ -754,7 +741,7 @@
 	};
 
 	/**
-	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+	 * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
 	 * @returns {DrawingContext}
 	 */
 	DrawingContext.prototype.setStrokeStyle = function (val) {
@@ -874,14 +861,14 @@
 			fontStyle = FontStyle.FontStyleBoldItalic;
 
 		if (angle && 0 != angle) {
-			r = g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[1], font.FontSize, fontStyle, this.ppiX, this.ppiY);
+			r = g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[1], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 
 			this.fmgrGraphics[1].SetTextMatrix(
 				this._mt.sx, this._mt.shy, this._mt.shx, this._mt.sy, this._mt.tx, this._mt.ty);
 		} else {
 
-		    r = g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
-		    g_fontApplication.LoadFont(font.FontFamily.Name, window.g_font_loader, this.fmgrGraphics[3], font.FontSize, fontStyle, this.ppiX, this.ppiY);
+		    r = g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[0], font.FontSize, fontStyle, this.ppiX, this.ppiY);
+		    g_fontApplication.LoadFont(font.FontFamily.Name, AscCommon.g_font_loader, this.fmgrGraphics[3], font.FontSize, fontStyle, this.ppiX, this.ppiY);
 		}
 
 		if (r === false) {
@@ -1245,7 +1232,7 @@
 	/**
 	 * @param {Number} w         Ширина текста
 	 * @param {Number} wBB       Ширина Bound Box текста
-	 * @param {CFontManager} fm  Объект CFontManager для получения метрик шрифта
+	 * @param {AscFonts.CFontManager} fm  Объект AscFonts.CFontManager для получения метрик шрифта
 	 * @param {Number} r         Коэффициент перевода pt -> в текущие единицы измерения (this.units)
 	 * @return {TextMetrics}
 	 */
@@ -1263,6 +1250,7 @@
 	 * -----------------------------------------------------------------------------
 	 */
 
+	window['Asc'] = window['Asc'] || {};
 	window["Asc"].getCvtRatio      = getCvtRatio;
 	window["Asc"].calcNearestPt    = calcNearestPt;
 	window["Asc"].colorObjToAscColor = colorObjToAscColor;
@@ -1272,5 +1260,4 @@
 	window["Asc"].FontMetrics      = FontMetrics;
 	window["Asc"].DrawingContext   = DrawingContext;
 	window["Asc"].Matrix           = Matrix;
-
 })(window);

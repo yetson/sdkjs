@@ -22,7 +22,7 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿function CDrawingStreamSerializer()
+function CDrawingStreamSerializer()
 {
     this.Memory = [];
 }
@@ -529,8 +529,8 @@ function CDrawingStream(_writer)
     this.Native = (undefined === _writer) ? window["native"] : _writer;
 
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
+    this.m_oLastFont    = new AscCommon.CFontSetup();
 
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
@@ -539,8 +539,8 @@ function CDrawingStream(_writer)
 
     this.m_bIntegerGrid = true;
 
-    this.m_oPen     = new CPen();
-    this.m_oBrush   = new CBrush();
+    this.m_oPen     = new AscCommon.CPen();
+    this.m_oBrush   = new AscCommon.CBrush();
 }
 
 CDrawingStream.prototype =
@@ -548,8 +548,8 @@ CDrawingStream.prototype =
     ClearParams : function()
     {
         this.m_oTextPr      = null;
-        this.m_oGrFonts     = new CGrRFonts();
-        this.m_oLastFont    = new CFontSetup();
+        this.m_oGrFonts     = new AscCommon.CGrRFonts();
+        this.m_oLastFont    = new AscCommon.CFontSetup();
 
         this.IsUseFonts2    = false;
         this.m_oLastFont2   = null;
@@ -713,15 +713,15 @@ CDrawingStream.prototype =
         var bItalic = true === font.Italic;
         var bBold   = true === font.Bold;
 
-        var oFontStyle = FontStyle.FontStyleRegular;
+        var oFontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBold;
+            oFontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( bItalic && !bBold )
-            oFontStyle = FontStyle.FontStyleItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBoldItalic;
+            oFontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
-        var _fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
+        var _fontinfo = AscFonts.g_fontApplication.GetFontInfo(font.FontFamily.Name, oFontStyle, this.LastFontOriginInfo);
         var _info = GetLoadInfoForMeasurer(_fontinfo, oFontStyle);
 
         var flag = 0;
@@ -807,7 +807,7 @@ CDrawingStream.prototype =
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            var _fontinfo = g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
+            var _fontinfo = AscFonts.g_fontApplication.GetFontInfo(_lastFont.SetUpName, _lastFont.SetUpStyle, this.LastFontOriginInfo);
             var _info = GetLoadInfoForMeasurer(_fontinfo, _lastFont.SetUpStyle);
 
             var flag = 0;
@@ -824,7 +824,7 @@ CDrawingStream.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         this.Native["PD_FillText"](x,y,_code);
     },
@@ -840,7 +840,7 @@ CDrawingStream.prototype =
     {
         var _code = text.charCodeAt(0);
         if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
+            _code = AscFonts.g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
 
         this.Native["PD_FillText2"](x,y,_code,cropX,cropW);
     },
@@ -855,7 +855,7 @@ CDrawingStream.prototype =
     FillTextCode : function(x,y,lUnicode)
     {
         if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
+            lUnicode = AscFonts.g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
 
         this.Native["PD_FillText"](x,y,lUnicode);
     },

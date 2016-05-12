@@ -22,10 +22,13 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
 var c_oAscDocumentUnits = Asc.c_oAscDocumentUnits;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 function CTab(pos,type)
 {
@@ -102,7 +105,7 @@ function CVerRulerRepaintChecker()
 
 function RulerCorrectPosition(_ruler, val, margin)
 {
-    if (global_keyboardEvent.AltKey)
+    if (AscCommon.global_keyboardEvent.AltKey)
         return val;
 
     var mm_1_4 = 10 / 4;
@@ -1077,8 +1080,8 @@ function CHorRuler()
     this.OnMouseMove = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        
-        check_MouseMoveEvent(e);
+
+        AscCommon.check_MouseMoveEvent(e);
 
         this.SimpleChanges.CheckMove();
 
@@ -1802,7 +1805,7 @@ function CHorRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e);
         global_mouseEvent.LockMouse();
 
         this.SimpleChanges.Reinit();
@@ -2010,7 +2013,7 @@ function CHorRuler()
     {
         var word_control = this.m_oWordControl;
         this.m_oWordControl.OnUpdateOverlay();
-        var lockedElement = check_MouseUpEvent(e);
+        var lockedElement = AscCommon.check_MouseUpEvent(e);
 
         this.m_dIndentLeft_old      = -10000;
         this.m_dIndentLeftFirst_old = -10000;
@@ -2201,17 +2204,17 @@ function CHorRuler()
         var _c = this.m_arrTabs.length;
         for (var i = 0; i < _c; i++)
         {
-            if (this.m_arrTabs[i].type == g_tabtype_left)
+            if (this.m_arrTabs[i].type == AscCommon.g_tabtype_left)
                 _arr.Add( new CParaTab( tab_Left, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == g_tabtype_right)
+            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_right)
                 _arr.Add( new CParaTab( tab_Right, this.m_arrTabs[i].pos ) );
-            else if (this.m_arrTabs[i].type == g_tabtype_center)
+            else if (this.m_arrTabs[i].type == AscCommon.g_tabtype_center)
                 _arr.Add( new CParaTab( tab_Center, this.m_arrTabs[i].pos ) );
         }
         
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetParagraphTabs);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphTabs);
             this.m_oWordControl.m_oLogicDocument.Set_ParagraphTabs(_arr);
         }
     }
@@ -2220,7 +2223,7 @@ function CHorRuler()
     {
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Paragraph_Properties) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetParagraphIndentFromRulers);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetParagraphIndentFromRulers);
             this.m_oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
                 FirstLine: (this.m_dIndentLeftFirst - this.m_dIndentLeft) } );
             this.m_oWordControl.m_oLogicDocument.Document_UpdateInterfaceState();
@@ -2230,7 +2233,7 @@ function CHorRuler()
     {
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetDocumentMargin_Hor);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetDocumentMargin_Hor);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Left : this.m_dMarginLeft, Right : this.m_dMarginRight });
         }
         //oWordControl.m_oLogicDocument.Set_ParagraphIndent( { Left : this.m_dIndentLeft, Right : this.m_dIndentRight,
@@ -2241,7 +2244,7 @@ function CHorRuler()
     {
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetTableMarkup_Hor);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Hor);
 
             this.m_oTableMarkup.CorrectTo();
             this.m_oTableMarkup.Table.Update_TableMarkupFromRuler(this.m_oTableMarkup, true, this.DragTablePos);
@@ -2424,7 +2427,7 @@ function CHorRuler()
                 context.lineWidth = 2;
                 switch (_tab.type)
                 {
-                    case g_tabtype_left:
+                    case AscCommon.g_tabtype_left:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2433,7 +2436,7 @@ function CHorRuler()
                         context.stroke();
                         break;
                     }
-                    case g_tabtype_right:
+                    case AscCommon.g_tabtype_right:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2442,7 +2445,7 @@ function CHorRuler()
                         context.stroke();
                         break;
                     }
-                    case g_tabtype_center:
+                    case AscCommon.g_tabtype_center:
                     {
                         context.beginPath();
                         context.moveTo(_x, _positon_y);
@@ -2591,7 +2594,7 @@ function CHorRuler()
 
                     switch (tab.type)
                     {
-                        case g_tabtype_left:
+                        case AscCommon.g_tabtype_left:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
@@ -2600,7 +2603,7 @@ function CHorRuler()
                             context.stroke();
                             break;
                         }
-                        case g_tabtype_right:
+                        case AscCommon.g_tabtype_right:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
@@ -2609,7 +2612,7 @@ function CHorRuler()
                             context.stroke();
                             break;
                         }
-                        case g_tabtype_center:
+                        case AscCommon.g_tabtype_center:
                         {
                             context.beginPath();
                             context.moveTo(_x, _positon_y);
@@ -3205,7 +3208,7 @@ function CVerRuler()
     this.OnMouseMove = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
 
         this.SimpleChanges.CheckMove();
         var ver_ruler = word_control.m_oLeftRuler_vertRuler;
@@ -3457,7 +3460,7 @@ function CVerRuler()
     this.OnMouseDown = function(left, top, e)
     {
         var word_control = this.m_oWordControl;
-        check_MouseDownEvent(e);
+        AscCommon.check_MouseDownEvent(e);
 
         this.SimpleChanges.Reinit();
         global_mouseEvent.LockMouse();
@@ -3518,7 +3521,7 @@ function CVerRuler()
 
     this.OnMouseUp = function(left, top, e)
     {
-        var lockedElement = check_MouseUpEvent(e);
+        var lockedElement = AscCommon.check_MouseUpEvent(e);
 
         //this.m_oWordControl.m_oOverlayApi.UnShow();
         this.m_oWordControl.OnUpdateOverlay();
@@ -3620,7 +3623,7 @@ function CVerRuler()
     {
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Document_SectPr) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetDocumentMargin_Ver);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetDocumentMargin_Ver);
             this.m_oWordControl.m_oLogicDocument.Set_DocumentMargin( { Top : this.m_dMarginTop, Bottom : this.m_dMarginBottom });
         }
     }
@@ -3631,7 +3634,7 @@ function CVerRuler()
             // TODO: в данной функции при определенных параметрах может меняться верхнее поле. Поэтому, надо
             //       вставить проверку на залоченность с типом changestype_Document_SectPr
 
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetHdrFtrBounds);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetHdrFtrBounds);
             this.m_oWordControl.m_oLogicDocument.Document_SetHdrFtrBounds(this.header_top, this.header_bottom);
         }
     }
@@ -3639,7 +3642,7 @@ function CVerRuler()
     {
         if ( false === this.m_oWordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_Table_Properties) )
         {
-            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(historydescription_Document_SetTableMarkup_Ver);
+            this.m_oWordControl.m_oLogicDocument.Create_NewHistoryPoint(AscDFH.historydescription_Document_SetTableMarkup_Ver);
 
             this.m_oTableMarkup.CorrectTo();
             this.m_oTableMarkup.Table.Update_TableMarkupFromRuler(this.m_oTableMarkup, false, this.DragTablePos);

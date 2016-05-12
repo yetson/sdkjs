@@ -90,12 +90,9 @@
   prot["asc_setArrColors"] = prot.asc_setArrColors;
 })(window);
 
-baseEditorsApi.prototype.asc_showRevision = function(newObj) {
+AscCommon.baseEditorsApi.prototype.asc_showRevision = function(newObj) {
   if (!newObj.docId) {
     return;
-  }
-  if (this.isCoAuthoringEnable) {
-    this.asc_coAuthoringDisconnect();
   }
 
   var bUpdate = true;
@@ -111,13 +108,17 @@ baseEditorsApi.prototype.asc_showRevision = function(newObj) {
     this.DocInfo.put_Id(this.VersionHistory.docId);
     this.DocInfo.put_Url(this.VersionHistory.url);
     this.documentUrlChanges = this.VersionHistory.urlChanges;
+    this.VersionHistoryOpen = true;
     this.asc_setDocInfo(this.DocInfo);
-    this.asc_LoadDocument(true);
+    this.asc_setViewMode(true);
+
+    //делаем disconnect и reconnect, чтобы docId соединения и документа совпадали, иначе будут проблемы со сборшиком мусора
+    this.CoAuthoringApi.disconnect(true);
   } else if (this.VersionHistory.currentChangeId < newObj.currentChangeId) {
     // Нужно только добавить некоторые изменения
-    CollaborativeEditing.Clear_CollaborativeMarks();
+    AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
     editor.VersionHistory.applyChanges(editor);
-    CollaborativeEditing.Apply_Changes();
+    AscCommon.CollaborativeEditing.Apply_Changes();
   }
 };
-baseEditorsApi.prototype['asc_showRevision'] = baseEditorsApi.prototype.asc_showRevision;
+AscCommon.baseEditorsApi.prototype['asc_showRevision'] = AscCommon.baseEditorsApi.prototype.asc_showRevision;

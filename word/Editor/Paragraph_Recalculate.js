@@ -23,11 +23,9 @@
  *
 */
 "use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 16.09.14
- * Time: 12:04
- */
+
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
 // TODO: В колонтитулах быстрые пересчеты отключены. Надо реализовать.
 
@@ -748,7 +746,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
             {
                 var PrevSectPr = Prev.Get_SectionPr();
                 var CurSectPr = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-                if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+                if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
                     bNeedPageBreak = false;
             }
 
@@ -797,7 +795,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
                 {
                     var PrevSectPr = PrevElement.Get_SectionPr();
                     var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-                    if (section_type_Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+                    if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
                         bNeedPageBreak = false;
                 }
 

@@ -41,6 +41,8 @@ var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var g_oTableId = AscCommon.g_oTableId;
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 var linerule_Exact = Asc.linerule_Exact;
 var c_oAscRelativeFromV = Asc.c_oAscRelativeFromV;
@@ -50,6 +52,108 @@ var type_Paragraph = 0x0001;
 var UnknownValue  = null;
 
 var REVIEW_COLOR = new AscCommon.CColor(255, 0, 0, 255);
+
+function CRevisionsChange()
+{
+    this.Type      = c_oAscRevisionsChangeType.Unknown;
+    this.X         = 0;
+    this.Y         = 0;
+    this.Value     = "";
+
+    this.UserName  = "";
+    this.UserId    = "";
+    this.DateTime  = "";
+    this.UserColor = new AscCommon.CColor(0, 0, 0, 255);
+
+    this.Paragraph = null;
+    this.StartPos  = null;
+    this.EndPos    = null;
+
+    this._X       = 0;
+    this._Y       = 0;
+    this._PageNum = 0;
+    this._PosChanged = false;
+}
+CRevisionsChange.prototype.get_UserId = function(){return this.UserId;};
+CRevisionsChange.prototype.put_UserId = function(UserId)
+{
+    this.UserId = UserId;
+    this.private_UpdateUserColor();
+};
+CRevisionsChange.prototype.get_UserName = function(){return this.UserName;};
+CRevisionsChange.prototype.put_UserName = function(UserName)
+{
+    this.UserName = UserName;
+    this.private_UpdateUserColor();
+};
+CRevisionsChange.prototype.get_DateTime = function(){return this.DateTime};
+CRevisionsChange.prototype.put_DateTime = function(DateTime){this.DateTime = DateTime};
+CRevisionsChange.prototype.get_UserColor = function(){return this.UserColor;};
+CRevisionsChange.prototype.get_StartPos = function(){return this.StartPos};
+CRevisionsChange.prototype.put_StartPos = function(StartPos){this.StartPos = StartPos;};
+CRevisionsChange.prototype.get_EndPos = function(){return this.EndPos};
+CRevisionsChange.prototype.put_EndPos = function(EndPos){this.EndPos = EndPos;};
+CRevisionsChange.prototype.get_Type  = function(){return this.Type;};
+CRevisionsChange.prototype.get_X     = function(){return this.X;};
+CRevisionsChange.prototype.get_Y     = function(){return this.Y;};
+CRevisionsChange.prototype.get_Value = function(){return this.Value;};
+CRevisionsChange.prototype.put_Type  = function(Type){this.Type = Type;};
+CRevisionsChange.prototype.put_XY    = function(X, Y){this.X = X; this.Y = Y;};
+CRevisionsChange.prototype.put_Value = function(Value){this.Value = Value;};
+CRevisionsChange.prototype.put_Paragraph = function(Para){this.Paragraph = Para;};
+CRevisionsChange.prototype.get_Paragraph = function(){return this.Paragraph;};
+CRevisionsChange.prototype.get_LockUserId = function()
+{
+    if (this.Paragraph)
+    {
+        var Lock = this.Paragraph.Get_Lock();
+        var LockType = Lock.Get_Type();
+
+        if (locktype_Mine !== LockType && locktype_None !== LockType)
+            return Lock.Get_UserId();
+    }
+
+    return null;
+};
+CRevisionsChange.prototype.put_InternalPos = function(x, y, pageNum)
+{
+    if (this._PageNum !== pageNum
+      || Math.abs(this._X - x) > 0.001
+      || Math.abs(this._Y - y) > 0.001)
+    {
+        this._X = x;
+        this._Y = y;
+        this._PageNum = pageNum;
+        this._PosChanged = true;
+    }
+    else
+    {
+        this._PosChanged = false;
+    }
+};
+CRevisionsChange.prototype.get_InternalPosX = function()
+{
+    return this._X;
+};
+CRevisionsChange.prototype.get_InternalPosY = function()
+{
+    return this._Y;
+};
+CRevisionsChange.prototype.get_InternalPosPageNum = function()
+{
+    return this._PageNum;
+};
+CRevisionsChange.prototype.ComparePrevPosition = function()
+{
+    if (true === this._PosChanged)
+        return false;
+
+    return true;
+};
+CRevisionsChange.prototype.private_UpdateUserColor = function()
+{
+    this.UserColor = AscCommon.getUserColorById(this.UserId, this.UserName, true, false);
+};
 
 // Класс Paragraph
 function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFromPresentation)
@@ -156,8 +260,8 @@ function Paragraph(DrawingDocument, Parent, PageNum, X, Y, XLimit, YLimit, bFrom
     if (false === AscCommon.g_oIdCounter.m_bLoad && true === History.Is_On())
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (CollaborativeEditing)
-            CollaborativeEditing.Add_Unlock2(this);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Add_Unlock2(this);
     }
 
     this.DeleteCommentOnRemove    = true; // Удаляем ли комменты в функциях Internal_Content_Remove
@@ -266,7 +370,7 @@ Paragraph.prototype =
     {
         var Pr_old = this.Pr;
         var Pr_new = oNewPr;
-        History.Add( this, { Type : historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Pr, Old : Pr_old, New : Pr_new } );
 
         this.Pr = oNewPr;
 
@@ -551,7 +655,7 @@ Paragraph.prototype =
         // их изменить.
         var oOldPr = OtherParagraph.Pr;
         OtherParagraph.Pr = this.Pr.Copy();
-        History.Add( OtherParagraph, { Type : historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
+        History.Add( OtherParagraph, { Type : AscDFH.historyitem_Paragraph_Pr, Old : oOldPr, New : OtherParagraph.Pr } );
         OtherParagraph.private_UpdateTrackRevisionOnChangeParaPr(true);
 
         if(this.bFromDocument)
@@ -566,7 +670,7 @@ Paragraph.prototype =
     // CurPos.ContentPos, Selection.StartPos, Selection.EndPos)
     Internal_Content_Add : function (Pos, Item, bCorrectPos)
     {
-        History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 0, Item );
         this.private_UpdateTrackRevisions();
 
@@ -657,7 +761,7 @@ Paragraph.prototype =
         var StartPos = this.Content.length;
         this.Content = this.Content.concat( Items );
 
-        History.Add( this, { Type : historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_AddItem, Pos : StartPos, EndPos : this.Content.length - 1, Items : Items } );
         this.private_UpdateTrackRevisions();
 
         // Нам нужно сбросить рассчет всех добавленных элементов и выставить у них родительский класс и параграф
@@ -677,7 +781,7 @@ Paragraph.prototype =
     Internal_Content_Remove : function (Pos)
     {
         var Item = this.Content[Pos];
-        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
         this.Content.splice( Pos, 1 );
         this.private_UpdateTrackRevisions();
 
@@ -782,7 +886,7 @@ Paragraph.prototype =
         }
 
         var DeletedItems = this.Content.slice( Pos, Pos + Count );
-        History.Add( this, { Type : historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
         this.private_UpdateTrackRevisions();
 
         if ( this.Selection.StartPos > Pos + Count )
@@ -1286,7 +1390,7 @@ Paragraph.prototype =
 
         if(pGraphics.Start_Command)
         {
-            pGraphics.Start_Command(DRAW_COMMAND_PARAGRAPH);
+            pGraphics.Start_Command(AscFormat.DRAW_COMMAND_PARAGRAPH);
         }
 
         var Pr = this.Get_CompiledPr();
@@ -1545,7 +1649,7 @@ Paragraph.prototype =
                 {
                     if(pGraphics.Start_Command)
                     {
-                        pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 4)
+                        pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 4)
                     }
 
                     var TempX0 = this.Lines[CurLine].Ranges[CurRange].X;
@@ -1669,7 +1773,7 @@ Paragraph.prototype =
 
                 if(pGraphics.Start_Command)
                 {
-                    pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2);
+                    pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 2);
                 }
                 var aShd = PDSH.Shd;
                 var Element = aShd.Get_Next();
@@ -1775,7 +1879,7 @@ Paragraph.prototype =
 
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 1)
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[CurLine], CurLine, 1)
             }
             //----------------------------------------------------------------------------------------------------------
             // Рисуем боковые линии границы параграфа
@@ -1857,7 +1961,7 @@ Paragraph.prototype =
             var RangesCount = Line.Ranges.length;
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 0);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, Line, CurLine, 0);
             }
 
             for ( var CurRange = 0; CurRange < RangesCount; CurRange++ )
@@ -2049,7 +2153,7 @@ Paragraph.prototype =
 
             if(pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, Line, CurLine, 3)
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, Line, CurLine, 3)
             }
 
             var Baseline        = Page.Y + Line.Y;
@@ -2308,7 +2412,7 @@ Paragraph.prototype =
 
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
             }
             var RangesCount = this.Lines[StartLine].Ranges.length;
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
@@ -2342,7 +2446,7 @@ Paragraph.prototype =
             var RangesCount = this.Lines[StartLine].Ranges.length;
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[StartLine], StartLine, 1);
             }
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
             {
@@ -2399,7 +2503,7 @@ Paragraph.prototype =
             var RangesCount = this.Lines[EndLine].Ranges.length;
             if (pGraphics.Start_Command)
             {
-                pGraphics.Start_Command(DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
+                pGraphics.Start_Command(AscFormat.DRAW_COMMAND_LINE, this.Lines[EndLine], EndLine, 1);
             }
             for (var CurRange = 0; CurRange < RangesCount; CurRange++)
             {
@@ -2966,6 +3070,8 @@ Paragraph.prototype =
             case para_Tab:
             case para_Drawing:
             case para_NewLine:
+            case para_FootnoteReference:
+            default:
             {
                 // Элементы данного типа добавляем во внутренний элемент
                 this.Content[this.CurPos.ContentPos].Add(Item);
@@ -3394,8 +3500,8 @@ Paragraph.prototype =
                     AbstractNum.Change_LeftInd( NewX );
 
                     this.private_AddPrChange();
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
 
                     // При добавлении списка в параграф, удаляем все собственные сдвиги
                     this.Pr.Ind.FirstLine = undefined;
@@ -3416,7 +3522,7 @@ Paragraph.prototype =
 
     Can_IncreaseLevel : function(bIncrease)
     {
-        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        var CurLevel = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
         if(bIncrease)
         {
             if(CurLevel >= 8)
@@ -3434,14 +3540,14 @@ Paragraph.prototype =
             NewPr = this.Internal_CompiledParaPrPresentation(CurLevel - 1).TextPr;
         }
         DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
-        if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+        if(this.Pr.DefaultRunPr && AscFormat.isRealNumber(this.Pr.DefaultRunPr.FontSize))
         {
             if(this.Pr.DefaultRunPr.FontSize + DeltaFontSize < 1)
             {
                 return false;
             }
         }
-        if(isRealNumber(this.TextPr.FontSize))
+        if(AscFormat.isRealNumber(this.TextPr.FontSize))
         {
             if(this.TextPr.FontSize + DeltaFontSize < 1)
             {
@@ -3475,7 +3581,7 @@ Paragraph.prototype =
 
     Increase_Level : function(bIncrease)
     {
-        var CurLevel = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
+        var CurLevel = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0, NewPr, OldPr = this.Get_CompiledPr2(false).TextPr, DeltaFontSize, i, j, RunPr;
         if(bIncrease)
         {
             NewPr = this.Internal_CompiledParaPrPresentation(CurLevel + 1).TextPr;
@@ -3497,13 +3603,13 @@ Paragraph.prototype =
         DeltaFontSize = NewPr.FontSize - OldPr.FontSize;
         if(DeltaFontSize !== 0)
         {
-            if(this.Pr.DefaultRunPr && isRealNumber(this.Pr.DefaultRunPr.FontSize))
+            if(this.Pr.DefaultRunPr && AscFormat.isRealNumber(this.Pr.DefaultRunPr.FontSize))
             {
                 var NewParaPr = this.Pr.Copy();
                 NewParaPr.DefaultRunPr.FontSize += DeltaFontSize;
                 this.Set_Pr(NewParaPr);//Todo: сделать отдельный метод для выставления DefaultRunPr
             }
-            if(isRealNumber(this.TextPr.FontSize))
+            if(AscFormat.isRealNumber(this.TextPr.FontSize))
             {
                 this.TextPr.Set_FontSize(this.TextPr.FontSize + DeltaFontSize);
             }
@@ -3511,7 +3617,7 @@ Paragraph.prototype =
             {
                 if(this.Content[i].Type === para_Run)
                 {
-                    if(isRealNumber(this.Content[i].Pr.FontSize))
+                    if(AscFormat.isRealNumber(this.Content[i].Pr.FontSize))
                     {
                         this.Content[i].Set_FontSize(this.Content[i].Pr.FontSize + DeltaFontSize);
                     }
@@ -3520,7 +3626,7 @@ Paragraph.prototype =
                 {
                     for(j = 0; j < this.Content[i].Content.length; ++j)
                     {
-                        if(isRealNumber(this.Content[i].Content[j].Pr.FontSize))
+                        if(AscFormat.isRealNumber(this.Content[i].Content[j].Pr.FontSize))
                         {
                             this.Content[i].Content[j].Set_FontSize(this.Content[i].Content[j].Pr.FontSize + DeltaFontSize);
                         }
@@ -5369,15 +5475,15 @@ Paragraph.prototype =
                         EndTextPr.Merge( this.TextPr.Value );
                         if(TextPr.AscFill)
                         {
-                            this.TextPr.Set_TextFill(CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
+                            this.TextPr.Set_TextFill(AscFormat.CorrectUniFill(TextPr.AscFill, EndTextPr.TextFill, 0));
                         }
                         if(TextPr.AscUnifill)
                         {
-                            this.TextPr.Set_Unifill(CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
+                            this.TextPr.Set_Unifill(AscFormat.CorrectUniFill(TextPr.AscUnifill, EndTextPr.Unifill, 0));
                         }
                         if(TextPr.AscLine)
                         {
-                            this.TextPr.Set_TextOutline(CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
+                            this.TextPr.Set_TextOutline(AscFormat.CorrectUniStroke(TextPr.AscLine, EndTextPr.TextOutline, 0));
                         }
                     }
                 }
@@ -5624,7 +5730,7 @@ Paragraph.prototype =
             TextPr.RStyle    = editor && editor.isDocumentEditor ? editor.WordControl.m_oLogicDocument.Get_Styles().Get_Default_Hyperlink() : null;
             if(!this.bFromDocument)
             {
-                TextPr.Unifill = CreateUniFillSchemeColorWidthTint(11, 0);
+                TextPr.Unifill = AscFormat.CreateUniFillSchemeColorWidthTint(11, 0);
                 TextPr.Underline = true;
             }
             Hyperlink.Apply_TextPr( TextPr, undefined, false );
@@ -5672,7 +5778,7 @@ Paragraph.prototype =
             {
                 HyperRun.Set_Pr( TextPr.Copy() );
                 HyperRun.Set_Color( undefined );
-                HyperRun.Set_Unifill( CreateUniFillSchemeColorWidthTint(11, 0) );
+                HyperRun.Set_Unifill( AscFormat.CreateUniFillSchemeColorWidthTint(11, 0) );
                 HyperRun.Set_Underline( true );
             }
 
@@ -5778,7 +5884,7 @@ Paragraph.prototype =
                 {
                     HyperRun.Set_Pr( TextPr.Copy() );
                     HyperRun.Set_Color( undefined );
-                    HyperRun.Set_Unifill( CreateUniFillSchemeColorWidthTint(11, 0) );
+                    HyperRun.Set_Unifill( AscFormat.CreateUniFillSchemeColorWidthTint(11, 0) );
                     HyperRun.Set_Underline( true );
                 }
 
@@ -6065,7 +6171,7 @@ Paragraph.prototype =
             {
                 if ( this.bFromDocument && false === editor.isViewMode && false === editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : AscCommon.changestype_2_Element_and_Type, Element : this, CheckType : AscCommon.changestype_Paragraph_Content } ) )
                 {
-                    History.Create_NewPoint(historydescription_Document_ParagraphExtendToPos);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_ParagraphExtendToPos);
                     History.Set_Additional_ExtendDocumentToPos();
 
                     if ( true === this.Extend_ToPos( X ) )
@@ -6087,7 +6193,7 @@ Paragraph.prototype =
         var SelectionStartPos = this.Get_ParaContentPos( true, true );
         var SelectionEndPos   = this.Get_ParaContentPos( true, false );
 
-        if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && g_mouse_event_type_up === MouseEvent.Type )
+        if ( 0 === SelectionStartPos.Compare( SelectionEndPos ) && AscCommon.g_mouse_event_type_up === MouseEvent.Type )
         {
             var NumPr = this.Numbering_Get();
             if ( true === SearchPosXY.Numbering && undefined != NumPr )
@@ -7184,8 +7290,8 @@ Paragraph.prototype =
                 {
                     var NewFirstLine = Prev.Pr.Ind.FirstLine;
                     var NewLeft      = Prev.Pr.Ind.Left;
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : NewFirstLine } );
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : NewLeft } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : NewFirstLine } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : NewLeft } );
 
                     // При добавлении списка в параграф, удаляем все собственные сдвиги
                     this.Pr.Ind.FirstLine = NewFirstLine;
@@ -7201,8 +7307,8 @@ Paragraph.prototype =
                     {
                         AbstractNum.Change_LeftInd( X + NumParaPr.Ind.Left );
 
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-                        History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+                        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
 
                         // При добавлении списка в параграф, удаляем все собственные сдвиги
                         this.Pr.Ind.FirstLine = undefined;
@@ -7212,7 +7318,7 @@ Paragraph.prototype =
 
                 this.Pr.NumPr = new CNumPr();
                 this.Pr.NumPr.Set( NumId, Lvl );
-                History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
                 this.private_RefreshNumbering(NumPr_old);
                 this.private_RefreshNumbering(this.Pr.NumPr);
             }
@@ -7239,8 +7345,8 @@ Paragraph.prototype =
 
                 if ( undefined != this.Pr.Ind && undefined != NumParaPr.Ind && undefined != NumParaPr.Ind.Left )
                 {
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
-                    History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : undefined } );
+                    History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : undefined } );
 
                     // При добавлении списка в параграф, удаляем все собственные сдвиги
                     this.Pr.Ind.FirstLine = undefined;
@@ -7249,7 +7355,7 @@ Paragraph.prototype =
 
                 this.Pr.NumPr = new CNumPr();
                 this.Pr.NumPr.Set( NumId, LvlFound );
-                History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
                 this.private_RefreshNumbering(NumPr_old);
                 this.private_RefreshNumbering(this.Pr.NumPr);
             }
@@ -7264,15 +7370,15 @@ Paragraph.prototype =
             this.Pr.NumPr = new CNumPr();
             this.Pr.NumPr.Set( NumId, Lvl );
 
-            History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
             this.private_RefreshNumbering(NumPr_old);
             this.private_RefreshNumbering(this.Pr.NumPr);
 
             var Left      = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.Left );
             var FirstLine = ( NumPr_old.Lvl === Lvl ? undefined : ParaPr.Ind.FirstLine );
 
-            History.Add( this, { Type : historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : Left      } );
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : FirstLine } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ), New : Left      } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  Old : ( undefined != this.Pr.Ind.Left      ? this.Pr.Ind.Left      : undefined ), New : FirstLine } );
 
             this.Pr.Ind.FirstLine = FirstLine;
             this.Pr.Ind.Left      = Left;
@@ -7299,7 +7405,7 @@ Paragraph.prototype =
         this.Pr.NumPr.Set( NumId, Lvl );
 
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : NumPr_old, New : this.Pr.NumPr } );
         this.private_RefreshNumbering(NumPr_old);
         this.private_RefreshNumbering(this.Pr.NumPr);
 
@@ -7324,7 +7430,7 @@ Paragraph.prototype =
             this.Pr.NumPr.Set( NumPr.NumId, NewLvl );
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : NumPr, New : this.Pr.NumPr } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : NumPr, New : this.Pr.NumPr } );
             this.private_RefreshNumbering(NumPr);
             this.private_RefreshNumbering(this.Pr.NumPr);
 
@@ -7370,7 +7476,7 @@ Paragraph.prototype =
 
         var OldNumPr = undefined != this.Pr.NumPr ? this.Pr.NumPr : undefined;
 
-        History.Add( this, { Type : historyitem_Paragraph_Numbering, Old : OldNumPr, New : NewNumPr } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Numbering, Old : OldNumPr, New : NewNumPr } );
         this.private_RefreshNumbering(OldNumPr);
         this.private_RefreshNumbering(NewNumPr);
 
@@ -7399,8 +7505,8 @@ Paragraph.prototype =
                             var NewFirstLine = 0;
                             var NewLeft      = Left < 0 ? Left : Math.max(0, Left - NumLeftCorrection);
 
-                            History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : NewLeft,      Old : this.Pr.Ind.Left } );
-                            History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : NewFirstLine, Old : this.Pr.Ind.FirstLine } );
+                            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  New : NewLeft,      Old : this.Pr.Ind.Left } );
+                            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, New : NewFirstLine, Old : this.Pr.Ind.FirstLine } );
                             this.Pr.Ind.Left      = NewLeft;
                             this.Pr.Ind.FirstLine = NewFirstLine;
                         }
@@ -7409,13 +7515,13 @@ Paragraph.prototype =
             }
             else if ( this.Pr.Ind.FirstLine < 0 )
             {
-                History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );
                 this.Pr.Ind.FirstLine = 0;
             }
             else if ( undefined != this.Pr.Ind.Left && this.Pr.Ind.FirstLine > 0 )
             {
-                History.Add( this, { Type : historyitem_Paragraph_Ind_Left,  New : this.Pr.Ind.Left + this.Pr.Ind.FirstLine, Old : this.Pr.Ind.Left } );
-                History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left,  New : this.Pr.Ind.Left + this.Pr.Ind.FirstLine, Old : this.Pr.Ind.Left } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, New : 0, Old : this.Pr.Ind.FirstLine } );
                 this.Pr.Ind.Left += this.Pr.Ind.FirstLine;
                 this.Pr.Ind.FirstLine = 0;
             }
@@ -7462,9 +7568,9 @@ Paragraph.prototype =
         }
         else
         {
-            oBullet2 = new CBullet();
-            oBullet2.bulletType = new CBulletType();
-            oBullet2.bulletType.type = BULLET_TYPE_BULLET_NONE;
+            oBullet2 = new AscFormat.CBullet();
+            oBullet2.bulletType = new AscFormat.CBulletType();
+            oBullet2.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         }
         var oUndefParaPr = this.Get_CompiledPr2(false).ParaPr;
         var NewType = oBullet2.getBulletType();
@@ -7548,9 +7654,9 @@ Paragraph.prototype =
     // Удаляем нумерацию
     Remove_PresentationNumbering : function()
     {
-        var Bullet = new CBullet();
-        Bullet.bulletType = new CBulletType();
-        Bullet.bulletType.type = BULLET_TYPE_BULLET_NONE;
+        var Bullet = new AscFormat.CBullet();
+        Bullet.bulletType = new AscFormat.CBulletType();
+        Bullet.bulletType.type = AscFormat.BULLET_TYPE_BULLET_NONE;
         this.Add_PresentationNumbering(Bullet);
     },
 
@@ -7559,7 +7665,7 @@ Paragraph.prototype =
         if ( this.Pr.Lvl != Level )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Level, Old : this.Pr.Lvl, New : Level } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_PresentationPr_Level, Old : this.Pr.Lvl, New : Level } );
             this.Pr.Lvl = Level;
             this.CompiledPr.NeedRecalc = true;
             this.Recalc_RunsCompiledPr();
@@ -7806,7 +7912,7 @@ Paragraph.prototype =
                 this.CompiledPr.Pr = this.Internal_CompileParaPr2();
                 if(!this.bFromDocument)
                 {
-                    this.PresentationPr.Level = isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
+                    this.PresentationPr.Level = AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0;
                     this.PresentationPr.Bullet =  this.CompiledPr.Pr.ParaPr.Get_PresentationBullet();
                     this.Numbering.Bullet = this.PresentationPr.Bullet;
                 }
@@ -7927,7 +8033,7 @@ Paragraph.prototype =
 
     Internal_CompiledParaPrPresentation: function(Lvl)
     {
-        var _Lvl = isRealNumber(Lvl) ? Lvl : (isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
+        var _Lvl = AscFormat.isRealNumber(Lvl) ? Lvl : (AscFormat.isRealNumber(this.Pr.Lvl) ? this.Pr.Lvl : 0);
         var styleObject = this.Parent.Get_Styles(_Lvl);
         var Styles     = styleObject.styles;
 
@@ -8133,7 +8239,7 @@ Paragraph.prototype =
         if ( Id != this.Parent.Get_Styles().Get_Default_Paragraph() )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : Id_old, New : Id } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_PStyle, Old : Id_old, New : Id } );
             this.Pr.PStyle = Id;
             this.private_UpdateTrackRevisionOnChangeParaPr(true);
         }
@@ -8162,11 +8268,11 @@ Paragraph.prototype =
             this.Set_Shd( undefined, true );
             this.Set_WidowControl( undefined );
             this.Set_Tabs( new CParaTabs() );
-            this.Set_Border( undefined, historyitem_Paragraph_Borders_Between );
-            this.Set_Border( undefined, historyitem_Paragraph_Borders_Bottom );
-            this.Set_Border( undefined, historyitem_Paragraph_Borders_Left );
-            this.Set_Border( undefined, historyitem_Paragraph_Borders_Right );
-            this.Set_Border( undefined, historyitem_Paragraph_Borders_Top );
+            this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Between );
+            this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Bottom );
+            this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Left );
+            this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Right );
+            this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Top );
 
             // При изменении стиля убираются только те текстовые настроки внутри параграфа,
             // которые присутствуют в стиле. Пока мы удалим вообще все настроки.
@@ -8195,7 +8301,7 @@ Paragraph.prototype =
         if ( undefined != this.Pr.PStyle )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_PStyle, Old : this.Pr.PStyle, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_PStyle, Old : this.Pr.PStyle, New : undefined } );
             this.Pr.PStyle = undefined;
         }
 
@@ -8296,11 +8402,11 @@ Paragraph.prototype =
         this.Set_Shd( new CDocumentShd(), true );
         this.Set_WidowControl( undefined );
         this.Set_Tabs( new CParaTabs() );
-        this.Set_Border( undefined, historyitem_Paragraph_Borders_Between );
-        this.Set_Border( undefined, historyitem_Paragraph_Borders_Bottom );
-        this.Set_Border( undefined, historyitem_Paragraph_Borders_Left );
-        this.Set_Border( undefined, historyitem_Paragraph_Borders_Right );
-        this.Set_Border( undefined, historyitem_Paragraph_Borders_Top );
+        this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Between );
+        this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Bottom );
+        this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Left );
+        this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Right );
+        this.Set_Border( undefined, AscDFH.historyitem_Paragraph_Borders_Top );
         if(!(this.bFromDocument === true))
         {
             this.Set_Bullet(undefined);
@@ -8337,21 +8443,21 @@ Paragraph.prototype =
         if ( ( undefined != Ind.FirstLine || true === bDeleteUndefined ) && this.Pr.Ind.FirstLine !== Ind.FirstLine )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Ind_First, New : Ind.FirstLine, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_First, New : Ind.FirstLine, Old : ( undefined != this.Pr.Ind.FirstLine ? this.Pr.Ind.FirstLine : undefined ) } );
             this.Pr.Ind.FirstLine = Ind.FirstLine;
         }
 
         if ( ( undefined != Ind.Left || true === bDeleteUndefined ) && this.Pr.Ind.Left !== Ind.Left )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Left, New : Ind.Left, Old : ( undefined != this.Pr.Ind.Left ? this.Pr.Ind.Left : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Left, New : Ind.Left, Old : ( undefined != this.Pr.Ind.Left ? this.Pr.Ind.Left : undefined ) } );
             this.Pr.Ind.Left = Ind.Left;
         }
 
         if ( ( undefined != Ind.Right || true === bDeleteUndefined ) && this.Pr.Ind.Right !== Ind.Right )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Ind_Right, New : Ind.Right, Old : ( undefined != this.Pr.Ind.Right ? this.Pr.Ind.Right : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Ind_Right, New : Ind.Right, Old : ( undefined != this.Pr.Ind.Right ? this.Pr.Ind.Right : undefined ) } );
             this.Pr.Ind.Right = Ind.Right;
         }
 
@@ -8368,42 +8474,42 @@ Paragraph.prototype =
         if ( ( undefined != Spacing.Line || true === bDeleteUndefined ) && this.Pr.Spacing.Line !== Spacing.Line )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_Line, New : Spacing.Line, Old : ( undefined != this.Pr.Spacing.Line ? this.Pr.Spacing.Line : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_Line, New : Spacing.Line, Old : ( undefined != this.Pr.Spacing.Line ? this.Pr.Spacing.Line : undefined ) } );
             this.Pr.Spacing.Line = Spacing.Line;
         }
 
         if ( ( undefined != Spacing.LineRule || true === bDeleteUndefined ) && this.Pr.Spacing.LineRule !== Spacing.LineRule )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_LineRule, New : Spacing.LineRule, Old : ( undefined != this.Pr.Spacing.LineRule ? this.Pr.Spacing.LineRule : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_LineRule, New : Spacing.LineRule, Old : ( undefined != this.Pr.Spacing.LineRule ? this.Pr.Spacing.LineRule : undefined ) } );
             this.Pr.Spacing.LineRule = Spacing.LineRule;
         }
 
         if ( ( undefined != Spacing.Before || true === bDeleteUndefined ) && this.Pr.Spacing.Before !== Spacing.Before )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_Before, New : Spacing.Before, Old : ( undefined != this.Pr.Spacing.Before ? this.Pr.Spacing.Before : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_Before, New : Spacing.Before, Old : ( undefined != this.Pr.Spacing.Before ? this.Pr.Spacing.Before : undefined ) } );
             this.Pr.Spacing.Before = Spacing.Before;
         }
 
         if ( ( undefined != Spacing.After || true === bDeleteUndefined ) && this.Pr.Spacing.After !== Spacing.After )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_After, New : Spacing.After, Old : ( undefined != this.Pr.Spacing.After ? this.Pr.Spacing.After : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_After, New : Spacing.After, Old : ( undefined != this.Pr.Spacing.After ? this.Pr.Spacing.After : undefined ) } );
             this.Pr.Spacing.After = Spacing.After;
         }
 
         if ( ( undefined != Spacing.AfterAutoSpacing || true === bDeleteUndefined ) && this.Pr.Spacing.AfterAutoSpacing !== Spacing.AfterAutoSpacing )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_AfterAutoSpacing, New : Spacing.AfterAutoSpacing, Old : ( undefined != this.Pr.Spacing.AfterAutoSpacing ? this.Pr.Spacing.AfterAutoSpacing : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing, New : Spacing.AfterAutoSpacing, Old : ( undefined != this.Pr.Spacing.AfterAutoSpacing ? this.Pr.Spacing.AfterAutoSpacing : undefined ) } );
             this.Pr.Spacing.AfterAutoSpacing = Spacing.AfterAutoSpacing;
         }
 
         if ( ( undefined != Spacing.BeforeAutoSpacing || true === bDeleteUndefined ) && this.Pr.Spacing.BeforeAutoSpacing !== Spacing.BeforeAutoSpacing )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Spacing_BeforeAutoSpacing, New : Spacing.BeforeAutoSpacing, Old : ( undefined != this.Pr.Spacing.BeforeAutoSpacing ? this.Pr.Spacing.BeforeAutoSpacing : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing, New : Spacing.BeforeAutoSpacing, Old : ( undefined != this.Pr.Spacing.BeforeAutoSpacing ? this.Pr.Spacing.BeforeAutoSpacing : undefined ) } );
             this.Pr.Spacing.BeforeAutoSpacing = Spacing.BeforeAutoSpacing;
         }
 
@@ -8418,7 +8524,7 @@ Paragraph.prototype =
         {
             this.private_AddPrChange();
 
-            History.Add( this, { Type : historyitem_Paragraph_Align, New : Align, Old : ( undefined != this.Pr.Jc ? this.Pr.Jc : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Align, New : Align, Old : ( undefined != this.Pr.Jc ? this.Pr.Jc : undefined ) } );
             this.Pr.Jc = Align;
 
             // Надо пересчитать конечный стиль
@@ -8434,7 +8540,7 @@ Paragraph.prototype =
             if ( undefined != this.Pr.Shd )
             {
                 this.private_AddPrChange();
-                History.Add( this, { Type : historyitem_Paragraph_Shd, New : undefined, Old : this.Pr.Shd } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Shd, New : undefined, Old : this.Pr.Shd } );
                 this.Pr.Shd = undefined;
             }
         }
@@ -8446,27 +8552,27 @@ Paragraph.prototype =
             if (undefined === this.Pr.Shd)
             {
                 this.Pr.Shd = new CDocumentShd();
-                History.Add( this, { Type : historyitem_Paragraph_Shd, Old : undefined, New : this.Pr.Shd } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Shd, Old : undefined, New : this.Pr.Shd } );
             }
 
             if ( ( undefined != Shd.Value || true === bDeleteUndefined ) && this.Pr.Shd.Value !== Shd.Value )
             {
                 this.private_AddPrChange();
-                History.Add( this, { Type : historyitem_Paragraph_Shd_Value, New : Shd.Value, Old : ( undefined != this.Pr.Shd.Value ? this.Pr.Shd.Value : undefined ) } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Shd_Value, New : Shd.Value, Old : ( undefined != this.Pr.Shd.Value ? this.Pr.Shd.Value : undefined ) } );
                 this.Pr.Shd.Value = Shd.Value;
             }
 
             if ( undefined != Shd.Color || true === bDeleteUndefined )
             {
                 this.private_AddPrChange();
-                History.Add( this, { Type : historyitem_Paragraph_Shd_Color, New : Shd.Color, Old : ( undefined != this.Pr.Shd.Color ? this.Pr.Shd.Color : undefined ) } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Shd_Color, New : Shd.Color, Old : ( undefined != this.Pr.Shd.Color ? this.Pr.Shd.Color : undefined ) } );
                 this.Pr.Shd.Color = Shd.Color;
             }
 
             if(undefined != Shd.Unifill || true === bDeleteUndefined)
             {
                 this.private_AddPrChange();
-                History.Add( this, { Type : historyitem_Paragraph_Shd_Unifill, New : Shd.Unifill, Old : ( undefined != this.Pr.Shd.Unifill ? this.Pr.Shd.Unifill : undefined ) } );
+                History.Add( this, { Type : AscDFH.historyitem_Paragraph_Shd_Unifill, New : Shd.Unifill, Old : ( undefined != this.Pr.Shd.Unifill ? this.Pr.Shd.Unifill : undefined ) } );
                 this.Pr.Shd.Unifill = Shd.Unifill;
             }
         }
@@ -8499,7 +8605,7 @@ Paragraph.prototype =
         }
 
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_Tabs, New : _Tabs, Old : this.Pr.Tabs } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Tabs, New : _Tabs, Old : this.Pr.Tabs } );
         this.Pr.Tabs = _Tabs;
 
         // Надо пересчитать конечный стиль
@@ -8512,7 +8618,7 @@ Paragraph.prototype =
         if ( Value != this.Pr.ContextualSpacing )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_ContextualSpacing, New : Value, Old : ( undefined != this.Pr.ContextualSpacing ? this.Pr.ContextualSpacing : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_ContextualSpacing, New : Value, Old : ( undefined != this.Pr.ContextualSpacing ? this.Pr.ContextualSpacing : undefined ) } );
             this.Pr.ContextualSpacing = Value;
 
             // Надо пересчитать конечный стиль
@@ -8526,7 +8632,7 @@ Paragraph.prototype =
         if ( Value != this.Pr.PageBreakBefore )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_PageBreakBefore, New : Value, Old : ( undefined != this.Pr.PageBreakBefore ? this.Pr.PageBreakBefore : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_PageBreakBefore, New : Value, Old : ( undefined != this.Pr.PageBreakBefore ? this.Pr.PageBreakBefore : undefined ) } );
             this.Pr.PageBreakBefore = Value;
 
             // Надо пересчитать конечный стиль
@@ -8540,7 +8646,7 @@ Paragraph.prototype =
         if ( Value != this.Pr.KeepLines )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_KeepLines, New : Value, Old : ( undefined != this.Pr.KeepLines ? this.Pr.KeepLines : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_KeepLines, New : Value, Old : ( undefined != this.Pr.KeepLines ? this.Pr.KeepLines : undefined ) } );
             this.Pr.KeepLines = Value;
 
             // Надо пересчитать конечный стиль
@@ -8554,7 +8660,7 @@ Paragraph.prototype =
         if ( Value != this.Pr.KeepNext )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_KeepNext, New : Value, Old : ( undefined != this.Pr.KeepNext ? this.Pr.KeepNext : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_KeepNext, New : Value, Old : ( undefined != this.Pr.KeepNext ? this.Pr.KeepNext : undefined ) } );
             this.Pr.KeepNext = Value;
 
             // Надо пересчитать конечный стиль
@@ -8568,7 +8674,7 @@ Paragraph.prototype =
         if ( Value != this.Pr.WidowControl )
         {
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_WidowControl, New : Value, Old : ( undefined != this.Pr.WidowControl ? this.Pr.WidowControl : undefined ) } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_WidowControl, New : Value, Old : ( undefined != this.Pr.WidowControl ? this.Pr.WidowControl : undefined ) } );
             this.Pr.WidowControl = Value;
 
             // Надо пересчитать конечный стиль
@@ -8598,7 +8704,7 @@ Paragraph.prototype =
             }
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Borders_Between, New : NewBorder, Old : this.Pr.Brd.Between } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Borders_Between, New : NewBorder, Old : this.Pr.Brd.Between } );
             this.Pr.Brd.Between = NewBorder;
         }
 
@@ -8617,7 +8723,7 @@ Paragraph.prototype =
             }
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Borders_Top, New : NewBorder, Old : this.Pr.Brd.Top } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Borders_Top, New : NewBorder, Old : this.Pr.Brd.Top } );
             this.Pr.Brd.Top = NewBorder;
         }
 
@@ -8636,7 +8742,7 @@ Paragraph.prototype =
             }
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Borders_Right, New : NewBorder, Old : this.Pr.Brd.Right } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Borders_Right, New : NewBorder, Old : this.Pr.Brd.Right } );
             this.Pr.Brd.Right = NewBorder;
         }
 
@@ -8654,7 +8760,7 @@ Paragraph.prototype =
             }
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Borders_Bottom, New : NewBorder, Old : this.Pr.Brd.Bottom } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Borders_Bottom, New : NewBorder, Old : this.Pr.Brd.Bottom } );
             this.Pr.Brd.Bottom = NewBorder;
         }
 
@@ -8673,7 +8779,7 @@ Paragraph.prototype =
             }
 
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_Borders_Left, New : NewBorder, Old : this.Pr.Brd.Left } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_Borders_Left, New : NewBorder, Old : this.Pr.Brd.Left } );
             this.Pr.Brd.Left = NewBorder;
         }
 
@@ -8687,11 +8793,11 @@ Paragraph.prototype =
         var OldValue;
         switch( HistoryType )
         {
-            case historyitem_Paragraph_Borders_Between: OldValue = this.Pr.Brd.Between; this.Pr.Brd.Between = Border; break;
-            case historyitem_Paragraph_Borders_Bottom:  OldValue = this.Pr.Brd.Bottom;  this.Pr.Brd.Bottom  = Border; break;
-            case historyitem_Paragraph_Borders_Left:    OldValue = this.Pr.Brd.Left;    this.Pr.Brd.Left    = Border; break;
-            case historyitem_Paragraph_Borders_Right:   OldValue = this.Pr.Brd.Right;   this.Pr.Brd.Right   = Border; break;
-            case historyitem_Paragraph_Borders_Top:     OldValue = this.Pr.Brd.Top;     this.Pr.Brd.Top     = Border; break;
+            case AscDFH.historyitem_Paragraph_Borders_Between: OldValue = this.Pr.Brd.Between; this.Pr.Brd.Between = Border; break;
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:  OldValue = this.Pr.Brd.Bottom;  this.Pr.Brd.Bottom  = Border; break;
+            case AscDFH.historyitem_Paragraph_Borders_Left:    OldValue = this.Pr.Brd.Left;    this.Pr.Brd.Left    = Border; break;
+            case AscDFH.historyitem_Paragraph_Borders_Right:   OldValue = this.Pr.Brd.Right;   this.Pr.Brd.Right   = Border; break;
+            case AscDFH.historyitem_Paragraph_Borders_Top:     OldValue = this.Pr.Brd.Top;     this.Pr.Brd.Top     = Border; break;
         }
 
         this.private_AddPrChange();
@@ -8705,7 +8811,7 @@ Paragraph.prototype =
     Set_Bullet : function(Bullet)
     {
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_PresentationPr_Bullet, New : Bullet, Old : this.Pr.Bullet } );
         this.Pr.Bullet = Bullet;
         this.CompiledPr.NeedRecalc = true;
         this.private_UpdateTrackRevisionOnChangeParaPr(true);
@@ -9020,13 +9126,13 @@ Paragraph.prototype =
 
     Set_DocumentNext : function(Object)
     {
-        History.Add( this, { Type : historyitem_Paragraph_DocNext, New : Object, Old : this.Next } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_DocNext, New : Object, Old : this.Next } );
         this.Next = Object;
     },
 
     Set_DocumentPrev : function(Object)
     {
-        History.Add( this, { Type : historyitem_Paragraph_DocPrev, New : Object, Old : this.Prev } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_DocPrev, New : Object, Old : this.Prev } );
         this.Prev = Object;
     },
 
@@ -9047,7 +9153,7 @@ Paragraph.prototype =
 
     Set_Parent : function(ParentObject)
     {
-        History.Add( this, { Type : historyitem_Paragraph_Parent, New : ParentObject, Old : this.Parent } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_Parent, New : ParentObject, Old : this.Parent } );
         this.Parent = ParentObject;
     },
 
@@ -9168,12 +9274,12 @@ Paragraph.prototype =
         if (null != Hyperlink && (Y <= this.Pages[CurPage].Bounds.Bottom && Y >= this.Pages[CurPage].Bounds.Top))
         {
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Hyperlink;
-            MMData.Hyperlink = new CHyperlinkProperty( Hyperlink );
+            MMData.Hyperlink = new Asc.CHyperlinkProperty( Hyperlink );
         }
         else
             MMData.Type      = AscCommon.c_oAscMouseMoveDataTypes.Common;
 
-        if ( null != Hyperlink && true === global_keyboardEvent.CtrlKey )
+        if ( null != Hyperlink && true === AscCommon.global_keyboardEvent.CtrlKey )
             this.DrawingDocument.SetCursorType( "pointer", MMData );
         else
             this.DrawingDocument.SetCursorType( "default", MMData );
@@ -9501,7 +9607,7 @@ Paragraph.prototype =
         {
             this.Pr.FramePr = undefined;
             this.private_AddPrChange();
-            History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : undefined } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_FramePr, Old : FramePr_old, New : undefined } );
             this.CompiledPr.NeedRecalc = true;
             this.private_UpdateTrackRevisionOnChangeParaPr(true);
             return;
@@ -9637,7 +9743,7 @@ Paragraph.prototype =
         }
 
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_FramePr, Old : FramePr_old, New : this.Pr.FramePr } );
         this.CompiledPr.NeedRecalc = true;
         this.private_UpdateTrackRevisionOnChangeParaPr(true);
     },
@@ -9645,7 +9751,7 @@ Paragraph.prototype =
     Set_FramePr2 : function(FramePr)
     {
         this.private_AddPrChange();
-        History.Add( this, { Type : historyitem_Paragraph_FramePr, Old : this.Pr.FramePr, New : FramePr } );
+        History.Add( this, { Type : AscDFH.historyitem_Paragraph_FramePr, Old : this.Pr.FramePr, New : FramePr } );
         this.Pr.FramePr = FramePr;
         this.CompiledPr.NeedRecalc = true;
         this.private_UpdateTrackRevisionOnChangeParaPr(true);
@@ -9801,7 +9907,7 @@ Paragraph.prototype =
         var FrameParas = this.Internal_Get_FrameParagraphs();
         if ( false === LogicDocument.Document_Is_SelectionLocked( AscCommon.changestype_None, { Type : AscCommon.changestype_2_ElementsArray_and_Type, Elements : FrameParas, CheckType : AscCommon.changestype_Paragraph_Content } ) )
         {
-            History.Create_NewPoint(historydescription_Document_ParagraphChangeFrame);
+            History.Create_NewPoint(AscDFH.historydescription_Document_ParagraphChangeFrame);
             var NewFramePr = FramePr.Copy();
 
             if ( Math.abs( X - this.CalculatedFrame.L ) > 0.001 )
@@ -10298,7 +10404,7 @@ Paragraph.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Paragraph_AddItem:
+            case  AscDFH.historyitem_Paragraph_AddItem:
             {
                 var StartPos = Data.Pos;
                 var EndPos   = Data.EndPos;
@@ -10308,7 +10414,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_RemoveItem:
+            case AscDFH.historyitem_Paragraph_RemoveItem:
             {
                 var Pos = Data.Pos;
 
@@ -10320,7 +10426,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Numbering:
+            case AscDFH.historyitem_Paragraph_Numbering:
             {
                 var Old = Data.Old;
                 if ( undefined != Old )
@@ -10335,7 +10441,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Align:
+            case AscDFH.historyitem_Paragraph_Align:
             {
                 this.Pr.Jc = Data.Old;
 
@@ -10344,7 +10450,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_First:
+            case AscDFH.historyitem_Paragraph_Ind_First:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
@@ -10356,7 +10462,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Left:
+            case AscDFH.historyitem_Paragraph_Ind_Left:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
@@ -10368,7 +10474,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Right:
+            case AscDFH.historyitem_Paragraph_Ind_Right:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaSpacing();
@@ -10380,7 +10486,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_ContextualSpacing:
+            case AscDFH.historyitem_Paragraph_ContextualSpacing:
             {
                 this.Pr.ContextualSpacing = Data.Old;
 
@@ -10389,7 +10495,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepLines:
+            case AscDFH.historyitem_Paragraph_KeepLines:
             {
                 this.Pr.KeepLines = Data.Old;
 
@@ -10398,7 +10504,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepNext:
+            case AscDFH.historyitem_Paragraph_KeepNext:
             {
                 this.Pr.KeepNext = Data.Old;
 
@@ -10407,7 +10513,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PageBreakBefore:
+            case AscDFH.historyitem_Paragraph_PageBreakBefore:
             {
                 this.Pr.PageBreakBefore = Data.Old;
 
@@ -10416,7 +10522,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Line:
+            case AscDFH.historyitem_Paragraph_Spacing_Line:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10428,7 +10534,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_LineRule:
+            case AscDFH.historyitem_Paragraph_Spacing_LineRule:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10440,7 +10546,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Before:
+            case AscDFH.historyitem_Paragraph_Spacing_Before:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10452,7 +10558,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_After:
+            case AscDFH.historyitem_Paragraph_Spacing_After:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10464,7 +10570,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_AfterAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10476,7 +10582,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10488,7 +10594,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Value:
+            case AscDFH.historyitem_Paragraph_Shd_Value:
             {
                 if ( undefined != Data.Old && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10501,7 +10607,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Color:
+            case AscDFH.historyitem_Paragraph_Shd_Color:
             {
                 if ( undefined != Data.Old && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10514,7 +10620,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Unifill:
+            case AscDFH.historyitem_Paragraph_Shd_Unifill:
             {
                 if ( undefined != Data.Old && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10527,7 +10633,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd:
+            case AscDFH.historyitem_Paragraph_Shd:
             {
                 this.Pr.Shd = Data.Old;
 
@@ -10536,7 +10642,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_WidowControl:
+            case AscDFH.historyitem_Paragraph_WidowControl:
             {
                 this.Pr.WidowControl = Data.Old;
 
@@ -10545,7 +10651,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Tabs:
+            case AscDFH.historyitem_Paragraph_Tabs:
             {
                 this.Pr.Tabs = Data.Old;
 
@@ -10554,7 +10660,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PStyle:
+            case AscDFH.historyitem_Paragraph_PStyle:
             {
                 var Old = Data.Old;
                 if ( undefined != Old )
@@ -10568,25 +10674,25 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_DocNext:
+            case AscDFH.historyitem_Paragraph_DocNext:
             {
                 this.Next = Data.Old;
                 break;
             }
 
-            case historyitem_Paragraph_DocPrev:
+            case AscDFH.historyitem_Paragraph_DocPrev:
             {
                 this.Prev = Data.Old;
                 break;
             }
 
-            case historyitem_Paragraph_Parent:
+            case AscDFH.historyitem_Paragraph_Parent:
             {
                 this.Parent = Data.Old;
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Between:
+            case AscDFH.historyitem_Paragraph_Borders_Between:
             {
                 this.Pr.Brd.Between = Data.Old;
 
@@ -10595,7 +10701,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Bottom:
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:
             {
                 this.Pr.Brd.Bottom = Data.Old;
 
@@ -10604,7 +10710,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Left:
+            case AscDFH.historyitem_Paragraph_Borders_Left:
             {
                 this.Pr.Brd.Left = Data.Old;
 
@@ -10613,7 +10719,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Right:
+            case AscDFH.historyitem_Paragraph_Borders_Right:
             {
                 this.Pr.Brd.Right = Data.Old;
 
@@ -10622,7 +10728,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Top:
+            case AscDFH.historyitem_Paragraph_Borders_Top:
             {
                 this.Pr.Brd.Top = Data.Old;
 
@@ -10631,7 +10737,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Pr:
+            case AscDFH.historyitem_Paragraph_Pr:
             {
                 var Old = Data.Old;
                 if ( undefined != Old )
@@ -10644,7 +10750,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Bullet:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
             {
                 this.Pr.Bullet = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
@@ -10652,7 +10758,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Level:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Level:
             {
                 this.Pr.Lvl = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
@@ -10661,7 +10767,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_FramePr:
+            case AscDFH.historyitem_Paragraph_FramePr:
             {
                 this.Pr.FramePr = Data.Old;
                 this.CompiledPr.NeedRecalc = true;
@@ -10669,14 +10775,14 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_SectionPr:
+            case AscDFH.historyitem_Paragraph_SectionPr:
             {
                 this.SectPr = Data.Old;
                 this.LogicDocument.Update_SectionsInfo();
                 break;
             }
 
-            case historyitem_Paragraph_PrChange:
+            case AscDFH.historyitem_Paragraph_PrChange:
             {
                 this.Pr.PrChange   = Data.Old.PrChange;
                 this.Pr.ReviewInfo = Data.Old.ReviewInfo;
@@ -10684,7 +10790,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrReviewInfo:
+            case AscDFH.historyitem_Paragraph_PrReviewInfo:
             {
                 this.Pr.ReviewInfo = Data.Old;
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
@@ -10702,7 +10808,7 @@ Paragraph.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Paragraph_AddItem:
+            case  AscDFH.historyitem_Paragraph_AddItem:
             {
                 var Pos = Data.Pos;
 
@@ -10715,7 +10821,7 @@ Paragraph.prototype =
 
             }
 
-            case historyitem_Paragraph_RemoveItem:
+            case AscDFH.historyitem_Paragraph_RemoveItem:
             {
                 var StartPos = Data.Pos;
                 var EndPos   = Data.EndPos;
@@ -10725,7 +10831,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Numbering:
+            case AscDFH.historyitem_Paragraph_Numbering:
             {
                 var New = Data.New;
                 if ( undefined != New )
@@ -10740,7 +10846,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Align:
+            case AscDFH.historyitem_Paragraph_Align:
             {
                 this.Pr.Jc = Data.New;
 
@@ -10749,7 +10855,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_First:
+            case AscDFH.historyitem_Paragraph_Ind_First:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
@@ -10761,7 +10867,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Left:
+            case AscDFH.historyitem_Paragraph_Ind_Left:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
@@ -10773,7 +10879,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Right:
+            case AscDFH.historyitem_Paragraph_Ind_Right:
             {
                 if ( undefined === this.Pr.Ind )
                     this.Pr.Ind = new CParaInd();
@@ -10785,7 +10891,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_ContextualSpacing:
+            case AscDFH.historyitem_Paragraph_ContextualSpacing:
             {
                 this.Pr.ContextualSpacing = Data.New;
 
@@ -10794,7 +10900,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepLines:
+            case AscDFH.historyitem_Paragraph_KeepLines:
             {
                 this.Pr.KeepLines = Data.New;
 
@@ -10803,7 +10909,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepNext:
+            case AscDFH.historyitem_Paragraph_KeepNext:
             {
                 this.Pr.KeepNext = Data.New;
 
@@ -10812,7 +10918,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PageBreakBefore:
+            case AscDFH.historyitem_Paragraph_PageBreakBefore:
             {
                 this.Pr.PageBreakBefore = Data.New;
 
@@ -10821,7 +10927,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Line:
+            case AscDFH.historyitem_Paragraph_Spacing_Line:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10833,7 +10939,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_LineRule:
+            case AscDFH.historyitem_Paragraph_Spacing_LineRule:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10845,7 +10951,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Before:
+            case AscDFH.historyitem_Paragraph_Spacing_Before:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10857,7 +10963,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_After:
+            case AscDFH.historyitem_Paragraph_Spacing_After:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10869,7 +10975,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_AfterAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10881,7 +10987,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
             {
                 if ( undefined === this.Pr.Spacing )
                     this.Pr.Spacing = new CParaSpacing();
@@ -10893,7 +10999,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Value:
+            case AscDFH.historyitem_Paragraph_Shd_Value:
             {
                 if ( undefined != Data.New && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10906,7 +11012,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Color:
+            case AscDFH.historyitem_Paragraph_Shd_Color:
             {
                 if ( undefined != Data.New && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10918,7 +11024,7 @@ Paragraph.prototype =
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
                 break;
             }
-            case historyitem_Paragraph_Shd_Unifill:
+            case AscDFH.historyitem_Paragraph_Shd_Unifill:
             {
                 if ( undefined != Data.New && undefined === this.Pr.Shd )
                     this.Pr.Shd = new CDocumentShd();
@@ -10932,7 +11038,7 @@ Paragraph.prototype =
             }
 
 
-            case historyitem_Paragraph_Shd:
+            case AscDFH.historyitem_Paragraph_Shd:
             {
                 this.Pr.Shd = Data.New;
 
@@ -10942,7 +11048,7 @@ Paragraph.prototype =
             }
 
 
-            case historyitem_Paragraph_WidowControl:
+            case AscDFH.historyitem_Paragraph_WidowControl:
             {
                 this.Pr.WidowControl = Data.New;
 
@@ -10951,7 +11057,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Tabs:
+            case AscDFH.historyitem_Paragraph_Tabs:
             {
                 this.Pr.Tabs = Data.New;
 
@@ -10960,7 +11066,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PStyle:
+            case AscDFH.historyitem_Paragraph_PStyle:
             {
                 var New = Data.New;
                 if ( undefined != New )
@@ -10974,25 +11080,25 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_DocNext:
+            case AscDFH.historyitem_Paragraph_DocNext:
             {
                 this.Next = Data.New;
                 break;
             }
 
-            case historyitem_Paragraph_DocPrev:
+            case AscDFH.historyitem_Paragraph_DocPrev:
             {
                 this.Prev = Data.New;
                 break;
             }
 
-            case historyitem_Paragraph_Parent:
+            case AscDFH.historyitem_Paragraph_Parent:
             {
                 this.Parent = Data.New;
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Between:
+            case AscDFH.historyitem_Paragraph_Borders_Between:
             {
                 this.Pr.Brd.Between = Data.New;
 
@@ -11001,7 +11107,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Bottom:
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:
             {
                 this.Pr.Brd.Bottom = Data.New;
 
@@ -11010,7 +11116,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Left:
+            case AscDFH.historyitem_Paragraph_Borders_Left:
             {
                 this.Pr.Brd.Left = Data.New;
 
@@ -11019,7 +11125,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Right:
+            case AscDFH.historyitem_Paragraph_Borders_Right:
             {
                 this.Pr.Brd.Right = Data.New;
 
@@ -11028,7 +11134,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Top:
+            case AscDFH.historyitem_Paragraph_Borders_Top:
             {
                 this.Pr.Brd.Top = Data.New;
 
@@ -11037,7 +11143,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Pr:
+            case AscDFH.historyitem_Paragraph_Pr:
             {
                 var New = Data.New;
                 if ( undefined != New )
@@ -11050,7 +11156,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Bullet:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
             {
                 this.Pr.Bullet = Data.New;
                 this.CompiledPr.NeedRecalc = true;
@@ -11058,7 +11164,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Level:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Level:
             {
                 this.Pr.Lvl = Data.New;
                 this.CompiledPr.NeedRecalc = true;
@@ -11067,7 +11173,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_FramePr:
+            case AscDFH.historyitem_Paragraph_FramePr:
             {
                 this.Pr.FramePr = Data.New;
                 this.CompiledPr.NeedRecalc = true;
@@ -11075,14 +11181,14 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_SectionPr:
+            case AscDFH.historyitem_Paragraph_SectionPr:
             {
                 this.SectPr = Data.New;
                 this.LogicDocument.Update_SectionsInfo();
                 break;
             }
 
-            case historyitem_Paragraph_PrChange:
+            case AscDFH.historyitem_Paragraph_PrChange:
             {
                 this.Pr.PrChange   = Data.New.PrChange;
                 this.Pr.ReviewInfo = Data.New.ReviewInfo;
@@ -11090,7 +11196,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrReviewInfo:
+            case AscDFH.historyitem_Paragraph_PrReviewInfo:
             {
                 this.Pr.ReviewInfo = Data.New;
                 this.private_UpdateTrackRevisionOnChangeParaPr(false);
@@ -11176,8 +11282,8 @@ Paragraph.prototype =
 
         switch ( Type )
         {
-            case historyitem_Paragraph_AddItem:
-            case historyitem_Paragraph_RemoveItem:
+            case AscDFH.historyitem_Paragraph_AddItem:
+            case AscDFH.historyitem_Paragraph_RemoveItem:
             {
                 for ( CurPage = this.Pages.length - 1; CurPage > 0; CurPage-- )
                 {
@@ -11189,11 +11295,11 @@ Paragraph.prototype =
                 bNeedRecalc = true;
                 break;
             }
-            case historyitem_Paragraph_Numbering:
-            case historyitem_Paragraph_PStyle:
-            case historyitem_Paragraph_Pr:
-            case historyitem_Paragraph_PresentationPr_Bullet:
-            case historyitem_Paragraph_PresentationPr_Level:
+            case AscDFH.historyitem_Paragraph_Numbering:
+            case AscDFH.historyitem_Paragraph_PStyle:
+            case AscDFH.historyitem_Paragraph_Pr:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Level:
             {
                 this.RecalcInfo.Set_Type_0(pararecalc_0_All);
                 bNeedRecalc = true;
@@ -11204,37 +11310,37 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Align:
-            case historyitem_Paragraph_Ind_First:
-            case historyitem_Paragraph_Ind_Left:
-            case historyitem_Paragraph_Ind_Right:
-            case historyitem_Paragraph_ContextualSpacing:
-            case historyitem_Paragraph_KeepLines:
-            case historyitem_Paragraph_KeepNext:
-            case historyitem_Paragraph_PageBreakBefore:
-            case historyitem_Paragraph_Spacing_Line:
-            case historyitem_Paragraph_Spacing_LineRule:
-            case historyitem_Paragraph_Spacing_Before:
-            case historyitem_Paragraph_Spacing_After:
-            case historyitem_Paragraph_Spacing_AfterAutoSpacing:
-            case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
-            case historyitem_Paragraph_WidowControl:
-            case historyitem_Paragraph_Tabs:
-            case historyitem_Paragraph_Parent:
-            case historyitem_Paragraph_Borders_Between:
-            case historyitem_Paragraph_Borders_Bottom:
-            case historyitem_Paragraph_Borders_Left:
-            case historyitem_Paragraph_Borders_Right:
-            case historyitem_Paragraph_Borders_Top:
-            case historyitem_Paragraph_FramePr:
+            case AscDFH.historyitem_Paragraph_Align:
+            case AscDFH.historyitem_Paragraph_Ind_First:
+            case AscDFH.historyitem_Paragraph_Ind_Left:
+            case AscDFH.historyitem_Paragraph_Ind_Right:
+            case AscDFH.historyitem_Paragraph_ContextualSpacing:
+            case AscDFH.historyitem_Paragraph_KeepLines:
+            case AscDFH.historyitem_Paragraph_KeepNext:
+            case AscDFH.historyitem_Paragraph_PageBreakBefore:
+            case AscDFH.historyitem_Paragraph_Spacing_Line:
+            case AscDFH.historyitem_Paragraph_Spacing_LineRule:
+            case AscDFH.historyitem_Paragraph_Spacing_Before:
+            case AscDFH.historyitem_Paragraph_Spacing_After:
+            case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+            case AscDFH.historyitem_Paragraph_WidowControl:
+            case AscDFH.historyitem_Paragraph_Tabs:
+            case AscDFH.historyitem_Paragraph_Parent:
+            case AscDFH.historyitem_Paragraph_Borders_Between:
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:
+            case AscDFH.historyitem_Paragraph_Borders_Left:
+            case AscDFH.historyitem_Paragraph_Borders_Right:
+            case AscDFH.historyitem_Paragraph_Borders_Top:
+            case AscDFH.historyitem_Paragraph_FramePr:
             {
                 bNeedRecalc = true;
                 break;
             }
-            case historyitem_Paragraph_Shd_Value:
-            case historyitem_Paragraph_Shd_Color:
-            case historyitem_Paragraph_Shd_Unifill:
-            case historyitem_Paragraph_Shd:
+            case AscDFH.historyitem_Paragraph_Shd_Value:
+            case AscDFH.historyitem_Paragraph_Shd_Color:
+            case AscDFH.historyitem_Paragraph_Shd_Unifill:
+            case AscDFH.historyitem_Paragraph_Shd:
             {
                 if(this.Parent)
                 {
@@ -11249,8 +11355,8 @@ Paragraph.prototype =
                 }
                 break;
             }
-            case historyitem_Paragraph_DocNext:
-            case historyitem_Paragraph_DocPrev:
+            case AscDFH.historyitem_Paragraph_DocNext:
+            case AscDFH.historyitem_Paragraph_DocPrev:
             {
                 // Пересчитывать этот элемент не надо при таких изменениях
                 break;
@@ -11286,7 +11392,7 @@ Paragraph.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Paragraph );
+        Writer.WriteLong( AscDFH.historyitem_type_Paragraph );
 
         var Type = Data.Type;
 
@@ -11295,7 +11401,7 @@ Paragraph.prototype =
 
         switch ( Type )
         {
-            case  historyitem_Paragraph_AddItem:
+            case  AscDFH.historyitem_Paragraph_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -11322,7 +11428,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_RemoveItem:
+            case AscDFH.historyitem_Paragraph_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -11355,7 +11461,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Numbering:
+            case AscDFH.historyitem_Paragraph_Numbering:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -11372,12 +11478,12 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_First:
-            case historyitem_Paragraph_Ind_Left:
-            case historyitem_Paragraph_Ind_Right:
-            case historyitem_Paragraph_Spacing_Line:
-            case historyitem_Paragraph_Spacing_Before:
-            case historyitem_Paragraph_Spacing_After:
+            case AscDFH.historyitem_Paragraph_Ind_First:
+            case AscDFH.historyitem_Paragraph_Ind_Left:
+            case AscDFH.historyitem_Paragraph_Ind_Right:
+            case AscDFH.historyitem_Paragraph_Spacing_Line:
+            case AscDFH.historyitem_Paragraph_Spacing_Before:
+            case AscDFH.historyitem_Paragraph_Spacing_After:
             {
                 // Bool : IsUndefined
 
@@ -11397,8 +11503,8 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Align:
-            case historyitem_Paragraph_Spacing_LineRule:
+            case AscDFH.historyitem_Paragraph_Align:
+            case AscDFH.historyitem_Paragraph_Spacing_LineRule:
             {
                 // Bool : IsUndefined
 
@@ -11418,13 +11524,13 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_ContextualSpacing:
-            case historyitem_Paragraph_KeepLines:
-            case historyitem_Paragraph_KeepNext:
-            case historyitem_Paragraph_PageBreakBefore:
-            case historyitem_Paragraph_Spacing_AfterAutoSpacing:
-            case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
-            case historyitem_Paragraph_WidowControl:
+            case AscDFH.historyitem_Paragraph_ContextualSpacing:
+            case AscDFH.historyitem_Paragraph_KeepLines:
+            case AscDFH.historyitem_Paragraph_KeepNext:
+            case AscDFH.historyitem_Paragraph_PageBreakBefore:
+            case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+            case AscDFH.historyitem_Paragraph_WidowControl:
             {
                 // Bool : IsUndefined
 
@@ -11444,7 +11550,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Value:
+            case AscDFH.historyitem_Paragraph_Shd_Value:
             {
                 // Bool : IsUndefined
 
@@ -11463,8 +11569,8 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Color:
-            case historyitem_Paragraph_Shd_Unifill:
+            case AscDFH.historyitem_Paragraph_Shd_Color:
+            case AscDFH.historyitem_Paragraph_Shd_Unifill:
             {
                 // Bool : IsUndefined
 
@@ -11483,7 +11589,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd:
+            case AscDFH.historyitem_Paragraph_Shd:
             {
                 // Bool : IsUndefined
 
@@ -11503,7 +11609,7 @@ Paragraph.prototype =
             }
 
 
-            case historyitem_Paragraph_Tabs:
+            case AscDFH.historyitem_Paragraph_Tabs:
             {
                 // Bool : IsUndefined
                 // Есди false
@@ -11520,7 +11626,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PStyle:
+            case AscDFH.historyitem_Paragraph_PStyle:
             {
                 // Bool : Удаляем ли
 
@@ -11538,9 +11644,9 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_DocNext:
-            case historyitem_Paragraph_DocPrev:
-            case historyitem_Paragraph_Parent:
+            case AscDFH.historyitem_Paragraph_DocNext:
+            case AscDFH.historyitem_Paragraph_DocPrev:
+            case AscDFH.historyitem_Paragraph_Parent:
             {
                 // String : Id элемента
 
@@ -11552,11 +11658,11 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Between:
-            case historyitem_Paragraph_Borders_Bottom:
-            case historyitem_Paragraph_Borders_Left:
-            case historyitem_Paragraph_Borders_Right:
-            case historyitem_Paragraph_Borders_Top:
+            case AscDFH.historyitem_Paragraph_Borders_Between:
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:
+            case AscDFH.historyitem_Paragraph_Borders_Left:
+            case AscDFH.historyitem_Paragraph_Borders_Right:
+            case AscDFH.historyitem_Paragraph_Borders_Top:
             {
                 // Bool : IsUndefined
                 // если false
@@ -11573,7 +11679,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Pr:
+            case AscDFH.historyitem_Paragraph_Pr:
             {
                 // Bool : удаляем ли
 
@@ -11588,7 +11694,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Bullet:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
             {
                 if(Data.New)
                 {
@@ -11603,14 +11709,14 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Level:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Level:
             {
                 // Long : Level
                 Writer.WriteLong( Data.New );
                 break;
             }
 
-            case historyitem_Paragraph_FramePr:
+            case AscDFH.historyitem_Paragraph_FramePr:
             {
                 // Bool : IsUndefined
                 // false ->
@@ -11627,7 +11733,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_SectionPr:
+            case AscDFH.historyitem_Paragraph_SectionPr:
             {
                 // Bool : IsUndefined
                 // false ->
@@ -11644,7 +11750,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrChange:
+            case AscDFH.historyitem_Paragraph_PrChange:
             {
                 // Bool : is undefined ?
                 // false -> PrChange
@@ -11670,7 +11776,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrReviewInfo:
+            case AscDFH.historyitem_Paragraph_PrReviewInfo:
             {
                 // Bool : is undefined ?
                 // false -> ReviewInfo
@@ -11696,14 +11802,14 @@ Paragraph.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Paragraph != ClassType )
+        if ( AscDFH.historyitem_type_Paragraph != ClassType )
             return;
 
         var Type = Reader.GetLong();
         var bPrChanged = false;
         switch ( Type )
         {
-            case  historyitem_Paragraph_AddItem:
+            case  AscDFH.historyitem_Paragraph_AddItem:
             {
                 // Long     : Количество элементов
                 // Array of :
@@ -11739,7 +11845,7 @@ Paragraph.prototype =
                             Element.Set_Paragraph(this);
 
                         this.Content.splice(Pos, 0, Element);
-                        CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                        AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
 
                         if (Element.Recalc_RunsCompiledPr)
                             Element.Recalc_RunsCompiledPr();
@@ -11751,7 +11857,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_RemoveItem:
+            case AscDFH.historyitem_Paragraph_RemoveItem:
             {
                 // Long          : Количество удаляемых элементов
                 // Array of Long : позиции удаляемых элементов
@@ -11767,7 +11873,7 @@ Paragraph.prototype =
                         continue;
 
                     this.Content.splice(ChangesPos, 1);
-                    CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
                 }
 
                 this.private_ResetSelection();
@@ -11775,7 +11881,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Numbering:
+            case AscDFH.historyitem_Paragraph_Numbering:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -11795,7 +11901,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Align:
+            case AscDFH.historyitem_Paragraph_Align:
             {
                 // Bool : IsUndefined
 
@@ -11813,7 +11919,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_First:
+            case AscDFH.historyitem_Paragraph_Ind_First:
             {
                 // Bool : IsUndefined
 
@@ -11834,7 +11940,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Left:
+            case AscDFH.historyitem_Paragraph_Ind_Left:
             {
                 // Bool : IsUndefined
 
@@ -11855,7 +11961,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Ind_Right:
+            case AscDFH.historyitem_Paragraph_Ind_Right:
             {
                 // Bool : IsUndefined
 
@@ -11876,7 +11982,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_ContextualSpacing:
+            case AscDFH.historyitem_Paragraph_ContextualSpacing:
             {
                 // Bool : IsUndefined
 
@@ -11894,7 +12000,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepLines:
+            case AscDFH.historyitem_Paragraph_KeepLines:
             {
                 // Bool : IsUndefined
 
@@ -11912,7 +12018,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_KeepNext:
+            case AscDFH.historyitem_Paragraph_KeepNext:
             {
                 // Bool : IsUndefined
 
@@ -11930,7 +12036,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PageBreakBefore:
+            case AscDFH.historyitem_Paragraph_PageBreakBefore:
             {
                 // Bool : IsUndefined
 
@@ -11948,7 +12054,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Line:
+            case AscDFH.historyitem_Paragraph_Spacing_Line:
             {
                 // Bool : IsUndefined
 
@@ -11969,7 +12075,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_LineRule:
+            case AscDFH.historyitem_Paragraph_Spacing_LineRule:
             {
                 // Bool : IsUndefined
 
@@ -11990,7 +12096,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_Before:
+            case AscDFH.historyitem_Paragraph_Spacing_Before:
             {
                 // Bool : IsUndefined
 
@@ -12011,7 +12117,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_After:
+            case AscDFH.historyitem_Paragraph_Spacing_After:
             {
                 // Bool : IsUndefined
 
@@ -12032,7 +12138,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_AfterAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_AfterAutoSpacing:
             {
                 // Bool : IsUndefined
 
@@ -12053,7 +12159,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Spacing_BeforeAutoSpacing:
+            case AscDFH.historyitem_Paragraph_Spacing_BeforeAutoSpacing:
             {
                 // Bool : IsUndefined
 
@@ -12074,7 +12180,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Value:
+            case AscDFH.historyitem_Paragraph_Shd_Value:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -12096,7 +12202,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Color:
+            case AscDFH.historyitem_Paragraph_Shd_Color:
             {
                 // Bool : IsUndefined
 
@@ -12120,14 +12226,14 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd_Unifill:
+            case AscDFH.historyitem_Paragraph_Shd_Unifill:
             {
                 if ( false === Reader.GetBool() )
                 {
                     if ( undefined === this.Pr.Shd )
                         this.Pr.Shd = new CDocumentShd();
 
-                    this.Pr.Shd.Unifill = new CUniFill();
+                    this.Pr.Shd.Unifill = new AscFormat.CUniFill();
                     this.Pr.Shd.Unifill.Read_FromBinary(Reader);
                 }
                 else if ( undefined != this.Pr.Shd )
@@ -12139,7 +12245,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Shd:
+            case AscDFH.historyitem_Paragraph_Shd:
             {
                 // Bool : IsUndefined
                 // Если false
@@ -12159,7 +12265,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_WidowControl:
+            case AscDFH.historyitem_Paragraph_WidowControl:
             {
                 // Bool : IsUndefined
 
@@ -12177,7 +12283,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Tabs:
+            case AscDFH.historyitem_Paragraph_Tabs:
             {
                 // Bool : IsUndefined
                 // Есди false
@@ -12197,7 +12303,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PStyle:
+            case AscDFH.historyitem_Paragraph_PStyle:
             {
                 // Bool : Удаляем ли
 
@@ -12216,7 +12322,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_DocNext:
+            case AscDFH.historyitem_Paragraph_DocNext:
             {
                 // String : Id элемента
 
@@ -12224,7 +12330,7 @@ Paragraph.prototype =
 
                 break;
             }
-            case historyitem_Paragraph_DocPrev:
+            case AscDFH.historyitem_Paragraph_DocPrev:
             {
                 // String : Id элемента
 
@@ -12232,7 +12338,7 @@ Paragraph.prototype =
 
                 break;
             }
-            case historyitem_Paragraph_Parent:
+            case AscDFH.historyitem_Paragraph_Parent:
             {
                 // String : Id элемента
 
@@ -12241,7 +12347,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Between:
+            case AscDFH.historyitem_Paragraph_Borders_Between:
             {
                 // Bool : IsUndefined
                 // если false
@@ -12261,7 +12367,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Bottom:
+            case AscDFH.historyitem_Paragraph_Borders_Bottom:
             {
                 // Bool : IsUndefined
                 // если false
@@ -12281,7 +12387,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Left:
+            case AscDFH.historyitem_Paragraph_Borders_Left:
             {
                 // Bool : IsUndefined
                 // если false
@@ -12301,7 +12407,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Right:
+            case AscDFH.historyitem_Paragraph_Borders_Right:
             {
                 // Bool : IsUndefined
                 // если false
@@ -12321,7 +12427,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Borders_Top:
+            case AscDFH.historyitem_Paragraph_Borders_Top:
             {
                 // Bool : IsUndefined
                 // если false
@@ -12341,7 +12447,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_Pr:
+            case AscDFH.historyitem_Paragraph_Pr:
             {
                 // Bool : IsUndefined
 
@@ -12358,12 +12464,12 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Bullet:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Bullet:
             {
                 // Variable : Bullet
                 if(Reader.GetBool())
                 {
-                    this.Pr.Bullet = new CBullet();
+                    this.Pr.Bullet = new AscFormat.CBullet();
                     this.Pr.Bullet.Read_FromBinary(Reader);
                 }
                 else
@@ -12375,7 +12481,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PresentationPr_Level:
+            case AscDFH.historyitem_Paragraph_PresentationPr_Level:
             {
                 // Long : Level
                 this.Pr.Lvl = Reader.GetLong();
@@ -12385,7 +12491,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_FramePr:
+            case AscDFH.historyitem_Paragraph_FramePr:
             {
                 // Bool : IsUndefined
                 // false ->
@@ -12406,7 +12512,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_SectionPr:
+            case AscDFH.historyitem_Paragraph_SectionPr:
             {
                 // Bool : IsUndefined
                 // false ->
@@ -12418,7 +12524,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrChange:
+            case AscDFH.historyitem_Paragraph_PrChange:
             {
                 // Bool : is undefined ?
                 // false -> PrChange
@@ -12449,7 +12555,7 @@ Paragraph.prototype =
                 break;
             }
 
-            case historyitem_Paragraph_PrReviewInfo:
+            case AscDFH.historyitem_Paragraph_PrReviewInfo:
             {
                 // Bool : is undefined ?
                 // false -> ReviewInfo
@@ -12477,7 +12583,7 @@ Paragraph.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Paragraph );
+        Writer.WriteLong( AscDFH.historyitem_type_Paragraph );
 
         // String2   : Id
         // Variable  : ParaPr
@@ -12543,7 +12649,7 @@ Paragraph.prototype =
             }
         }
 
-        CollaborativeEditing.Add_NewObject( this );
+        AscCommon.CollaborativeEditing.Add_NewObject( this );
 
         this.bFromDocument = Reader.GetBool();
         if(!this.bFromDocument)
@@ -12561,7 +12667,7 @@ Paragraph.prototype =
         }
         else
         {
-            CollaborativeEditing.Add_LinkData(this, {});
+            AscCommon.CollaborativeEditing.Add_LinkData(this, {});
         }
 
         this.PageNum = 0;
@@ -12921,7 +13027,7 @@ Paragraph.prototype =
         
         if ( SectPr !== this.SectPr )
         {
-            History.Add( this, { Type : historyitem_Paragraph_SectionPr, Old : this.SectPr, New : SectPr } );
+            History.Add( this, { Type : AscDFH.historyitem_Paragraph_SectionPr, Old : this.SectPr, New : SectPr } );
 
             this.SectPr = SectPr;
 
@@ -13214,7 +13320,7 @@ Paragraph.prototype.Get_StyleFromFormatting = function()
 Paragraph.prototype.private_AddCollPrChange = function(Color)
 {
     this.CollPrChange = Color;
-    CollaborativeEditing.Add_ChangedClass(this);
+    AscCommon.CollaborativeEditing.Add_ChangedClass(this);
 };
 Paragraph.prototype.private_GetCollPrChange = function()
 {
@@ -13251,13 +13357,13 @@ Paragraph.prototype.Add_PrChange = function()
     if (false === this.Have_PrChange())
     {
         this.Pr.Add_PrChange();
-        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
+        History.Add(this, {Type : AscDFH.historyitem_Paragraph_PrChange, New : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}, Old : {PrChange : undefined, ReviewInfo : undefined}});
         this.private_UpdateTrackRevisions();
     }
 };
 Paragraph.prototype.Set_PrChange = function(PrChange, ReviewInfo)
 {
-    History.Add(this, {Type : historyitem_Paragraph_PrChange, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
+    History.Add(this, {Type : AscDFH.historyitem_Paragraph_PrChange, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo ? this.Pr.ReviewInfo.Copy() : undefined}, New : {PrChange : PrChange, ReviewInfo : ReviewInfo ? ReviewInfo.Copy() : undefined}});
     this.Pr.Set_PrChange(PrChange, ReviewInfo);
     this.private_UpdateTrackRevisions();
 };
@@ -13265,7 +13371,7 @@ Paragraph.prototype.Remove_PrChange = function()
 {
     if (true === this.Have_PrChange())
     {
-        History.Add(this, {Type : historyitem_Paragraph_PrChange, New : {PrChange : undefined, ReviewInfo: undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
+        History.Add(this, {Type : AscDFH.historyitem_Paragraph_PrChange, New : {PrChange : undefined, ReviewInfo: undefined}, Old : {PrChange : this.Pr.PrChange, ReviewInfo : this.Pr.ReviewInfo}});
         this.Pr.Remove_PrChange();
         this.private_UpdateTrackRevisions();
     }
@@ -13394,7 +13500,7 @@ Paragraph.prototype.private_UpdateTrackRevisionOnChangeParaPr = function(bUpdate
         {
             var OldReviewInfo = this.Pr.ReviewInfo.Copy();
             this.Pr.ReviewInfo.Update();
-            History.Add(this, {Type : historyitem_Paragraph_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
+            History.Add(this, {Type : AscDFH.historyitem_Paragraph_PrReviewInfo, Old : OldReviewInfo, New : this.Pr.ReviewInfo.Copy()});
         }
     }
 };
@@ -15081,19 +15187,19 @@ CParagraphRevisionsChangesChecker.prototype.Add_Drawing = function(Drawing)
         var Type = Drawing.Get_ObjectType();
         switch (Type)
         {
-            case historyitem_type_Chart:
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_Chart:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 this.AddRemove.Value.push(c_oAscRevisionsObjectType.Chart);
                 break;
             }
-            case historyitem_type_ImageShape:
-            case historyitem_type_Image:
+            case AscDFH.historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Image:
             {
                 this.AddRemove.Value.push(c_oAscRevisionsObjectType.Image);
                 break;
             }
-            case historyitem_type_Shape:
+            case AscDFH.historyitem_type_Shape:
             default:
             {
                 this.AddRemove.Value.push(c_oAscRevisionsObjectType.Shape);
@@ -15156,3 +15262,28 @@ CParagraphRevisionsChangesChecker.prototype.Get_PrChangeUserId = function()
 {
     return this.TextPr.UserId;
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].Paragraph = Paragraph;
+window['AscCommonWord'].UnknownValue = UnknownValue;
+
+CRevisionsChange.prototype['get_UserId'] = CRevisionsChange.prototype.get_UserId;
+CRevisionsChange.prototype['put_UserId'] = CRevisionsChange.prototype.put_UserId;
+CRevisionsChange.prototype['get_UserName'] = CRevisionsChange.prototype.get_UserName;
+CRevisionsChange.prototype['put_UserName'] = CRevisionsChange.prototype.put_UserName;
+CRevisionsChange.prototype['get_DateTime'] = CRevisionsChange.prototype.get_DateTime;
+CRevisionsChange.prototype['put_DateTime'] = CRevisionsChange.prototype.put_DateTime;
+CRevisionsChange.prototype['get_UserColor'] = CRevisionsChange.prototype.get_UserColor;
+CRevisionsChange.prototype['get_StartPos'] = CRevisionsChange.prototype.get_StartPos;
+CRevisionsChange.prototype['put_StartPos'] = CRevisionsChange.prototype.put_StartPos;
+CRevisionsChange.prototype['get_EndPos'] = CRevisionsChange.prototype.get_EndPos;
+CRevisionsChange.prototype['put_EndPos'] = CRevisionsChange.prototype.put_EndPos;
+CRevisionsChange.prototype['get_Type'] = CRevisionsChange.prototype.get_Type;
+CRevisionsChange.prototype['get_X'] = CRevisionsChange.prototype.get_X;
+CRevisionsChange.prototype['get_Y'] = CRevisionsChange.prototype.get_Y;
+CRevisionsChange.prototype['get_Value'] = CRevisionsChange.prototype.get_Value;
+CRevisionsChange.prototype['put_Type'] = CRevisionsChange.prototype.put_Type;
+CRevisionsChange.prototype['put_XY'] = CRevisionsChange.prototype.put_XY;
+CRevisionsChange.prototype['put_Value'] = CRevisionsChange.prototype.put_Value;
+CRevisionsChange.prototype['get_LockUserId'] = CRevisionsChange.prototype.get_LockUserId;

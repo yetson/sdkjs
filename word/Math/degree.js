@@ -1,4 +1,31 @@
+/*
+ *
+ * (c) Copyright Ascensio System Limited 2010-2016
+ *
+ * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
+ * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
+ * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
+ * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
+ *
+ * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+ * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
+ *
+ * You can contact Ascensio System SIA by email at sales@onlyoffice.com
+ *
+ * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
+ * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
+ *
+ * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
+ * relevant author attributions when distributing the software. If the display of the logo in its graphic 
+ * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
+ * in every copy of the program you distribute. 
+ * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
+ *
+ */
 "use strict";
+
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
 
 function CMathDegreePr()
 {
@@ -415,7 +442,7 @@ function CDegree(props, bInside)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CDegree, CDegreeBase);
-CDegree.prototype.ClassType = historyitem_type_deg;
+CDegree.prototype.ClassType = AscDFH.historyitem_type_deg;
 CDegree.prototype.kind      = MATH_DEGREE;
 CDegree.prototype.init = function(props)
 {
@@ -871,7 +898,7 @@ function CDegreeSubSup(props, bInside)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CDegreeSubSup, CDegreeSubSupBase);
-CDegreeSubSup.prototype.ClassType = historyitem_type_deg_subsup;
+CDegreeSubSup.prototype.ClassType = AscDFH.historyitem_type_deg_subsup;
 CDegreeSubSup.prototype.kind      = MATH_DEGREESubSup;
 CDegreeSubSup.prototype.init = function(props)
 {
@@ -1130,13 +1157,13 @@ CDegreeSubSup.prototype.Apply_MenuProps = function(Props)
     {
         if(Props.ScriptType == c_oAscMathInterfaceScript.PreSubSup && this.Pr.type == DEGREE_SubSup)
         {
-            History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_PreSubSup, this.Pr.type));
+            AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_PreSubSup, this.Pr.type));
             this.raw_SetType(DEGREE_PreSubSup);
         }
 
         if(Props.ScriptType == c_oAscMathInterfaceScript.SubSup && this.Pr.type == DEGREE_PreSubSup)
         {
-            History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_SubSup, this.Pr.type));
+            AscCommon.History.Add(this, new CChangesMathDegreeSubSupType(DEGREE_SubSup, this.Pr.type));
             this.raw_SetType(DEGREE_SubSup);
         }
     }
@@ -1177,6 +1204,11 @@ AscCommon.extendClass(CMathMenuScript, CMathMenuBase);
 
 CMathMenuScript.prototype.get_ScriptType = function(){return this.ScriptType;};
 CMathMenuScript.prototype.put_ScriptType = function(Type){this.ScriptType = Type;};
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CDegreeSubSup = CDegreeSubSup;
+window['AscCommonWord'].CDegree = CDegree;
 
 window["CMathMenuScript"] = CMathMenuScript;
 CMathMenuScript.prototype["get_ScriptType"] = CMathMenuScript.prototype.get_ScriptType;

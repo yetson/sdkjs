@@ -24,6 +24,13 @@
 */
 "use strict";
 
+// Import
+var DrawingObjectsController = AscFormat.DrawingObjectsController;
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
+
+var History = AscCommon.History;
+
 
 DrawingObjectsController.prototype.getTheme = function()
 {
@@ -67,7 +74,7 @@ DrawingObjectsController.prototype.getColorMap = function()
             }
         }
     }
-    return G_O_DEFAULT_COLOR_MAP;
+    return AscFormat.G_O_DEFAULT_COLOR_MAP;
 };
 
 DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(callback, args, bNoSendProps, nHistoryPointType)
@@ -84,7 +91,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndCallback = function(ca
     }
     if(editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(check_type, comment) === false)
     {
-        var nPointType = isRealNumber(nHistoryPointType) ? nHistoryPointType : historydescription_CommonControllerCheckSelected;
+        var nPointType = AscFormat.isRealNumber(nHistoryPointType) ? nHistoryPointType : AscDFH.historydescription_CommonControllerCheckSelected;
         History.Create_NewPoint(nPointType);
         callback.apply(this, args);
         this.startRecalculate();
@@ -107,7 +114,7 @@ DrawingObjectsController.prototype.paragraphFormatPaste = function( CopyTextPr, 
     this.checkSelectedObjectsAndCallback(function()
     {
         this.applyTextFunction(CDocumentContent.prototype.Paragraph_Format_Paste, CTable.prototype.Paragraph_Format_Paste, [CopyTextPr, CopyParaPr, Bool]);
-    }, [CopyTextPr, CopyParaPr, Bool], false, historydescription_Presentation_ParaFormatPaste);
+    }, [CopyTextPr, CopyParaPr, Bool], false, AscDFH.historydescription_Presentation_ParaFormatPaste);
 };
 
 
@@ -164,7 +171,7 @@ DrawingObjectsController.prototype.resetSelect = function()
     this.resetSelection();
     this.clearPreTrackObjects();
     this.clearTrackObjects();
-    this.changeCurrentState(new NullState(this));
+    this.changeCurrentState(new AscFormat.NullState(this));
 };
 
 
@@ -193,7 +200,7 @@ DrawingObjectsController.prototype.checkSelectedObjectsAndFireCallback = functio
 DrawingObjectsController.prototype.showChartSettings  =  function()
 {
     editor.asc_doubleClickOnChart(this.getChartObject());
-    this.changeCurrentState(new NullState(this));
+    this.changeCurrentState(new AscFormat.NullState(this));
 };
 DrawingObjectsController.prototype.getColorMapOverride  =  function()
 {
@@ -205,7 +212,7 @@ DrawingObjectsController.prototype.editChart = function(binary)
     var chart_space = this.getChartSpace2(bin_object, null);
     chart_space.setParent(this.drawingObjects);
     var by_types, i;
-    by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+    by_types = AscFormat.getObjectsByTypesFromArr(this.selectedObjects, true);
     var aSelectedCharts = [];
     for(i = 0; i < by_types.charts.length; ++i)
     {
@@ -282,7 +289,7 @@ DrawingObjectsController.prototype.handleSlideComments  =  function(e, x, y, pag
             if(this.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
             {
                 comments[i].selected = true;
-                this.addPreTrackObject(new MoveComment(comments[i]));
+                this.addPreTrackObject(new AscFormat.MoveComment(comments[i]));
                 this.changeCurrentState(new PreMoveCommentState(this, x, y, comments[i]));
                 if(i !== index_selected)
                 {
@@ -353,7 +360,7 @@ PreMoveCommentState.prototype =
         editor.sync_ShowComment(this.comment.Id, Coords.X, Coords.Y );
         editor.WordControl.m_oLogicDocument.noShowContextMenu = true;
         this.drawingObjects.clearPreTrackObjects();
-        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
     }
 };
 
@@ -391,7 +398,7 @@ MoveCommentState.prototype =
     {
         if(!this.drawingObjects.isViewMode() && editor.WordControl.m_oLogicDocument.Document_Is_SelectionLocked(AscCommon.changestype_MoveComment, this.comment.Get_Id()) === false)
         {
-            History.Create_NewPoint(historydescription_Presentation_MoveComments);
+            History.Create_NewPoint(AscDFH.historydescription_Presentation_MoveComments);
             var tracks = this.drawingObjects.arrTrackObjects;
             for(var i = 0; i < tracks.length; ++i)
             {
@@ -401,7 +408,7 @@ MoveCommentState.prototype =
         }
         this.drawingObjects.clearTrackObjects();
         this.drawingObjects.updateOverlay();
-        this.drawingObjects.changeCurrentState(new NullState(this.drawingObjects));
+        this.drawingObjects.changeCurrentState(new AscFormat.NullState(this.drawingObjects));
 
     }
 };

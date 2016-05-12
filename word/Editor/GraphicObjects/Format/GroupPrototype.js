@@ -22,6 +22,11 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
+"use strict";
+
+// Import
+var CShape = AscFormat.CShape;
+var CGroupShape = AscFormat.CGroupShape;
 
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 
@@ -63,7 +68,7 @@ CGroupShape.prototype.Get_ColorMap = CShape.prototype.Get_ColorMap;
 CGroupShape.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 
-CGroupShape.prototype.getTargetDocContent = DrawingObjectsController.prototype.getTargetDocContent;
+CGroupShape.prototype.getTargetDocContent = AscFormat.DrawingObjectsController.prototype.getTargetDocContent;
 CGroupShape.prototype.documentUpdateInterfaceState = function()
 {
     if(this.selection.textSelection)
@@ -76,8 +81,8 @@ CGroupShape.prototype.documentUpdateInterfaceState = function()
     }
     else
     {
-        var para_pr = DrawingObjectsController.prototype.getParagraphParaPr.call(this);
-        var text_pr = DrawingObjectsController.prototype.getParagraphTextPr.call(this);
+        var para_pr = AscFormat.DrawingObjectsController.prototype.getParagraphParaPr.call(this);
+        var text_pr = AscFormat.DrawingObjectsController.prototype.getParagraphTextPr.call(this);
         if(!para_pr)
         {
             para_pr = new CParaPr();
@@ -132,12 +137,10 @@ CGroupShape.prototype.setRecalculateInfo = function()
         recalculateScaleCoefficients: true,
         recalculateWrapPolygon: true
     };
-    this.localTransform = new CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.posX = null;
     this.posY = null;
-    this.snapArrayX = [];
-    this.snapArrayY = [];
     this.bNeedUpdatePosition = true;
 };
 
@@ -159,7 +162,7 @@ CGroupShape.prototype.recalculate = function()
 
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if(this.recalcInfo.recalculateBrush)
         {
@@ -315,8 +318,8 @@ CGroupShape.prototype.Refresh_RecalcData = function(data)
 {
     switch (data.Type)
     {
-        case historyitem_GroupShapeAddToSpTree:
-        case historyitem_GroupShapeRemoveFromSpTree:
+        case AscDFH.historyitem_GroupShapeAddToSpTree:
+        case AscDFH.historyitem_GroupShapeRemoveFromSpTree:
         {
             if(!this.group)
             {

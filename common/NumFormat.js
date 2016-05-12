@@ -111,6 +111,10 @@ function getNumberParts(x)
     return {mantissa: man, exponent: exp, sign: sig};//для 0,123 exponent == - gc_nMaxDigCount
 }
 
+    function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
 function NumFormatFont() {
     this.skip = null;
     this.repeat = null;
@@ -1314,7 +1318,7 @@ NumFormat.prototype =
             {
                 if(null == format)
                     format = new NumFormatFont();
-                format.c = new RgbColor(this.Color);
+                format.c = new AscCommonExcel.RgbColor(this.Color);
             }
             if(null != prev && ((null == prev.format && null == format) || (null != prev.format && null != format && format.isEqual(prev.format))))
             {
@@ -2028,14 +2032,25 @@ function CellFormat(format)
     this.oTextFormat = null;
 	this.aComporationFormats = null;
     var aFormats = format.split(";");
-    var nFormatsLength = aFormats.length;
 	var aParsedFormats = [];
-	for(var i = 0; i < nFormatsLength; ++i)
+	for(var i = 0; i < aFormats.length; ++i)
 	{
+    var sNewFormat = aFormats[i];
+    //если sNewFormat заканчивается на нечетное число '\', значит ';' был экранирован и это текст
+    while(true){
+      var formatTail = sNewFormat.match(/\\+$/g);
+      if (formatTail && formatTail.length > 0 && 1 === formatTail[0].length % 2 && i + 1 < aFormats.length) {
+        sNewFormat += ';';
+        sNewFormat += aFormats[++i];
+      } else {
+        break;
+      }
+    }
 		var oNewFormat = new NumFormat(false);
-		oNewFormat.setFormat(aFormats[i]);
+		oNewFormat.setFormat(sNewFormat);
 		aParsedFormats.push(oNewFormat);
 	}
+  var nFormatsLength = aParsedFormats.length;
 	var bComporationOperator = false;
 	if(nFormatsLength > 0)
 	{
@@ -3019,7 +3034,7 @@ FormatParser.prototype =
                     bThouthand = true;
                 }
             }
-            if (Asc.isNumber(val)) {
+            if (AscCommon.isNumber(val)) {
                 var dNumber = parseFloat(val);
                 if (!isNaN(dNumber))
                     oRes = { number: dNumber, thouthand: bThouthand };
@@ -3927,6 +3942,7 @@ var g_oDefaultCultureInfo = g_aCultureInfos[1033];//en-US//1033//fr-FR//1036//ba
 
     //---------------------------------------------------------export---------------------------------------------------
     window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].isNumber = isNumber;
     window["AscCommon"].NumFormatFont = NumFormatFont;
     window["AscCommon"].NumFormat = NumFormat;
     window["AscCommon"].CellFormat = CellFormat;

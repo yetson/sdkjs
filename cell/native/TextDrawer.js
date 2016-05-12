@@ -24,6 +24,8 @@
 */
 "use strict";
 
+(function (window, undefined) {
+
 var PATH_DIV_EPSILON = 0.1;
 var UNDERLINE_DIV_EPSILON = 3;
 
@@ -106,7 +108,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
 {
     var i, j, t, aByPaths,  aWarpedObjects = [];
     var bOddPaths = oWarpStruct.pathLst.length / 2 - ((oWarpStruct.pathLst.length / 2) >> 0) > 0;
-    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new CMatrix();
+    var nDivCount = bOddPaths ? oWarpStruct.pathLst.length : oWarpStruct.pathLst.length >> 1, oNextPointOnPolygon, oObjectToDrawNext, oMatrix = new AscCommon.CMatrix();
     aByPaths = oWarpStruct.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
     var nLastIndex = 0, dTmp, oBoundsChecker, oTemp, nIndex, aWarpedObjects2 = [];
     oBoundsChecker = new CSlideBoundsChecker();
@@ -159,7 +161,7 @@ CDocContentStructure.prototype.checkByWarpStruct = function(oWarpStruct, dWidth,
             {
                 var oWarpedObject = aWarpedObjects[t];
                 var bArcDown = "textArchDown" !== oWarpStruct.preset && i < 1;
-                if(!isRealNumber(oWarpedObject.x) || !isRealNumber(oWarpedObject.y) )
+                if(!AscFormat.isRealNumber(oWarpedObject.x) || !AscFormat.isRealNumber(oWarpedObject.y) )
                 {
                     CheckGeometryByPolygon(oWarpedObject, oPolygon, bArcDown, XLimit*dKoeff, dContentHeight, dKoeff, nDivCount > 1 ? oBoundsChecker.Bounds : null);
                 }
@@ -219,9 +221,9 @@ CDocContentStructure.prototype.checkContentReduct = function(oWarpStruct, dWidth
             for(t = 0; t < aWarpedObjects.length; ++t)
             {
                 var oWarpedObject = aWarpedObjects[t];
-                if(isRealNumber(oWarpedObject.x) && isRealNumber(oWarpedObject.y) )
+                if(AscFormat.isRealNumber(oWarpedObject.x) && AscFormat.isRealNumber(oWarpedObject.y) )
                 {
-                    oMatrix = new CMatrix();
+                    oMatrix = new AscCommon.CMatrix();
                     oBoundsChecker.Bounds.ClearNoAttack();
                     oNextPointOnPolygon = this.checkTransformByOddPath(oMatrix, oWarpedObject, aWarpedObjects[t+1], oNextPointOnPolygon, dContentHeight, dKoeff, bArcDown, oPolygon, XLimit);
                     oWarpedObject.draw(oBoundsChecker);
@@ -458,7 +460,7 @@ CDocContentStructure.prototype.checkTransformByOddPath = function(oMatrix, oWarp
         dX = -dX;
         dY = -dY;
     }
-    if(oObjectToDrawNext && isRealNumber(oObjectToDrawNext.x) && isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oWarpedObject.x)
+    if(oObjectToDrawNext && AscFormat.isRealNumber(oObjectToDrawNext.x) && AscFormat.isRealNumber(oObjectToDrawNext.y) && oObjectToDrawNext.x > oWarpedObject.x)
     {
         cX2 = (oObjectToDrawNext.x)/XLimit;
         oRet = oPolygon.getPointOnPolygon(cX2, true);
@@ -648,7 +650,7 @@ function CLineStructure(oLine)
 {
     this.m_nType = DRAW_COMMAND_LINE;
     this.m_oLine = oLine;
-    this.m_aContent = [];//ObjectToDraw
+    this.m_aContent = [];//AscFormat.ObjectToDraw
     this.m_aBorders = [];
     this.m_aBackgrounds = [];
     this.m_aUnderlinesStrikeouts = [];
@@ -822,7 +824,7 @@ function GetConstDescription(nConst)
 
 function CreatePenFromParams(oUnifill, nStyle, nLineCap, nLineJoin, dLineWidth, dSize)
 {
-    var oLine = new CLn();
+    var oLine = new AscFormat.CLn();
     oLine.setW(dSize * 36000 >> 0);
     oLine.setFill(oUnifill);
 
@@ -850,7 +852,7 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_oTheme = oTheme;
     this.Width = dWidth;
     this.Height = dHeight;
-    this.m_oTransform = new CMatrix();
+    this.m_oTransform = new AscCommon.CMatrix();
     this.pathW = 43200;
     this.pathH = 43200;
 
@@ -863,11 +865,11 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_aDrawings = [];
     // RFonts
     this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
+    this.m_oGrFonts     = new AscCommon.CGrRFonts();
     this.m_oCurComment     = null;
 
-    this.m_oPen     = new CPen();
-    this.m_oBrush   = new CBrush();
+    this.m_oPen     = new AscCommon.CPen();
+    this.m_oBrush   = new AscCommon.CBrush();
 
     this.m_oLine = null;
     this.m_oFill = null;
@@ -879,10 +881,10 @@ function CTextDrawer(dWidth, dHeight, bDivByLInes, oTheme, bDivGlyphs)
     this.m_oBrush.Color2.R  = -1;
 
     // просто чтобы не создавать каждый раз
-    this.m_oFontSlotFont = new CFontSetup();
+    this.m_oFontSlotFont = new AscCommon.CFontSetup();
     this.LastFontOriginInfo = { Name : "", Replace : null };
 
-    this.GrState = new CGrState();
+    this.GrState = new AscCommon.CGrState();
     this.GrState.Parent = this;
 
     this.m_bDivByLines = bDivByLInes === true;
@@ -960,7 +962,7 @@ CTextDrawer.prototype =
 
     set_fillColor: function(R, G, B)
     {
-        this.m_oFill = CreateUniFillByUniColor(CreateUniColorRGB(R, G, B));
+        this.m_oFill = AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(R, G, B));
         this.Get_PathToDraw(false, true);
     },
 
@@ -1002,7 +1004,7 @@ CTextDrawer.prototype =
                 {
                     if(oShd.Color)
                     {
-                        this.m_oFill = CreateUnfilFromRGB(oShd.Color.r, oShd.Color.g, oShd.Color.b);
+                        this.m_oFill = AscFormat.CreateUnfilFromRGB(oShd.Color.r, oShd.Color.g, oShd.Color.b);
                     }
                     else
                     {
@@ -1027,7 +1029,7 @@ CTextDrawer.prototype =
     {
         if(oBorder && oBorder.Value !== border_None)
         {
-            this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
+            this.m_oLine = CreatePenFromParams(oBorder.Unifill ? oBorder.Unifill : AscFormat.CreateUnfilFromRGB(oBorder.Color.r, oBorder.Color.g, oBorder.Color.b), this.m_oPen.Style, this.m_oPen.LineCap, this.m_oPen.LineJoin, this.m_oPen.LineWidth, this.m_oPen.Size);
         }
         else
         {
@@ -1221,7 +1223,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aContent.length === 0)
                             {
-                                oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
+                                oLastCommand.m_aContent.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y, this.m_oCurComment));
                             }
                             oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
 
@@ -1233,7 +1235,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aContent.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aContent.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aContent[oLastCommand.m_aContent.length - 1];
                                 }
                             }
@@ -1243,7 +1245,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBorders.length === 0)
                             {
-                                oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1255,7 +1257,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                                 }
                             }
@@ -1265,7 +1267,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
 
@@ -1277,7 +1279,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aBackgrounds[oLastCommand.m_aBackgrounds.length - 1];
                                 }
                             }
@@ -1289,7 +1291,7 @@ CTextDrawer.prototype =
                             {
                                 oBrushColor = this.m_oBrush.Color1;
                                 oPenColor = this.m_oPen.Color;
-                                oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aUnderlinesStrikeouts.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
 
@@ -1301,7 +1303,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aUnderlinesStrikeouts.push(new ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aUnderlinesStrikeouts.push(new AscFormat.ObjectToDraw(this.GetFillFromTextPr(this.m_oTextPr), this.GetPenFromTextPr(this.m_oTextPr), this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aUnderlinesStrikeouts[oLastCommand.m_aUnderlinesStrikeouts.length - 1];
                                 }
                             }
@@ -1311,7 +1313,7 @@ CTextDrawer.prototype =
                         {
                             if(oLastCommand.m_aParagraphBackgrounds.length === 0)
                             {
-                                oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y))
+                                oLastCommand.m_aParagraphBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y))
                             }
                             oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
 
@@ -1323,7 +1325,7 @@ CTextDrawer.prototype =
                                 }
                                 else
                                 {
-                                    oLastCommand.m_aParagraphBackgrounds.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                                    oLastCommand.m_aParagraphBackgrounds.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                                     oLastObjectToDraw = oLastCommand.m_aParagraphBackgrounds[oLastCommand.m_aParagraphBackgrounds.length - 1];
                                 }
                             }
@@ -1338,7 +1340,7 @@ CTextDrawer.prototype =
                     {
                         oBrushColor = this.m_oBrush.Color1;
                         oPenColor = this.m_oPen.Color;
-                        oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                        oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                     }
                     oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
 
@@ -1350,7 +1352,7 @@ CTextDrawer.prototype =
                         }
                         else
                         {
-                            oLastCommand.m_aBorders.push(new ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new Geometry(), this.m_oTransform, x, y));
+                            oLastCommand.m_aBorders.push(new AscFormat.ObjectToDraw(this.m_oFill, this.m_oLine, this.Width, this.Height, new AscFormat.Geometry(), this.m_oTransform, x, y));
                             oLastObjectToDraw = oLastCommand.m_aBorders[oLastCommand.m_aBorders.length - 1];
                         }
                     }
@@ -1376,7 +1378,7 @@ CTextDrawer.prototype =
             oLastObjectToDraw.Comment = this.m_oCurComment;
             if(oLastObjectToDraw.geometry.pathLst.length === 0 || bStart)
             {
-                oPath = new Path();
+                oPath = new AscFormat.Path();
                 oPath.setPathW(this.pathW);
                 oPath.setPathH(this.pathH);
                 oPath.setExtrusionOk(false);
@@ -1436,14 +1438,14 @@ CTextDrawer.prototype =
     {
         if(this.bCheckLines)
         {
-            if(Math.abs(x - this.lastX) < EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
+            if(Math.abs(x - this.lastX) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(x - this.lastX) < Math.abs(y - this.lastY))
             {
                 this.checkCurveBezier(this.lastX, this.lastY, this.lastX, this.lastY  + (y - this.lastY)/3, this.lastX, this.lastY + 2*(y - this.lastY)/3, x, y, PATH_DIV_EPSILON);
                 this.lastX = x;
                 this.lastY = y;
                 return;
             }
-            else if(Math.abs(y - this.lastY) < EPSILON_TEXT_AUTOFIT && Math.abs(y - this.lastY) < Math.abs(x - this.lastX))
+            else if(Math.abs(y - this.lastY) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(y - this.lastY) < Math.abs(x - this.lastX))
             {
                 this.checkCurveBezier(this.lastX, this.lastY, this.lastX + (x - this.lastX)/3, this.lastY, this.lastX + 2*(x - this.lastX)/3, this.lastY, x, y, PATH_DIV_EPSILON);
                 this.lastX = x;
@@ -1521,7 +1523,7 @@ CTextDrawer.prototype =
         if (font.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
+        var fontinfo = AscFonts.g_fontApplication.GetFontInfo(font.FontFamily.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)
@@ -1552,11 +1554,11 @@ CTextDrawer.prototype =
         {
             this.Get_PathToDraw(false, true, x, y);
         }
-        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
+        AscCommon.g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
 
         if (null != this.LastFontOriginInfo.Replace)
         {
-            code = g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
+            code = AscFonts.g_fontApplication.GetReplaceGlyph(code, this.LastFontOriginInfo.Replace);
         }
 
         window["native"]["PD_FillText"](x, y, code); // TODO:
@@ -1564,7 +1566,7 @@ CTextDrawer.prototype =
     },
     tg : function(gid,x,y)
     {
-        g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
+        AscCommon.g_oTextMeasurer.SetFontInternal(this.m_oFont.Name, this.m_oFont.FontSize, Math.max(this.m_oFont.Style, 0));
         window["native"]["PD_FillTextG"](x, y, gid); // TODO:
        // g_oTextMeasurer.m_oManager.LoadStringPathCode(gid, true, x, y, this);
     },
@@ -1643,7 +1645,7 @@ CTextDrawer.prototype =
         if (_lastFont.Bold == true)
             style += 1;
 
-        var fontinfo = g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
+        var fontinfo = AscFonts.g_fontApplication.GetFontInfo(_lastFont.Name, style, this.LastFontOriginInfo);
         style = fontinfo.GetBaseStyle(style);
 
         if (this.m_oFont.Name != fontinfo.Name)
@@ -1736,7 +1738,7 @@ CTextDrawer.prototype =
     checkCurveBezier: function(x0, y0, x1, y1, x2, y2, x3, y3, dEpsilon)
     {
         var _epsilon = dEpsilon ? dEpsilon : UNDERLINE_DIV_EPSILON;
-        var arr_point = partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, _epsilon), i, count = arr_point.length >> 2;
+        var arr_point = AscFormat.partition_bezier4(x0, y0, x1, y1, x2, y2, x3, y3, _epsilon), i, count = arr_point.length >> 2;
         for(i = 0; i < count; ++i)
         {
             var k = 4*i;
@@ -2074,7 +2076,7 @@ CTextDrawer.prototype =
             }
             if(oTextPr.Color)
             {
-                return CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b)
+                return AscFormat.CreateUnfilFromRGB(oTextPr.Color.r, oTextPr.Color.g, oTextPr.Color.b)
             }
             return null;
         }
@@ -2083,11 +2085,11 @@ CTextDrawer.prototype =
             if(this.m_oBrush.Color1.R !== -1)
             {
                 var Color = this.m_oBrush.Color1;
-                return CreateUniFillByUniColor(CreateUniColorRGB(Color.R, Color.G, Color.B));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(Color.R, Color.G, Color.B));
             }
             else
             {
-                return CreateUniFillByUniColor(CreateUniColorRGB(0, 0, 0));
+                return AscFormat.CreateUniFillByUniColor(AscFormat.CreateUniColorRGB(0, 0, 0));
             }
         }
     },
@@ -2181,22 +2183,22 @@ PolygonWrapper.prototype.getPointOnPolygon = function(dCT, bNeedPoints)
         var nRightIndex = nTempIndex, nLeftIndex = nIndex;
         var oLeftPoint = oPoint1, oRightPoint = oPoint2;
         var dx = oPoint1.x - oPoint2.x, dy = oPoint1.y - oPoint2.y;
-        while(nRightIndex + 1 < this.oPolygon.length && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nRightIndex + 1 < this.oPolygon.length && Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
 
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
             oRightPoint = this.oPolygon[++nRightIndex]
         }
-        while(nLeftIndex > 0 && Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        while(nLeftIndex > 0 && Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
             dx =  oRightPoint.x - oLeftPoint.x;
             dy =  oRightPoint.y - oLeftPoint.y;
             oLeftPoint = this.oPolygon[--nLeftIndex];
         }
-        if(Math.abs(dx) < EPSILON_TEXT_AUTOFIT && Math.abs(dy) < EPSILON_TEXT_AUTOFIT)
+        if(Math.abs(dx) < AscFormat.EPSILON_TEXT_AUTOFIT && Math.abs(dy) < AscFormat.EPSILON_TEXT_AUTOFIT)
         {
-            oRetPoint1 = {x: oRetPoint1.x + EPSILON_TEXT_AUTOFIT, y: oRetPoint1.y};
+            oRetPoint1 = {x: oRetPoint1.x + AscFormat.EPSILON_TEXT_AUTOFIT, y: oRetPoint1.y};
         }
         else
         {
@@ -2243,8 +2245,8 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                 oCommand = oPath.ArrPathCommand[j];
                 switch(oCommand.id)
                 {
-                    case moveTo:
-                    case lineTo:
+                    case AscFormat.moveTo:
+                    case AscFormat.lineTo:
                     {
                         oPoint = CheckPointByPaths(oCommand.X, oCommand.Y, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X = oPoint.x;
@@ -2252,7 +2254,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         break;
                     }
 
-                    case bezier3:
+                    case AscFormat.bezier3:
                     {
                         oPoint = CheckPointByPaths(oCommand.X0, oCommand.Y0, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X0 = oPoint.x;
@@ -2262,7 +2264,7 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         oCommand.Y1 = oPoint.y;
                         break;
                     }
-                    case bezier4:
+                    case AscFormat.bezier4:
                     {
                         oPoint = CheckPointByPaths(oCommand.X0, oCommand.Y0, dWidth, dHeight, dMinX, dMinY, oPolygonWrapper1, oPolygonWrapper2);
                         oCommand.X0 = oPoint.x;
@@ -2275,11 +2277,11 @@ function ObjectsToDrawBetweenTwoPolygons(aObjectsToDraw, oBoundsController, oPol
                         oCommand.Y2 = oPoint.y;
                         break;
                     }
-                    case arcTo:
+                    case AscFormat.arcTo:
                     {
                         break;
                     }
-                    case close:
+                    case AscFormat.close:
                     {
                         break;
                     }
@@ -2310,8 +2312,8 @@ function TransformGeometry(oObjectToDraw, oTransform)
             oCommand = oPath.ArrPathCommand[j];
             switch(oCommand.id)
             {
-                case moveTo:
-                case lineTo:
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
                 {
                     oPoint = TransformPointGeometry(oCommand.X, oCommand.Y, oTransform);
                     oCommand.X = oPoint.x;
@@ -2319,7 +2321,7 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     break;
                 }
 
-                case bezier3:
+                case AscFormat.bezier3:
                 {
                     oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
@@ -2329,7 +2331,7 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
-                case bezier4:
+                case AscFormat.bezier4:
                 {
                     oPoint = TransformPointGeometry(oCommand.X0, oCommand.Y0, oTransform);
                     oCommand.X0 = oPoint.x;
@@ -2342,11 +2344,11 @@ function TransformGeometry(oObjectToDraw, oTransform)
                     oCommand.Y2 = oPoint.y;
                     break;
                 }
-                case arcTo:
+                case AscFormat.arcTo:
                 {
                     break;
                 }
-                case close:
+                case AscFormat.close:
                 {
                     break;
                 }
@@ -2419,8 +2421,8 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
             oCommand = oPath.ArrPathCommand[j];
             switch(oCommand.id)
             {
-                case moveTo:
-                case lineTo:
+                case AscFormat.moveTo:
+                case AscFormat.lineTo:
                 {
                     oPoint = TransformPointPolygon(oCommand.X, oCommand.Y, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X = oPoint.x;
@@ -2428,7 +2430,7 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     break;
                 }
 
-                case bezier3:
+                case AscFormat.bezier3:
                 {
                     oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X0 = oPoint.x;
@@ -2438,7 +2440,7 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     oCommand.Y1 = oPoint.y;
                     break;
                 }
-                case bezier4:
+                case AscFormat.bezier4:
                 {
                     oPoint = TransformPointPolygon(oCommand.X0, oCommand.Y0, oPolygon, bFlag, XLimit, ContentHeight, dKoeff, oBounds);
                     oCommand.X0 = oPoint.x;
@@ -2451,11 +2453,11 @@ function CheckGeometryByPolygon(oObjectToDraw, oPolygon, bFlag, XLimit, ContentH
                     oCommand.Y2 = oPoint.y;
                     break;
                 }
-                case arcTo:
+                case AscFormat.arcTo:
                 {
                     break;
                 }
-                case close:
+                case AscFormat.close:
                 {
                     break;
                 }
@@ -2481,7 +2483,7 @@ function ComparePens(oPen1, oPen2)
 
 function GetRectContentWidth(oContent, dMaxWidth)
 {
-    var _maxWidth = isRealNumber(dMaxWidth) ? dMaxWidth : 100000;
+    var _maxWidth = AscFormat.isRealNumber(dMaxWidth) ? dMaxWidth : 100000;
 
     oContent.Reset(0, 0, _maxWidth, 100000);
     oContent.Recalculate_Page(0, true);
@@ -2503,3 +2505,8 @@ function GetRectContentWidth(oContent, dMaxWidth)
     }
     return max_width + 2;
 }
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CTextDrawer = CTextDrawer;
+    window['AscFormat'].GetRectContentWidth = GetRectContentWidth;
+})(window);

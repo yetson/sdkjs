@@ -22,14 +22,13 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-window.IsShapeToImageConverter = false;
 function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 {
     switch (type)
     {
-        case LineEndType.None:
+        case AscFormat.LineEndType.None:
             break;
-        case LineEndType.Arrow:
+        case AscFormat.LineEndType.Arrow:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -58,7 +57,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Diamond:
+        case AscFormat.LineEndType.Diamond:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -101,7 +100,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Oval:
+        case AscFormat.LineEndType.Oval:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -155,7 +154,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
             drawer._e();
             break;
         }
-        case LineEndType.Stealth:
+        case AscFormat.LineEndType.Stealth:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -198,7 +197,7 @@ function DrawLineEnd(xEnd, yEnd, xPrev, yPrev, type, w, len, drawer, trans)
 
             break;
         }
-        case LineEndType.Triangle:
+        case AscFormat.LineEndType.Triangle:
         {
             var _ex = xPrev - xEnd;
             var _ey = yPrev - yEnd;
@@ -247,7 +246,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
     cos=Math.cos(angle);
     switch(type)
     {
-        case ar_arrow:
+        case AscFormat.ar_arrow:
         {
             var xb, yb, xc, yc;
             xb=-length;
@@ -264,7 +263,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
 
             break;
         }
-        case ar_diamond:
+        case AscFormat.ar_diamond:
         {
             var xd, yd;
             xb=-length*0.5;
@@ -287,16 +286,16 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
 
             break;
         }
-        case ar_none:
+        case AscFormat.ar_none:
         {
             break;
         }
-        case ar_oval:
+        case AscFormat.ar_oval:
         {
             EllipseN(graphics, x, y, length*0.5, width*0.5, angle);
             break;
         }
-        case ar_stealth:
+        case AscFormat.ar_stealth:
         {
             xb=-length;
             yb=-width*0.5;
@@ -317,7 +316,7 @@ function DrawTailEnd(type, length, width, x, y, angle, graphics, array_points)
             graphics.df();
             break;
         }
-        case ar_triangle:
+        case AscFormat.ar_triangle:
         {
             xb=-length;
             yb=-width*0.5;
@@ -346,7 +345,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
     cos=Math.cos(angle);
     switch(type)
     {
-        case ar_arrow:
+        case AscFormat.ar_arrow:
         {
             var xb, yb, xc, yc;
             xb=length;
@@ -363,7 +362,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
 
             break;
         }
-        case ar_diamond:
+        case AscFormat.ar_diamond:
         {
             var xd, yd;
             xb=length*0.5;
@@ -386,16 +385,16 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
 
             break;
         }
-        case ar_none:
+        case AscFormat.ar_none:
         {
             break;
         }
-        case ar_oval:
+        case AscFormat.ar_oval:
         {
             Ellipse2(graphics, x, y, length*0.5, width*0.5, angle);
             break;
         }
-        case ar_stealth:
+        case AscFormat.ar_stealth:
         {
             xb=length;
             yb=-width*0.5;
@@ -416,7 +415,7 @@ function DrawHeadEnd(type, length, width, x, y, angle, graphics)
             graphics.df();
             break;
         }
-        case ar_triangle:
+        case AscFormat.ar_triangle:
         {
             xb=length;
             yb=-width*0.5;
@@ -602,7 +601,7 @@ CShapeDrawer.prototype =
             {
                 case Asc.c_oAscFill.FILL_TYPE_BLIP:
                 {
-                    this.StrokeUniColor = new CUniColor().RGBA;
+                    this.StrokeUniColor = new AscFormat.CUniColor().RGBA;
                     break;
                 }
                 case Asc.c_oAscFill.FILL_TYPE_SOLID:
@@ -614,7 +613,7 @@ CShapeDrawer.prototype =
                 {
                     var _c = _fill.colors;
                     if (_c == 0)
-                        this.StrokeUniColor = new CUniColor().RGBA;
+                        this.StrokeUniColor = new AscFormat.CUniColor().RGBA;
                     else
                         this.StrokeUniColor = _fill.colors[0].color.RGBA;
 
@@ -856,25 +855,25 @@ CShapeDrawer.prototype =
                 var rgba = this.FillUniColor;
                 if (mode == "darken")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.darken();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "darkenLess")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.darkenLess();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "lighten")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.lighten();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
                 else if (mode == "lightenLess")
                 {
-                    var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                    var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                     var rgb = _color1.lightenLess();
                     rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                 }
@@ -930,7 +929,7 @@ CShapeDrawer.prototype =
             }
             case Asc.c_oAscFill.FILL_TYPE_PATT:
             {
-                var _patt_name = global_hatch_names[_fill.ftype];
+                var _patt_name = AscCommon.global_hatch_names[_fill.ftype];
                 if (undefined == _patt_name)
                     _patt_name = "cross";
 
@@ -963,22 +962,22 @@ CShapeDrawer.prototype =
         {
             switch (this.Ln.Join.type)
             {
-                case LineJoinType.Round:
+                case AscFormat.LineJoinType.Round:
                 {
                     this.NativeGraphics["PD_lineJoin"]("round");
                     break;
                 }
-                case LineJoinType.Bevel:
+                case AscFormat.LineJoinType.Bevel:
                 {
                     this.NativeGraphics["PD_lineJoin"]("bevel");
                     break;
                 }
-                case LineJoinType.Empty:
+                case AscFormat.LineJoinType.Empty:
                 {
                     this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
                 }
-                case LineJoinType.Miter:
+                case AscFormat.LineJoinType.Miter:
                 {
                     this.NativeGraphics["PD_lineJoin"]("miter");
                     break;
@@ -1019,7 +1018,7 @@ CShapeDrawer.prototype =
             // и отправляем на отрисовку (с матрицей)
 
             var trans = (this.Graphics.IsTrack === true) ? this.Graphics.Graphics.m_oFullTransform : this.Graphics.m_oFullTransform;
-            var trans1 = global_MatrixTransformer.Invert(trans);
+            var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var x1 = trans.TransformPointX(0, 0);
             var y1 = trans.TransformPointY(0, 0);
@@ -1128,7 +1127,7 @@ CShapeDrawer.prototype =
         {
             if (null != this.OldLineJoin && !this.IsArrowsDrawing)
             {
-                this.Graphics.put_PenLineJoin(ConvertJoinAggType(this.Ln.Join.type));
+                this.Graphics.put_PenLineJoin(AscFormat.ConvertJoinAggType(this.Ln.Join.type));
             }
 
             var rgba = this.StrokeUniColor;
@@ -1190,7 +1189,7 @@ CShapeDrawer.prototype =
                 var _fill = this.UniFill.fill;
                 if (_fill.type == Asc.c_oAscFill.FILL_TYPE_PATT)
                 {
-                    var _patt_name = global_hatch_names[_fill.ftype];
+                    var _patt_name = AscCommon.global_hatch_names[_fill.ftype];
                     if (undefined == _patt_name)
                         _patt_name = "cross";
 
@@ -1200,7 +1199,7 @@ CShapeDrawer.prototype =
                     var __fa = (null === this.UniFill.transparent) ? _fc.A : 255;
                     var __ba = (null === this.UniFill.transparent) ? _bc.A : 255;
 
-                    var _pattern = GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
+                    var _pattern = AscCommon.GetHatchBrush(_patt_name, _fc.R, _fc.G, _fc.B, __fa, _bc.R, _bc.G, _bc.B, __ba);
 
                     var _url64 = "";
                     try
@@ -1248,25 +1247,25 @@ CShapeDrawer.prototype =
                     var rgba = this.FillUniColor;
                     if (fill_mode == "darken")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.darken();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "darkenLess")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.darkenLess();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "lighten")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.lighten();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
                     else if (fill_mode == "lightenLess")
                     {
-                        var _color1 = new CShapeColor(rgba.R, rgba.G, rgba.B);
+                        var _color1 = new AscFormat.CShapeColor(rgba.R, rgba.G, rgba.B);
                         var rgb = _color1.lightenLess();
                         rgba = { R: rgb.r, G: rgb.g, B: rgb.b, A: rgba.A };
                     }
@@ -1317,7 +1316,7 @@ CShapeDrawer.prototype =
             // и отправляем на отрисовку (с матрицей)
 
             var trans = this.Graphics.GetTransform();
-            var trans1 = global_MatrixTransformer.Invert(trans);
+            var trans1 = AscCommon.global_MatrixTransformer.Invert(trans);
 
             var lineSize = this.Graphics.GetLineWidth();
 
@@ -1476,7 +1475,7 @@ CShapeDrawer.prototype =
             return points;
         }
 
-        var grad_a = deg2rad(angle);
+        var grad_a = AscCommon.deg2rad(angle);
         if (!scale)
         {
             if (angle > 0 && angle < 90)
@@ -1623,3 +1622,9 @@ function ShapeToImageConverter(shape, pageIndex)
 {
 	return "";
 }
+
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CShapeDrawer = CShapeDrawer;
+window['AscCommon'].ShapeToImageConverter = ShapeToImageConverter;
+window['AscCommon'].IsShapeToImageConverter = false;

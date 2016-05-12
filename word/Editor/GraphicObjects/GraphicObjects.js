@@ -28,6 +28,13 @@
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
 var g_oTableId = AscCommon.g_oTableId;
+var isRealObject = AscCommon.isRealObject;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+
+var DrawingObjectsController = AscFormat.DrawingObjectsController;
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
 
 var asc_CImgProperty = Asc.asc_CImgProperty;
 
@@ -111,7 +118,7 @@ function CBoundsRectForMath(oDrawing)
     else
     {
         this.WrapType = WRAPPING_TYPE_NONE;
-        this.Distance = new CDistance(0, 0, 0, 0);
+        this.Distance = new AscFormat.CDistance(0, 0, 0, 0);
     }
 }
 
@@ -134,7 +141,7 @@ function CGraphicObjects(document, drawingDocument, api)
     this.arrTrackObjects = [];
 
 
-    this.curState = new NullState(this);
+    this.curState = new AscFormat.NullState(this);
 
     this.selectionInfo =
     {
@@ -167,7 +174,7 @@ function CGraphicObjects(document, drawingDocument, api)
 
     this.handleEventMode = HANDLE_EVENT_MODE_HANDLE;
 
-    this.nullState = new NullState(this);
+    this.nullState = new AscFormat.NullState(this);
     this.bNoCheckChartTextSelection = false;
 
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
@@ -320,7 +327,7 @@ CGraphicObjects.prototype =
     addToRecalculate: function(object)
     {
         if(typeof object.Get_Id === "function" && typeof object.recalculate === "function")
-            History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: object});
+            History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: object});
         return;
     },
 
@@ -330,7 +337,7 @@ CGraphicObjects.prototype =
 
     getTrialImage: function(sImageUrl)
     {
-        return ExecuteNoHistory(function(){
+        return AscFormat.ExecuteNoHistory(function(){
             var oParaDrawing = new ParaDrawing();
             oParaDrawing.Set_PositionH(Asc.c_oAscRelativeFromH.Page, true, c_oAscAlignH.Center, undefined);
             oParaDrawing.Set_PositionV(Asc.c_oAscRelativeFromV.Page, true, c_oAscAlignV.Center, undefined);
@@ -476,7 +483,7 @@ CGraphicObjects.prototype =
             if(props_by_types.shapeProps)
             {
                 shape_props = new asc_CImgProperty(para_drawing_props);
-                shape_props.ShapeProperties = CreateAscShapePropFromProp(props_by_types.shapeProps);
+                shape_props.ShapeProperties = AscFormat.CreateAscShapePropFromProp(props_by_types.shapeProps);
                 shape_props.verticalTextAlign = props_by_types.shapeProps.verticalTextAlign;
                 shape_props.vert = props_by_types.shapeProps.vert;
                 shape_props.Width = props_by_types.shapeProps.w;
@@ -542,7 +549,7 @@ CGraphicObjects.prototype =
         {
             this.selectedObjects[i].parent.Set_Props(oProps);
         }
-        if(isRealNumber(oProps.Width) || isRealNumber(oProps.Height))
+        if(AscFormat.isRealNumber(oProps.Width) || AscFormat.isRealNumber(oProps.Height))
         {
             oApplyProps = oProps;
         }
@@ -551,7 +558,7 @@ CGraphicObjects.prototype =
             oApplyProps = oProps.ShapeProperties ? oProps.ShapeProperties : oProps;
         }
         this.applyDrawingProps(oApplyProps);
-        if(isRealNumber(oApplyProps.Width) || isRealNumber(oApplyProps.Height))
+        if(AscFormat.isRealNumber(oApplyProps.Width) || AscFormat.isRealNumber(oApplyProps.Height))
         {
             /*в случае если в насторойках ParaDrawing стоит UseAlign - пересчитываем drawing, т. к. ширина и высото ParaDrawing рассчитывается по bounds*/
             var aSelectedObjects = this.selectedObjects;
@@ -565,7 +572,7 @@ CGraphicObjects.prototype =
         {
             this.document.Document_UpdateSelectionState();
         }
-        oApplyProps && (isRealNumber(oApplyProps.verticalTextAlign) || isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
+        oApplyProps && (AscFormat.isRealNumber(oApplyProps.verticalTextAlign) || AscFormat.isRealNumber(oApplyProps.vert)) && this.document.Document_UpdateSelectionState();
     },
 
     applyDrawingProps: DrawingObjectsController.prototype.applyDrawingProps,
@@ -593,7 +600,7 @@ CGraphicObjects.prototype =
     {
         if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
         {
-            History.Create_NewPoint(historydescription_Document_GrObjectsBringToFront);
+            History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringToFront);
             if(this.selection.groupSelection)
             {
                 this.selection.groupSelection.bringToFront();
@@ -712,7 +719,7 @@ CGraphicObjects.prototype =
         {
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsBringForwardGroup);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringForwardGroup);
                 this.selection.groupSelection.bringForward();
             }
         }
@@ -753,7 +760,7 @@ CGraphicObjects.prototype =
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
             if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsBringForward);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringForward);
                 this.applyZIndex(oCheckObject);
                 this.document.Recalculate();
                 this.document.Document_UpdateUndoRedoState();
@@ -767,7 +774,7 @@ CGraphicObjects.prototype =
         {
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsSendToBackGroup);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsSendToBackGroup);
                 this.selection.groupSelection.sendToBack();
             }
         }
@@ -787,7 +794,7 @@ CGraphicObjects.prototype =
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
             if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsSendToBack);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsSendToBack);
                 this.applyZIndex(oCheckObject);
                 this.document.Recalculate();
                 this.document.Document_UpdateUndoRedoState();
@@ -801,7 +808,7 @@ CGraphicObjects.prototype =
         {
             if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : [this.selection.groupSelection.parent.Get_ParentParagraph()], CheckType : AscCommon.changestype_Paragraph_Content}))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsBringBackwardGroup);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringBackwardGroup);
                 this.selection.groupSelection.bringBackward();
             }
         }
@@ -842,7 +849,7 @@ CGraphicObjects.prototype =
             var oCheckObject = this.checkDrawingsMap(oDrawingsMap);
             if(false === this.document.Document_Is_SelectionLocked(AscCommon.changestype_None, {Type: changestype_2_ElementsArray_and_Type, CheckType: changestype_Drawing_Props, Elements:oCheckObject.aDrawings}))
             {
-                History.Create_NewPoint(historydescription_Document_GrObjectsBringBackward);
+                History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsBringBackward);
                 this.applyZIndex(oCheckObject);
                 this.document.Recalculate();
                 this.document.Document_UpdateUndoRedoState();
@@ -857,7 +864,7 @@ CGraphicObjects.prototype =
 
 
         var by_types;
-        by_types = getObjectsByTypesFromArr(this.selectedObjects, true);
+        by_types = AscFormat.getObjectsByTypesFromArr(this.selectedObjects, true);
 
         var aSelectedCharts = [];
         for(i = 0; i < by_types.charts.length; ++i)
@@ -1131,9 +1138,9 @@ CGraphicObjects.prototype =
                 DocContent.Selection.Start = true;
             }
 
-            this.changeCurrentState(new StartAddNewShape(this, sPreset));
+            this.changeCurrentState(new AscFormat.StartAddNewShape(this, sPreset));
             this.OnMouseDown({}, dX, dY, nPageIndex);
-            if(isRealNumber(dExtX) && isRealNumber(dExtY))
+            if(AscFormat.isRealNumber(dExtX) && AscFormat.isRealNumber(dExtY))
             {
                 this.OnMouseMove({IsLocked: true}, dX + dExtX, dY + dExtY, nPageIndex)
             }
@@ -1228,14 +1235,14 @@ CGraphicObjects.prototype =
         {
             editor.asc_doubleClickOnChart(this.getChartObject());
         }
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
     handleMathDrawingDoubleClick : function(drawing, e, x, y, pageIndex)
     {
         drawing.Convert_ToMathObject();
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         this.document.OnMouseUp(e, x, y, pageIndex);
     },
 
@@ -1341,7 +1348,7 @@ CGraphicObjects.prototype =
                     drawing = new ParaDrawing(0, 0, selectedObjects[i].copy(), this.document.DrawingDocument, this.document, null);
                     drawing.Set_DrawingType(groupParaDrawing.DrawingType);
                     drawing.GraphicObj.setParent(drawing);
-                    if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
+                    if(drawing.GraphicObj.spPr && drawing.GraphicObj.spPr.xfrm && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offX) && AscFormat.isRealNumber(drawing.GraphicObj.spPr.xfrm.offY))
                     {
                         drawing.GraphicObj.spPr.xfrm.setOffX(0);
                         drawing.GraphicObj.spPr.xfrm.setOffY(0);
@@ -1497,7 +1504,7 @@ CGraphicObjects.prototype =
     documentUpdateRulersState: function()
     {
         var content = this.getTargetDocContent();
-        if(content && content.Parent && content.Parent.getObjectType && content.Parent.getObjectType() === historyitem_type_Shape)
+        if(content && content.Parent && content.Parent.getObjectType && content.Parent.getObjectType() === AscDFH.historyitem_type_Shape)
         {
             content.Parent.documentUpdateRulersState();
         }
@@ -1953,7 +1960,7 @@ CGraphicObjects.prototype =
     {
         if(drawing && drawing.GraphicObj)
         {
-            if(drawing.GraphicObj.getObjectType() !== historyitem_type_ImageShape && drawing.GraphicObj.getObjectType() !== historyitem_type_ChartSpace)
+            if(drawing.GraphicObj.getObjectType() !== AscDFH.historyitem_type_ImageShape && drawing.GraphicObj.getObjectType() !== AscDFH.historyitem_type_ChartSpace)
                 return null;
         }
         this.handleEventMode = HANDLE_EVENT_MODE_CURSOR;
@@ -1974,7 +1981,7 @@ CGraphicObjects.prototype =
                 }
                 else
                 {
-                    if(object.getObjectType() === historyitem_type_ImageShape && object.parent)
+                    if(object.getObjectType() === AscDFH.historyitem_type_ImageShape && object.parent)
                     {
                         var oShape = object.parent.isShapeChild(true);
                         if(oShape)
@@ -1990,7 +1997,7 @@ CGraphicObjects.prototype =
 
     selectionCheck: function( X, Y, Page_Abs, NearPos )
     {
-        var text_object = getTargetTextObject(this);
+        var text_object = AscFormat.getTargetTextObject(this);
         if(text_object)
             return text_object.selectionCheck( X, Y, Page_Abs, NearPos );
         return false;
@@ -1998,7 +2005,7 @@ CGraphicObjects.prototype =
 
     checkTextObject: function(x, y, pageIndex)
     {
-        var text_object = getTargetTextObject(this);
+        var text_object = AscFormat.getTargetTextObject(this);
         if(text_object && text_object.hitInTextRect)
         {
             if(text_object.selectStartPage === pageIndex)
@@ -2319,8 +2326,8 @@ CGraphicObjects.prototype =
         var x_arr_max = [], y_arr_max = [];
         for(var i = 0; i < arrDrawings.length; ++i)
         {
-            var rot = normalizeRotate(isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
-            if (checkNormalRotate(rot))
+            var rot = AscFormat.normalizeRotate(AscFormat.isRealNumber(arrDrawings[i].rot) ? arrDrawings[i].rot : 0);
+            if (AscFormat.checkNormalRotate(rot))
             {
                 l = arrDrawings[i].posX;
                 r = arrDrawings[i].extX + arrDrawings[i].posX;
@@ -2446,12 +2453,17 @@ CGraphicObjects.prototype =
                     drawing.Set_DrawingType(drawing_Anchor);
                     drawing.Set_WrappingType(cur_group.parent.wrappingType);
                     drawing.CheckWH();
-                    sp.spPr.xfrm.setRot(normalizeRotate(sp.rot + cur_group.rot));
+                    sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(sp.rot + cur_group.rot));
                     sp.spPr.xfrm.setOffX(0);
                     sp.spPr.xfrm.setOffY(0);
                     sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                     sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                     sp.setGroup(null);
+                    if(sp.spPr.Fill && sp.spPr.Fill.fill && sp.spPr.Fill.fill.type === Asc.c_oAscFill.FILL_TYPE_GRP && cur_group.spPr && cur_group.spPr.Fill)
+                    {
+                        sp.spPr.setFill(cur_group.spPr.Fill.createDuplicate());
+                    }
+
                     nearest_pos = this.document.Get_NearestPos(page_num, sp.bounds.x + sp.posX, sp.bounds.y + sp.posY, true, drawing);
                     nearest_pos.Paragraph.Check_NearestPos(nearest_pos);
 
@@ -2581,7 +2593,7 @@ CGraphicObjects.prototype =
         if(content)
         {
             content.Remove(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd);
-            var oTargetTextObject = getTargetTextObject(this);
+            var oTargetTextObject = AscFormat.getTargetTextObject(this);
             oTargetTextObject && oTargetTextObject.checkExtentsByDocContent && oTargetTextObject.checkExtentsByDocContent();
             this.document.Recalculate();
         }
@@ -2615,7 +2627,7 @@ CGraphicObjects.prototype =
                         if(group_map.hasOwnProperty(key))
                             group_arr.push(group_map[key]);
                     }
-                    group_arr.sort(CompareGroups);
+                    group_arr.sort(AscFormat.CompareGroups);
                     for(i = 0; i < group_arr.length; ++i)
                     {
                         cur_group = group_arr[i];
@@ -2636,7 +2648,7 @@ CGraphicObjects.prototype =
                                 rel_yc = cur_group.group.invertTransform.TransformPointY(xc, yc);
                                 sp.spPr.xfrm.setOffX(rel_xc - hc);
                                 sp.spPr.xfrm.setOffY(rel_yc - vc);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(cur_group.group);
@@ -2664,7 +2676,7 @@ CGraphicObjects.prototype =
                                 sp = cur_group.spTree[0];
                                 sp.spPr.xfrm.setOffX(0);
                                 sp.spPr.xfrm.setOffY(0);
-                                sp.spPr.xfrm.setRot(normalizeRotate(cur_group.rot + sp.rot));
+                                sp.spPr.xfrm.setRot(AscFormat.normalizeRotate(cur_group.rot + sp.rot));
                                 sp.spPr.xfrm.setFlipH(cur_group.spPr.xfrm.flipH === true ? !(sp.spPr.xfrm.flipH === true) : sp.spPr.xfrm.flipH === true);
                                 sp.spPr.xfrm.setFlipV(cur_group.spPr.xfrm.flipV === true ? !(sp.spPr.xfrm.flipV === true) : sp.spPr.xfrm.flipV === true);
                                 sp.setGroup(null);
@@ -2853,7 +2865,7 @@ CGraphicObjects.prototype =
         this.clearPreTrackObjects();
         this.clearTrackObjects();
         this.resetSelection();
-        this.changeCurrentState(new NullState(this));
+        this.changeCurrentState(new AscFormat.NullState(this));
         return this.loadDocumentStateAfterLoadChanges(oState);
     },
 
@@ -2874,7 +2886,7 @@ CGraphicObjects.prototype =
             {
                 if(false === this.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : this.selectedObjects[0].parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content} ))
                 {
-                    History.Create_NewPoint(historydescription_Document_GrObjectsChangeWrapPolygon);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_GrObjectsChangeWrapPolygon);
                     this.selectedObjects[0].parent.Set_WrappingType(WRAPPING_TYPE_TIGHT);
                     this.selectedObjects[0].parent.Check_WrapPolygon();
                     this.document.Recalculate();
@@ -3185,22 +3197,22 @@ CGraphicObjects.prototype =
         {
             case "spline":
             {
-                this.changeCurrentState(new SplineBezierState(this));
+                this.changeCurrentState(new AscFormat.SplineBezierState(this));
                 break;
             }
             case "polyline1":
             {
-                this.changeCurrentState(new PolyLineAddState(this));
+                this.changeCurrentState(new AscFormat.PolyLineAddState(this));
                 break;
             }
             case "polyline2":
             {
-                this.changeCurrentState(new AddPolyLine2State(this));
+                this.changeCurrentState(new AscFormat.AddPolyLine2State(this));
                 break;
             }
             default :
             {
-                this.changeCurrentState(new StartAddNewShape(this, preset));
+                this.changeCurrentState(new AscFormat.StartAddNewShape(this, preset));
                 break;
             }
         }
@@ -3211,7 +3223,7 @@ CGraphicObjects.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ChangeColorScheme:
+            case AscDFH.historyitem_ChangeColorScheme:
             {
                 this.document.theme.themeElements.clrScheme = data.oldScheme;
                 this.drawingDocument.CheckGuiControlColors();
@@ -3227,7 +3239,7 @@ CGraphicObjects.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ChangeColorScheme:
+            case AscDFH.historyitem_ChangeColorScheme:
             {
                 this.document.theme.themeElements.clrScheme = data.newScheme;
                 this.drawingDocument.CheckGuiControlColors();
@@ -3241,11 +3253,11 @@ CGraphicObjects.prototype =
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(historyitem_type_GrObjects);
+        w.WriteLong(AscDFH.historyitem_type_GrObjects);
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ChangeColorScheme:
+            case AscDFH.historyitem_ChangeColorScheme:
             {
                 data.newScheme.Write_ToBinary(w);
                 break;
@@ -3256,14 +3268,14 @@ CGraphicObjects.prototype =
     Load_Changes: function(r)
     {
         var class_type = r.GetLong();
-        if(class_type != historyitem_type_GrObjects)
+        if(class_type != AscDFH.historyitem_type_GrObjects)
             return;
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_ChangeColorScheme:
+            case AscDFH.historyitem_ChangeColorScheme:
             {
-                var clr_scheme = new ClrScheme();
+                var clr_scheme = new AscFormat.ClrScheme();
                 clr_scheme.Read_FromBinary(r);
                 this.document.theme.themeElements.clrScheme = clr_scheme;
                 this.drawingDocument.CheckGuiControlColors();
@@ -3309,7 +3321,7 @@ function ComparisonByZIndexSimpleParent(obj1, obj2)
 
 function ComparisonByZIndexSimple(obj1, obj2)
 {
-    if(isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+    if(AscFormat.isRealNumber(obj1.RelativeHeight) && AscFormat.isRealNumber(obj2.RelativeHeight))
     {
         if(obj1.RelativeHeight === obj2.RelativeHeight)
         {
@@ -3320,9 +3332,13 @@ function ComparisonByZIndexSimple(obj1, obj2)
         }
         return obj1.RelativeHeight - obj2.RelativeHeight;
     }
-    if(!isRealNumber(obj1.RelativeHeight) && isRealNumber(obj2.RelativeHeight))
+    if(!AscFormat.isRealNumber(obj1.RelativeHeight) && AscFormat.isRealNumber(obj2.RelativeHeight))
         return -1;
-    if(isRealNumber(obj1.RelativeHeight) && !isRealNumber(obj2.RelativeHeight))
+    if(AscFormat.isRealNumber(obj1.RelativeHeight) && !AscFormat.isRealNumber(obj2.RelativeHeight))
         return 1;
     return 0;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CGraphicObjects = CGraphicObjects;

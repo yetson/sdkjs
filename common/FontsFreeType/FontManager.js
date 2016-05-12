@@ -22,419 +22,19 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
+
+(function(window, undefined){
 
 // Import
+var FT_Open_Args = AscFonts.FT_Open_Args;
+var FT_Library = AscFonts.FT_Library;
+var FT_Set_Char_Size = AscFonts.FT_Set_Char_Size;
+var CFontFile = AscFonts.CFontFile;
+var EGlyphState = AscFonts.EGlyphState;
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var AscBrowser = AscCommon.AscBrowser;
-
-var g_bIsAppleDevices = AscBrowser.isAppleDevices;
-
-function get_raster_bounds(data, width, height, stride)
-{
-    var ret = { dist_l : 0, dist_t : 0, dist_r : 0, dist_b : 0 };
-
-    // left
-    var bIsBreak = false;
-    for (var i = 0; i < width; i++)
-    {
-        var _ind = i * 4 + 3;
-        for (var j = 0; j < height; j++, _ind += stride)
-        {
-            if (data[_ind] != 0)
-            {
-                bIsBreak = true;
-                break;
-            }
-        }
-        if (bIsBreak)
-            break;
-
-        ret.dist_l++;
-    }
-
-    // right
-    bIsBreak = false;
-    for (var i = width - 1; i >= 0; i--)
-    {
-        var _ind = i * 4 + 3;
-        for (var j = 0; j < height; j++, _ind += stride)
-        {
-            if (data[_ind] != 0)
-            {
-                bIsBreak = true;
-                break;
-            }
-        }
-        if (bIsBreak)
-            break;
-
-        ret.dist_r++;
-    }
-
-    // top
-    var bIsBreak = false;
-    for (var j = 0; j < height; j++)
-    {
-        var _ind = j * stride + 3;
-        for (var i = 0; i < width; i++, _ind += 4)
-        {
-            if (data[_ind] != 0)
-            {
-                bIsBreak = true;
-                break;
-            }
-        }
-        if (bIsBreak)
-            break;
-
-        ret.dist_t++;
-    }
-
-    // bottom
-    var bIsBreak = false;
-    for (var j = height - 1; j >= 0; j--)
-    {
-        var _ind = j * stride + 3;
-        for (var i = 0; i < width; i++, _ind += 4)
-        {
-            if (data[_ind] != 0)
-            {
-                bIsBreak = true;
-                break;
-            }
-        }
-        if (bIsBreak)
-            break;
-
-        ret.dist_b++;
-    }
-
-    // clear
-    if (null != raster_memory.m_oBuffer)
-    {
-        var nIndexDst = 3;
-        var nPitch = 4 * (raster_memory.width - width);
-        var dst = raster_memory.m_oBuffer.data;
-        for (var j = 0; j < height; j++)
-        {
-            for (var i = 0; i < width; i++)
-            {
-                dst[nIndexDst] = 0;
-                nIndexDst += 4;
-            }
-            nIndexDst += nPitch;
-        }
-    }
-
-    return ret;
-}
-
-function CGlyphData()
-{
-    this.m_oCanvas  = null;
-    this.m_oContext = null;
-    this.R          = 0;
-    this.G          = 0;
-    this.B          = 0;
-
-    this.RasterData = null;
-
-    this.TempImage  = null;
-}
-CGlyphData.prototype =
-{
-    init : function(width, height)
-    {
-        if (width == 0 || height == 0)
-            return;
-
-        this.m_oCanvas = document.createElement('canvas');
-
-        this.m_oCanvas.width = width;
-        this.m_oCanvas.height = height;
-
-        this.m_oContext = this.m_oCanvas.getContext('2d');
-        this.m_oContext.globalCompositeOperation = "source-in";
-    },
-    checkColor : function(r,g,b,w,h)
-    {
-        if ((r == this.R) && (g == this.G) && (b == this.B))
-            return;
-
-        if (!g_bIsAppleDevices)
-        {
-            this.R = r;
-            this.G = g;
-            this.B = b;
-
-            if (this.m_oCanvas != null)
-            {
-				if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-				{
-					this.m_oContext.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-					this.m_oContext.fillRect(0,0,w,h);
-				}
-				else
-				{
-					this.m_oContext.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-					this.m_oContext.fillRect(0,0,w,h);
-				}
-            }
-            else
-            {
-				if (AscBrowser.isMozilla && AscBrowser.isLinuxOS)
-				{
-					var _raster = this.RasterData;
-					_raster.Chunk.CanvasCtx.fillStyle = (this.R == 0xFF && this.G == 0xFF && this.B == 0xFF) ? "rgb(255,255,254)" : "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-					var _x = _raster.Line.Height * _raster.Index;
-					var _y = _raster.Line.Y;
-					this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-				}
-				else
-				{
-					var _raster = this.RasterData;
-					_raster.Chunk.CanvasCtx.fillStyle = "rgb(" + this.R + "," + this.G + "," + this.B + ")";
-					var _x = _raster.Line.Height * _raster.Index;
-					var _y = _raster.Line.Y;
-					this.RasterData.Chunk.CanvasCtx.fillRect(_x, _y, w, h);
-				}
-            }
-        }
-        else
-        {
-            var _r = r;
-            var _g = g;
-            var _b = b;
-
-            this.TempImage = document.createElement("canvas");
-            this.TempImage.width = w;
-            this.TempImage.height = h;
-            var ctxD = this.TempImage.getContext("2d");
-            var pixDst = null;
-
-            if (this.m_oCanvas != null)
-            {
-                pixDst = this.m_oContext.getImageData(0, 0, w, h);
-                var dataPx = pixDst.data;
-
-                var cur = 0;
-                var cnt = w * h;
-                for (var i = 0; i < cnt; i++)
-                {
-                    dataPx[cur++] = _r;
-                    dataPx[cur++] = _g;
-                    dataPx[cur++] = _b;
-                    cur++;
-                }
-            }
-            else
-            {
-                var _raster = this.RasterData;
-                var _x = _raster.Line.Height * _raster.Index;
-                var _y = _raster.Line.Y;
-
-                pixDst = _raster.Chunk.CanvasCtx.getImageData(_x, _y, w, h);
-                var dataPx = pixDst.data;
-
-                var cur = 0;
-                var cnt = w * h;
-                for (var i = 0; i < cnt; i++)
-                {
-                    dataPx[cur++] = _r;
-                    dataPx[cur++] = _g;
-                    dataPx[cur++] = _b;
-                    cur++;
-                }
-            }
-
-            ctxD.putImageData(pixDst, 0, 0, 0, 0, w, h);
-        }
-    }
-}
-
-function TGlyphBitmap()
-{
-    this.nX = 0;            // Сдвиг по X начальной точки для рисования символа
-    this.nY = 0;            // Сдвиг по Y начальной точки для рисования символа
-    this.nWidth = 0;        // Ширина символа
-    this.nHeight = 0;       // Высота символа
-
-    this.oGlyphData = new CGlyphData();
-}
-TGlyphBitmap.prototype =
-{
-    fromAlphaMask : function(font_manager)
-    {
-        var bIsCanvas = false;
-        var _chunk_size = (font_manager.RasterMemory == null) ? 0 : font_manager.RasterMemory.ChunkHeapSize;
-        if (Math.max(this.nWidth, this.nHeight) > (_chunk_size / 10))
-            bIsCanvas = true;
-
-        var _x = 0;
-        var _y = 0;
-        var ctx = null;
-
-        if (bIsCanvas)
-        {
-            this.oGlyphData.init(this.nWidth,this.nHeight);
-            ctx = this.oGlyphData.m_oContext;
-        }
-        else
-        {
-            this.oGlyphData.RasterData = font_manager.RasterMemory.Alloc(this.nWidth, this.nHeight);
-            ctx = this.oGlyphData.RasterData.Chunk.CanvasCtx;
-            _x = this.oGlyphData.RasterData.Line.Height * this.oGlyphData.RasterData.Index;
-            _y = this.oGlyphData.RasterData.Line.Y;
-        }
-
-        if (true)
-        {
-            ctx.putImageData(raster_memory.m_oBuffer,_x,_y,0,0,this.nWidth,this.nHeight);
-        }
-        else
-        {
-            var gamma = 1.1;
-
-            var nIndexDst = 3;
-            var nPitch = 4 * (raster_memory.width - this.nWidth);
-            var dst = raster_memory.m_oBuffer.data;
-            for (var j = 0; j < this.nHeight; j++)
-            {
-                for (var i = 0; i < this.nWidth; i++)
-                {
-                    dst[nIndexDst] = Math.min(parseInt(dst[nIndexDst] * gamma), 255);
-                    nIndexDst += 4;
-                }
-                nIndexDst += nPitch;
-            }
-
-            ctx.putImageData(raster_memory.m_oBuffer,_x,_y,0,0,this.nWidth,this.nHeight);
-        }
-
-        if (null != raster_memory.m_oBuffer)
-        {
-            var nIndexDst = 3;
-            var nPitch = 4 * (raster_memory.width - this.nWidth);
-            var dst = raster_memory.m_oBuffer.data;
-            for (var j = 0; j < this.nHeight; j++)
-            {
-                for (var i = 0; i < this.nWidth; i++)
-                {
-                    dst[nIndexDst] = 0;
-                    nIndexDst += 4;
-                }
-                nIndexDst += nPitch;
-            }
-        }
-    },
-
-    draw : function(context2D, x, y)
-    {
-        var nW = this.nWidth;
-        var nH = this.nHeight;
-        if (null != this.oGlyphData.TempImage)
-        {
-            context2D.drawImage(this.oGlyphData.TempImage, 0, 0, nW, nH, x, y, nW, nH);
-            this.oGlyphData.TempImage = null;
-        }
-        else if (null != this.oGlyphData.m_oCanvas)
-        {
-            // своя память
-            context2D.drawImage(this.oGlyphData.m_oCanvas, 0, 0, nW, nH, x, y, nW, nH);
-        }
-        else
-        {
-            var _raster = this.oGlyphData.RasterData;
-            var _x = _raster.Line.Height * _raster.Index;
-            var _y = _raster.Line.Y;
-            context2D.drawImage(_raster.Chunk.CanvasImage, _x, _y, nW, nH, x, y, nW, nH);
-        }
-    },
-
-    drawCrop : function(context2D, x, y, w, h, cx)
-    {
-        if (null != this.oGlyphData.TempImage)
-        {
-            context2D.drawImage(this.oGlyphData.TempImage, cx, 0, w, h, x, y, w, h);
-            this.oGlyphData.TempImage = null;
-        }
-        else if (null != this.oGlyphData.m_oCanvas)
-        {
-            // своя память
-            context2D.drawImage(this.oGlyphData.m_oCanvas, cx, 0, w, h, x, y, w, h);
-        }
-        else
-        {
-            var _raster = this.oGlyphData.RasterData;
-            var _x = _raster.Line.Height * _raster.Index;
-            var _y = _raster.Line.Y;
-            context2D.drawImage(_raster.Chunk.CanvasImage, _x + cx, _y, w, h, x, y, w, h);
-        }
-    },
-
-    drawCropInRect : function(context2D, x, y, clipRect)
-    {
-        var _x = x;
-        var _y = y;
-        var _r = x + this.nWidth;
-        var _b = y + this.nHeight;
-
-        var _dstX = 0;
-        var _dstY = 0;
-        var _dstW = this.nWidth;
-        var _dstH = this.nHeight;
-
-        if (_x < clipRect.l)
-        {
-            _dstX = clipRect.l - _x;
-            _x += _dstX;
-            _dstW -= _dstX;
-        }
-        if (_y < clipRect.t)
-        {
-            _dstY = clipRect.t - _y;
-            _y += _dstY;
-            _dstH -= _dstY;
-        }
-        if (_r > clipRect.r)
-        {
-            _dstW -= (_r - clipRect.r);
-        }
-        if (_b > clipRect.b)
-        {
-            _dstH -= (_b - clipRect.b);
-        }
-
-        if (_dstW <= 0 || _dstH <= 0)
-            return;
-
-        if (null != this.oGlyphData.TempImage)
-        {
-            context2D.drawImage(this.oGlyphData.TempImage, _dstX, _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
-            this.oGlyphData.TempImage = null;
-        }
-        else if (null != this.oGlyphData.m_oCanvas)
-        {
-            // своя память
-            context2D.drawImage(this.oGlyphData.m_oCanvas, _dstX, _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
-        }
-        else
-        {
-            var _raster = this.oGlyphData.RasterData;
-            var __x = _raster.Line.Height * _raster.Index;
-            var __y = _raster.Line.Y;
-            context2D.drawImage(_raster.Chunk.CanvasImage, __x + _dstX, __y + _dstY, _dstW, _dstH, _x, _y, _dstW, _dstH);
-        }
-    },
-
-    Free : function()
-    {
-        if (null != this.oGlyphData.RasterData)
-        {
-            this.oGlyphData.RasterData.Chunk.Free(this.oGlyphData.RasterData);
-        }
-    }
-};
 
 function CRasterHeapLineFree()
 {
@@ -767,11 +367,11 @@ CRasterHeapTotal.prototype =
     }
 };
 
-function LoadFontFile(library, stream_index, name, faceindex)
+function LoadFontFile(library, stream_index, name, faceindex, fontManager)
 {
     var args = new FT_Open_Args();
     args.flags = 0x02;
-    args.stream = g_fonts_streams[stream_index];
+    args.stream = AscFonts.g_fonts_streams[stream_index];
 
     var face = library.FT_Open_Face(args, faceindex);
     if (null == face)
@@ -784,28 +384,46 @@ function LoadFontFile(library, stream_index, name, faceindex)
     font.m_lDescender = face.descender;
     font.m_lLineHeight = face.height;
 
-    if (window["USE_FONTS_WIN_PARAMS"] === true && face.horizontal && face.os2 && face.os2.version != 0xFFFF)
+    // flag for use always typo (os2 spec)
+    var bIsUseTypeAttack = ((face.os2.fsSelection & 128) == 128) ? true : false;
+    if (fontManager.IsCellMode)
+        bIsUseTypeAttack = false;
+
+    if (fontManager.IsUseWinOS2Params &&
+        face.os2 && face.os2.version != 0xFFFF &&
+        !bIsUseTypeAttack)
     {
-        var bIsUseWin = false;
-        if (face.horizontal.Ascender == 0 || face.horizontal.Descender == 0)
-            bIsUseWin = true;
-        if (face.os2.sTypoAscender == 0 || face.os2.sTypoDescender == 0)
-            bIsUseWin = true;
+        var _winAscent = face.os2.usWinAscent;
+        var _winDescent = -face.os2.usWinDescent;
 
-        var _h1 = face.horizontal.Ascender - face.horizontal.Descender + face.horizontal.Line_Gap;
-        var _h2 = face.os2.sTypoAscender - face.os2.sTypoDescender + face.os2.sTypoLineGap;
-        var _h3 = face.os2.usWinAscent + face.os2.usWinDescent;
-
-        if (_h1 != _h2 && _h2 != _h3 && _h1 != _h3 && (_h3 > _h1 && _h3 > _h2))
-            bIsUseWin = true;
-
-        if (bIsUseWin)
+        // experimantal: for cjk fonts lineheight *= 1.3
+        if ((face.os2.ulUnicodeRange2 & 0x2DF00000) != 0)
         {
-            font.m_lAscender = face.os2.usWinAscent;
-            font.m_lDescender = -face.os2.usWinDescent;
-            font.m_lLineHeight = face.os2.usWinAscent + face.os2.usWinDescent;
+            var _addidive = (0.3 * (_winAscent - _winDescent)) >> 0;
+            _winAscent += ((_addidive + 1) >> 1);
+            _winDescent -= (_addidive >> 1);
+        }
+
+        // TODO:
+        // https://www.microsoft.com/typography/otspec/recom.htm - hhea, not typo!!!
+        if (font.m_lLineHeight < (_winAscent - _winDescent))
+        {
+            font.m_lAscender = _winAscent;
+            font.m_lDescender = _winDescent;
+            font.m_lLineHeight = _winAscent - _winDescent;
         }
     }
+
+    /*
+    // что-то типо этого в экселе... пока выключаем
+    if (fontManager.IsCellMode)
+    {
+        var _addidive = (0.15 * font.m_lLineHeight) >> 0;
+        font.m_lAscender += ((_addidive + 1) >> 1);
+        font.m_lDescender -= (_addidive >> 1);
+        font.m_lLineHeight += _addidive;
+    }
+    */
 
     font.m_nNum_charmaps = face.num_charmaps;
     //if (null == face.charmap && 0 != this.m_nNum_charmaps)
@@ -840,7 +458,7 @@ function CFontFilesCache()
     this.m_lCurrentSize = 0;
     this.Fonts = {};
 
-    this.LockFont = function(stream_index, fontName, faceIndex, fontSize, _ext)
+    this.LockFont = function(stream_index, fontName, faceIndex, fontSize, _ext, fontManager)
     {
         var key = fontName + faceIndex + fontSize;
         if (undefined !== _ext)
@@ -849,7 +467,7 @@ function CFontFilesCache()
         if (pFontFile)
             return pFontFile;
 
-        pFontFile = this.Fonts[key] = LoadFontFile(this.m_oLibrary, stream_index, fontName, faceIndex);
+        pFontFile = this.Fonts[key] = LoadFontFile(this.m_oLibrary, stream_index, fontName, faceIndex, fontManager);
         return pFontFile;
     }
 }
@@ -876,55 +494,30 @@ function CDefaultFont()
         var _indexB = fontInfo.indexB != -1 ? fontInfo.indexB : _defaultIndex;
         var _indexBI = fontInfo.indexBI != -1 ? fontInfo.indexBI : _defaultIndex;
 
-        font = window.g_font_infos[_indexR];
+        var fontInfos = AscFonts.g_font_infos;
+        font = fontInfos[_indexR];
         this.m_arrDefaultFont[0] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexR);
         this.m_arrDefaultFont[0].UpdateStyles(false, false);
 
-        font = window.g_font_infos[_indexB];
+        font = fontInfos[_indexB];
         this.m_arrDefaultFont[1] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexB);
         this.m_arrDefaultFont[1].UpdateStyles(true, false);
 
-        font = window.g_font_infos[_indexI];
+        font = fontInfos[_indexI];
         this.m_arrDefaultFont[2] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexI);
         this.m_arrDefaultFont[2].UpdateStyles(false, true);
 
-        font = window.g_font_infos[_indexBI];
+        font = fontInfos[_indexBI];
         this.m_arrDefaultFont[3] = this.m_oLibrary.LoadFont(font.stream_index, font.id, fontInfo.faceIndexBI);
         this.m_arrDefaultFont[3].UpdateStyles(true, true);
-    }
+    };
 
     this.GetDefaultFont = function(bBold, bItalic)
     {
         var nIndex = (bBold ? 1 : 0) + (bItalic ? 2 : 0);
         return this.m_arrDefaultFont[nIndex];
-    }
+    };
 }
-var FONT_ITALIC_ANGLE = 0.3090169943749;
-var FT_ENCODING_UNICODE = 1970170211;
-var FT_ENCODING_NONE = 0;
-var FT_ENCODING_MS_SYMBOL = 1937337698;
-var FT_ENCODING_APPLE_ROMAN = 1634889070;
-
-var LOAD_MODE = 40970; // FT_LOAD_NO_HINTING | FT_LOAD_NO_AUTOHINT | FT_LOAD_NO_BITMAP | FT_LOAD_LINEAR_DESIGN
-//var LOAD_MODE = 40968; // FT_LOAD_NO_AUTOHINT | FT_LOAD_NO_BITMAP | FT_LOAD_LINEAR_DESIGN
-var REND_MODE = 0;
-
-var FontStyle =
-{
-    FontStyleRegular:    0,
-    FontStyleBold:       1,
-    FontStyleItalic:     2,
-    FontStyleBoldItalic: 3,
-    FontStyleUnderline:  4,
-    FontStyleStrikeout:  8
-};
-
-var EGlyphState = 
-{
-	glyphstateNormal:   0,  // символ отрисовался в нужном шрифте
-	glyphstateDeafault: 1,  // символ отрисовался в дефолтовом шрифте
-	glyphstateMiss:     2   // символ не отрисовался
-};
 
 function CPoint1()
 {
@@ -940,20 +533,6 @@ function CPoint2()
 	this.fTop = 0;
 	this.fRight = 0;
 	this.fBottom = 0;
-}
-
-function TMetrics()
-{
-    this.fWidth = 0;
-    this.fHeight = 0;
-
-    this.fHoriBearingX = 0;
-    this.fHoriBearingY = 0;
-    this.fHoriAdvance = 0;
-
-    this.fVertBearingX = 0;
-    this.fVertBearingY = 0;
-    this.fVertAdvance = 0;
 }
 
 function TGlyph()
@@ -979,33 +558,6 @@ function TGlyph()
 		this.bBitmap = false;
 		this.eState = EGlyphState.glyphstateNormal;
 	}
-}
-
-function TBBox()
-{
-	this.fMinX = 0;
-	this.fMaxX = 0;
-	this.fMinY = 0;
-	this.fMaxY = 0;
-
-    this.rasterDistances = null;
-}
-
-function TFontCacheSizes()
-{
-	this.ushUnicode; // Значение символа в юникоде
-	this.eState;     // Есть ли символ в шрифте/стандартном шрифте
-	this.nCMapIndex; // Номер таблицы 'cmap', в которой был найден данный символ 
-
-	this.ushGID;     
-
-	this.fAdvanceX; 
-
-	this.oBBox = new TBBox();
-	this.oMetrics = new TMetrics();
-
-	this.bBitmap = false;
-	this.oBitmap = null;
 }
 
 function CGlyphString()
@@ -1311,7 +863,8 @@ function CGlyphString()
 	}
 }
 
-function CFontManager()
+// params: { mode: "cell" };
+function CFontManager(params)
 {
 	this.m_oLibrary = null;
 	
@@ -1338,7 +891,9 @@ function CFontManager()
 
     this.LOAD_MODE = 40970;
 
-    this.IsAdvanceNeedBoldFonts = true;
+    this.IsCellMode = (params && params.mode == "cell") ? true : false;
+    this.IsAdvanceNeedBoldFonts = this.IsCellMode;
+    this.IsUseWinOS2Params = true;
 
     this.AfterLoad = function()
     {
@@ -1699,7 +1254,7 @@ function CFontManager()
 
     this.SetHintsProps = function(bIsHinting, bIsSubpixHinting)
     {
-        if (undefined === g_fontManager.m_oLibrary.tt_hint_props)
+        if (undefined === AscCommon.g_fontManager.m_oLibrary.tt_hint_props)
             return;
 
         if (bIsHinting && bIsSubpixHinting)
@@ -1730,3 +1285,9 @@ function CFontManager()
         this.IsAdvanceNeedBoldFonts = value;
     }
 }
+
+    //------------------------------------------------------export------------------------------------------------------
+    window['AscFonts'] = window['AscFonts'] || {};
+    window['AscFonts'].CRasterHeapTotal = CRasterHeapTotal;
+    window['AscFonts'].CFontManager = CFontManager;
+})(window);

@@ -22,6 +22,14 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
+"use strict";
+
+// Import
+var CShape = AscFormat.CShape;
+
+var isRealObject = AscCommon.isRealObject;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+
 CShape.prototype.setRecalculateInfo = function()
 {
     this.recalcInfo =
@@ -53,11 +61,9 @@ CShape.prototype.setRecalculateInfo = function()
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
     this.posX = null;
     this.posY = null;
-    this.snapArrayX = [];
-    this.snapArrayY = [];
 
-    this.localTransform = new CMatrix();
-    this.localTransformText = new CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
+    this.localTransformText = new AscCommon.CMatrix();
 };
 
 CShape.prototype.recalcContent = function()
@@ -289,7 +295,7 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.bWordShape)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
@@ -328,7 +334,7 @@ CShape.prototype.recalculateText = function()
 {
     if(!this.bWordShape)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if(this.bWordShape)
         {
@@ -518,6 +524,9 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
     this.textStyleForParagraph = {TextPr: styles.Default.TextPr.Copy(), ParaPr: styles.Default.ParaPr.Copy()};
     var DefId = styles.Default.Paragraph;
     var DefaultStyle = styles.Style[DefId];
+
+    this.textStyleForParagraph.ParaPr.Merge( g_oDocumentDefaultParaPr );
+    this.textStyleForParagraph.TextPr.Merge( g_oDocumentDefaultTextPr );
     if(DefaultStyle)
     {
         this.textStyleForParagraph.ParaPr.Merge( DefaultStyle.ParaPr );
@@ -530,15 +539,15 @@ CShape.prototype.recalculateShapeStyleForParagraph = function()
         var shape_text_pr = new CTextPr();
         if(this.style.fontRef.Color)
         {
-            shape_text_pr.Unifill = CreateUniFillByUniColorCopy(this.style.fontRef.Color);
+            shape_text_pr.Unifill = AscFormat.CreateUniFillByUniColorCopy(this.style.fontRef.Color);
         }
-        if(this.style.fontRef.idx === fntStyleInd_major)
+        if(this.style.fontRef.idx === AscFormat.fntStyleInd_major)
         {
             shape_text_pr.RFonts.Ascii = { Name: "+mj-lt", Index : -1 };
             shape_text_pr.RFonts.EastAsia = { Name: "+mj-ea", Index : -1 };
             shape_text_pr.RFonts.CS = { Name: "+mj-cs", Index : -1 };
         }
-        else if( this.style.fontRef.idx === fntStyleInd_minor)
+        else if( this.style.fontRef.idx === AscFormat.fntStyleInd_minor)
         {
             shape_text_pr.RFonts.Ascii = { Name: "+mn-lt", Index : -1 };
             shape_text_pr.RFonts.EastAsia = { Name: "+mn-ea", Index : -1 };
@@ -568,7 +577,7 @@ CShape.prototype.Refresh_RecalcData2 = function()
 {
 
     var oController = this.getDrawingObjectsController();
-    if(oController && getTargetTextObject(oController) === this)
+    if(oController && AscFormat.getTargetTextObject(oController) === this)
     {
         this.recalcInfo.recalcTitle = this.getDocContent();
         this.recalcInfo.bRecalculatedTitle = true;
@@ -581,14 +590,14 @@ CShape.prototype.Refresh_RecalcData2 = function()
             var oMainGroup = this.getMainGroup();
             if(oMainGroup.parent)
             {
-                oMainGroup.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+                oMainGroup.parent.Refresh_RecalcData({Type: AscDFH.historyitem_SetExtent});
             }
         }
         else
         {
             if(this.parent)
             {
-                this.parent.Refresh_RecalcData({Type: historyitem_SetExtent});
+                this.parent.Refresh_RecalcData({Type: AscDFH.historyitem_SetExtent});
             }
         }
         return;
@@ -819,7 +828,7 @@ CShape.prototype.documentStatistics = function(stats)
 
 CShape.prototype.checkPosTransformText = function()
 {
-    if(isRealNumber(this.posX) && isRealNumber(this.posY))
+    if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
     {
         this.transformText = this.localTransformText.CreateDublicate();
         global_MatrixTransformer.TranslateAppend(this.transformText, this.posX, this.posY);
@@ -868,7 +877,7 @@ CShape.prototype.cursorMoveAt = function( X, Y, AddToSelect )
     {
         var t_x = this.invertTransformText.TransformPointX(X, Y);
         var t_y = this.invertTransformText.TransformPointY(X, Y);
-        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
+        content.Cursor_MoveAt(t_x, t_y, AddToSelect, undefined, AscFormat.isRealNumber(this.selectStartPage) ? this.selectStartPage : 0);
     }
 };
 

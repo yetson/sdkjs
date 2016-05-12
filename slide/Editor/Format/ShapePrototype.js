@@ -24,33 +24,31 @@
 */
 "use strict";
 
-var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+(function(window, undefined){
 
-CRFonts.prototype.Merge = function(RFonts)
-{
-    if ( undefined !== RFonts.Ascii )
-        this.Ascii = RFonts.Ascii;
+// Import
+var CShape = AscFormat.CShape;
 
-    if ( undefined != RFonts.EastAsia )
-        this.EastAsia = RFonts.EastAsia;
-    else if ( undefined !== RFonts.Ascii )
-        this.EastAsia = RFonts.Ascii;
+var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
-    if ( undefined != RFonts.HAnsi )
-        this.HAnsi = RFonts.HAnsi;
-
-    else if ( undefined !== RFonts.Ascii )
-        this.HAnsi = RFonts.Ascii;
-
-    if ( undefined != RFonts.CS )
-        this.CS = RFonts.CS;
-
-    else if ( undefined !== RFonts.Ascii )
-        this.CS = RFonts.Ascii;
-
-    if ( undefined != RFonts.Hint )
-        this.Hint = RFonts.Hint;
-};
+var pHText = [];
+pHText[0] = [];//rus         ""                                                          ;
+pHText[0][AscFormat.phType_body]  =    "Slide text";             //"Текст слайда" ;                              ;
+pHText[0][AscFormat.phType_chart]    = "Chart";         // "Диаграмма" ;                                     ;
+pHText[0][AscFormat.phType_clipArt]  = "ClipArt";// "Текст слайда" ; //(Clip Art)                   ;
+pHText[0][AscFormat.phType_ctrTitle] = "Slide title";// "Заголовок слайда" ; //(Centered Title)     ;
+pHText[0][AscFormat.phType_dgm]      = "Diagram";// "Диаграмма";// (Diagram)                        ;
+pHText[0][AscFormat.phType_dt]       = "Date and time";// "Дата и время";// (Date and Time)         ;
+pHText[0][AscFormat.phType_ftr]      = "Footer";// "Нижний колонтитул";// (Footer)                  ;
+pHText[0][AscFormat.phType_hdr]      = "Header";// "Верхний колонтитул"; //(Header)                 ;
+pHText[0][AscFormat.phType_media]    = "Media";// "Текст слайда"; //(Media)                         ;
+pHText[0][AscFormat.phType_obj]      = "Slide text";// "Текст слайда"; //(Object)                   ;
+pHText[0][AscFormat.phType_pic]      = "Picture";// "Вставка рисунка"; //(Picture)                  ;
+pHText[0][AscFormat.phType_sldImg]   = "Image";// "Вставка рисунка"; //(Slide Image)                ;
+pHText[0][AscFormat.phType_sldNum]   = "Slide number";// "Номер слайда"; //(Slide Number)           ;
+pHText[0][AscFormat.phType_subTitle] = "Slide subtitle";// "Подзаголовок слайда"; //(Subtitle)      ;
+pHText[0][AscFormat.phType_tbl]      = "Table";// "Таблица"; //(Table)                              ;
+pHText[0][AscFormat.phType_title]    = "Slide title";// "Заголовок слайда" ;  //(Title)             ;
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
@@ -81,7 +79,7 @@ CShape.prototype.Is_UseInDocument = function(drawingObjects)
 };
 CShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     if(this.spTree)
     {
@@ -105,7 +103,7 @@ CShape.prototype.setDrawingBase = function(drawingBase)
 
 CShape.prototype.getDrawingObjectsController = function()
 {
-    if(this.parent && this.parent.getObjectType() === historyitem_type_Slide)
+    if(this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide)
     {
         return this.parent.graphicObjects;
     }
@@ -128,7 +126,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
     }
     if(!drawingObjects)
     {
-        drawingObjects = new DrawingObjects();
+        drawingObjects = new AscFormat.DrawingObjects();
     }
 
     var drawingObject = drawingObjects.createDrawingObject();
@@ -137,7 +135,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position)) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }
@@ -158,19 +156,6 @@ function addToDrawings(worksheet, graphic, position, lockByDefault)
         graphic.addToRecalculate();
     }
     return ret;
-}
-
-function deleteDrawingBase(aObjects, graphicId)
-{
-    var position = null;
-    for (var i = 0; i < aObjects.length; i++) {
-        if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
-            aObjects.splice(i, 1);
-            position = i;
-            break;
-        }
-    }
-    return position;
 }
 
 CShape.prototype.addToDrawingObjects =  function(pos)
@@ -303,11 +288,11 @@ CShape.prototype.recalcTextStyles = function()
 };
 CShape.prototype.addToRecalculate = function()
 {
-    History.RecalcData_Add({Type: historyrecalctype_Drawing, Object: this});
+    AscCommon.History.RecalcData_Add({Type: AscDFH.historyitem_recalctype_Drawing, Object: this});
 };
 CShape.prototype.getSlideIndex = function()
 {
-    if(this.parent && isRealNumber(this.parent.num))
+    if(this.parent && AscFormat.isRealNumber(this.parent.num))
     {
         return this.parent.num;
     }
@@ -336,7 +321,7 @@ CShape.prototype.handleUpdateTheme = function()
 
     if(this.isPlaceholder()
         && !( this.spPr && this.spPr.xfrm &&
-        (this.getObjectType() === historyitem_type_GroupShape && this.spPr.xfrm.isNotNullForGroup() || this.getObjectType() !== historyitem_type_GroupShape && this.spPr.xfrm.isNotNull() ) ))
+        (this.getObjectType() === AscDFH.historyitem_type_GroupShape && this.spPr.xfrm.isNotNullForGroup() || this.getObjectType() !== AscDFH.historyitem_type_GroupShape && this.spPr.xfrm.isNotNull() ) ))
     {
         this.recalcTransform();
         this.recalcGeometry()
@@ -424,7 +409,7 @@ CShape.prototype.getParentObjects = function ()
     {
         switch(this.parent.getObjectType())
         {
-            case historyitem_type_Slide:
+            case AscDFH.historyitem_type_Slide:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -434,7 +419,7 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : (this.parent.Layout && this.parent.Layout.Master ? this.parent.Layout.Master.Theme : null)
                 };
             }
-            case historyitem_type_SlideLayout:
+            case AscDFH.historyitem_type_SlideLayout:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -444,7 +429,7 @@ CShape.prototype.getParentObjects = function ()
                     theme: this.themeOverride ? this.themeOverride : (this.parent.Master ? this.parent.Master.Theme : null)
                 };
             }
-            case historyitem_type_SlideMaster:
+            case AscDFH.historyitem_type_SlideMaster:
             {
                 return {
                     presentation: editor.WordControl.m_oLogicDocument,
@@ -470,8 +455,8 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === historyitem_type_Slide);
-    ExecuteNoHistory(function(){
+    var check_slide_placeholder = !this.isPlaceholder() || (this.parent && this.parent.getObjectType() === AscDFH.historyitem_type_Slide);
+    AscFormat.ExecuteNoHistory(function(){
 
 
         if (this.recalcInfo.recalculateBrush) {
@@ -485,7 +470,7 @@ CShape.prototype.recalculate = function ()
         }
         if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
-            this.calculateSnapArrays();
+            this.recalculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
 
@@ -518,7 +503,7 @@ CShape.prototype.recalculate = function ()
 };
 CShape.prototype.recalculateBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     boundsChecker.CorrectBounds();
 
@@ -580,9 +565,9 @@ CShape.prototype.recalculateContent2 = function()
             {
                 return;
             }
-            var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][phType_body];
+            var text = typeof pHText[0][this.nvSpPr.nvPr.ph.type] === "string" && pHText[0][this.nvSpPr.nvPr.ph.type].length > 0 ?  pHText[0][this.nvSpPr.nvPr.ph.type] : pHText[0][AscFormat.phType_body];
             if (!this.txBody.content2)
-                this.txBody.content2 = CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
+                this.txBody.content2 = AscFormat.CreateDocContentFromString(text, this.getDrawingDocument(), this.txBody);
             else
             {
                 this.txBody.content2.Recalc_AllParagraphs_CompiledPr();
@@ -596,10 +581,10 @@ CShape.prototype.recalculateContent2 = function()
                 var body_pr = this.getBodyPr();
                 if(body_pr)
                 {
-                    l_ins = isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
-                    r_ins = isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
-                    t_ins = isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
-                    b_ins = isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
+                    l_ins = AscFormat.isRealNumber(body_pr.lIns) ? body_pr.lIns : 2.54;
+                    r_ins = AscFormat.isRealNumber(body_pr.rIns) ? body_pr.rIns : 2.54;
+                    t_ins = AscFormat.isRealNumber(body_pr.tIns) ? body_pr.tIns : 1.27;
+                    b_ins = AscFormat.isRealNumber(body_pr.bIns) ? body_pr.bIns : 1.27;
                 }
                 else
                 {
@@ -609,8 +594,8 @@ CShape.prototype.recalculateContent2 = function()
                     b_ins = 1.27;
                 }
                 if(this.spPr.geometry && this.spPr.geometry.rect
-                    && isRealNumber(this.spPr.geometry.rect.l) && isRealNumber(this.spPr.geometry.rect.t)
-                    && isRealNumber(this.spPr.geometry.rect.r) && isRealNumber(this.spPr.geometry.rect.r))
+                    && AscFormat.isRealNumber(this.spPr.geometry.rect.l) && AscFormat.isRealNumber(this.spPr.geometry.rect.t)
+                    && AscFormat.isRealNumber(this.spPr.geometry.rect.r) && AscFormat.isRealNumber(this.spPr.geometry.rect.r))
                 {
                     w = this.spPr.geometry.rect.r - this.spPr.geometry.rect.l - (l_ins + r_ins);
                     h = this.spPr.geometry.rect.b - this.spPr.geometry.rect.t - (t_ins + b_ins);
@@ -623,7 +608,7 @@ CShape.prototype.recalculateContent2 = function()
 
                 if(!body_pr.upright)
                 {
-                    if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                    if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                     {
                         this.txBody.contentWidth2 = w;
                         this.txBody.contentHeight2 = h;
@@ -638,9 +623,9 @@ CShape.prototype.recalculateContent2 = function()
                 else
                 {
                     var _full_rotate = this.getFullRotate();
-                    if(checkNormalRotate(_full_rotate))
+                    if(AscFormat.checkNormalRotate(_full_rotate))
                     {
-                        if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                         {
 
                             this.txBody.contentWidth2 = w;
@@ -654,7 +639,7 @@ CShape.prototype.recalculateContent2 = function()
                     }
                     else
                     {
-                        if(!(body_pr.vert === nVertTTvert || body_pr.vert === nVertTTvert270))
+                        if(!(body_pr.vert === AscFormat.nVertTTvert || body_pr.vert === AscFormat.nVertTTvert270))
                         {
 
                             this.txBody.contentWidth2 = h;
@@ -748,14 +733,14 @@ CShape.prototype.getIsSingleBody = function(x, y)
 {
     if(!this.isPlaceholder())
         return false;
-    if(this.getPlaceholderType() !== phType_body)
+    if(this.getPlaceholderType() !== AscFormat.phType_body)
         return false;
     if(this.parent && this.parent.cSld && Array.isArray(this.parent.cSld.spTree))
     {
         var sp_tree = this.parent.cSld.spTree;
         for(var i = 0; i < sp_tree.length; ++i)
         {
-            if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === phType_body)
+            if(sp_tree[i] !== this && sp_tree[i].getPlaceholderType && sp_tree[i].getPlaceholderType() === AscFormat.phType_body)
                 return false;
         }
     }
@@ -791,11 +776,8 @@ CShape.prototype.Set_CurrentElement = function(bUpdate, pageIndex)
     }
 };
 
-CTextBody.prototype.Get_Worksheet = function()
-{
-    return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
-};
-CTextBody.prototype.getDrawingDocument = function()
-{
-    return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
-};
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].G_O_DEFAULT_COLOR_MAP = G_O_DEFAULT_COLOR_MAP;
+    window['AscFormat'].addToDrawings = addToDrawings;
+})(window);

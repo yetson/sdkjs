@@ -1,4 +1,31 @@
+/*
+ *
+ * (c) Copyright Ascensio System Limited 2010-2016
+ *
+ * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
+ * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
+ * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
+ * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
+ *
+ * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+ * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
+ *
+ * You can contact Ascensio System SIA by email at sales@onlyoffice.com
+ *
+ * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
+ * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
+ *
+ * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
+ * relevant author attributions when distributing the software. If the display of the logo in its graphic 
+ * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
+ * in every copy of the program you distribute. 
+ * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
+ *
+ */
 "use strict";
+
+// Import
+var History = AscCommon.History;
 
 function CRPI()
 {
@@ -1139,7 +1166,7 @@ CMathContent.prototype.GetParent = function()
 };
 CMathContent.prototype.SetArgSize = function(val)
 {
-    History.Add( this, { Type : historyitem_Math_ArgSize, New: val, Old: this.ArgSize.GetValue()});
+    History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: val, Old: this.ArgSize.GetValue()});
     this.ArgSize.SetValue(val);
 };
 CMathContent.prototype.GetArgSize = function()
@@ -1652,7 +1679,7 @@ CMathContent.prototype.Internal_Content_Add = function(Pos, Item, bUpdatePositio
     Item.Parent = this;
     Item.Recalc_RunsCompiledPr();
 
-    History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     this.Content.splice( Pos, 0, Item );
 
     this.private_UpdatePosOnAdd(Pos, bUpdatePosition);
@@ -1763,7 +1790,7 @@ CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
             NewItems[i].Recalc_RunsCompiledPr();
         }
 
-        History.Add( this, { Type : historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + Count - 1, Items : NewItems } );
+        History.Add( this, { Type : AscDFH.historyitem_Math_AddItem, Pos : Pos, EndPos : Pos + Count - 1, Items : NewItems } );
 
         var Array_start = this.Content.slice(0, Pos);
         var Array_end   = this.Content.slice(Pos);
@@ -1774,7 +1801,7 @@ CMathContent.prototype.Concat_ToContent = function(Pos, NewItems)
 CMathContent.prototype.Remove_FromContent = function(Pos, Count)
 {
     var DeletedItems = this.Content.splice(Pos, Count);
-    History.Add( this, { Type : historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add( this, { Type : AscDFH.historyitem_Math_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
     // Обновим текущую позицию
     if (this.CurPos > Pos + Count)
@@ -1924,13 +1951,13 @@ CMathContent.prototype.Undo = function(Data)
 
     switch(type)
     {
-        case historyitem_Math_AddItem:
+        case AscDFH.historyitem_Math_AddItem:
         {
             this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
             break;
         }
-        case historyitem_Math_RemoveItem:
+        case AscDFH.historyitem_Math_RemoveItem:
         {
             var Pos = Data.Pos;
 
@@ -1944,7 +1971,7 @@ CMathContent.prototype.Undo = function(Data)
 
             break;
         }
-        case historyitem_Math_ArgSize:
+        case AscDFH.historyitem_Math_ArgSize:
         {
             this.ArgSize.SetValue(Data.Old);
             this.Recalc_RunsCompiledPr();
@@ -1958,7 +1985,7 @@ CMathContent.prototype.Redo = function(Data)
 
     switch(type)
     {
-        case historyitem_Math_AddItem:
+        case AscDFH.historyitem_Math_AddItem:
         {
             var Pos = Data.Pos;
 
@@ -1972,13 +1999,13 @@ CMathContent.prototype.Redo = function(Data)
 
             break;
         }
-        case historyitem_Math_RemoveItem:
+        case AscDFH.historyitem_Math_RemoveItem:
         {
             this.Content.splice(Data.Pos, Data.EndPos - Data.Pos + 1);
 
             break;
         }
-        case historyitem_Math_ArgSize:
+        case AscDFH.historyitem_Math_ArgSize:
         {
             this.ArgSize.SetValue(Data.New);
             this.Recalc_RunsCompiledPr();
@@ -1988,7 +2015,7 @@ CMathContent.prototype.Redo = function(Data)
 };
 CMathContent.prototype.Save_Changes = function(Data, Writer)
 {
-    Writer.WriteLong(historyitem_type_MathContent);
+    Writer.WriteLong(AscDFH.historyitem_type_MathContent);
 
     var Type = Data.Type;
     // Пишем тип
@@ -1996,7 +2023,7 @@ CMathContent.prototype.Save_Changes = function(Data, Writer)
 
     switch (Type)
     {
-        case historyitem_Math_AddItem:
+        case AscDFH.historyitem_Math_AddItem:
         {
             // Long     : Количество элементов
             // Array of :
@@ -2017,7 +2044,7 @@ CMathContent.prototype.Save_Changes = function(Data, Writer)
 
             break;
         }
-        case historyitem_Math_RemoveItem:
+        case AscDFH.historyitem_Math_RemoveItem:
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -2032,7 +2059,7 @@ CMathContent.prototype.Save_Changes = function(Data, Writer)
 
             break;
         }
-        case historyitem_Math_ArgSize:
+        case AscDFH.historyitem_Math_ArgSize:
         {
             if(undefined !== Data.New)
             {
@@ -2055,14 +2082,14 @@ CMathContent.prototype.Load_Changes = function(Reader)
     // Long : тип изменений
 
     var ClassType = Reader.GetLong();
-    if ( historyitem_type_MathContent != ClassType )
+    if ( AscDFH.historyitem_type_MathContent != ClassType )
         return;
 
     var Type = Reader.GetLong();
 
     switch ( Type )
     {
-        case  historyitem_Math_AddItem:
+        case  AscDFH.historyitem_Math_AddItem:
         {
             // Long     : Количество элементов
             // Array of :
@@ -2082,13 +2109,13 @@ CMathContent.prototype.Load_Changes = function(Reader)
                 {
                     this.Content.splice(Pos, 0, Element);
                     Element.Recalc_RunsCompiledPr();
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
 
             break;
         }
-        case historyitem_Math_RemoveItem:
+        case AscDFH.historyitem_Math_RemoveItem:
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -2099,12 +2126,12 @@ CMathContent.prototype.Load_Changes = function(Reader)
             {
                 var ChangesPos = Reader.GetLong();
                 this.Content.splice(ChangesPos, 1);
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
 
             break;
         }
-        case historyitem_Math_ArgSize:
+        case AscDFH.historyitem_Math_ArgSize:
         {
             if(false === Reader.GetBool())
             {
@@ -2123,7 +2150,7 @@ CMathContent.prototype.Load_Changes = function(Reader)
 };
 CMathContent.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong(historyitem_type_MathContent);
+    Writer.WriteLong(AscDFH.historyitem_type_MathContent);
 
     // Long : Id
     Writer.WriteString2(this.Id);
@@ -4840,7 +4867,7 @@ CMathContent.prototype.Apply_MenuProps = function(Props, Pos)
             ArgSize = this.ArgSize.GetValue();
             NewArgSize = this.ArgSize.Increase();
 
-            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
+            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
             this.Recalc_RunsCompiledPr();
         }
     }
@@ -4851,7 +4878,7 @@ CMathContent.prototype.Apply_MenuProps = function(Props, Pos)
             ArgSize = this.ArgSize.GetValue();
             NewArgSize = this.ArgSize.Decrease();
 
-            History.Add( this, { Type : historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
+            History.Add( this, { Type : AscDFH.historyitem_Math_ArgSize, New: NewArgSize, Old: ArgSize});
             this.Recalc_RunsCompiledPr();
 
         }
@@ -5023,7 +5050,7 @@ CMathContent.prototype.Process_AutoCorrect = function(ActionElement)
         AutoCorrectEngine.MathPr = new CMPrp();
 
     // Создаем новую точку здесь, потому что если автозамену можно будет сделать классы сразу будут создаваться
-    History.Create_NewPoint(historydescription_Document_MathAutoCorrect);
+    History.Create_NewPoint(AscDFH.historydescription_Document_MathAutoCorrect);
 
     var bCursorStepRight = false;
 	// Смотрим возможно ли выполнить автозамену, если нет, тогда пробуем произвести автозамену пропуская последний символ
@@ -6528,3 +6555,7 @@ var g_aMathAutoCorrectTriggerCharCodes =
     0x3F : 1, 0x40 : 1, 0x5B : 1, 0x5C : 1, 0x5D : 1, 0x5E : 1, 0x5F : 1,
     0x60 : 1, 0x7B : 1, 0x7C : 1, 0x7D : 1, 0x7E : 1
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CMathContent = CMathContent;

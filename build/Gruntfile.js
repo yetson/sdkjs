@@ -28,11 +28,11 @@ module.exports = function(grunt) {
 	var path = grunt.option('src') || './configs';
 	var level = grunt.option('level') || 'ADVANCED';
 	var formatting = grunt.option('formatting') || '';
-	var nomap = grunt.option('nomap') || '';
 
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-replace');
+	grunt.loadNpmTasks('grunt-split-file');
 	
 	grunt.registerTask('build_webword_init', 'Initialize build WebWord SDK.', function(){
         defaultConfig = path + '/webword.json';
@@ -92,79 +92,122 @@ module.exports = function(grunt) {
 
 	grunt.registerTask('build_all', ['build_webword_init', 'build_sdk', 'build_webexcel_init', 'build_sdk', 'build_webpowerpoint_init', 'build_sdk']);
 	
+	grunt.registerTask('concat_sdk_init', function() {
+		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
+		var srcFilesMin = packageFile['compile']['sdk']['min'];
+		var srcFilesAll = packageFile['compile']['sdk']['common'];
+		var sdkOpt = {
+			compilation_level: 'WHITESPACE_ONLY',
+			warning_level: 'QUIET',
+			externs: packageFile['compile']['sdk']['externs']
+		};
+		
+		if (grunt.option('mobile')) {
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFilesAll = srcFilesAll.filter(function(item) {
+				return -1 === excludeFiles.indexOf(item);
+			});		
+			var mobileFiles = packageFile['compile']['sdk']['mobile'];
+			if(mobileFiles){
+				srcFilesAll = srcFilesAll.concat(mobileFiles);
+			}
+		}
+		
+		if (!grunt.option('noprivate')) {
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['private']);
+		}
+		if (grunt.option('desktop')) {
+			srcFilesMin = srcFilesMin.concat(packageFile['compile']['sdk']['desktop']['min']);
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['desktop']['common']);
+		}
+		if (grunt.option('builder')) {
+			srcFilesAll = srcFilesAll.concat(packageFile['compile']['sdk']['builder']);
+		}
+		
+		grunt.initConfig({
+			concat: {
+				sdkmin: {
+					options: {
+//						banner: '(function(window, undefined) {',
+//						footer: '})(window);window["split"]="split";'
+						banner: '',
+						footer: 'window["split"]="split";'
+					},
+					src: srcFilesMin,
+					dest: sdkAllMinTmp
+				},
+				sdk: {
+					options: {
+						banner: '(function(window, undefined) {',
+						footer: '})(window);'
+					},
+					src: srcFilesAll,
+					dest: sdkAllTmp
+				},
+				all: {
+					src: [sdkAllMinTmp, sdkAllTmp],
+					dest: sdkTmp
+				}
+			},
+			clean: [
+				sdkAllMinTmp,
+				sdkAllTmp
+			]
+		});
+	});
+	
 	grunt.registerTask('compile_sdk_init', function(compilation_level) {
-		grunt.file.mkdir( packageFile['compile']['sdk']['log'] );
-		var map_file_path = packageFile['compile']['sdk']['dst'] + '.map';
-		var map_record_file_path = map_file_path + '.tmp';
-		var concat_src = [
-			packageFile['compile']['sdk']['dst'],
-			packageFile['compile']['defines']['dst'],
-			map_record_file_path ];
-		var srcFiles = packageFile['compile']['sdk']['common'];
+		var sdkTmp = 'sdk-tmp.js'
+		var splitLine = '';
+		var tmp_sdk_path = 'sdk-js-tmp.js';
+		var sdkDstFolder = packageFile['compile']['sdk']['dst'];
+		var sdkAllMinDst = sdkDstFolder + '/sdk-all-min.js';
+		var sdkAllDst = sdkDstFolder + '/sdk-all.js';
 		var sdkOpt = {
 			compilation_level: compilation_level,
 			warning_level: 'QUIET',
 			externs: packageFile['compile']['sdk']['externs']
 		};
-		var definesOpt = {
-			compilation_level: 'ADVANCED' === compilation_level ? 'SIMPLE' : compilation_level,
-			warning_level: 'QUIET'
-		};
 		if (formatting) {
-			definesOpt['formatting'] = sdkOpt['formatting'] = formatting;
+			sdkOpt['formatting'] = formatting;
 		}
-		if (!nomap) {
-			sdkOpt['variable_renaming_report'] = packageFile['compile']['sdk']['log'] + '/variable.map';
-			sdkOpt['property_renaming_report'] = packageFile['compile']['sdk']['log'] + '/property.map';
-		}		
-		
-		if (grunt.option('mobile')) {
-			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
-			srcFiles = srcFiles.filter(function(item) {
-				return -1 === excludeFiles.indexOf(item);
-			});		
-			var mobileFiles = packageFile['compile']['sdk']['mobile'];
-			if(mobileFiles){
-				srcFiles = mobileFiles.concat(srcFiles);
-			}
+		if ('ADVANCED' === compilation_level) {
+			splitLine = ('PRETTY_PRINT' === formatting) ? 'window.split = "split";' : 'window.split="split";';
+		} else {
+			splitLine = ('PRETTY_PRINT' === formatting) ? 'window["split"] = "split";' : 'window["split"]="split";';
 		}
 		
-		if (!grunt.option('noprivate')) {
-			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['private']);
-		}
-		if (grunt.option('desktop')) {
-			srcFiles = srcFiles.concat(packageFile['compile']['sdk']['desktop']);
-		}
-
 		grunt.initConfig({
-			pkg: packageFile,
 			'closure-compiler': {
 				sdk: {
-					files: {
-						'<%= pkg.compile.sdk.dst %>': srcFiles
+					options: sdkOpt,
+					dest: tmp_sdk_path,
+					src: [sdkTmp]
+				}
+			},
+			splitfile: {
+				sdk: {
+					options: {
+					  separator: splitLine,
+					  prefix: [ "sdk-all-min", "sdk-all" ]
 					},
-					options: sdkOpt
-				},
-				defines: {
-					files: {
-						'<%= pkg.compile.defines.dst %>': packageFile['compile']['defines']['src']
-					},
-					options: definesOpt
+					dest: sdkDstFolder,
+					src: tmp_sdk_path
 				}
 			},
 			concat: {
-				options: {
-					banner: '(function(window, undefined) {',
-					footer: '})(window);'
+				sdkmin: {
+					src: ['license.js', sdkAllMinDst],
+					dest: sdkAllMinDst
 				},
-				dist: {
-					src: concat_src,
-					dest: '<%= pkg.compile.sdk.dst %>'
+				sdk: {
+					src: ['license.js', sdkAllDst],
+					dest: sdkAllDst
 				}
 			},
-			clean: [ 
-				packageFile['compile']['defines']['dst'],
-				map_record_file_path
+			clean: [
+				sdkTmp,
+				tmp_sdk_path
 			],
 			replace: {
 				version: {
@@ -174,16 +217,15 @@ module.exports = function(grunt) {
 							Build: process.env['BUILD_NUMBER']
 						}
 					},
-					files: {
-						'<%= pkg.compile.sdk.dst %>': '<%= pkg.compile.sdk.dst %>'
-					}
+					files: [
+						{ src: [sdkAllMinDst, sdkAllDst], dest: sdkDstFolder + '/' }
+					]
 				}
 			}
 		});
 	});
 	
-	grunt.registerTask('compile_sdk', ['compile_sdk_init:' + level, 'closure-compiler', 'concat', 'replace', 'clean']);
-	grunt.registerTask('compile_sdk_native', ['compile_sdk_init:' + level, 'closure-compiler:sdk', 'concat', 'replace', 'clean']);
-		 
+	grunt.registerTask('concat_sdk', ['concat_sdk_init', 'concat', 'clean']);
+	grunt.registerTask('compile_sdk', ['concat_sdk', 'compile_sdk_init:' + level, 'closure-compiler', 'splitfile', 'concat', 'replace', 'clean']);
 	grunt.registerTask('default', ['build_all']);
 };

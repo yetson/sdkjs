@@ -1,3 +1,27 @@
+/*
+ *
+ * (c) Copyright Ascensio System Limited 2010-2016
+ *
+ * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
+ * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
+ * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
+ * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
+ *
+ * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+ * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
+ *
+ * You can contact Ascensio System SIA by email at sales@onlyoffice.com
+ *
+ * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
+ * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
+ *
+ * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
+ * relevant author attributions when distributing the software. If the display of the logo in its graphic 
+ * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
+ * in every copy of the program you distribute. 
+ * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
+ *
+ */
 "use strict";
 
 //величина символа "сигма" не меняется в зависимости от аргумента
@@ -153,7 +177,7 @@ function CNary(props)
 }
 AscCommon.extendClass(CNary, CMathBase);
 
-CNary.prototype.ClassType = historyitem_type_nary;
+CNary.prototype.ClassType = AscDFH.historyitem_type_nary;
 CNary.prototype.kind      = MATH_NARY;
   
 CNary.prototype.init = function(props)
@@ -467,19 +491,19 @@ CNary.prototype.Apply_MenuProps = function(Props)
         if(Props.LimLoc !== undefined && false == this.ParaMath.Is_Inline() && this.Pr.limLoc !== Props.LimLoc)
         {
             var LimLoc = Props.LimLoc == c_oAscMathInterfaceNaryLimitLocation.SubSup ? NARY_SubSup : NARY_UndOvr;
-            History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
+            AscCommon.History.Add(this, new CChangesMathNaryLimLoc(LimLoc, this.Pr.limLoc));
             this.raw_SetLimLoc(LimLoc);
         }
 
         if(Props.HideUpper !== undefined && Props.HideUpper !== this.Pr.supHide)
         {
-            History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
+            AscCommon.History.Add(this, new CChangesMathNaryUpperLimit(!this.Pr.supHide, this.Pr.supHide));
             this.raw_HideUpperIterator(!this.Pr.supHide);
         }
 
         if(Props.HideLower !== undefined && Props.HideLower !== this.Pr.subHide)
         {
-            History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
+            AscCommon.History.Add(this, new CChangesMathNaryLowerLimit(!this.Pr.subHide, this.Pr.subHide));
             this.raw_HideLowerIterator(!this.Pr.subHide);
         }
     }
@@ -2301,7 +2325,7 @@ CClosedPathIntegral.prototype.drawGlyph = function(parameters)
         var oTextOutline = oCompiledPr.TextOutline;
 
         var oCompiledPr2 = oCompiledPr.Copy();
-        oCompiledPr2.TextFill = CreateNoFillUniFill();
+        oCompiledPr2.TextFill = AscFormat.CreateNoFillUniFill();
         oCompiledPr2.Unifill  = null;
         oCompiledPr2.Color    = null;
         pGraphics.SetTextPr(oCompiledPr2, PDSE.Theme);
@@ -2320,7 +2344,7 @@ CClosedPathIntegral.prototype.drawGlyph = function(parameters)
         // делаем заливку уже обводки
 
         var WidthLine;
-        if(pGraphics.m_oTextPr.TextOutline && isRealNumber(pGraphics.m_oTextPr.TextOutline.w))
+        if(pGraphics.m_oTextPr.TextOutline && AscFormat.isRealNumber(pGraphics.m_oTextPr.TextOutline.w))
         {
             WidthLine = (pGraphics.m_oTextPr.TextOutline.w/36000) *0.6; // сместим заливку на половину толщины линии , чтобы не было зазоров м/ду обводкой и заливкой
         }
@@ -2561,3 +2585,7 @@ CVolumeIntegral.prototype.calculateSizeGlyph = function()
 
     return {width : width, height : height};
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CNary = CNary;

@@ -23,13 +23,18 @@
  *
 */
 
+(function(window, undefined){
+
 // Import
 var changestype_Drawing_Props = AscCommon.changestype_Drawing_Props;
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+    var History = AscCommon.History;
+
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+var HANDLE_EVENT_MODE_CURSOR = AscFormat.HANDLE_EVENT_MODE_CURSOR;
 
 var MOVE_DELTA = 1/100000;
 var SNAP_DISTANCE = 1.27;
-
 
 function checkEmptyPlaceholderContent(content)
 {
@@ -62,7 +67,7 @@ StartAddNewShape.prototype =
         this.startX = x;
         this.startY = y;
         this.drawingObjects.arrPreTrackObjects.length = 0;
-        this.drawingObjects.arrPreTrackObjects.push(new NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.arrPreTrackObjects.push(new AscFormat.NewShapeTrack(this.preset, x, y, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.bStart = true;
         this.drawingObjects.swapTrackObjects();
         return true;
@@ -98,17 +103,17 @@ StartAddNewShape.prototype =
             if(!this.bMoved && this instanceof StartAddNewShape)
             {
                 var ext_x, ext_y;
-                if(typeof SHAPE_EXT[this.preset] === "number")
+                if(typeof AscFormat.SHAPE_EXT[this.preset] === "number")
                 {
-                    ext_x = SHAPE_EXT[this.preset];
+                    ext_x = AscFormat.SHAPE_EXT[this.preset];
                 }
                 else
                 {
                     ext_x = 25.4;
                 }
-                if(typeof SHAPE_ASPECTS[this.preset] === "number")
+                if(typeof AscFormat.SHAPE_ASPECTS[this.preset] === "number")
                 {
-                    var _aspect = SHAPE_ASPECTS[this.preset];
+                    var _aspect = AscFormat.SHAPE_ASPECTS[this.preset];
                     ext_y = ext_x/_aspect;
                 }
                 else
@@ -117,7 +122,7 @@ StartAddNewShape.prototype =
                 }
                 this.onMouseMove({IsLocked: true}, this.startX + ext_x, this.startY + ext_y, this.pageIndex);
             }
-            History.Create_NewPoint(historydescription_Document_AddNewShape);
+            History.Create_NewPoint(AscDFH.historydescription_Document_AddNewShape);
             var bounds = this.drawingObjects.arrTrackObjects[0].getBounds();
             var shape = this.drawingObjects.arrTrackObjects[0].getShape(true, this.drawingObjects.drawingDocument);
             var drawing = new ParaDrawing(shape.spPr.xfrm.extX, shape.spPr.xfrm.extY, shape, this.drawingObjects.drawingDocument, this.drawingObjects.document, null);
@@ -172,7 +177,7 @@ NullState.prototype =
         var selection = this.drawingObjects.selection;
         var b_no_handle_selected = false;
 
-        this.startTargetTextObject = getTargetTextObject(this.drawingObjects);
+        this.startTargetTextObject = AscFormat.getTargetTextObject(this.drawingObjects);
         var start_target_doc_content, end_target_doc_content;
         if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
         {
@@ -184,7 +189,7 @@ NullState.prototype =
         {
             b_no_handle_selected = true;
             var  object_page_x, object_page_y;
-            var coords = CheckCoordsNeedPage(x, y, pageIndex, selection.wrapPolygonSelection.selectStartPage, this.drawingObjects.drawingDocument);
+            var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, selection.wrapPolygonSelection.selectStartPage, this.drawingObjects.drawingDocument);
             object_page_x = coords.x;
             object_page_y = coords.y;
             var hit_to_wrap_polygon = selection.wrapPolygonSelection.parent.hitToWrapPolygonPoint(object_page_x, object_page_y);
@@ -205,7 +210,7 @@ NullState.prototype =
                             {
                                 if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : AscCommon.changestype_2_Element_and_Type , Element : selection.wrapPolygonSelection.parent.Get_ParentParagraph(), CheckType : AscCommon.changestype_Paragraph_Content}))
                                 {
-                                    History.Create_NewPoint(historydescription_Document_EditWrapPolygon);
+                                    History.Create_NewPoint(AscDFH.historydescription_Document_EditWrapPolygon);
                                     var new_rel_array = [].concat(wrap_polygon.relativeArrPoints);
                                     new_rel_array.splice(hit_to_wrap_polygon.pointNum, 1);
                                     wrap_polygon.setEdited(true);
@@ -231,7 +236,7 @@ NullState.prototype =
         }
         else if(selection.groupSelection)
         {
-            ret = handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, true);
+            ret = AscFormat.handleSelectedObjects(this.drawingObjects, e, x, y, selection.groupSelection, pageIndex, true);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -249,7 +254,7 @@ NullState.prototype =
             }
 
             if(selection.groupSelection.selectStartPage === pageIndex){
-                ret = handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, true);
+                ret = AscFormat.handleFloatObjects(this.drawingObjects, selection.groupSelection.arrGraphicObjects, e, x, y, selection.groupSelection, pageIndex, true);
                 if(ret)
                 {
                     if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -273,7 +278,7 @@ NullState.prototype =
 
         if(!b_no_handle_selected)
         {
-            ret = handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, true);
+            ret = AscFormat.handleSelectedObjects(this.drawingObjects, e, x, y, null, pageIndex, true);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -302,7 +307,7 @@ NullState.prototype =
         }
         if(drawing_page)
         {
-            ret = handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
+            ret = AscFormat.handleFloatObjects(this.drawingObjects, drawing_page.beforeTextObjects, e, x, y, null, pageIndex, true);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -324,7 +329,7 @@ NullState.prototype =
                 if(!(drawing_page.inlineObjects[i].parent && drawing_page.inlineObjects[i].parent.isShapeChild()))
                     no_shape_child_array.push(drawing_page.inlineObjects[i]);
             }
-            ret = handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
+            ret = AscFormat.handleInlineObjects(this.drawingObjects, no_shape_child_array, e, x, y, pageIndex, true);
             if(ret)
             {
                 if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -342,7 +347,7 @@ NullState.prototype =
 
             if(!bTextFlag)
             {
-                ret = handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
+                ret = AscFormat.handleFloatObjects(this.drawingObjects, drawing_page.wrappingObjects, e, x, y, null, pageIndex, true);
                 if(ret)
                 {
                     if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -358,7 +363,7 @@ NullState.prototype =
                     return ret;
                 }
 
-                ret = handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
+                ret = AscFormat.handleFloatObjects(this.drawingObjects, drawing_page.behindDocObjects, e, x, y, null, pageIndex, true);
                 if(ret)
                 {
                     if(this.drawingObjects.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
@@ -387,7 +392,7 @@ NullState.prototype =
 
     onMouseMove: function(e, x, y, pageIndex)
     {
-        var text_object = getTargetTextObject(this.drawingObjects);
+        var text_object = AscFormat.getTargetTextObject(this.drawingObjects);
         if(text_object && e.IsLocked)
         {
             text_object.selectionSetEnd(e, x, y, pageIndex);
@@ -459,7 +464,7 @@ PreMoveInlineObject.prototype =
 
     onMouseUp: function(e, x,y,pageIndex)
     {
-        return handleMouseUpPreMoveState(this.drawingObjects, e, x, y,pageIndex, true);
+        return AscFormat.handleMouseUpPreMoveState(this.drawingObjects, e, x, y,pageIndex, true);
     }
 };
 
@@ -503,7 +508,7 @@ MoveInlineObject.prototype =
                 check_paragraphs.push(new_check_paragraph);
             if(false === editor.isViewMode &&  false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
             {
-                History.Create_NewPoint(historydescription_Document_MoveInlineObject);
+                History.Create_NewPoint(AscDFH.historydescription_Document_MoveInlineObject);
                 this.majorObject.parent.OnEnd_MoveInline(this.InlinePos);
             }
         }
@@ -512,7 +517,7 @@ MoveInlineObject.prototype =
             check_paragraphs.push(this.majorObject.parent.checkShapeChildAndGetTopParagraph(this.InlinePos.Paragraph));
             if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : check_paragraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
             {
-                History.Create_NewPoint(historydescription_Document_CopyAndMoveInlineObject);
+                History.Create_NewPoint(AscDFH.historydescription_Document_CopyAndMoveInlineObject);
                 var new_para_drawing = new ParaDrawing(this.majorObject.parent.Extent.W, this.majorObject.parent.Extent.H, null, this.drawingObjects.drawingDocument, null, null);
                 var drawing = this.majorObject.copy();
                 drawing.setParent(new_para_drawing);
@@ -578,7 +583,7 @@ RotateState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
+        var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
         this.drawingObjects.handleRotateTrack(e, coords.x, coords.y);
     },
 
@@ -591,7 +596,7 @@ RotateState.prototype =
             {
                 if(this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props) === false)
                 {
-                    History.Create_NewPoint(historydescription_Document_RotateInlineDrawing);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_RotateInlineDrawing);
                     this.drawingObjects.arrTrackObjects[0].trackEnd(true);
                     this.majorObject.parent.CheckWH();
                     this.drawingObjects.document.Recalculate();
@@ -606,7 +611,7 @@ RotateState.prototype =
                     aDrawings[i] = this.drawingObjects.arrTrackObjects[i].originalObject.parent;
                     bounds = this.drawingObjects.arrTrackObjects[i].getBounds();
                     aBounds.push(bounds);
-                    page_index = isRealNumber(this.drawingObjects.arrTrackObjects[i].pageIndex) ? this.drawingObjects.arrTrackObjects[i].pageIndex : this.drawingObjects.arrTrackObjects[i].originalObject.parent.pageIndex;
+                    page_index = AscFormat.isRealNumber(this.drawingObjects.arrTrackObjects[i].pageIndex) ? this.drawingObjects.arrTrackObjects[i].pageIndex : this.drawingObjects.arrTrackObjects[i].originalObject.parent.pageIndex;
                     nearest_pos = this.drawingObjects.document.Get_NearestPos(page_index, bounds.min_x, bounds.min_y, true, this.drawingObjects.arrTrackObjects[i].originalObject.parent);
                     aNearestPos.push(nearest_pos);
                     aParentParagraphs.push(aDrawings[i].Get_ParentParagraph());
@@ -616,14 +621,14 @@ RotateState.prototype =
                     for(i = 0; i < aNearestPos.length; ++i)
                     {
                         if(aDrawings[i].Locked !== true)
-                            checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
+                            AscFormat.checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
                         else
-                            checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
+                            AscFormat.checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
                     }
                     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
                     {
                         this.drawingObjects.resetSelection();
-                        History.Create_NewPoint(historydescription_Document_RotateFlowDrawingCtrl);
+                        History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingCtrl);
                         for(i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)
                         {
                             bounds = aBounds[i];
@@ -653,14 +658,14 @@ RotateState.prototype =
                         {
                             if(aNearestPos[i].Paragraph !== aParentParagraphs[i] && aDrawings[i].Locked !== true)
                             {
-                                checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
-                                checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
+                                AscFormat.checkObjectInArray(aCheckParagraphs, aNearestPos[i].Paragraph);
+                                AscFormat.checkObjectInArray(aCheckParagraphs, aParentParagraphs[i]);
                             }
                         }
                     }
                     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props, {Type : changestype_2_ElementsArray_and_Type , Elements : aCheckParagraphs, CheckType : AscCommon.changestype_Paragraph_Content}))
                     {
-                        History.Create_NewPoint(historydescription_Document_RotateFlowDrawingNoCtrl);
+                        History.Create_NewPoint(AscDFH.historydescription_Document_RotateFlowDrawingNoCtrl);
                         for(i = 0; i < aDrawings.length; ++i)
                         {
                             bounds = aBounds[i];
@@ -728,7 +733,7 @@ ChangeAdjState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
+        var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
         this.drawingObjects.arrTrackObjects[0].track(t.x, t.y);
         this.drawingObjects.updateOverlay();
     },
@@ -788,7 +793,7 @@ ResizeState.prototype =
             this.onMouseUp(e, x, y, pageIndex);
             return;
         }
-        var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
+        var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
         var resize_coef = this.majorObject.getResizeCoefficients(this.handleNum, coords.x, coords.y);
         this.drawingObjects.trackResizeObjects(resize_coef.kd1, resize_coef.kd2, e);
         this.drawingObjects.updateOverlay();
@@ -832,7 +837,7 @@ PreMoveState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        return handleMouseUpPreMoveState(this.drawingObjects, e, x, y, pageIndex, true)
+        return AscFormat.handleMouseUpPreMoveState(this.drawingObjects, e, x, y, pageIndex, true)
     }
 };
 
@@ -883,7 +888,7 @@ MoveState.prototype =
             }
         }
 
-        var t = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
+        var t = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage, this.drawingObjects.drawingDocument);
 
         var startPage = this.drawingObjects.graphicPages[this.majorObject.selectStartPage];
         var startPos = {x: this.startX, y: this.startY};
@@ -916,8 +921,8 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
-                    if(isRealObject(snap_obj))
+                    var snap_obj = AscFormat.GetMinSnapDistanceXObjectByArrays(trackSnapArrayX[snap_index] + curDX, snapHorArray);
+                    if(AscCommon.isRealObject(snap_obj))
                     {
                         dx = snap_obj.dist;
                         if(dx !== null)
@@ -943,8 +948,8 @@ MoveState.prototype =
                 {
                     for(var snap_index = 0; snap_index < trackSnapArrayX.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
-                        if(isRealObject(snap_obj))
+                        var snap_obj = AscFormat.GetMinSnapDistanceXObject(trackSnapArrayX[snap_index] + curDX, start_arr);
+                        if(AscCommon.isRealObject(snap_obj))
                         {
                             dx = snap_obj.dist;
                             if(dx !== null)
@@ -984,8 +989,8 @@ MoveState.prototype =
 
                 for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                 {
-                    var snap_obj = GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
-                    if(isRealObject(snap_obj))
+                    var snap_obj = AscFormat.GetMinSnapDistanceYObjectByArrays(trackSnapArrayY[snap_index] + curDY, snapVerArray);
+                    if(AscCommon.isRealObject(snap_obj))
                     {
                         dy = snap_obj.dist;
                         if(dy !== null)
@@ -1011,8 +1016,8 @@ MoveState.prototype =
                 {
                     for(snap_index = 0; snap_index < trackSnapArrayY.length; ++snap_index)
                     {
-                        var snap_obj = GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
-                        if(isRealObject(snap_obj))
+                        var snap_obj = AscFormat.GetMinSnapDistanceYObject(trackSnapArrayY[snap_index] + curDY, start_arr);
+                        if(AscCommon.isRealObject(snap_obj))
                         {
                             dy = snap_obj.dist;
                             if(dy !== null)
@@ -1043,7 +1048,7 @@ MoveState.prototype =
             min_dx = 0;
         else
         {
-            if(isRealNumber(snap_x))
+            if(AscFormat.isRealNumber(snap_x))
             {
                 this.drawingObjects.drawingDocument.DrawVerAnchor(pageIndex, snap_x);
             }
@@ -1053,7 +1058,7 @@ MoveState.prototype =
             min_dy = 0;
         else
         {
-            if(isRealNumber(snap_y))
+            if(AscFormat.isRealNumber(snap_y))
             {
                 this.drawingObjects.drawingDocument.DrawHorAnchor(pageIndex, snap_y);
             }
@@ -1126,7 +1131,7 @@ MoveInGroupState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        History.Create_NewPoint(historydescription_Document_MoveInGroup);
+        History.Create_NewPoint(AscDFH.historydescription_Document_MoveInGroup);
         var old_x = this.group.bounds.x;
         var old_y = this.group.bounds.y;
         var i;
@@ -1417,7 +1422,7 @@ ChangeWrapContour.prototype.onMouseDown = function(e, x, y, pageIndex)
 {};
 ChangeWrapContour.prototype.onMouseMove = function(e, x, y, pageIndex)
 {
-    var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);
+    var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);
     var tr_x, tr_y;
     tr_x = coords.x;
     tr_y = coords.y;
@@ -1428,7 +1433,7 @@ ChangeWrapContour.prototype.onMouseUp = function(e, x, y, pageIndex)
 {
     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
     {
-        History.Create_NewPoint(historydescription_Document_ChangeWrapContour);
+        History.Create_NewPoint(AscDFH.historydescription_Document_ChangeWrapContour);
         var calc_points = [], calc_points2 = [], i;
         for(i = 0; i < this.majorObject.parent.wrappingPolygon.calculatedPoints.length; ++i)
         {
@@ -1502,7 +1507,7 @@ ChangeWrapContourAddPoint.prototype.onMouseDown = function(e, x, y, pageIndex)
 {};
 ChangeWrapContourAddPoint.prototype.onMouseMove = function(e, x, y, pageIndex)
 {
-    var coords = CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);
+    var coords = AscFormat.CheckCoordsNeedPage(x, y, pageIndex, this.majorObject.selectStartPage);
     var tr_x, tr_y;
     tr_x = coords.x;
     tr_y = coords.y;
@@ -1513,7 +1518,7 @@ ChangeWrapContourAddPoint.prototype.onMouseUp = function(e, x, y, pageIndex)
 {
     if(false === editor.isViewMode && false === this.drawingObjects.document.Document_Is_SelectionLocked(changestype_Drawing_Props))
     {
-        History.Create_NewPoint(historydescription_Document_ChangeWrapContourAddPoint);
+        History.Create_NewPoint(AscDFH.historydescription_Document_ChangeWrapContourAddPoint);
         var calc_points = [], calc_points2 = [], i;
         for(i = 0; i < this.drawingObjects.arrTrackObjects[0].arrPoints.length; ++i)
         {
@@ -1552,8 +1557,8 @@ SplineBezierState.prototype =
             return {objectId: null, bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex: pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new Spline(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
-        this.drawingObjects.arrTrackObjects[0].path.push(new SplineCommandMoveTo(x, y));
+        this.drawingObjects.addTrackObject(new AscFormat.Spline(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.arrTrackObjects[0].path.push(new AscFormat.SplineCommandMoveTo(x, y));
         this.drawingObjects.changeCurrentState(new SplineBezierState33(this.drawingObjects, x, y,pageIndex));
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
@@ -1604,7 +1609,7 @@ SplineBezierState33.prototype =
             tr_x = tr_point.X;
             tr_y = tr_point.Y;
         }
-        this.drawingObjects.arrTrackObjects[0].path.push(new SplineCommandLineTo(tr_x, tr_y));
+        this.drawingObjects.arrTrackObjects[0].path.push(new AscFormat.SplineCommandLineTo(tr_x, tr_y));
         this.drawingObjects.changeCurrentState(new SplineBezierState2(this.drawingObjects, this.pageIndex));
         this.drawingObjects.updateOverlay();
     },
@@ -1748,10 +1753,10 @@ SplineBezierState3.prototype =
 
 
         spline.path.length = 1;
-        spline.path.push(new SplineCommandBezier(x1, y1, x2, y2, x3, y3));
+        spline.path.push(new AscFormat.SplineCommandBezier(x1, y1, x2, y2, x3, y3));
 
 
-        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        spline.path.push(new AscFormat.SplineCommandBezier(x4, y4, x5, y5, x6, y6));
         this.drawingObjects.updateOverlay();
         this.drawingObjects.changeCurrentState(new SplineBezierState4(this.drawingObjects, this.pageIndex));
     },
@@ -1970,7 +1975,7 @@ SplineBezierState5.prototype =
         lastCommand.y2 = y2;
 
 
-        spline.path.push(new SplineCommandBezier(x4, y4, x5, y5, x6, y6));
+        spline.path.push(new AscFormat.SplineCommandBezier(x4, y4, x5, y5, x6, y6));
         this.drawingObjects.updateOverlay();
         this.drawingObjects.changeCurrentState(new SplineBezierState4(this.drawingObjects, this.pageIndex));
     },
@@ -2001,7 +2006,7 @@ PolyLineAddState.prototype =
             return {objectId: null, bMarker: true};
         this.drawingObjects.startTrackPos = {x: x, y: y, pageIndex:pageIndex};
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
@@ -2097,7 +2102,7 @@ AddPolyLine2State.prototype =
         this.drawingObjects.resetSelection();
         this.drawingObjects.updateOverlay();
         this.drawingObjects.clearTrackObjects();
-        this.drawingObjects.addTrackObject(new PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
+        this.drawingObjects.addTrackObject(new AscFormat.PolyLine(this.drawingObjects, this.drawingObjects.document.theme, null, null, null, pageIndex));
         this.drawingObjects.arrTrackObjects[0].arrPoint.push({x : x, y: y});
         this.drawingObjects.changeCurrentState(new AddPolyLine2State2(this.drawingObjects, x, y));
     },
@@ -2239,3 +2244,26 @@ AddPolyLine2State3.prototype =
         }
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscFormat'] = window['AscFormat'] || {};
+window['AscFormat'].MOVE_DELTA = MOVE_DELTA;
+window['AscFormat'].SNAP_DISTANCE = SNAP_DISTANCE;
+window['AscFormat'].StartAddNewShape = StartAddNewShape;
+window['AscFormat'].NullState = NullState;
+window['AscFormat'].PreChangeAdjState = PreChangeAdjState;
+window['AscFormat'].PreMoveInlineObject = PreMoveInlineObject;
+window['AscFormat'].PreRotateState = PreRotateState;
+window['AscFormat'].PreResizeState = PreResizeState;
+window['AscFormat'].PreMoveState = PreMoveState;
+window['AscFormat'].MoveState = MoveState;
+window['AscFormat'].PreMoveInGroupState = PreMoveInGroupState;
+window['AscFormat'].MoveInGroupState = MoveInGroupState;
+window['AscFormat'].PreRotateInGroupState = PreRotateInGroupState;
+window['AscFormat'].PreResizeInGroupState = PreResizeInGroupState;
+window['AscFormat'].PreChangeAdjInGroupState = PreChangeAdjInGroupState;
+window['AscFormat'].TextAddState = TextAddState;
+window['AscFormat'].SplineBezierState = SplineBezierState;
+window['AscFormat'].PolyLineAddState = PolyLineAddState;
+window['AscFormat'].AddPolyLine2State = AddPolyLine2State;
+})(window);

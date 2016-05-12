@@ -24,11 +24,6 @@
 */
 "use strict";
 
-/* EventsController.js
- *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   May 16, 2012
- */
 (	/**
 	 * @param {jQuery} $
 	 * @param {Window} window
@@ -39,7 +34,7 @@
 		var AscBrowser = AscCommon.AscBrowser;
 
 		var asc = window["Asc"] ? window["Asc"] : (window["Asc"] = {});
-		var asc_applyFunction = asc.applyFunction;
+		var asc_applyFunction = AscCommonExcel.applyFunction;
 		var c_oTargetType = AscCommonExcel.c_oTargetType;
 
 		/**
@@ -106,7 +101,7 @@
 			this.frozenAnchorMode = false;
 			
 			// Обработчик кликов для граф.объектов
-			this.clickCounter = new ClickCounter();
+			this.clickCounter = new AscFormat.ClickCounter();
 			this.isMousePressed = false;
 			this.isShapeAction = false;
             this.isUpOnCanvas = false;
@@ -129,7 +124,7 @@
 		}
 
 		/**
-		 * @param {WorkbookView} view
+		 * @param {AscCommonExcel.WorkbookView} view
 		 * @param {Element} widgetElem
 		 * @param {Element} canvasElem
 		 * @param {Object} handlers  Event handlers (resize, reinitializeScroll, scrollY, scrollX, changeSelection, ...)
@@ -140,7 +135,7 @@
 			this.view     = view;
 			this.widget   = widgetElem;
 			this.element  = canvasElem;
-			this.handlers = new asc.asc_CHandlersList(handlers);
+			this.handlers = new AscCommonExcel.asc_CHandlersList(handlers);
             this._createScrollBars();
             if( this.view.Api.isMobileVersion ){
                 var __hasTouch = 'ontouchstart' in window;
@@ -373,7 +368,7 @@
 			this.vsbHSt = document.getElementById("ws-v-scroll-helper").style;
 
 			if (!this.vsbApi) {
-				this.vsbApi = new ScrollObject(this.vsb.id, opt);
+				this.vsbApi = new AscCommon.ScrollObject(this.vsb.id, opt);
 				this.vsbApi.bind("scrollvertical", function(evt) {
 					self.handlers.trigger("scrollY", evt.scrollPositionY / opt.vscrollStep);
 				});
@@ -396,7 +391,7 @@
 			this.hsbHSt = document.getElementById("ws-h-scroll-helper").style;
 
 			if (!this.hsbApi) {
-				this.hsbApi = new ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
+				this.hsbApi = new AscCommon.ScrollObject(this.hsb.id, $.extend(true, {}, opt, {wheelScrollLines: 1}));
 				this.hsbApi.bind("scrollhorizontal",function(evt) {
 					self.handlers.trigger("scrollX", evt.scrollPositionX / opt.hscrollStep);
 				});
@@ -1569,12 +1564,8 @@
             this.view.MobileTouchManager.onTouchEnd(event);
         };
 
-        /*
-         * Export
-         * -----------------------------------------------------------------------------
-         */
-		window["Asc"]["asc_CEventsController"] = window["Asc"].asc_CEventsController = asc_CEventsController;
-
-
+		//------------------------------------------------------------export---------------------------------------------------
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].asc_CEventsController = asc_CEventsController;
 	}
 )(jQuery, window);

@@ -24,8 +24,15 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 // Import
+var CMatrix = AscCommon.CMatrix;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+    
 var c_oAscFill = Asc.c_oAscFill;
+
+var MIN_ANGLE = 0.07;
 
 
 function OverlayObject(geometry, extX, extY, brush, pen, transform )
@@ -41,7 +48,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     if((!brush || !brush.fill || brush.fill.type === c_oAscFill.FILL_TYPE_NOFILL) &&
         (!pen || !pen.Fill || !pen.Fill || !pen.Fill.fill || pen.Fill.fill.type === c_oAscFill.FILL_TYPE_NOFILL || pen.w === 0))
     {
-        var penBrush = CreatePenBrushForChartTrack();
+        var penBrush = AscFormat.CreatePenBrushForChartTrack();
         _brush = penBrush.brush;
         _pen = penBrush.pen;
     }
@@ -54,7 +61,7 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
     this.brush = _brush;
     this.pen = _pen;
     this.TransformMatrix = transform;
-    this.shapeDrawer = new CShapeDrawer();
+    this.shapeDrawer = new AscCommon.CShapeDrawer();
 
     this.updateTransform = function(extX, extY, transform)
     {
@@ -100,13 +107,13 @@ function OverlayObject(geometry, extX, extY, brush, pen, transform )
         {
             if (window["NATIVE_EDITOR_ENJINE"] === true)
             {
-                var _shape = new CShape();
+                var _shape = new AscFormat.CShape();
 				_shape.extX = this.ext.cx;
 				_shape.extY = this.ext.cy;
 				
-				_shape.brush = CreateSolidFillRGBA(255, 255, 255, 128);
-				_shape.pen = new CLn();
-				_shape.pen.Fill = CreateSolidFillRGBA(0, 0, 0, 160);
+				_shape.brush = AscFormat.CreateSolidFillRGBA(255, 255, 255, 128);
+				_shape.pen = new AscFormat.CLn();
+				_shape.pen.Fill = AscFormat.CreateSolidFillRGBA(0, 0, 0, 160);
 				_shape.pen.w = 18000;
 				
 				overlay.SaveGrState();
@@ -215,7 +222,7 @@ ObjectToDraw.prototype =
         this.brush = brush;
         this.pen = pen;
 
-        if(isRealNumber(x) && isRealNumber(y))
+        if(AscFormat.isRealNumber(x) && AscFormat.isRealNumber(y))
         {
             this.x = x;
             this.y = y;
@@ -224,7 +231,7 @@ ObjectToDraw.prototype =
 
     Recalculate: function(oTheme, oColorMap, dWidth, dHeight, oShape)
     {
-       // if(isRealNumber(this.x) && isRealNumber(this.y))
+       // if(AscFormat.isRealNumber(this.x) && AscFormat.isRealNumber(this.y))
        // {
        //     if(Math.abs(dWidth - this.extX) > MOVE_DELTA || Math.abs(dHeight - this.extY))
        //     {
@@ -284,15 +291,15 @@ ObjectToDraw.prototype =
             {
                 var Para = AscCommon.g_oTableId.Get_ById( oComment.StartId );
                 if( editor && editor.WordControl && editor.WordControl.m_oLogicDocument && editor.WordControl.m_oLogicDocument.Comments &&
-                    (graphics instanceof CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
+                    (graphics instanceof AscCommon.CGraphics) && ( editor.WordControl.m_oLogicDocument.Comments.Is_Use() && true != editor.isViewMode))
                 {
                     if(this.Comment.Additional.CommentId === editor.WordControl.m_oLogicDocument.Comments.Get_CurrentId())
                     {
-                        this.brush = G_O_ACTIVE_COMMENT_BRUSH;
+                        this.brush = AscFormat.G_O_ACTIVE_COMMENT_BRUSH;
                     }
                     else
                     {
-                        this.brush = G_O_NO_ACTIVE_COMMENT_BRUSH;
+                        this.brush = AscFormat.G_O_NO_ACTIVE_COMMENT_BRUSH;
                     }
                     var oComm = this.Comment;
                     Para && editor.WordControl.m_oLogicDocument.Comments.Add_DrawingRect(oComm.x0, oComm.y0, oComm.x1 - oComm.x0, oComm.y1 - oComm.y0, graphics.PageNum, this.Comment.Additional.CommentId, global_MatrixTransformer.Invert(oTransform));
@@ -319,7 +326,7 @@ ObjectToDraw.prototype =
         graphics.SaveGrState();
         graphics.SetIntegerGrid(false);
         graphics.transform3(oTransform, false);
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape2(this, graphics, this.geometry);
         if(graphics.IsSlideBoundsCheckerType)
         {
@@ -337,7 +344,17 @@ function RotateTrackShapeImage(originalObject)
 {
     this.originalObject = originalObject;
     this.transform = new CMatrix();
-    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, originalObject.brush, originalObject.pen, this.transform);
+    var brush;
+    if(originalObject.blipFill)
+    {
+        brush = new AscFormat.CUniFill();
+        brush.fill = originalObject.blipFill;
+    }
+    else
+    {
+        brush = originalObject.brush;
+    }
+    this.overlayObject = new OverlayObject(originalObject.spPr.geometry, originalObject.extX, originalObject.extY, brush, originalObject.pen, this.transform);
 
     this.angle = originalObject.rot;
     var full_flip_h = this.originalObject.getFullFlipH();
@@ -345,7 +362,7 @@ function RotateTrackShapeImage(originalObject)
     this.signum = !full_flip_h && !full_flip_v || full_flip_h && full_flip_v ? 1 : -1;
     this.draw = function(overlay, transform)
     {
-        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }
@@ -404,13 +421,13 @@ function RotateTrackShapeImage(originalObject)
 
     this.trackEnd = function()
     {
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     };
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         var tr = null;
         if(this.originalObject && this.originalObject.parent)
         {
@@ -479,7 +496,7 @@ function RotateTrackGroup(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalObject.selectStartPage);
         }
@@ -491,7 +508,7 @@ function RotateTrackGroup(originalObject)
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];
@@ -566,7 +583,15 @@ function RotateTrackGroup(originalObject)
 
     this.trackEnd = function()
     {
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         this.originalObject.spPr.xfrm.setRot(this.angle);
     }
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].OverlayObject = OverlayObject;
+    window['AscFormat'].ObjectToDraw = ObjectToDraw;
+    window['AscFormat'].RotateTrackShapeImage = RotateTrackShapeImage;
+    window['AscFormat'].RotateTrackGroup = RotateTrackGroup;
+})(window);

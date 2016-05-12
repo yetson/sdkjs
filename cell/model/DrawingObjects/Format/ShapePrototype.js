@@ -24,14 +24,21 @@
 */
 "use strict";
 
-var G_O_DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+(function(window, undefined){
+
+// Import
+var CShape = AscFormat.CShape;
+
+var History = AscCommon.History;
+
+var G_O_DEFAULT_COLOR_MAP = AscFormat.GenerateDefaultColorMap();
 
 CShape.prototype.setDrawingObjects = function(drawingObjects)
 {
 };
 CShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     if(this.spTree)
     {
@@ -110,7 +117,7 @@ CShape.prototype.getDrawingObjectsController = function()
 CShape.prototype.hitInTextRect = function (x, y)
 {
     var oController = this.getDrawingObjectsController && this.getDrawingObjectsController();
-    if(oController && (getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
+    if(oController && (AscFormat.getTargetTextObject(oController) === this || (oController.curState.startTargetTextObject === this)))
     {
         var content = this.getDocContent && this.getDocContent();
         if ( content && this.invertTransformText)
@@ -148,7 +155,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     }
     if(!drawingObjects)
     {
-        drawingObjects = new DrawingObjects();
+        drawingObjects = new AscFormat.DrawingObjects();
     }
     var oldDrawingBase = graphic.drawingBase;
 
@@ -158,7 +165,7 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     if(!worksheet)
         return;
     var ret, aObjects = worksheet.Drawings;
-    if (isRealNumber(position)) {
+    if (AscFormat.isRealNumber(position)) {
         aObjects.splice(position, 0, drawingObject);
         ret = position;
     }
@@ -198,24 +205,11 @@ function addToDrawings(worksheet, graphic, position, lockByDefault, anchor)
     return ret;
 }
 
-function deleteDrawingBase(aObjects, graphicId)
-{
-    var position = null;
-    for (var i = 0; i < aObjects.length; i++) {
-        if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
-            aObjects.splice(i, 1);
-            position = i;
-            break;
-        }
-    }
-    return position;
-}
-
 CShape.prototype.addToDrawingObjects =  function(pos)
 {
     var controller = this.getDrawingObjectsController();
     var position = addToDrawings(this.worksheet, this, pos, /*lockByDefault*/undefined, undefined);
-    var data = {Type: historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
+    var data = {Type: AscDFH.historyitem_AutoShapes_AddToDrawingObjects, Pos: position};
     History.Add(this, data);
     this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Add, data.Pos, 1, data));
 };
@@ -223,10 +217,10 @@ CShape.prototype.addToDrawingObjects =  function(pos)
 
 CShape.prototype.deleteDrawingBase = function()
 {
-    var position = deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
-    if(isRealNumber(position))
+    var position = AscFormat.deleteDrawingBase(this.worksheet.Drawings, this.Get_Id());
+    if(AscFormat.isRealNumber(position))
     {
-        var data = {Type: historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
+        var data = {Type: AscDFH.historyitem_AutoShapes_RemoveFromDrawingObjects, Pos: position};
         History.Add(this, data);
         this.worksheet.addContentChanges(new AscCommon.CContentChangesElement(AscCommon.contentchanges_Remove, data.Pos, 1, data));
     }
@@ -420,7 +414,7 @@ CShape.prototype.recalculate = function ()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;
@@ -432,7 +426,7 @@ CShape.prototype.recalculate = function ()
         }
         if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
-            this.calculateSnapArrays();
+            this.recalculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
 
@@ -461,7 +455,7 @@ CShape.prototype.recalculate = function ()
 };
 CShape.prototype.recalculateBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     boundsChecker.CorrectBounds();
 
@@ -537,11 +531,17 @@ CShape.prototype.Get_Worksheet = function()
     return this.worksheet;
 };
 
-CTextBody.prototype.Get_Worksheet = function()
+AscFormat.CTextBody.prototype.Get_Worksheet = function()
 {
     return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
 };
-CTextBody.prototype.getDrawingDocument = function()
+AscFormat.CTextBody.prototype.getDrawingDocument = function()
 {
     return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
 };
+
+    //------------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].G_O_DEFAULT_COLOR_MAP = G_O_DEFAULT_COLOR_MAP;
+    window['AscFormat'].addToDrawings = addToDrawings;
+})(window);

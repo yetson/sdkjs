@@ -29,6 +29,23 @@
  * @param {undefined} undefined
  */
 function (window, undefined) {
+    // Import
+    var MATRIX_ORDER_PREPEND = AscCommon.MATRIX_ORDER_PREPEND;
+    var global_mouseEvent = AscCommon.global_mouseEvent;
+
+    var MobileTouchMode =
+    {
+        None        : 0,
+        Scroll      : 1,
+        Zoom        : 2,
+        Select      : 3,
+        InlineObj   : 4,
+        FlowObj     : 5,
+        Cursor      : 6,
+        TableMove   : 7,
+        TableRuler  : 8
+    };
+    
 function CMobileTouchManager()
 {
     this.AnimateScroll  = false;
@@ -90,7 +107,7 @@ function CMobileTouchManager()
 
     this.longTapFlag = false;
     this.longTapTimer = -1;
-    this.mylatesttap = null
+    this.mylatesttap = null;
     this.zoomFactor = 1;
     this.wasZoom = false;
     this.canZoom = true;
@@ -99,14 +116,14 @@ function CMobileTouchManager()
 CMobileTouchManager.prototype.Init = function(ctrl)
 {
     this.ctrl = ctrl;
-    this.iScroll = new window.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
+    this.iScroll = new AscCommonExcel.CTouchScroll(ctrl,{hScrollbar:true,vScrollbar:true,momentum:false}/*, { onAnimationEnd : function(param) {
      param.api.MobileTouchManager.OnScrollAnimationEnd();
      } }*/);
 };
 
 CMobileTouchManager.prototype.MoveCursorToPoint = function(e)
 {
-    check_MouseMoveEvent(e);
+    AscCommon.check_MouseMoveEvent(e);
     var pos = this.DrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
 
     var old_click_count = global_mouseEvent.ClickCount;
@@ -1025,7 +1042,7 @@ CMobileTouchManager.prototype.onTouchEnd = function(e)
 
 CMobileTouchManager.prototype.onTouchStart_renderer = function(e)
 {
-    check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
+    AscCommon.check_MouseDownEvent(e.touches ? e.touches[0] : e, true);
     global_mouseEvent.LockMouse();
 
     this.ScrollH = this.HtmlPage.m_dScrollX;
@@ -1087,7 +1104,7 @@ CMobileTouchManager.prototype.onTouchStart_renderer = function(e)
 };
 CMobileTouchManager.prototype.onTouchMove_renderer = function(e)
 {
-    check_MouseMoveEvent(e.touches ? e.touches[0] : e);
+    AscCommon.check_MouseMoveEvent(e.touches ? e.touches[0] : e);
 
     if (!this.MoveAfterDown)
     {
@@ -1151,7 +1168,7 @@ CMobileTouchManager.prototype.onTouchMove_renderer = function(e)
 };
 CMobileTouchManager.prototype.onTouchEnd_renderer = function(e)
 {
-    check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
+    AscCommon.check_MouseUpEvent(e.changedTouches ? e.changedTouches[0] : e);
 
     this.ScrollH = this.HtmlPage.m_dScrollX;
     this.ScrollV = this.HtmlPage.m_dScrollY;
@@ -1208,7 +1225,7 @@ CMobileTouchManager.prototype.CheckSelectEnd = function(bIsAttack)
         var pos1 = null;
         var pos4 = null;
 
-        if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+        if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
         {
             pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
             pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
@@ -1258,7 +1275,7 @@ CMobileTouchManager.prototype.CheckZoomCriticalValues = function(zoomMin)
             {
                 _w >>= 1;
             }
-            Zoom = 100 * _w * g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
+            Zoom = 100 * _w * AscCommon.g_dKoef_pix_to_mm / this.HtmlPage.m_dDocumentPageWidth;
         }
     }
     var _new_value = (Zoom - 0.5) >> 0;
@@ -1298,7 +1315,7 @@ CMobileTouchManager.prototype.OnScrollAnimationEnd = function()
         var pos4 = null;
 
         var _matrix = this.DrawingDocument.TextMatrix;
-        if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+        if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
         {
             pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
             pos4 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect2.x + this.RectSelect2.w, this.RectSelect2.y + this.RectSelect2.h, this.PageSelect2);
@@ -1329,7 +1346,7 @@ CMobileTouchManager.prototype.CheckSelect = function(overlay)
 
     var _matrix = this.DrawingDocument.TextMatrix;
 
-    if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+    if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
     {
         var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
         var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
@@ -1440,7 +1457,7 @@ CMobileTouchManager.prototype.CheckSelect2 = function(overlay)
 
     var _matrix = this.DrawingDocument.TextMatrix;
 
-    if (!_matrix || global_MatrixTransformer.IsIdentity(_matrix))
+    if (!_matrix || AscCommon.global_MatrixTransformer.IsIdentity(_matrix))
     {
         var pos1 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y, this.PageSelect1);
         var pos2 = this.DrawingDocument.ConvertCoordsToCursorWR(this.RectSelect1.x, this.RectSelect1.y + this.RectSelect1.h, this.PageSelect1);
@@ -1585,7 +1602,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
         _tableW += _cols[i];
     }
 
-    if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
+    if (!_table_outline_dr.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
     {
         this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
 
@@ -1624,7 +1641,7 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
         ctx.fillStyle = "#FFFFFF";
         ctx.strokeStyle = "#0000FF";
 
-        var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
         var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
         var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
@@ -1687,13 +1704,13 @@ CMobileTouchManager.prototype.CheckTableRules = function(overlay)
     }
     else
     {
-        var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
         var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
         var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
         ctx.lineWidth = 1 / dKoef;
 
-        var _coord_transform = new CMatrix();
+        var _coord_transform = new AscCommon.CMatrix();
         _coord_transform.sx = dKoef;
         _coord_transform.sy = dKoef;
         _coord_transform.tx = xDst;
@@ -1835,7 +1852,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
         _tableW += _cols[i];
     }
 
-    if (!_table_outline_dr.TableMatrix || global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
+    if (!_table_outline_dr.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(_table_outline_dr.TableMatrix))
     {
         this.TableMovePoint = { X : _tableOutline.X, Y : _tableOutline.Y };
 
@@ -1894,7 +1911,7 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
         var ___w = window.g_table_track_diamond.width;
         var ___h = window.g_table_track_diamond.height;
 
-        var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
         var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
         var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
@@ -1962,13 +1979,13 @@ CMobileTouchManager.prototype.CheckTableRules2 = function(overlay)
     }
     else
     {
-        var dKoef = (this.HtmlPage.m_nZoomValue * g_dKoef_mm_to_pix / 100);
+        var dKoef = (this.HtmlPage.m_nZoomValue * AscCommon.g_dKoef_mm_to_pix / 100);
         var xDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.left;
         var yDst = this.DrawingDocument.m_arrPages[this.DrawingDocument.m_lCurrentPage].drawingPage.top;
 
         ctx.lineWidth = 1 / dKoef;
 
-        var _coord_transform = new CMatrix();
+        var _coord_transform = new AscCommon.CMatrix();
         _coord_transform.sx = dKoef;
         _coord_transform.sy = dKoef;
         _coord_transform.tx = xDst;

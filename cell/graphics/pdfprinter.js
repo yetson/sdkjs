@@ -24,24 +24,18 @@
 */
 "use strict";
 
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-}
+(function (window, undefined) {
 
 var vector_koef = 25.4 / 72;
 
 function CPdfPrinter()
 {
-    this.DocumentRenderer = new CDocumentRenderer();
-    this.DocumentRenderer.VectorMemoryForPrint = new CMemory();
+    this.DocumentRenderer = new AscCommon.CDocumentRenderer();
+    this.DocumentRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
 
     this.font = new window["Asc"].FontProperties("Arial", -1);
-    this.Transform = new CMatrix();
-    this.InvertTransform = new CMatrix();
+    this.Transform = new AscCommon.CMatrix();
+    this.InvertTransform = new AscCommon.CMatrix();
 
     this.bIsSimpleCommands = false;
 
@@ -174,7 +168,7 @@ CPdfPrinter.prototype =
         return "miter";
     },
 	/**
-	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+	 * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setFillStyle : function(val)
@@ -193,7 +187,7 @@ CPdfPrinter.prototype =
         return this;
     },
 	/**
-	 * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+	 * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
 	 * @returns {CPdfPrinter}
 	 */
     setStrokeStyle : function(val)
@@ -733,3 +727,8 @@ CPdfPrinter.prototype =
     }
 };
 
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+    window['AscCommonExcel'].vector_koef = vector_koef;
+    window['AscCommonExcel'].CPdfPrinter = CPdfPrinter;
+})(window);

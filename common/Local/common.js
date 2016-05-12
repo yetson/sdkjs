@@ -24,26 +24,10 @@
 */
 "use strict";
 
-function CheckLicense(licenseUrl, customerId, userId, userFirstName, userLastName, callback) 
-{
-    callback(true, g_oLicenseResult.Success);
-}
-
-baseEditorsApi.prototype._onEndPermissions = function() 
-{
-	if (this.isOnFirstConnectEnd && this.isOnLoadLicense) 
-	{
-		var oResult = new AscCommon.asc_CAscEditorPermissions();
-		oResult.asc_setCanLicense(true);
-		oResult.asc_setCanBranding(true);
- 		this.sendEvent('asc_onGetEditorPermissions', oResult);
-	}
-};
-
 /////////////////////////////////////////////////////////
 //////////////       FONTS       ////////////////////////
 /////////////////////////////////////////////////////////
-CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
+AscFonts.CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 {
 	this.callback = _callback;
     if (-1 != this.Status)
@@ -78,17 +62,18 @@ CFontFileLoader.prototype.LoadFontAsync = function(basePath, _callback, isEmbed)
 
 		oThis.Status = 0;
 
+		var fontStreams = AscFonts.g_fonts_streams;
 		if (this.response)
 		{
-			var __font_data_idx = g_fonts_streams.length;
+			var __font_data_idx = fontStreams.length;
 			var _uintData = new Uint8Array(this.response);
-			g_fonts_streams[__font_data_idx] = new FT_Stream(_uintData, _uintData.length);
+			fontStreams[__font_data_idx] = new AscFonts.FT_Stream(_uintData, _uintData.length);
 			oThis.SetStreamIndex(__font_data_idx);
 		}
 		else
 		{
-			var __font_data_idx = g_fonts_streams.length;
-			g_fonts_streams[__font_data_idx] = CreateFontData3(this.responseText);
+			var __font_data_idx = fontStreams.length;
+			fontStreams[__font_data_idx] = AscFonts.CreateFontData3(this.responseText);
 			oThis.SetStreamIndex(__font_data_idx);
 
 			if (null != oThis.callback)
@@ -126,6 +111,11 @@ prot.getImageLocal = function(url){
 	var _first = this.documentUrl + "/media/";
 	if (0 == url.indexOf(_first))
 		return url.substring(_first.length);
+
+	if (window.editor && window.editor.ThemeLoader && 0 == url.indexOf(editor.ThemeLoader.ThemesUrlAbs)) {
+		return url.substring(editor.ThemeLoader.ThemesUrlAbs.length);
+	}
+
 	return null;
 };
 prot.imagePath2Local = function(imageLocal){
@@ -144,7 +134,7 @@ prot.getLocal = function(url){
 	return this.getImageLocal(url);
 };
 
-function sendImgUrls(api, images, callback)
+AscCommon.sendImgUrls = function(api, images, callback)
 {
 	var _data = [];
 	for (var i = 0; i < images.length; i++)
@@ -152,8 +142,8 @@ function sendImgUrls(api, images, callback)
 		var _url = window["AscDesktopEditor"]["LocalFileGetImageUrl"](images[i]);
 		_data[i] = { url: images[i], path : AscCommon.g_oDocumentUrls.getImageUrl(_url) };
 	}
-	callback(_data);  
-}
+	callback(_data);
+};
 
 /////////////////////////////////////////////////////////
 ////////////////        SAVE       //////////////////////

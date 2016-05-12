@@ -24,9 +24,11 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
 
         var oPen, oBrush;
@@ -127,14 +129,14 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
                 this.refY = _ref_y;
             }
         }
-        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
 
     }, this, []);
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
@@ -220,7 +222,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         {
             var new_body_pr = this.originalShape.getBodyPr();
             if (new_body_pr) {
-                oGeometryToSet = ExecuteNoHistory(function(){
+                oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
                     var oGeom = this.geometry.createDuplicate();
                     if(this.xFlag)
                     {
@@ -251,7 +253,7 @@ function XYAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
 XYAdjustmentTrack.prototype.getBounds = function()
 {
-    var bounds_checker = new  CSlideBoundsChecker();
+    var bounds_checker = new  AscFormat.CSlideBoundsChecker();
     bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
     this.draw(bounds_checker);
     var tr = this.originalShape.transform;
@@ -286,7 +288,7 @@ XYAdjustmentTrack.prototype.getBounds = function()
 
 function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.originalShape = originalShape;
 
 
@@ -368,13 +370,13 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
 
         }
 
-        this.overlayObject = new OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.shapeWidth, this.shapeHeight, oBrush, oPen, this.transform);
 
     }, this, []);
 
     this.draw = function(overlay)
     {
-        if(this.originalShape.parent && isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
+        if(this.originalShape.parent && AscFormat.isRealNumber(this.originalShape.selectStartPage) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.originalShape.selectStartPage);
         }
@@ -418,7 +420,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
             while(_angle >= 2*Math.PI)
                 _angle -= 2*Math.PI;
 
-            _angle *= cToDeg;
+            _angle *= AscFormat.cToDeg;
             if(_angle >= this.minimalAngle && _angle <= this.maximalAngle)
             {
                 this.geometry.gdLst[this.adjastment.gdRefAng]= _angle;
@@ -455,7 +457,7 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
         {
             var new_body_pr = this.originalShape.getBodyPr();
             if (new_body_pr) {
-                oGeometryToSet = ExecuteNoHistory(function(){
+                oGeometryToSet = AscFormat.ExecuteNoHistory(function(){
                     var oGeom = this.geometry.createDuplicate();
                     if(this.radiusFlag)
                     {
@@ -484,3 +486,9 @@ function PolarAdjustmentTrack(originalShape, adjIndex, bTextWarp)
     };
 }
 PolarAdjustmentTrack.prototype.getBounds = XYAdjustmentTrack.prototype.getBounds;
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].XYAdjustmentTrack = XYAdjustmentTrack;
+    window['AscFormat'].PolarAdjustmentTrack = PolarAdjustmentTrack;
+})(window);

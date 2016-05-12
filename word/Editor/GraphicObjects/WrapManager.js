@@ -22,6 +22,10 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
+
+// Import
+var History = AscCommon.History;
+
 var WRAP_TEXT_SIDE_BOTH_SIDES = 0x00;
 var WRAP_TEXT_SIDE_LARGEST = 0x01;
 var WRAP_TEXT_SIDE_LEFT = 0x02;
@@ -66,24 +70,24 @@ CWrapPolygon.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_WrapPolygon;
+        return AscDFH.historyitem_type_WrapPolygon;
     },
 
     setEdited: function(pr)
     {
-        History.Add(this, {Type: historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetEdited, oldPr: this.edited, newPr: pr});
         this.edited = pr;
     },
 
     setArrRelPoints: function(pr)
     {
-        History.Add(this, {Type:historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
+        History.Add(this, {Type:AscDFH.historyitem_WrapPolygonSetRelPoints, oldPr: this.relativeArrPoints, newPr: pr});
         this.relativeArrPoints = pr;
     },
 
     setWrapSide: function(pr)
     {
-        History.Add(this, {Type: historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_WrapPolygonSetWrapSide, oldPr: this.wrapSide, newPr: pr});
         this.wrapSide = pr;
     },
 
@@ -111,15 +115,15 @@ CWrapPolygon.prototype =
 
     Write_ToBinary2: function(writer)
     {
-        writer.WriteLong(historyitem_type_WrapPolygon);
+        writer.WriteLong(AscDFH.historyitem_type_WrapPolygon);
         writer.WriteString2(this.Get_Id());
-        writeObject(writer, this.wordGraphicObject);
+        AscFormat.writeObject(writer, this.wordGraphicObject);
     },
 
     Read_FromBinary2: function(reader)
     {
         this.Id = reader.GetString2();
-        this.wordGraphicObject = readObject(reader);
+        this.wordGraphicObject = AscFormat.readObject(reader);
     },
 
     Load_LinkData: function(data)
@@ -455,7 +459,7 @@ CWrapPolygon.prototype =
     calculate: function(drawing)
     {
         var arrPolygons = drawing.getArrayWrapPolygons();
-        var transform = new CMatrix();
+        var transform = new AscCommon.CMatrix();
         var arrEdges = [];
         var arrPoints = [];
         var polygonsCount = arrPolygons.length;
@@ -477,7 +481,7 @@ CWrapPolygon.prototype =
                 var transformed_x1 = transform.TransformPointX(cur_polygon[point_index].x, cur_polygon[point_index].y);
                 var transformed_y1 = transform.TransformPointY(cur_polygon[point_index].x, cur_polygon[point_index].y);
 
-                if (Math.abs(transformed_x1 - polygon_point0.x) < APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < APPROXIMATE_EPSILON)
+                if (Math.abs(transformed_x1 - polygon_point0.x) < AscFormat.APPROXIMATE_EPSILON && Math.abs(transformed_y1 - polygon_point0.y) < AscFormat.APPROXIMATE_EPSILON)
                     continue;
 
                 var _prev = polygon_point0;
@@ -487,7 +491,7 @@ CWrapPolygon.prototype =
                 polygon_point0.y = transformed_y1;
 
                 arrPoints.push(polygon_point0);
-                arrEdges.push(new GraphEdge(_prev, polygon_point0));
+                arrEdges.push(new AscFormat.GraphEdge(_prev, polygon_point0));
             }
         }
         if(arrPoints.length < 2)
@@ -502,14 +506,14 @@ CWrapPolygon.prototype =
             var cur_point = arrPoints[point_index];
             for(var point_index2 = point_index + 1; point_index2 < arrPoints.length-1; ++point_index2)
             {
-                if(Math.abs(arrPoints[point_index2].y - cur_point.y) < APPROXIMATE_EPSILON2 && Math.abs(arrPoints[point_index2].x - cur_point.x) < APPROXIMATE_EPSILON2)
+                if(Math.abs(arrPoints[point_index2].y - cur_point.y) < AscFormat.APPROXIMATE_EPSILON2 && Math.abs(arrPoints[point_index2].x - cur_point.x) < AscFormat.APPROXIMATE_EPSILON2)
                 {
                     arrPoints.splice(point_index2, 1);
                     --point_index2;
                 }
                 else
                 {
-                    if(Math.abs(arrPoints[point_index2].y - cur_point.y) >= APPROXIMATE_EPSILON2)
+                    if(Math.abs(arrPoints[point_index2].y - cur_point.y) >= AscFormat.APPROXIMATE_EPSILON2)
                         break;
                 }
             }
@@ -604,7 +608,7 @@ CWrapPolygon.prototype =
                 left_path_arr.splice(point_index, 1);
                 --point_index;
             }
-            if(l_prev < APPROXIMATE_EPSILON3 && l_last < APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
+            if(l_prev < AscFormat.APPROXIMATE_EPSILON3 && l_last < AscFormat.APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
             {
                 left_path_arr.splice(point_index, 1);
                 --point_index;
@@ -627,7 +631,7 @@ CWrapPolygon.prototype =
                 right_path_arr.splice(point_index, 1);
                 --point_index;
             }
-            if(l_prev < APPROXIMATE_EPSILON3 && l_last < APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
+            if(l_prev < AscFormat.APPROXIMATE_EPSILON3 && l_last < AscFormat.APPROXIMATE_EPSILON3 && Math.abs(Math.acos((dx_last*dx_prev + dy_last*dy_prev)/(l_last*l_prev)) - Math.PI) < APPROXIMATE_ANGLE)
             {
                 right_path_arr.splice(point_index, 1);
                 --point_index;
@@ -650,14 +654,14 @@ CWrapPolygon.prototype =
     calculateRelToAbs: function(transform, drawing)
     {
 
-        var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance();
+        var bounds = drawing.bounds, oDistance = drawing.parent.Get_Distance(), oEffectExtent = drawing.parent.EffectExtent;
         if(this.relativeArrPoints.length === 0)
         {
             this.arrPoints.length = 0;
-            this.localLeft = bounds.l - oDistance.L;
-            this.localRight = bounds.r + oDistance.R;
-            this.localTop = bounds.t - oDistance.T;
-            this.localBottom = bounds.b + oDistance.B;
+            this.localLeft = bounds.l - oDistance.L - AscFormat.getValOrDefault(oEffectExtent.L, 0);
+            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
+            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
+            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
             return;
         }
         var relArr = this.relativeArrPoints;
@@ -692,24 +696,24 @@ CWrapPolygon.prototype =
         }
 
         if(bounds.l < min_x)
-            this.localLeft = bounds.l - oDistance.L;
+            this.localLeft = bounds.l - oDistance.L  - AscFormat.getValOrDefault(oEffectExtent.L, 0);
         else
-            this.localLeft  = min_x - oDistance.L;
+            this.localLeft  = min_x - oDistance.L  - AscFormat.getValOrDefault(oEffectExtent.L, 0);
 
         if(bounds.r > max_x)
-            this.localRight = bounds.r + oDistance.R;
+            this.localRight = bounds.r + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
         else
-            this.localRight = max_x + oDistance.R;
+            this.localRight = max_x + oDistance.R + AscFormat.getValOrDefault(oEffectExtent.R, 0);
 
         if(bounds.t < min_y)
-            this.localTop = bounds.t - oDistance.T;
+            this.localTop = bounds.t - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
         else
-            this.localTop = min_y - oDistance.T;
+            this.localTop = min_y - oDistance.T - AscFormat.getValOrDefault(oEffectExtent.T, 0);
 
         if(bounds.b > max_y)
-            this.localBottom = bounds.b + oDistance.B;
+            this.localBottom = bounds.b + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
         else
-            this.localBottom = max_y + oDistance.B;
+            this.localBottom = max_y + oDistance.B + AscFormat.getValOrDefault(oEffectExtent.B, 0);
     },
 
     calculateAbsToRel: function(drawing, aPoints)
@@ -720,7 +724,7 @@ CWrapPolygon.prototype =
             return relArr;
         }
         var transform = drawing.localTransform;
-        var invert_transform = global_MatrixTransformer.Invert(transform);
+        var invert_transform = AscCommon.global_MatrixTransformer.Invert(transform);
         for(var point_index = 0; point_index < aPoints.length; ++point_index)
         {
             var abs_point = aPoints[point_index];
@@ -776,17 +780,17 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 this.edited = data.oldPr;
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 this.relativeArrPoints = data.oldPr;
                 break;
             }
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 this.wrapSide = data.oldPr;
                 break;
@@ -798,18 +802,18 @@ CWrapPolygon.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
                 this.edited = data.newPr;
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 this.relativeArrPoints = data.newPr;
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
                 this.wrapSide = data.newPr;
                 break;
@@ -819,16 +823,16 @@ CWrapPolygon.prototype =
 
     Save_Changes: function(data, writer)
     {
-        writer.WriteLong(historyitem_type_WrapPolygon);
+        writer.WriteLong(AscDFH.historyitem_type_WrapPolygon);
         writer.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
-                writeBool(writer, data.newPr);
+                AscFormat.writeBool(writer, data.newPr);
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 writer.WriteLong(data.newPr.length);
                 for(var i = 0; i < data.newPr.length; ++i)
@@ -839,9 +843,9 @@ CWrapPolygon.prototype =
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
-                writeLong(writer, data.newPr);
+                AscFormat.writeLong(writer, data.newPr);
                 break;
             }
         }
@@ -849,16 +853,16 @@ CWrapPolygon.prototype =
 
     Load_Changes: function(reader)
     {
-        if(reader.GetLong() !== historyitem_type_WrapPolygon)
+        if(reader.GetLong() !== AscDFH.historyitem_type_WrapPolygon)
             return;
         switch (reader.GetLong())
         {
-            case historyitem_WrapPolygonSetEdited:
+            case AscDFH.historyitem_WrapPolygonSetEdited:
             {
-                this.edited = readBool(reader);
+                this.edited = AscFormat.readBool(reader);
                 break;
             }
-            case historyitem_WrapPolygonSetRelPoints:
+            case AscDFH.historyitem_WrapPolygonSetRelPoints:
             {
                 var l = reader.GetLong();
                 var rel_arr = [], x, y;
@@ -872,9 +876,9 @@ CWrapPolygon.prototype =
                 break;
             }
 
-            case historyitem_WrapPolygonSetWrapSide:
+            case AscDFH.historyitem_WrapPolygonSetWrapSide:
             {
-                this.wrapSide = readLong(reader);
+                this.wrapSide = AscFormat.readLong(reader);
                 break;
             }
         }
@@ -1047,7 +1051,7 @@ function TrackNewPointWrapPolygon(originalObject, point1)
         this.arrPoints[i].y = originalObject.parent.wrappingPolygon.calculatedPoints[i].y;
     }
     this.arrPoints.splice(point1+1, 0, {x: null, y: null});
-    this.matrix = new CMatrix();
+    this.matrix = new AscCommon.CMatrix();
     this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point1 + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
 }
 
@@ -1077,7 +1081,7 @@ function TrackPointWrapPointWrapPolygon(originalObject, point)
     this.pointCoord.y = originalObject.parent.wrappingPolygon.calculatedPoints[point].y;
     this.point1 = originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point - 1] : originalObject.parent.wrappingPolygon.calculatedPoints[originalObject.parent.wrappingPolygon.calculatedPoints.length-1];
     this.point2 = originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] ? originalObject.parent.wrappingPolygon.calculatedPoints[point + 1] : originalObject.parent.wrappingPolygon.calculatedPoints[0];
-    this.matrix = new CMatrix();
+    this.matrix = new AscCommon.CMatrix();
     this.pageIndex = originalObject.selectStartPage;
 }
 
@@ -1096,3 +1100,7 @@ TrackPointWrapPointWrapPolygon.prototype =
         overlay.ds();
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CWrapPolygon = CWrapPolygon;

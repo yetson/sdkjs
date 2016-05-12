@@ -24,18 +24,20 @@
 */
 "use strict";
 
+(function(window, undefined){
+
 function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
 
         this.drawingObjects = drawingObjects;
         this.arrPoint = [];
-        this.Matrix = new CMatrixL();
-        this.TransformMatrix = new CMatrixL();
+        this.Matrix = new AscCommon.CMatrixL();
+        this.TransformMatrix = new AscCommon.CMatrixL();
 
         this.pageIndex = pageIndex;
-        this.style  = CreateDefaultShapeStyle();
+        this.style  = AscFormat.CreateDefaultShapeStyle();
         var style = this.style;
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
@@ -59,13 +61,13 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
     this.draw = function(g)
     {
-        if(isRealNumber(this.pageIndex) && g.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && g.SetCurrentPage)
         {
             g.SetCurrentPage(this.pageIndex);
         }
@@ -85,7 +87,7 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         boundsChecker.Bounds.posX = boundsChecker.Bounds.min_x;
         boundsChecker.Bounds.posY = boundsChecker.Bounds.min_y;
@@ -145,16 +147,16 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
 
 
 
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
 
      //  if(drawingObjects)
      //  {
      //      shape.setWorksheet(drawingObjects.getWorksheetModel());
      //      shape.addToDrawingObjects();
      //  }
-        shape.setSpPr(new CSpPr());
+        shape.setSpPr(new AscFormat.CSpPr());
         shape.spPr.setParent(shape);
-        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.setXfrm(new AscFormat.CXfrm());
         shape.spPr.xfrm.setParent(shape.spPr);
         if(!bWord)
         {
@@ -169,8 +171,8 @@ function PolyLine (drawingObjects, theme, master, layout, slide, pageIndex)
         }
         shape.spPr.xfrm.setExtX(xMax-xMin);
         shape.spPr.xfrm.setExtY(yMax - yMin);
-        shape.setStyle(CreateDefaultShapeStyle());
-        var geometry = new Geometry();
+        shape.setStyle(AscFormat.CreateDefaultShapeStyle());
+        var geometry = new AscFormat.Geometry();
 
 
         var w = xMax - xMin, h = yMax-yMin;
@@ -229,7 +231,7 @@ function PolylineForDrawer(polyline)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
@@ -248,3 +250,8 @@ function PolylineForDrawer(polyline)
         g.ds();
     };
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].PolyLine = PolyLine;
+})(window);

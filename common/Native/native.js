@@ -43,11 +43,29 @@ window.document = document;
 window["Asc"] = {};
 var Asc = window["Asc"];
 
+window["AscFonts"] = {};
+var AscFonts = window["AscFonts"];
+
 window["AscCommon"] = {};
 var AscCommon = window["AscCommon"];
 
+window["AscFormat"] = {};
+var AscFormat = window["AscFormat"];
+
+window["AscDFH"] = {};
+var AscDFH = window["AscDFH"];
+
+window["AscCH"] = {};
+var AscCH = window["AscCH"];
+
 window["AscCommonExcel"] = {};
 var AscCommonExcel = window["AscCommonExcel"];
+
+window["AscCommonWord"] = {};
+var AscCommonWord = window["AscCommonWord"];
+
+window["AscCommonSlide"] = {};
+var AscCommonSlide = window["AscCommonSlide"];
 
 function ConvertJSC_Array(_array)
 {
@@ -293,7 +311,7 @@ function NativeOpenFileData(data, version)
 
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");
+        _api = new window["Asc"]["asc_docs_api"]("");
         _api.asc_nativeOpenFile(data, version);
     }
     else
@@ -310,7 +328,7 @@ function NativeOpenFile()
     
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");       
+        _api = new window["Asc"]["asc_docs_api"]("");       
         _api.asc_nativeOpenFile(doc_bin);
     }
     else
@@ -329,7 +347,7 @@ function NativeOpenFile2(_params)
     var doc_bin = window.native.GetFileString(window.g_file_path);
     if (window.NATIVE_DOCUMENT_TYPE == "presentation" || window.NATIVE_DOCUMENT_TYPE == "document")
     {
-        _api = new window["asc_docs_api"]("");
+        _api = new window["Asc"]["asc_docs_api"]("");
 
         if (undefined !== _api.Native_Editor_Initialize_Settings)
         {

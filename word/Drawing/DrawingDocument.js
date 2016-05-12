@@ -25,134 +25,21 @@
 "use strict";
 
 // Import
+var FontStyle = AscFonts.FontStyle;
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var CColor = AscCommon.CColor;
 var CAscMathCategory = AscCommon.CAscMathCategory;
 var g_oTableId = AscCommon.g_oTableId;
-
-var g_fontManager = new CFontManager();
-g_fontManager.Initialize(true);
-
-function SetHintsProps(bIsHinting, bIsSubpixHinting)
-{
-    if (undefined === g_fontManager.m_oLibrary.tt_hint_props)
-        return;
-
-    if (bIsHinting && bIsSubpixHinting)
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = true;
-
-        g_fontManager.LOAD_MODE = 40968;
-    }
-    else if (bIsHinting)
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-        g_fontManager.LOAD_MODE = 40968;
-    }
-    else
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-        g_fontManager.LOAD_MODE = 40970;
-    }
-}
-
-SetHintsProps(true, true);
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var _canvas_tables = null;
 var _table_styles = null;
-
-function CTableMarkup(Table)
-{
-    this.Internal =
-    {
-        RowIndex  : 0,
-        CellIndex : 0,
-        PageNum   : 0
-    };
-    this.Table = Table;
-    this.X = 0; // Смещение таблицы от начала страницы до первой колонки
-
-    this.Cols    = []; // массив ширин колонок
-    this.Margins = []; // массив левых и правых маргинов
-
-    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
-                                // Rows = [ { Y : , H :  }, ... ]
-
-    this.CurCol = 0; // текущая колонка
-    this.CurRow = 0; // текущая строка
-
-    this.TransformX = 0;
-    this.TransformY = 0;
-}
-
-CTableMarkup.prototype =
-{
-    CreateDublicate : function()
-    {
-        var obj = new CTableMarkup(this.Table);
-
-        obj.Internal = { RowIndex : this.Internal.RowIndex, CellIndex : this.Internal.CellIndex, PageNum : this.Internal.PageNum };
-        obj.X = this.X;
-
-        var len = this.Cols.length;
-        for (var i = 0; i < len; i++)
-            obj.Cols[i] = this.Cols[i];
-
-        len = this.Margins.length;
-        for (var i = 0; i < len; i++)
-            obj.Margins[i] = { Left : this.Margins[i].Left, Right : this.Margins[i].Right };
-
-        len = this.Rows.length;
-        for (var i = 0; i < len; i++)
-            obj.Rows[i] = { Y : this.Rows[i].Y, H : this.Rows[i].H };
-
-        obj.CurRow = this.CurRow;
-        obj.CurCol = this.CurCol;
-
-        return obj;
-    },
-
-    CorrectFrom : function()
-    {
-        this.X += this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y += this.TransformY;
-        }
-    },
-
-    CorrectTo : function()
-    {
-        this.X -= this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y -= this.TransformY;
-        }
-    },
-
-    Get_X : function()
-    {
-        return this.X;
-    },
-
-    Get_Y : function()
-    {
-        var _Y = 0;
-        if (this.Rows.length > 0)
-        {
-            _Y = this.Rows[0].Y;
-        }
-        return _Y;
-    }
-};
 
 function CColumnsMarkupColumn()
 {
@@ -224,299 +111,6 @@ CColumnsMarkup.prototype.CreateDuplicate = function()
     return _ret;
 };
 
-function CTableOutline(Table, PageNum, X, Y, W, H)
-{
-    this.Table   = Table;
-    this.PageNum = PageNum;
-
-    this.X = X;
-    this.Y = Y;
-
-    this.W = W;
-    this.H = H;
-}
-
-function CTextMeasurer()
-{
-    this.m_oManager     = new CFontManager();
-
-    this.m_oFont        = null;
-
-    // RFonts
-    this.m_oTextPr      = null;
-    this.m_oGrFonts     = new CGrRFonts();
-    this.m_oLastFont    = new CFontSetup();
-
-    this.LastFontOriginInfo = { Name : "", Replace : null };
-
-    this.Init = function()
-    {
-        this.m_oManager.Initialize();
-    };
-
-    this.SetStringGid = function(bGID)
-    {
-        this.m_oManager.SetStringGID(bGID);
-    };
-
-    this.SetFont = function(font)
-    {
-        if (!font)
-            return;
-
-        this.m_oFont = font;
-
-        var bItalic = true === font.Italic;
-        var bBold   = true === font.Bold;
-
-        var oFontStyle = FontStyle.FontStyleRegular;
-        if ( !bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBold;
-        else if ( bItalic && !bBold )
-            oFontStyle = FontStyle.FontStyleItalic;
-        else if ( bItalic && bBold )
-            oFontStyle = FontStyle.FontStyleBoldItalic;
-
-        var _lastSetUp = this.m_oLastFont;
-        if (_lastSetUp.SetUpName != font.FontFamily.Name || _lastSetUp.SetUpSize != font.FontSize || _lastSetUp.SetUpStyle != oFontStyle)
-        {
-            _lastSetUp.SetUpName = font.FontFamily.Name;
-            _lastSetUp.SetUpSize = font.FontSize;
-            _lastSetUp.SetUpStyle = oFontStyle;
-
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
-        }
-    };
-
-    this.SetFontInternal = function(_name, _size, _style)
-    {
-        var _lastSetUp = this.m_oLastFont;
-        if (_lastSetUp.SetUpName != _name || _lastSetUp.SetUpSize != _size || _lastSetUp.SetUpStyle != _style)
-        {
-            _lastSetUp.SetUpName = _name;
-            _lastSetUp.SetUpSize = _size;
-            _lastSetUp.SetUpStyle = _style;
-
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
-        }
-    };
-
-    this.SetTextPr = function(textPr, theme)
-    {
-        this.m_oTextPr = textPr;
-        if (theme)
-            this.m_oGrFonts.checkFromTheme(theme.themeElements.fontScheme, this.m_oTextPr.RFonts);
-        else
-            this.m_oGrFonts = this.m_oTextPr.RFonts;
-    };
-
-    this.SetFontSlot = function(slot, fontSizeKoef)
-    {
-        var _rfonts = this.m_oGrFonts;
-        var _lastFont = this.m_oLastFont;
-
-        switch (slot)
-        {
-            case fontslot_ASCII:
-            {
-                _lastFont.Name   = _rfonts.Ascii.Name;
-                _lastFont.Index  = _rfonts.Ascii.Index;
-
-                _lastFont.Size = this.m_oTextPr.FontSize;
-                _lastFont.Bold = this.m_oTextPr.Bold;
-                _lastFont.Italic = this.m_oTextPr.Italic;
-
-                break;
-            }
-            case fontslot_CS:
-            {
-                _lastFont.Name   = _rfonts.CS.Name;
-                _lastFont.Index  = _rfonts.CS.Index;
-
-                _lastFont.Size = this.m_oTextPr.FontSizeCS;
-                _lastFont.Bold = this.m_oTextPr.BoldCS;
-                _lastFont.Italic = this.m_oTextPr.ItalicCS;
-
-                break;
-            }
-            case fontslot_EastAsia:
-            {
-                _lastFont.Name   = _rfonts.EastAsia.Name;
-                _lastFont.Index  = _rfonts.EastAsia.Index;
-
-                _lastFont.Size = this.m_oTextPr.FontSize;
-                _lastFont.Bold = this.m_oTextPr.Bold;
-                _lastFont.Italic = this.m_oTextPr.Italic;
-
-                break;
-            }
-            case fontslot_HAnsi:
-            default:
-            {
-                _lastFont.Name   = _rfonts.HAnsi.Name;
-                _lastFont.Index  = _rfonts.HAnsi.Index;
-
-                _lastFont.Size = this.m_oTextPr.FontSize;
-                _lastFont.Bold = this.m_oTextPr.Bold;
-                _lastFont.Italic = this.m_oTextPr.Italic;
-
-                break;
-            }
-        }
-
-        if (undefined !== fontSizeKoef)
-            _lastFont.Size *= fontSizeKoef;
-
-        var _style = 0;
-        if (_lastFont.Italic)
-            _style += 2;
-        if (_lastFont.Bold)
-            _style += 1;
-
-        if (_lastFont.Name != _lastFont.SetUpName || _lastFont.Size != _lastFont.SetUpSize || _style != _lastFont.SetUpStyle)
-        {
-            _lastFont.SetUpName = _lastFont.Name;
-            _lastFont.SetUpSize = _lastFont.Size;
-            _lastFont.SetUpStyle = _style;
-
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
-        }
-    };
-
-    this.GetTextPr = function()
-    {
-        return this.m_oTextPr;
-    };
-
-    this.GetFont = function()
-    {
-        return this.m_oFont;
-    };
-
-    this.Measure = function(text)
-    {
-        var Width  = 0;
-        var Height = 0;
-
-        var _code = text.charCodeAt(0);
-        if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
-
-        var Temp = this.m_oManager.MeasureChar( _code );
-		
-        Width  = Temp.fAdvanceX * 25.4 / 72;
-        Height = 0;//Temp.fHeight;
-
-        return { Width : Width, Height : Height };
-    };
-    this.Measure2 = function(text)
-    {
-        var Width  = 0;
-
-        var _code = text.charCodeAt(0);
-        if (null != this.LastFontOriginInfo.Replace)
-            _code = g_fontApplication.GetReplaceGlyph(_code, this.LastFontOriginInfo.Replace);
-
-        var Temp = this.m_oManager.MeasureChar( _code, true );
-
-        Width  = Temp.fAdvanceX * 25.4 / 72;
-
-        if (Temp.oBBox.rasterDistances == null)
-        {
-            return {
-                Width  : Width,
-                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
-                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-                rasterOffsetX: 0,
-                rasterOffsetY: 0
-            };
-        }
-
-        return {
-            Width  : Width,
-            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
-            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-            rasterOffsetX: Temp.oBBox.rasterDistances.dist_l * 25.4 / 72,
-            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
-        };
-    };
-
-    this.MeasureCode = function(lUnicode)
-    {
-        var Width  = 0;
-        var Height = 0;
-
-        if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
-
-        var Temp = this.m_oManager.MeasureChar( lUnicode );
-
-        Width  = Temp.fAdvanceX * 25.4 / 72;
-        Height = ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72);
-
-        return { Width : Width, Height : Height, Ascent : (Temp.oBBox.fMaxY * 25.4 / 72) };
-    };
-    this.Measure2Code = function(lUnicode)
-    {
-        var Width  = 0;
-
-        if (null != this.LastFontOriginInfo.Replace)
-            lUnicode = g_fontApplication.GetReplaceGlyph(lUnicode, this.LastFontOriginInfo.Replace);
-
-        var Temp = this.m_oManager.MeasureChar( lUnicode, true );
-
-        Width  = Temp.fAdvanceX * 25.4 / 72;
-
-        if (Temp.oBBox.rasterDistances == null)
-        {
-            return {
-                Width  : Width,
-                Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
-                Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-                WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-                rasterOffsetX: 0,
-                rasterOffsetY: 0
-            };
-        }
-
-        return {
-            Width  : Width,
-            Ascent : (Temp.oBBox.fMaxY * 25.4 / 72),
-            Height : ((Temp.oBBox.fMaxY - Temp.oBBox.fMinY) * 25.4 / 72),
-            WidthG : ((Temp.oBBox.fMaxX - Temp.oBBox.fMinX) * 25.4 / 72),
-            rasterOffsetX: (Temp.oBBox.rasterDistances.dist_l + Temp.oBBox.fMinX) * 25.4 / 72,
-            rasterOffsetY: Temp.oBBox.rasterDistances.dist_t * 25.4 / 72
-        };
-    };
-
-    this.GetAscender = function()
-    {
-        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Ascender   = this.m_oManager.m_lAscender;
-
-        return Ascender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    };
-    this.GetDescender = function()
-    {
-        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Descender  = this.m_oManager.m_lDescender;
-
-        return Descender * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    };
-    this.GetHeight = function()
-    {
-        var UnitsPerEm = this.m_oManager.m_lUnits_Per_Em;
-        var Height     = this.m_oManager.m_lLineHeight;
-
-        return Height * this.m_oLastFont.SetUpSize / UnitsPerEm * g_dKoef_pt_to_mm;
-    };
-}
-
-var g_oTextMeasurer = new CTextMeasurer();
-g_oTextMeasurer.Init();
-
 function CTableOutlineDr()
 {
     var image_64 = "u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u//6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6/4+Pj/+7u7v/9vb2//b29v/39/f/9/f3//f39/83aMT/9/f3//f39//39/f/9/f3//f39/+Pj4//u7u7//Ly8v/y8vL/8vLy//Pz8/83aMT/N2jE/zdoxP/z8/P/8/Pz//Pz8//z8/P/j4+P/7u7u//u7u7/7u7u/+7u7v/u7u7/7u7u/zdoxP/u7u7/7u7u/+7u7v/u7u7/7u7u/4+Pj/+7u7v/6Ojo/+jo6P83aMT/6enp/+np6f83aMT/6enp/+np6f83aMT/6enp/+np6f+Pj4//u7u7/+Pj4/83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP/k5OT/j4+P/7u7u//o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/4+Pj/+7u7v/7e3t/+3t7f/t7e3/7e3t/+3t7f83aMT/7e3t/+zs7P/s7Oz/7Ozs/+zs7P+Pj4//u7u7//Ly8v/y8vL/8vLy//Ly8v83aMT/N2jE/zdoxP/x8fH/8fHx//Hx8f/x8fH/j4+P/7u7u//19fX/9fX1//X19f/19fX/9fX1/zdoxP/19fX/9fX1//X19f/19fX/9fX1/4+Pj/+7u7v/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//j4+P+Pj4//u7u7/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/w==";
@@ -528,7 +122,7 @@ function CTableOutlineDr()
     var ctx = this.image.getContext('2d');
     var _data = ctx.createImageData(13, 13);
 
-    DecodeBase64(_data, image_64);
+    AscFonts.DecodeBase64(_data, image_64);
     ctx.putImageData(_data, 0, 0);
 
     _data = null;
@@ -1088,15 +682,6 @@ function CCacheManager()
         return this.arrayImages[index];
     }
 }
-
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-}
-
 
 function CPolygonPoint(X, Y)
 {
@@ -2089,7 +1674,7 @@ function CPage()
             var ctx = overlay.m_oContext;
 
 
-            var _ft = new CMatrix();
+            var _ft = new AscCommon.CMatrix();
             _ft.sx = transform.sx;
             _ft.shx = transform.shx;
             _ft.shy = transform.shy;
@@ -2097,7 +1682,7 @@ function CPage()
             _ft.tx = transform.tx;
             _ft.ty = transform.ty;
 
-            var coords = new CMatrix();
+            var coords = new AscCommon.CMatrix();
             coords.sx = wDst / this.width_mm;
             coords.sy = hDst / this.height_mm;
             coords.tx = xDst;
@@ -2329,8 +1914,8 @@ CDrawingCollaborativeTarget.prototype =
             }
         }
 
-        if (CollaborativeEditing)
-            CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
+        if (AscCommon.CollaborativeEditing)
+            AscCommon.CollaborativeEditing.Update_ForeignCursorLabelPosition(this.Id, this.HtmlElementX, this.HtmlElementY, this.Color);
 
         // 3) добавить, если нужно
         if (bIsHtmlElementCreate)
@@ -2355,7 +1940,7 @@ function CDrawingDocument()
     this.IsLockObjectsEnable = false;
 
     this.cursorMarkerFormat = "";
-    if (bIsIE)
+    if (AscCommon.AscBrowser.isIE)
     {
         // Пути указаны относительно html в меню, не надо их исправлять
         // и коммитить на пути относительно тестового меню
@@ -2775,9 +2360,9 @@ function CDrawingDocument()
         //var StartTime = new Date().getTime();
 
         // ������ ����� �������
-        var g = new CGraphics();
+        var g = new AscCommon.CGraphics();
         g.init(page.drawingPage.cachedImage.image.ctx, w, h, page.width_mm, page.height_mm);
-        g.m_oFontManager = g_fontManager;
+        g.m_oFontManager = AscCommon.g_fontManager;
 
         g.transform(1,0,0,1,0,0);
 
@@ -2818,8 +2403,8 @@ function CDrawingDocument()
 
     this.ToRenderer = function()
     {
-        var Renderer = new CDocumentRenderer();
-        Renderer.VectorMemoryForPrint = new CMemory();
+        var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
         this.RenderDocument(Renderer);
@@ -2831,7 +2416,7 @@ function CDrawingDocument()
 
     this.ToRenderer2 = function()
     {
-        var Renderer = new CDocumentRenderer();
+        var Renderer = new AscCommon.CDocumentRenderer();
 
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2858,8 +2443,8 @@ function CDrawingDocument()
 
         if (-1 == this.m_lCurrentRendererPage)
         {
-            this.m_oDocRenderer = new CDocumentRenderer();
-            this.m_oDocRenderer.VectorMemoryForPrint = new CMemory();
+            this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
             this.m_lCurrentRendererPage = 0;
             this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
             this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -3516,7 +3101,7 @@ function CDrawingDocument()
             this.TextMatrix = matrix;
         else if (matrix)
         {
-            this.TextMatrix.Multiply(matrix, MATRIX_ORDER_PREPEND);
+            this.TextMatrix.Multiply(matrix, AscCommon.MATRIX_ORDER_PREPEND);
         }
     }
 
@@ -3629,7 +3214,7 @@ function CDrawingDocument()
 
         if (0 != nValueScrollHor || 0 != nValueScrollVer)
         {
-            if (this.m_oWordControl.m_bIsMouseUpSend === true && global_keyboardEvent.ClickCount != 1)
+            if (this.m_oWordControl.m_bIsMouseUpSend === true && AscCommon.global_keyboardEvent.ClickCount != 1)
             {
                 this.m_tempX = x;
                 this.m_tempY = y;
@@ -4788,7 +4373,7 @@ function CDrawingDocument()
         {
             if (this.m_oWordControl.MobileTouchManager)
             {
-                var r = new _rect();
+                var r = new AscCommon._rect();
                 r.x = x;
                 r.y = y;
                 r.w = w;
@@ -4882,7 +4467,7 @@ function CDrawingDocument()
 
         if (this.m_oWordControl.MobileTouchManager)
         {
-            var r = new _rect();
+            var r = new AscCommon._rect();
             r.x = x;
             r.y = y;
             r.w = w;
@@ -4922,7 +4507,7 @@ function CDrawingDocument()
             this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
         }
 
-        var r = new _rect();
+        var r = new AscCommon._rect();
         r.x = x;
         r.y = y;
         r.w = width;
@@ -5079,7 +4664,7 @@ function CDrawingDocument()
             this.m_oWordControl.m_oOverlayApi.m_oContext.globalAlpha = 0.2;
         }
 
-        var r = new _rect();
+        var r = new AscCommon._rect();
         r.x = x;
         r.y = y;
         r.w = width;
@@ -5488,15 +5073,15 @@ function CDrawingDocument()
         for (var i = 0; i < _len; i++)
         {
             if (__tabs[i].Value == tab_Left)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
             else if (__tabs[i].Value == tab_Center)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_center);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center);
             else if (__tabs[i].Value == tab_Right)
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_right);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right);
             else
             {
                 // не должно такого быть. но приходит
-                _ar[i] = new CTab(__tabs[i].Pos, g_tabtype_left);
+                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
             }
         }
 
@@ -5506,7 +5091,7 @@ function CDrawingDocument()
 
     this.CorrectRulerPosition = function(pos)
     {
-        if (global_keyboardEvent.AltKey)
+        if (AscCommon.global_keyboardEvent.AltKey)
             return pos;
 
         return ((pos / 2.5 + 0.5) >> 0) * 2.5;
@@ -5611,13 +5196,13 @@ function CDrawingDocument()
         var map_used = this.m_oWordControl.m_oLogicDocument.Document_CreateFontMap();
 
         var _measure_map = g_oTextMeasurer.m_oManager.m_oFontsCache.Fonts;
-        var _drawing_map = g_fontManager.m_oFontsCache.Fonts;
+        var _drawing_map = AscCommon.g_fontManager.m_oFontsCache.Fonts;
 
         var map_keys = {};
         var api = this.m_oWordControl.m_oApi;
         for (var i in map_used)
         {
-            var key = GenerateMapId(api, g_fontApplication.GetFontInfoName(map_used[i].Name), map_used[i].Style, map_used[i].Size);
+            var key = AscFonts.GenerateMapId(api, g_fontApplication.GetFontInfoName(map_used[i].Name), map_used[i].Style, map_used[i].Size);
             map_keys[key] = true;
         }
 
@@ -5649,7 +5234,7 @@ function CDrawingDocument()
         var dstfonts = [];
         for (var i in map_keys)
         {
-            dstfonts[dstfonts.length] = new CFont(i, 0, "", 0, null);
+            dstfonts[dstfonts.length] = new AscFonts.CFont(i, 0, "", 0, null);
         }
         this.m_oWordControl.m_oLogicDocument.Fonts = dstfonts;
         return;
@@ -5760,8 +5345,8 @@ function CDrawingDocument()
         var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
         var _count = array_colors_types.length;
 
-        var color = new CUniColor();
-        color.color = new CSchemeColor();
+        var color = new AscFormat.CUniColor();
+        color.color = new AscFormat.CSchemeColor();
         for (var i = 0; i < _count; ++i)
         {
             color.color.id = array_colors_types[i];
@@ -5809,12 +5394,13 @@ function CDrawingDocument()
         var standart_colors = null;
         if (!this.IsSendStandartColors)
         {
-            var _c_s = g_oStandartColors.length;
+            var standartColors = AscCommon.g_oStandartColors;
+            var _c_s = standartColors.length;
             standart_colors = new Array(_c_s);
 
             for (var i = 0; i < _c_s; ++i)
             {
-                standart_colors[i] = new CColor(g_oStandartColors[i]["R"], g_oStandartColors[i]["G"], g_oStandartColors[i]["B"]);
+                standart_colors[i] = new CColor(standartColors[i].R, standartColors[i].G, standartColors[i].B);
             }
 
             this.IsSendStandartColors =  true;
@@ -5836,8 +5422,8 @@ function CDrawingDocument()
 			var _count_mods = 5;
             for (var j = 0; j < _count_mods; ++j)
             {
-                var dst_mods = new CColorModifiers();
-                dst_mods.Mods = _create_mods(GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 1));
+                var dst_mods = new AscFormat.CColorModifiers();
+                dst_mods.Mods = AscCommon.GetDefaultMods(_color_src.r, _color_src.g, _color_src.b, j + 1, 1);
 				
                 var _rgba = {R:_color_src.r, G: _color_src.g, B:_color_src.b, A: 255};
                 dst_mods.Apply(_rgba);
@@ -5870,48 +5456,49 @@ function CDrawingDocument()
         var _c = null;
 
         // user scheme
-        var _count_defaults = g_oUserColorScheme.length;
+        var oColorScheme = AscCommon.g_oUserColorScheme;
+        var _count_defaults = oColorScheme.length;
         for (var i = 0; i < _count_defaults; ++i)
         {
-            var _obj = g_oUserColorScheme[i];
+            var _obj = oColorScheme[i];
             infos[_index] = new AscCommon.CAscColorScheme();
-            infos[_index].Name = _obj["name"];
+            infos[_index].Name = _obj.name;
 
-            _c = _obj["dk1"];
-            infos[_index].Colors[0] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.dk1;
+            infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["lt1"];
-            infos[_index].Colors[1] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.lt1;
+            infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["dk2"];
-            infos[_index].Colors[2] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.dk2;
+            infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["lt2"];
-            infos[_index].Colors[3] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.lt2;
+            infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent1"];
-            infos[_index].Colors[4] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent1;
+            infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent2"];
-            infos[_index].Colors[5] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent2;
+            infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent3"];
-            infos[_index].Colors[6] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent3;
+            infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent4"];
-            infos[_index].Colors[7] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent4;
+            infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent5"];
-            infos[_index].Colors[8] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent5;
+            infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["accent6"];
-            infos[_index].Colors[9] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.accent6;
+            infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["hlink"];
-            infos[_index].Colors[10] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.hlink;
+            infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
 
-            _c = _obj["folHlink"];
-            infos[_index].Colors[11] = new CColor(_c["R"], _c["G"], _c["B"]);
+            _c = _obj.folHlink;
+            infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
 
             ++_index;
         }
@@ -6002,7 +5589,7 @@ function CDrawingDocument()
             return;
 
         var _img = this.m_oWordControl.m_oApi.ImageLoader.map_image_index[AscCommon.getFullImageSrc2(this.LastDrawingUrl)];
-        if (_img != undefined && _img.Image != null && _img.Status != ImageLoadStatus.Loading)
+        if (_img != undefined && _img.Image != null && _img.Status != AscFonts.ImageLoadStatus.Loading)
         {
             var _x = 0;
             var _y = 0;
@@ -6288,9 +5875,9 @@ function CDrawingDocument()
         var _yOffset = (((_hPx + _pxBoundsH) / 2) - baseLineOffset * g_dKoef_mm_to_pix) >> 0;
         var _xOffset = ((_wPx - _pxBoundsW) / 2) >> 0;
 
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _wPx, _hPx, _wMm, _hMm);
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
 
         graphics.m_oCoordTransform.tx = _xOffset;
         graphics.m_oCoordTransform.ty = _yOffset;
@@ -6337,7 +5924,7 @@ function CDrawingDocument()
         var bIsChanged = false;
         if (null == this.TableStylesLastLook)
         {
-            this.TableStylesLastLook = new CTablePropLook();
+            this.TableStylesLastLook = new Asc.CTablePropLook();
 
             this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
             this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
@@ -6462,9 +6049,9 @@ function CDrawingDocument()
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
-            graphics.m_oFontManager = g_fontManager;
+            graphics.m_oFontManager = AscCommon.g_fontManager;
             graphics.transform(1,0,0,1,0,0);
 
             _table_styles.Recalculate_Page(0);
@@ -7023,7 +6610,7 @@ function CDrawingDocument()
     {
         this.InlineTextTrackEnabled = false;
 
-        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, global_keyboardEvent.CtrlKey);
+        this.m_oWordControl.m_oLogicDocument.On_DragTextEnd(this.InlineTextTrack, AscCommon.global_keyboardEvent.CtrlKey);
         this.InlineTextTrack = null;
         this.InlineTextTrackPage = -1;
     }
@@ -7217,13 +6804,13 @@ CStylesPainter.prototype =
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-    var graphics = new CGraphics();
+    var graphics = new AscCommon.CGraphics();
     if (!this.IsRetinaEnabled) {
       graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
     } else {
       graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
     }
-    graphics.m_oFontManager = g_fontManager;
+    graphics.m_oFontManager = AscCommon.g_fontManager;
 
     var DocumentStyles = _api.WordControl.m_oLogicDocument.Get_Styles();
     this.defaultStyles = [];
@@ -7260,13 +6847,13 @@ CStylesPainter.prototype =
       ctx.fillRect(0, 0, _canvas.width, _canvas.height);
     }
 
-    var graphics = new CGraphics();
+    var graphics = new AscCommon.CGraphics();
     if (!this.IsRetinaEnabled) {
       graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm, _canvas.height * g_dKoef_pix_to_mm);
     } else {
       graphics.init(ctx, _canvas.width, _canvas.height, _canvas.width * g_dKoef_pix_to_mm / 2, _canvas.height * g_dKoef_pix_to_mm / 2);
     }
-    graphics.m_oFontManager = g_fontManager;
+    graphics.m_oFontManager = AscCommon.g_fontManager;
 
     this.docStyles = [];
     for (var i in styles) {
@@ -7415,7 +7002,7 @@ CStylesPainter.prototype =
         var brdL = new CDocumentBorder();
         brdL.Set_FromObject(_brdL);
         brdL.Space = 0;
-        par.Set_Border(brdL, historyitem_Paragraph_Borders_Left);
+        par.Set_Border(brdL, AscDFH.historyitem_Paragraph_Borders_Left);
       }
 
       var _brdT = style.ParaPr.Brd.Top;
@@ -7424,7 +7011,7 @@ CStylesPainter.prototype =
         var brd = new CDocumentBorder();
         brd.Set_FromObject(_brdT);
         brd.Space = 0;
-        par.Set_Border(brd, historyitem_Paragraph_Borders_Top);
+        par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Top);
       }
 
       var _brdB = style.ParaPr.Brd.Bottom;
@@ -7433,7 +7020,7 @@ CStylesPainter.prototype =
         var brd = new CDocumentBorder();
         brd.Set_FromObject(_brdB);
         brd.Space = 0;
-        par.Set_Border(brd, historyitem_Paragraph_Borders_Bottom);
+        par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Bottom);
       }
 
       var _brdR = style.ParaPr.Brd.Right;
@@ -7442,7 +7029,7 @@ CStylesPainter.prototype =
         var brd = new CDocumentBorder();
         brd.Set_FromObject(_brdR);
         brd.Space = 0;
-        par.Set_Border(brd, historyitem_Paragraph_Borders_Right);
+        par.Set_Border(brd, AscDFH.historyitem_Paragraph_Borders_Right);
       }
 
       var _ind = new CParaInd();
@@ -7498,7 +7085,8 @@ CStylesPainter.prototype =
       History.TurnOn();
     }
   }
-}
+};
+CStylesPainter.prototype.get_MergedStyles = function() { return this.mergedStyles; };
 
 function CMathPainter(_api)
 {
@@ -7506,7 +7094,7 @@ function CMathPainter(_api)
 
     this.StartLoad = function()
     {
-        var loader = window.g_font_loader;
+        var loader = AscCommon.g_font_loader;
         var fontinfo = g_fontApplication.GetFontInfo("Cambria Math");
         if (undefined === fontinfo)
         {
@@ -7577,7 +7165,7 @@ function CMathPainter(_api)
         //raster_koef = 2;
 
         // CREATE image!!!
-        var _total_image = new CRasterHeapTotal();
+        var _total_image = new AscFonts.CRasterHeapTotal();
         _total_image.CreateFirstChuck(1500 * raster_koef, 5000 * raster_koef);
 
         _total_image.Chunks[0].FindOnlyEqualHeight = true;
@@ -7716,3 +7304,12 @@ function TransformRectByMatrix(m, arr, offX, offY, koefX, koefY)
     ret.push(offY + koefY * m.TransformPointY(arr[0], arr[3]));
     return ret;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommon'].CPage = CPage;
+window['AscCommon'].CDrawingDocument = CDrawingDocument;
+
+window['AscCommonWord'].CStylesPainter = CStylesPainter;
+CStylesPainter.prototype['get_MergedStyles'] = CStylesPainter.prototype.get_MergedStyles;

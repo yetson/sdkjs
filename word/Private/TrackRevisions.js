@@ -23,95 +23,91 @@
  *
 */
 "use strict";
-/**
- * User: Ilja.Kirillov
- * Date: 09.10.2015
- * Time: 15:12
- */
 
 // Import
 var changestype_2_ElementsArray_and_Type = AscCommon.changestype_2_ElementsArray_and_Type;
+var History = AscCommon.History;
 
 //----------------------------------------------------------------------------------------------------------------------
 // Работаем с рецензированием
 //----------------------------------------------------------------------------------------------------------------------
-asc_docs_api.prototype.asc_SetTrackRevisions = function(bTrack)
+Asc['asc_docs_api'].prototype.asc_SetTrackRevisions = function(bTrack)
 {
     return this.WordControl.m_oLogicDocument.Set_TrackRevisions(bTrack);
 };
-asc_docs_api.prototype.asc_IsTrackRevisions = function()
+Asc['asc_docs_api'].prototype.asc_IsTrackRevisions = function()
 {
     return this.WordControl.m_oLogicDocument.Is_TrackRevisions();
 };
-asc_docs_api.prototype.sync_BeginCatchRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges = function()
 {
     this.RevisionChangesStack = [];
 };
-asc_docs_api.prototype.sync_EndCatchRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges = function()
 {
     this.asc_fireCallback("asc_onShowRevisionsChange", this.RevisionChangesStack);
 };
-asc_docs_api.prototype.sync_AddRevisionsChange = function(Change)
+Asc['asc_docs_api'].prototype.sync_AddRevisionsChange = function(Change)
 {
     this.RevisionChangesStack.push(Change);
 };
-asc_docs_api.prototype.asc_AcceptChanges = function(Change)
+Asc['asc_docs_api'].prototype.asc_AcceptChanges = function(Change)
 {
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Accept_RevisionChange(Change);
     else
         this.WordControl.m_oLogicDocument.Accept_RevisionChangesBySelection();
 };
-asc_docs_api.prototype.asc_RejectChanges = function(Change)
+Asc['asc_docs_api'].prototype.asc_RejectChanges = function(Change)
 {
     if (undefined !== Change)
         this.WordControl.m_oLogicDocument.Reject_RevisionChange(Change);
     else
         this.WordControl.m_oLogicDocument.Reject_RevisionChangesBySelection();
 };
-asc_docs_api.prototype.asc_HaveRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges = function()
 {
     this.WordControl.m_oLogicDocument.Have_RevisionChanges();
 };
-asc_docs_api.prototype.asc_HaveNewRevisionsChanges = function()
+Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges = function()
 {
     return this.asc_HaveRevisionsChanges();
 };
-asc_docs_api.prototype.asc_GetNextRevisionsChange = function()
+Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange = function()
 {
     return this.WordControl.m_oLogicDocument.Get_NextRevisionChange();
 };
-asc_docs_api.prototype.asc_GetPrevRevisionsChange = function()
+Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange = function()
 {
     return this.WordControl.m_oLogicDocument.Get_PrevRevisionChange();
 };
-asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
+Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition = function(X, Y)
 {
     this.asc_fireCallback("asc_onUpdateRevisionsChangesPosition", X, Y);
 };
-asc_docs_api.prototype.asc_AcceptAllChanges = function()
+Asc['asc_docs_api'].prototype.asc_AcceptAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Accept_AllRevisionChanges();
 };
-asc_docs_api.prototype.asc_RejectAllChanges = function()
+Asc['asc_docs_api'].prototype.asc_RejectAllChanges = function()
 {
     this.WordControl.m_oLogicDocument.Reject_AllRevisionChanges();
 };
 
-asc_docs_api.prototype['asc_SetTrackRevisions']               = asc_docs_api.prototype.asc_SetTrackRevisions;
-asc_docs_api.prototype['asc_IsTrackRevisions']                = asc_docs_api.prototype.asc_IsTrackRevisions;
-asc_docs_api.prototype['sync_BeginCatchRevisionsChanges']     = asc_docs_api.prototype.sync_BeginCatchRevisionsChanges;
-asc_docs_api.prototype['sync_EndCatchRevisionsChanges']       = asc_docs_api.prototype.sync_EndCatchRevisionsChanges;
-asc_docs_api.prototype['sync_AddRevisionsChange']             = asc_docs_api.prototype.sync_AddRevisionsChange;
-asc_docs_api.prototype['asc_AcceptChanges']                   = asc_docs_api.prototype.asc_AcceptChanges;
-asc_docs_api.prototype['asc_RejectChanges']                   = asc_docs_api.prototype.asc_RejectChanges;
-asc_docs_api.prototype['asc_HaveRevisionsChanges']            = asc_docs_api.prototype.asc_HaveRevisionsChanges;
-asc_docs_api.prototype['asc_HaveNewRevisionsChanges']         = asc_docs_api.prototype.asc_HaveNewRevisionsChanges;
-asc_docs_api.prototype['asc_GetNextRevisionsChange']          = asc_docs_api.prototype.asc_GetNextRevisionsChange;
-asc_docs_api.prototype['asc_GetPrevRevisionsChange']          = asc_docs_api.prototype.asc_GetPrevRevisionsChange;
-asc_docs_api.prototype['sync_UpdateRevisionsChangesPosition'] = asc_docs_api.prototype.sync_UpdateRevisionsChangesPosition;
-asc_docs_api.prototype['asc_AcceptAllChanges']                = asc_docs_api.prototype.asc_AcceptAllChanges;
-asc_docs_api.prototype['asc_RejectAllChanges']                = asc_docs_api.prototype.asc_RejectAllChanges;
+Asc['asc_docs_api'].prototype['asc_SetTrackRevisions']               = Asc['asc_docs_api'].prototype.asc_SetTrackRevisions;
+Asc['asc_docs_api'].prototype['asc_IsTrackRevisions']                = Asc['asc_docs_api'].prototype.asc_IsTrackRevisions;
+Asc['asc_docs_api'].prototype['sync_BeginCatchRevisionsChanges']     = Asc['asc_docs_api'].prototype.sync_BeginCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_EndCatchRevisionsChanges']       = Asc['asc_docs_api'].prototype.sync_EndCatchRevisionsChanges;
+Asc['asc_docs_api'].prototype['sync_AddRevisionsChange']             = Asc['asc_docs_api'].prototype.sync_AddRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_AcceptChanges']                   = Asc['asc_docs_api'].prototype.asc_AcceptChanges;
+Asc['asc_docs_api'].prototype['asc_RejectChanges']                   = Asc['asc_docs_api'].prototype.asc_RejectChanges;
+Asc['asc_docs_api'].prototype['asc_HaveRevisionsChanges']            = Asc['asc_docs_api'].prototype.asc_HaveRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_HaveNewRevisionsChanges']         = Asc['asc_docs_api'].prototype.asc_HaveNewRevisionsChanges;
+Asc['asc_docs_api'].prototype['asc_GetNextRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetNextRevisionsChange;
+Asc['asc_docs_api'].prototype['asc_GetPrevRevisionsChange']          = Asc['asc_docs_api'].prototype.asc_GetPrevRevisionsChange;
+Asc['asc_docs_api'].prototype['sync_UpdateRevisionsChangesPosition'] = Asc['asc_docs_api'].prototype.sync_UpdateRevisionsChangesPosition;
+Asc['asc_docs_api'].prototype['asc_AcceptAllChanges']                = Asc['asc_docs_api'].prototype.asc_AcceptAllChanges;
+Asc['asc_docs_api'].prototype['asc_RejectAllChanges']                = Asc['asc_docs_api'].prototype.asc_RejectAllChanges;
 //----------------------------------------------------------------------------------------------------------------------
 // CDocument
 //----------------------------------------------------------------------------------------------------------------------
@@ -273,7 +269,7 @@ CDocument.prototype.Accept_RevisionChange = function(Change)
         var RelatedParas = this.TrackRevisionsManager.Get_ChangeRelatedParagraphs(Change, true);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            this.Create_NewHistoryPoint(historydescription_Document_AcceptRevisionChange);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChange);
             this.private_SelectRevisionChange(Change);
             this.Accept_RevisionChanges(Change.get_Type(), false);
         }
@@ -286,7 +282,7 @@ CDocument.prototype.Reject_RevisionChange = function(Change)
         var RelatedParas = this.TrackRevisionsManager.Get_ChangeRelatedParagraphs(Change, false);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            this.Create_NewHistoryPoint(historydescription_Document_RejectRevisionChange);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RejectRevisionChange);
             this.private_SelectRevisionChange(Change);
             this.Reject_RevisionChanges(Change.get_Type(), false);
         }
@@ -303,7 +299,7 @@ CDocument.prototype.Accept_RevisionChangesBySelection = function()
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, true);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            this.Create_NewHistoryPoint(historydescription_Document_AcceptRevisionChangesBySelection);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChangesBySelection);
             this.Accept_RevisionChanges(undefined, false);
 
             if (true === this.History.Is_LastPointEmpty())
@@ -324,7 +320,7 @@ CDocument.prototype.Reject_RevisionChangesBySelection = function()
         var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphsBySelectedParagraphs(SelectedParagraphs, false);
         if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
         {
-            this.Create_NewHistoryPoint(historydescription_Document_AcceptRevisionChangesBySelection);
+            this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptRevisionChangesBySelection);
             this.Reject_RevisionChanges(undefined, false);
 
             if (true === this.History.Is_LastPointEmpty())
@@ -339,7 +335,7 @@ CDocument.prototype.Accept_AllRevisionChanges = function()
     var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphs(true);
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_AcceptAllRevisionChanges);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_AcceptAllRevisionChanges);
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
         for (var LogicDocId in LogicDocuments)
         {
@@ -368,7 +364,7 @@ CDocument.prototype.Reject_AllRevisionChanges = function()
     var RelatedParas = this.TrackRevisionsManager.Get_AllChangesRelatedParagraphs(false);
     if (false === this.Document_Is_SelectionLocked(AscCommon.changestype_None, { Type : changestype_2_ElementsArray_and_Type, Elements : RelatedParas, CheckType : AscCommon.changestype_Paragraph_Content}))
     {
-        this.Create_NewHistoryPoint(historydescription_Document_RejectAllRevisionChanges);
+        this.Create_NewHistoryPoint(AscDFH.historydescription_Document_RejectAllRevisionChanges);
         var LogicDocuments = this.TrackRevisionsManager.Get_AllChangesLogicDocuments();
         for (var LogicDocId in LogicDocuments)
         {

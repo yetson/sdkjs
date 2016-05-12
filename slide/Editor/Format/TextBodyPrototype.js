@@ -22,10 +22,15 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-/**
-* @license Copyright (c) Ascensio System SIA 2012-2016. All rights reserved
-*
-* http://www.onlyoffice.com
-*
-* Version: @@Version (build:@@Build)
-*/
+"use strict";
+
+(function(window, undefined){
+    AscFormat.CTextBody.prototype.Get_Worksheet = function()
+    {
+        return this.parent && this.parent.Get_Worksheet && this.parent.Get_Worksheet();
+    };
+    AscFormat.CTextBody.prototype.getDrawingDocument = function()
+    {
+        return this.parent && this.parent.getDrawingDocument && this.parent.getDrawingDocument();
+    };
+})(window);

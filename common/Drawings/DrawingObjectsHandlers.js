@@ -24,6 +24,11 @@
 */
 "use strict";
 
+(function(window, undefined){
+
+// Import
+var HANDLE_EVENT_MODE_HANDLE = AscFormat.HANDLE_EVENT_MODE_HANDLE;
+
 function CheckCoordsNeedPage(x, y, pageIndex, needPageIndex, drawingDocument)
 {
     if(pageIndex === needPageIndex)
@@ -113,8 +118,8 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
         drawing = drawingArr[i];
         switch(drawing.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleShapeImage(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -123,7 +128,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 ret = handleChart(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -132,7 +137,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, group, pageIndex, bWord);
                 if(ret)
@@ -141,7 +146,7 @@ function handleFloatObjects(drawingObjectsController, drawingArr, e, x, y, group
                 }
                 break;
             }
-            case historyitem_type_GraphicFrame:
+            case AscDFH.historyitem_type_GraphicFrame:
             {
                 ret = handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pageIndex);
                 if(ret)
@@ -220,15 +225,15 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
         var cur_grouped_object = grouped_objects[j];
         switch (cur_grouped_object.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleShapeImageInGroup(drawingObjectsController, drawing, cur_grouped_object, e, x, y, pageIndex, bWord);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 var ret, i, title;
                 if(cur_grouped_object.hit(x, y))
@@ -273,7 +278,7 @@ function handleGroup(drawing, drawingObjectsController, e, x, y, group, pageInde
                                 cur_grouped_object.selectTitle(title, pageIndex);
                                 cur_grouped_object.selection.textSelection = title;
                                 title.selectionSetStart(e, x, y, pageIndex);
-                                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
+                                drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
                                 if(e.ClickCount <= 1)
                                 {
                                     drawingObjectsController.updateSelectionState();
@@ -363,7 +368,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                 }
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    if(isRealNumber(drawing.selection.legendEntry))
+                    if(AscFormat.isRealNumber(drawing.selection.legendEntry))
                     {
                         drawing.selection.legendEntry = null;
                         drawingObjectsController.updateSelectionState();
@@ -414,11 +419,11 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
         if(drawing.chart.plotArea.chart && drawing.chart.plotArea.chart.series)
         {
             var series = drawing.chart.plotArea.chart.series;
-            var _len = drawing.chart.plotArea.chart.getObjectType() === historyitem_type_PieChart ? 1 : series.length;
+            var _len = drawing.chart.plotArea.chart.getObjectType() === AscDFH.historyitem_type_PieChart ? 1 : series.length;
             for(var i = _len - 1; i > -1; --i)
             {
                 var ser = series[i];
-                var pts = getPtsFromSeries(ser);
+                var pts = AscFormat.getPtsFromSeries(ser);
                 for(var j = 0; j < pts.length; ++j)
                 {
                     if(pts[j].compiledDlb)
@@ -482,7 +487,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
             {
                 if(drawingObjectsController.handleEventMode === HANDLE_EVENT_MODE_HANDLE)
                 {
-                    var oTargetTextObject = getTargetTextObject(drawingObjectsController);
+                    var oTargetTextObject = AscFormat.getTargetTextObject(drawingObjectsController);
                     if(title !== oTargetTextObject)
                     {
                         drawingObjectsController.checkChartTextSelection();
@@ -493,7 +498,7 @@ function handleInternalChart(drawing, drawingObjectsController, e, x, y, group, 
                         drawing.selection.textSelection = title;
                     }
                     title.selectionSetStart(e, x, y, pageIndex);
-                    drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, title, x, y));
+                    drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, title, x, y));
                     if(e.ClickCount <= 1)
                     {
                         drawingObjectsController.updateSelectionState();
@@ -573,8 +578,6 @@ function handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex
     return handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
 }
 
-
-
 function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInSelect)
 {
     var selected_objects = drawingObjects.selectedObjects;
@@ -588,10 +591,10 @@ function handleInlineHitNoText(drawing, drawingObjects, e, x, y, pageIndex, bInS
             drawingObjects.checkChartTextSelection();
             drawingObjects.resetSelection();
             drawing.select(drawingObjects, pageIndex);
-            drawingObjects.changeCurrentState(new PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
+            drawingObjects.changeCurrentState(new AscFormat.PreMoveInlineObject(drawingObjects, drawing, bIsSelected, !bInSelect, pageIndex, x, y));
             if(e.ClickCount > 1 && !e.ShiftKey && !e.CtrlKey && ((drawingObjects.selection.groupSelection && drawingObjects.selection.groupSelection.selectedObjects.length === 1) || drawingObjects.selectedObjects.length === 1))
             {
-                if (drawing.getObjectType() === historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
+                if (drawing.getObjectType() === AscDFH.historyitem_type_ChartSpace && drawingObjects.handleChartDoubleClick)
                     drawingObjects.handleChartDoubleClick(drawing.parent, drawing, e, x, y, pageIndex);
                 else if (2 == e.ClickCount && drawing.parent instanceof ParaDrawing && drawing.parent.Is_MathEquation())
                     drawingObjects.handleMathDrawingDoubleClick(drawing.parent, e, x, y, pageIndex);
@@ -620,22 +623,22 @@ function handleInlineObjects(drawingObjectsController, drawingArr, e, x, y, page
 
         switch(drawing.getObjectType())
         {
-            case historyitem_type_Shape:
-            case historyitem_type_ImageShape:
+            case AscDFH.historyitem_type_Shape:
+            case AscDFH.historyitem_type_ImageShape:
             {
                 ret = handleInlineShapeImage(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 ret  = handleInlineChart(drawing, drawingObjectsController, e, x, y, pageIndex);
                 if(ret)
                     return ret;
                 break;
             }
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 ret = handleGroup(drawing, drawingObjectsController, e, x, y, null, pageIndex, bWord);
                 if(ret)
@@ -651,12 +654,12 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
 {
     var state = drawingObjects.curState;
     state.drawingObjects.clearPreTrackObjects();
-    state.drawingObjects.changeCurrentState(new NullState(state.drawingObjects));
-    if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== g_mouse_button_right)
+    state.drawingObjects.changeCurrentState(new AscFormat.NullState(state.drawingObjects));
+    if(!state.shift && !state.ctrl && state.bInside && state.majorObjectIsSelected && e.Button !== AscCommon.g_mouse_button_right)
     {
         switch (state.majorObject.getObjectType())
         {
-            case historyitem_type_GroupShape:
+            case AscDFH.historyitem_type_GroupShape:
             {
                 state.drawingObjects.checkChartTextSelection();
                 state.drawingObjects.resetSelection();
@@ -668,7 +671,7 @@ function handleMouseUpPreMoveState(drawingObjects, e, x, y, pageIndex, bWord)
                 state.drawingObjects.document && state.drawingObjects.document.Document_UpdateInterfaceState();
                 break;
             }
-            case historyitem_type_ChartSpace:
+            case AscDFH.historyitem_type_ChartSpace:
             {
                 break;
             }
@@ -703,7 +706,7 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
                     drawingObjectsController.selectObject(group, pageIndex);
                     drawingObjectsController.selection.groupSelection = group;
                 }
-                drawingObjectsController.changeCurrentState(new TextAddState(drawingObjectsController, drawing, x, y));
+                drawingObjectsController.changeCurrentState(new AscFormat.TextAddState(drawingObjectsController, drawing, x, y));
                 return true;
             }
             else
@@ -715,3 +718,12 @@ function handleFloatTable(drawing, drawingObjectsController, e, x, y, group, pag
     }
     return false;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CheckCoordsNeedPage = CheckCoordsNeedPage;
+    window['AscFormat'].handleSelectedObjects = handleSelectedObjects;
+    window['AscFormat'].handleFloatObjects = handleFloatObjects;
+    window['AscFormat'].handleInlineObjects = handleInlineObjects;
+    window['AscFormat'].handleMouseUpPreMoveState = handleMouseUpPreMoveState;
+})(window);

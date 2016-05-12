@@ -24,6 +24,7 @@
 */
 "use strict";
 
+(function(window, undefined){
 // Import
 var offlineMode = AscCommon.offlineMode;
 var c_oEditorId = AscCommon.c_oEditorId;
@@ -35,21 +36,20 @@ var c_oAscAsyncActionType = Asc.c_oAscAsyncActionType;
 var ASC_DOCS_API_USE_EMBEDDED_FONTS = "@@ASC_DOCS_API_USE_EMBEDDED_FONTS";
 
 /** @constructor */
-function baseEditorsApi(name) {
-  g_fontApplication.Init();
-
-  this.editorId = null;
+function baseEditorsApi(name, editorId) {
+  this.editorId = editorId;
+  this.isLoadFullApi = false;
+  this.openResult = null;
 
   this.HtmlElementName = name;
   this.HtmlElement = null;
 
   this.isMobileVersion = false;
+  
+  this.isViewMode = false;
 
-  this.FontLoader = window.g_font_loader;
-  this.ImageLoader = window.g_image_loader;
-  this.FontLoader.put_Api(this);
-  this.ImageLoader.put_Api(this);
-  this.FontLoader.SetStandartFonts();
+  this.FontLoader = null;
+  this.ImageLoader = null;
 
   this.LoadedObject = null;
   this.DocumentType = 0; // 0 - empty, 1 - test, 2 - document (from json)
@@ -89,10 +89,11 @@ function baseEditorsApi(name) {
   this.isDocumentCanSave = false;			// Флаг, говорит о возможности сохранять документ (активна кнопка save или нет)
 
   // Chart
-  this.chartTranslate = new asc_CChartTranslate();
-  this.textArtTranslate = new Asc.asc_TextArtTranslate();
-  this.chartPreviewManager = new ChartPreviewManager();
-  this.textArtPreviewManager = new TextArtPreviewManager();
+  this.chartTranslate = null;
+  this.textArtTranslate = null;
+  this.chartPreviewManager = null;
+  this.textArtPreviewManager = null;
+  this.shapeElementId = null;
   // Режим вставки диаграмм в редакторе документов
   this.isChartEditor = false;
   this.isOpenedChartFrame = false;
@@ -119,6 +120,7 @@ function baseEditorsApi(name) {
 
   // Version History
   this.VersionHistory = null;				// Объект, который отвечает за точку в списке версий
+  this.VersionHistoryOpen = false;
 
   //Флаги для применения свойств через слайдеры
   this.noCreatePoint = false;
@@ -132,13 +134,15 @@ function baseEditorsApi(name) {
   // Использовать ли обрезанные шрифты
   this.isUseEmbeddedCutFonts = ("true" == ASC_DOCS_API_USE_EMBEDDED_FONTS.toLowerCase());
 
+  this.tmpFocus = null;
+
   this.fCurCallback = null;
 
-  this._baseInit();
   return this;
 }
-baseEditorsApi.prototype._baseInit = function() {
+baseEditorsApi.prototype._init = function() {
   var t = this;
+  //Asc.editor = Asc['editor'] = AscCommon['editor'] = AscCommon.editor = this; // ToDo сделать это!
   this.HtmlElement = document.getElementById(this.HtmlElementName);
 
   // init OnMessage
@@ -156,22 +160,34 @@ baseEditorsApi.prototype._baseInit = function() {
     t._uploadCallback(error, files);
   });
 
-  CHART_STYLE_MANAGER = new CChartStyleManager();
+  AscCommon.loadSdk(this._editorNameById(), function() {
+    t.isLoadFullApi = true;
+
+    if (t.DocInfo && t.DocInfo.get_OfflineApp()) {
+      t._OfflineAppDocumentStartLoad();
+    }
+
+    t._onEndLoadSdk();
+    t.onEndLoadFile(null);
+  });
 };
 baseEditorsApi.prototype._editorNameById = function() {
   var res = '';
   switch (this.editorId) {
     case c_oEditorId.Word:
-      res = 'Word';
+      res = 'word';
       break;
     case c_oEditorId.Spreadsheet:
-      res = 'Excel';
+      res = 'cell';
       break;
     case c_oEditorId.Presentation:
-      res = 'PowerPoint';
+      res = 'slide';
       break;
   }
   return res;
+};
+baseEditorsApi.prototype.getEditorId = function() {
+  return this.editorId;
 };
 baseEditorsApi.prototype.asc_GetFontThumbnailsPath = function() {
   return '../Common/Images/';
@@ -198,14 +214,14 @@ baseEditorsApi.prototype.asc_setDocInfo = function(oDocInfo) {
     this.User = new AscCommon.asc_CUser();
     this.User.setId(this.DocInfo.get_UserId());
     this.User.setUserName(this.DocInfo.get_UserName());
+
+	//чтобы в versionHistory был один documentId для auth и open 
+	this.CoAuthoringApi.setDocId(this.documentId);
   }
 
   if (undefined !== window["AscDesktopEditor"] && offlineMode != this.documentUrl) {
     window["AscDesktopEditor"]["SetDocumentName"](this.documentTitle);
   }
-};
-baseEditorsApi.prototype.asc_SetFontsPath = function(path) {
-  this.FontLoader.fontFilesPath = path;
 };
 baseEditorsApi.prototype.asc_enableKeyEvents = function(isEnabled) {
 };
@@ -241,10 +257,10 @@ baseEditorsApi.prototype.sync_EndAction = function(type, id) {
     this.decrementCounterLongAction();
   }
 };
-baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function()
-{
+baseEditorsApi.prototype.sync_TryUndoInFastCollaborative = function() {
   this.sendEvent("asc_OnTryUndoInFastCollaborative");
 };
+baseEditorsApi.prototype.asc_enableKeyEvents = function(val) {};
 baseEditorsApi.prototype.asc_setViewMode = function() {
 };
 baseEditorsApi.prototype.getViewMode = function() {
@@ -302,23 +318,14 @@ baseEditorsApi.prototype.onPrint = function() {
 baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
   // Меняем тип состояния (на открытие)
   this.advancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction.Open;
-  this.CoAuthoringApi.auth(this.getViewMode());
-
-  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
-
-  if (offlineMode === this.documentUrl) {
-    // ToDo убрать зависимость от this.FontLoader.fontFilesPath
-    this.documentUrl = this.FontLoader.fontFilesPath + '../' + this._editorNameById() + '/document/';
-    this.DocInfo.asc_putOfflineApp(true);
-    this._OfflineAppDocumentStartLoad();
-  } else {
-    var rData = {
+  var rData = null;
+  if (offlineMode !== this.documentUrl) {
+	  rData = {
       "c": 'open',
       "id": this.documentId,
       "userid": this.documentUserId,
       "format": this.documentFormat,
       "vkey": this.documentVKey,
-      "editorid": this.editorId,
       "url": this.documentUrl,
       "title": this.documentTitle,
       "embeddedfonts": this.isUseEmbeddedCutFonts,
@@ -328,7 +335,14 @@ baseEditorsApi.prototype.asc_LoadDocument = function(isVersionHistory) {
       //чтобы результат пришел только этому соединению, а не всем кто в документе
       rData["userconnectionid"] = this.CoAuthoringApi.getUserConnectionId();
     }
-    AscCommon.sendCommand(this, null, rData);
+  }
+  this.CoAuthoringApi.auth(this.getViewMode(), rData);
+
+  this.sync_StartAction(c_oAscAsyncActionType.BlockInteraction, c_oAscAsyncAction.Open);
+
+  if (offlineMode === this.documentUrl) {
+    this.documentUrl = '/sdkjs/' + this._editorNameById() + '/document/';
+    this.DocInfo.asc_putOfflineApp(true);
   }
 };
 baseEditorsApi.prototype._OfflineAppDocumentStartLoad = function() {
@@ -430,8 +444,17 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
     t.asyncServerIdEndLoaded();
   };
   this.CoAuthoringApi.onFirstConnect = function() {
-    t.isOnFirstConnectEnd = true;
-    t._onEndPermissions();
+    if (t.isOnFirstConnectEnd) {
+      if (t.VersionHistoryOpen) {
+        t.VersionHistoryOpen = false;
+        t.asc_LoadDocument(true);
+      } else {
+        t.CoAuthoringApi.auth(t.getViewMode());
+      }
+    } else {
+      t.isOnFirstConnectEnd = true;
+      t._onEndPermissions();
+    }
   };
   this.CoAuthoringApi.onLicense = function(res) {
     t.licenseResult = res;
@@ -487,6 +510,9 @@ baseEditorsApi.prototype._coAuthoringInit = function() {
               break;
             case "needparams":
               t._onNeedParams(input["data"]);
+              break;
+            case "needpassword":
+              t.sendEvent("asc_onError", Asc.c_oAscError.ID.ConvertationPassword, c_oAscError.Level.Critical);
               break;
             case "err":
               t.sendEvent("asc_onError", AscCommon.mapAscServerErrorToAscError(parseInt(input["data"])), c_oAscError.Level.Critical);
@@ -546,6 +572,15 @@ baseEditorsApi.prototype.asc_onOpenChartFrame = function() {
 baseEditorsApi.prototype.asc_onCloseChartFrame = function() {
     this.isOpenedChartFrame = false;
 };
+baseEditorsApi.prototype.asc_setInterfaceDrawImagePlaceShape = function(elementId) {
+  this.shapeElementId = elementId;
+};
+baseEditorsApi.prototype.asc_getPropertyEditorShapes = function() {
+  return [AscCommon.g_oAutoShapesGroups, AscCommon.g_oAutoShapesTypes];
+};
+baseEditorsApi.prototype.asc_getPropertyEditorTextArts = function() {
+  return [AscCommon.g_oPresetTxWarpGroups, AscCommon.g_PresetTxWarpTypes];
+};
 // Add image
 baseEditorsApi.prototype._addImageUrl = function() {
 };
@@ -594,3 +629,53 @@ baseEditorsApi.prototype.asc_isOffline = function() {
 baseEditorsApi.prototype.asc_getUrlType = function(url) {
 	return AscCommon.getUrlType(url);
 };
+
+  baseEditorsApi.prototype.openDocument = function() {
+  };
+  baseEditorsApi.prototype.onEndLoadFile = function(result) {
+    if (result) {
+      this.openResult = result;
+    }
+    if (this.isLoadFullApi && this.openResult) {
+      this.openDocument(this.openResult);
+    }
+
+  };
+  baseEditorsApi.prototype._onEndLoadSdk = function() {
+    AscFonts.g_fontApplication.Init();
+
+    this.FontLoader = AscCommon.g_font_loader;
+    this.ImageLoader = AscCommon.g_image_loader;
+    this.FontLoader.put_Api(this);
+    this.ImageLoader.put_Api(this);
+    this.FontLoader.SetStandartFonts();
+
+    this.chartTranslate = this.chartTranslate ? this.chartTranslate : new Asc.asc_CChartTranslate();
+    this.textArtTranslate = this.textArtTranslate ? this.textArtTranslate : new Asc.asc_TextArtTranslate();
+    this.chartPreviewManager = new AscCommon.ChartPreviewManager();
+    this.textArtPreviewManager = new AscCommon.TextArtPreviewManager();
+
+    AscFormat.initStyleManager();
+
+    if (null !== this.tmpFocus) {
+      this.asc_enableKeyEvents(this.tmpFocus);
+    }
+  };
+
+  baseEditorsApi.prototype.sendStandartTextures = function() {
+    var _count = AscCommon.g_oUserTexturePresets.length;
+    var arr = new Array(_count);
+    for (var i = 0; i < _count; ++i) {
+      arr[i] = new AscCommon.asc_CTexture();
+      arr[i].Id = i;
+      arr[i].Image = AscCommon.g_oUserTexturePresets[i];
+      this.ImageLoader.LoadImage(AscCommon.g_oUserTexturePresets[i], 1);
+    }
+
+    this.sendEvent('asc_onInitStandartTextures', arr);
+  };
+
+  //----------------------------------------------------------export----------------------------------------------------
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].baseEditorsApi = baseEditorsApi;
+})(window);

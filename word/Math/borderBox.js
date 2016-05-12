@@ -1,4 +1,31 @@
+/*
+ *
+ * (c) Copyright Ascensio System Limited 2010-2016
+ *
+ * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU
+ * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html).
+ * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that
+ * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
+ *
+ * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+ * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
+ *
+ * You can contact Ascensio System SIA by email at sales@onlyoffice.com
+ *
+ * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display
+ * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
+ *
+ * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains
+ * relevant author attributions when distributing the software. If the display of the logo in its graphic
+ * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE"
+ * in every copy of the program you distribute.
+ * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
+ *
+ */
 "use strict";
+
+// Import
+var History = AscCommon.History;
 
 function CMathBreak()
 {
@@ -198,7 +225,7 @@ function CBorderBox(props)
     AscCommon.g_oTableId.Add(this, this.Id);
 }
 AscCommon.extendClass(CBorderBox, CMathBase);
-CBorderBox.prototype.ClassType = historyitem_type_borderBox;
+CBorderBox.prototype.ClassType = AscDFH.historyitem_type_borderBox;
 CBorderBox.prototype.kind      = MATH_BORDER_BOX;
 CBorderBox.prototype.init = function(props)
 {
@@ -751,7 +778,7 @@ function CBox(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CBox, CMathBase);
-CBox.prototype.ClassType = historyitem_type_box;
+CBox.prototype.ClassType = AscDFH.historyitem_type_box;
 CBox.prototype.kind      = MATH_BOX;
 CBox.prototype.init = function(props)
 {
@@ -967,7 +994,7 @@ function CBar(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CBar, CCharacter);
-CBar.prototype.ClassType = historyitem_type_bar;
+CBar.prototype.ClassType = AscDFH.historyitem_type_bar;
 CBar.prototype.kind      = MATH_BAR;
 CBar.prototype.init = function(props)
 {
@@ -1165,7 +1192,7 @@ function CPhantom(props)
     AscCommon.g_oTableId.Add( this, this.Id );
 }
 AscCommon.extendClass(CPhantom, CMathBase);
-CPhantom.prototype.ClassType = historyitem_type_phant;
+CPhantom.prototype.ClassType = AscDFH.historyitem_type_phant;
 CPhantom.prototype.kind      = MATH_PHANTOM;
 CPhantom.prototype.init = function(props)
 {
@@ -1183,3 +1210,10 @@ CPhantom.prototype.fillContent = function()
     this.setDimension(1, 1);
     this.elements[0][0] = this.getBase();
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CBar = CBar;
+window['AscCommonWord'].CBox = CBox;
+window['AscCommonWord'].CBorderBox = CBorderBox;
+window['AscCommonWord'].CPhantom = CPhantom;

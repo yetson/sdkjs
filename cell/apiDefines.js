@@ -33,12 +33,12 @@ function (window, undefined) {
 // Используем [] вместо new Array() для ускорения (http://jsperf.com/creation-array)
 // Используем {} вместо new Object() для ускорения (http://jsperf.com/creation-object)
 
-
   // Import
   var CColor = AscCommon.CColor;
 
 var c_oAscConfirm = {
-  ConfirmReplaceRange: 0
+  ConfirmReplaceRange: 0,
+  ConfirmPutMergeRange: 1
 };
 
 var c_oAscAlignType = {
@@ -62,25 +62,6 @@ var c_oAscMergeOptions = {
 var c_oAscSortOptions = {
   Ascending: 1,
   Descending: 2
-};
-
-var c_oAscInsertOptions = {
-  InsertCellsAndShiftRight: 1,
-  InsertCellsAndShiftDown: 2,
-  InsertColumns: 3,
-  InsertRows: 4,
-  InsertTableRowAbove: 5,
-  InsertTableRowBelow: 6,
-  InsertTableColLeft: 7,
-  InsertTableColRight: 8
-};
-
-var c_oAscDeleteOptions = {
-  DeleteCellsAndShiftLeft: 1,
-  DeleteCellsAndShiftTop: 2,
-  DeleteColumns: 3,
-  DeleteRows: 4,
-  DeleteTable: 5
 };
 
 var c_oAscBorderOptions = {
@@ -107,20 +88,6 @@ var c_oAscDrawDepOptions = {
   Master: 0,
   Slave: 1,
   Clear: 2
-};
-
-// selection type
-var c_oAscSelectionType = {
-  RangeCells: 1,
-  RangeCol: 2,
-  RangeRow: 3,
-  RangeMax: 4,
-  RangeImage: 5,
-  RangeChart: 6,
-  RangeShape: 7,
-  RangeShapeText: 8,
-  RangeChartText: 9,
-  RangeFrozen: 10
 };
 
 var c_oAscSelectionDialogType = {
@@ -325,6 +292,12 @@ var c_oAscPopUpSelectorType = {
   Table: 3
 };
 
+  /** @enum */
+  var c_oSerFormat = {
+    Version		: 2, //1.0.0.2
+    Signature	: "XLSY"
+  };
+
   //----------------------------------------------------------export----------------------------------------------------
   window['AscCommonExcel'] = window['AscCommonExcel'] || {};
   window['AscCommonExcel'].c_oAscAlignType = c_oAscAlignType;
@@ -347,27 +320,139 @@ var c_oAscPopUpSelectorType = {
   window['AscCommonExcel'].c_oAscLockNameFrozenPane = c_oAscLockNameFrozenPane;
   window['AscCommonExcel'].c_oAscLockNameTabColor = c_oAscLockNameTabColor;
 
+  window['AscCommon'] = window['AscCommon'] || {};
+  window['AscCommon'].c_oSerFormat = c_oSerFormat;
+  window['AscCommon'].CurFileVersion = c_oSerFormat.Version;
+
+  var prot;
   window['Asc'] = window['Asc'] || {};
   window['Asc']['c_oAscConfirm'] = window['Asc'].c_oAscConfirm = c_oAscConfirm;
+  prot = c_oAscConfirm;
+  prot['ConfirmReplaceRange'] = prot.ConfirmReplaceRange;
+  prot['ConfirmPutMergeRange'] = prot.ConfirmPutMergeRange;
   window['Asc']['c_oAscMergeOptions'] = window['Asc'].c_oAscMergeOptions = c_oAscMergeOptions;
-  window['Asc']['c_oAscInsertOptions'] = window['Asc'].c_oAscInsertOptions = c_oAscInsertOptions;
-  window['Asc']['c_oAscDeleteOptions'] = window['Asc'].c_oAscDeleteOptions = c_oAscDeleteOptions;
+  prot = c_oAscMergeOptions;
+  prot['Unmerge'] = prot.Unmerge;
+  prot['Merge'] = prot.Merge;
+  prot['MergeCenter'] = prot.MergeCenter;
+  prot['MergeAcross'] = prot.MergeAcross;
   window['Asc']['c_oAscBorderOptions'] = window['Asc'].c_oAscBorderOptions = c_oAscBorderOptions;
+  prot = c_oAscBorderOptions;
+  prot['Top'] = prot.Top;
+  prot['Right'] = prot.Right;
+  prot['Bottom'] = prot.Bottom;
+  prot['Left'] = prot.Left;
+  prot['DiagD'] = prot.DiagD;
+  prot['DiagU'] = prot.DiagU;
+  prot['InnerV'] = prot.InnerV;
+  prot['InnerH'] = prot.InnerH;
   window['Asc']['c_oAscCleanOptions'] = window['Asc'].c_oAscCleanOptions = c_oAscCleanOptions;
-  window['Asc']['c_oAscSelectionType'] = window['Asc'].c_oAscSelectionType = c_oAscSelectionType;
+  prot = c_oAscCleanOptions;
+  prot['All'] = prot.All;
+  prot['Text'] = prot.Text;
+  prot['Format'] = prot.Format;
+  prot['Formula'] = prot.Formula;
+  prot['Comments'] = prot.Comments;
+  prot['Hyperlinks'] = prot.Hyperlinks;
   window['Asc']['c_oAscSelectionDialogType'] = window['Asc'].c_oAscSelectionDialogType = c_oAscSelectionDialogType;
+  prot = c_oAscSelectionDialogType;
+  prot['None'] = prot.None;
+  prot['FormatTable'] = prot.FormatTable;
+  prot['Chart'] = prot.Chart;
+  prot['DefinedName'] = prot.DefinedName;
+  prot['FormatTableChangeRange'] = prot.FormatTableChangeRange;
   window['Asc']['c_oAscHyperlinkType'] = window['Asc'].c_oAscHyperlinkType = c_oAscHyperlinkType;
+  prot = c_oAscHyperlinkType;
+  prot['WebLink'] = prot.WebLink;
+  prot['RangeLink'] = prot.RangeLink;
   window['Asc']['c_oAscMouseMoveType'] = window['Asc'].c_oAscMouseMoveType = c_oAscMouseMoveType;
+  prot = c_oAscMouseMoveType;
+  prot['None'] = prot.None;
+  prot['Hyperlink'] = prot.Hyperlink;
+  prot['Comment'] = prot.Comment;
+  prot['LockedObject'] = prot.LockedObject;
+  prot['ResizeColumn'] = prot.ResizeColumn;
+  prot['ResizeRow'] = prot.ResizeRow;
   window['Asc']['c_oAscMouseMoveLockedObjectType'] = window['Asc'].c_oAscMouseMoveLockedObjectType = c_oAscMouseMoveLockedObjectType;
+  prot = c_oAscMouseMoveLockedObjectType;
+  prot['None'] = prot.None;
+  prot['Range'] = prot.Range;
+  prot['TableProperties'] = prot.TableProperties;
+  prot['Sheet'] = prot.Sheet;
   window['Asc']['c_oAscPrintType'] = window['Asc'].c_oAscPrintType = c_oAscPrintType;
+  prot = c_oAscPrintType;
+  prot['ActiveSheets'] = prot.ActiveSheets;
+  prot['EntireWorkbook'] = prot.EntireWorkbook;
+  prot['Selection'] = prot.Selection;
   window['Asc']['c_oAscCustomAutoFilter'] = window['Asc'].c_oAscCustomAutoFilter = c_oAscCustomAutoFilter;
+  prot = c_oAscCustomAutoFilter;
+  prot['equals'] = prot.equals;
+  prot['isGreaterThan'] = prot.isGreaterThan;
+  prot['isGreaterThanOrEqualTo'] = prot.isGreaterThanOrEqualTo;
+  prot['isLessThan'] = prot.isLessThan;
+  prot['isLessThanOrEqualTo'] = prot.isLessThanOrEqualTo;
+  prot['doesNotEqual'] = prot.doesNotEqual;
+  prot['beginsWith'] = prot.beginsWith;
+  prot['doesNotBeginWith'] = prot.doesNotBeginWith;
+  prot['endsWith'] = prot.endsWith;
+  prot['doesNotEndWith'] = prot.doesNotEndWith;
+  prot['contains'] = prot.contains;
+  prot['doesNotContain'] = prot.doesNotContain;
   window['Asc']['c_oAscChangeFilterOptions'] = window['Asc'].c_oAscChangeFilterOptions = c_oAscChangeFilterOptions;
+  prot = c_oAscChangeFilterOptions;
+  prot['filter'] = prot.filter;
+  prot['style'] = prot.style;
   window['Asc']['c_oAscCellEditorState'] = window['Asc'].c_oAscCellEditorState = c_oAscCellEditorState;
+  prot = c_oAscCellEditorState;
+  prot['editEnd'] = prot.editEnd;
+  prot['editStart'] = prot.editStart;
+  prot['editEmptyCell'] = prot.editEmptyCell;
+  prot['editText'] = prot.editText;
+  prot['editFormula'] = prot.editFormula;
   window['Asc']['c_oAscChangeSelectionFormatTable'] = window['Asc'].c_oAscChangeSelectionFormatTable = c_oAscChangeSelectionFormatTable;
+  prot = c_oAscChangeSelectionFormatTable;
+  prot['all'] = prot.all;
+  prot['data'] = prot.data;
+  prot['row'] = prot.row;
+  prot['column'] = prot.column;
   window['Asc']['c_oAscChangeTableStyleInfo'] = window['Asc'].c_oAscChangeTableStyleInfo = c_oAscChangeTableStyleInfo;
+  prot = c_oAscChangeTableStyleInfo;
+  prot['columnFirst'] = prot.columnFirst;
+  prot['columnLast'] = prot.columnLast;
+  prot['columnBanded'] = prot.columnBanded;
+  prot['rowHeader'] = prot.rowHeader;
+  prot['rowTotal'] = prot.rowTotal;
+  prot['rowBanded'] = prot.rowBanded;
+  prot['filterButton'] = prot.filterButton;
   window['Asc']['c_oAscAutoFilterTypes'] = window['Asc'].c_oAscAutoFilterTypes = c_oAscAutoFilterTypes;
+  prot = c_oAscAutoFilterTypes;
+  prot['ColorFilter'] = prot.ColorFilter;
+  prot['CustomFilters'] = prot.CustomFilters;
+  prot['DynamicFilter'] = prot.DynamicFilter;
+  prot['Top10'] = prot.Top10;
+  prot['Filters'] = prot.Filters;
   window['Asc']['c_oAscFindLookIn'] = window['Asc'].c_oAscFindLookIn = c_oAscFindLookIn;
+  prot = c_oAscFindLookIn;
+  prot['Formulas'] = prot.Formulas;
+  prot['Value'] = prot.Value;
+  prot['Annotations'] = prot.Annotations;
   window['Asc']['c_oAscGetDefinedNamesList'] = window['Asc'].c_oAscGetDefinedNamesList = c_oAscGetDefinedNamesList;
+  prot = c_oAscGetDefinedNamesList;
+  prot['Worksheet'] = prot.Worksheet;
+  prot['WorksheetWorkbook'] = prot.WorksheetWorkbook;
+  prot['All'] = prot.All;
   window['Asc']['c_oAscDefinedNameReason'] = window['Asc'].c_oAscDefinedNameReason = c_oAscDefinedNameReason;
+  prot = c_oAscDefinedNameReason;
+  prot['WrongName'] = prot.WrongName;
+  prot['IsLocked'] = prot.IsLocked;
+  prot['Existed'] = prot.Existed;
+  prot['LockDefNameManager'] = prot.LockDefNameManager;
+  prot['NameReserved'] = prot.NameReserved;
+  prot['OK'] = prot.OK;
   window['Asc']['c_oAscPopUpSelectorType'] = window['Asc'].c_oAscPopUpSelectorType = c_oAscPopUpSelectorType;
+  prot = c_oAscPopUpSelectorType;
+  prot['None'] = prot.None;
+  prot['Func'] = prot.Func;
+  prot['Range'] = prot.Range;
+  prot['Table'] = prot.Table;
 })(window);

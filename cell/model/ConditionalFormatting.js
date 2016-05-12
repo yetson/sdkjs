@@ -24,21 +24,12 @@
 */
 "use strict";
 
-/*
- * Author: Alexander.Trofimov
- * Date: 30.10.12
- */
-
-(	/**
- * @param {Window} window
- * @param {undefined} undefined
- */
-	function (window, undefined) {
+(function (window, undefined) {
 	/*
 	 * Import
 	 * -----------------------------------------------------------------------------
 	 */
-	var asc				= window["Asc"];
+	var FT_Common = AscFonts.FT_Common;
 
 	/**
 	 * Отвечает за условное форматирование
@@ -258,19 +249,20 @@
 		var g = (this.g1 + ((FT_Common.IntToUInt(this.g2 - this.g1) * indexColor) >> this.base_shift)) & 0xFF;
 		var b = (this.b1 + ((FT_Common.IntToUInt(this.b2 - this.b1) * indexColor) >> this.base_shift)) & 0xFF;
 		//console.log("index=" + indexColor + ": r=" + r + " g=" + g + " b=" + b);
-		return new RgbColor((r << 16) + (g << 8) + b);
+		return new AscCommonExcel.RgbColor((r << 16) + (g << 8) + b);
 	};
 
 	/*
 	 * Export
 	 * -----------------------------------------------------------------------------
 	 */
-	asc.CConditionalFormatting = CConditionalFormatting;
-	asc.CConditionalFormattingRule = CConditionalFormattingRule;
-	asc.CColorScale = CColorScale;
-	asc.CDataBar = CDataBar;
-	asc.CFormulaCF = CFormulaCF;
-	asc.CIconSet = CIconSet;
-	asc.CConditionalFormatValueObject = CConditionalFormatValueObject;
-	asc.CGradient = CGradient;
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window['AscCommonExcel'].CConditionalFormatting = CConditionalFormatting;
+	window['AscCommonExcel'].CConditionalFormattingRule = CConditionalFormattingRule;
+	window['AscCommonExcel'].CColorScale = CColorScale;
+	window['AscCommonExcel'].CDataBar = CDataBar;
+	window['AscCommonExcel'].CFormulaCF = CFormulaCF;
+	window['AscCommonExcel'].CIconSet = CIconSet;
+	window['AscCommonExcel'].CConditionalFormatValueObject = CConditionalFormatValueObject;
+	window['AscCommonExcel'].CGradient = CGradient;
 })(window);

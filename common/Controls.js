@@ -24,6 +24,10 @@
 */
 "use strict";
 
+(function(window, undefined){
+    // Import
+    var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
+
 function CBounds()
 {
     this.L      = 0;    // ����� �������
@@ -439,3 +443,13 @@ function CreateControl(name)
     ctrl.HtmlElement = document.getElementById(name);
     return ctrl;
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].g_anchor_left = g_anchor_left;
+    window['AscCommon'].g_anchor_top = g_anchor_top;
+    window['AscCommon'].g_anchor_right = g_anchor_right;
+    window['AscCommon'].g_anchor_bottom = g_anchor_bottom;
+    window['AscCommon'].CreateControlContainer = CreateControlContainer;
+    window['AscCommon'].CreateControl = CreateControl;
+})(window);

@@ -24,6 +24,11 @@
 */
 "use strict";
 
+(function(window, undefined){
+    // Import
+    var CMatrix = AscCommon.CMatrix;
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
+
 function MoveShapeImageTrack(originalObject)
 {
     this.originalObject = originalObject;
@@ -35,16 +40,24 @@ function MoveShapeImageTrack(originalObject)
 
     if(!originalObject.isChart())
     {
-        this.brush = originalObject.brush;
+        if(originalObject.blipFill)
+        {
+            this.brush = new AscFormat.CUniFill();
+            this.brush.fill = originalObject.blipFill;
+        }
+        else
+        {
+            this.brush = originalObject.brush;
+        }
         this.pen = originalObject.pen;
     }
     else
     {
-        var pen_brush = CreatePenBrushForChartTrack();
+        var pen_brush = AscFormat.CreatePenBrushForChartTrack();
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(!(this.originalObject.getObjectType() === historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new AscFormat.OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
 
     this.groupInvertMatrix = null;
     if(this.originalObject.group)
@@ -91,13 +104,13 @@ function MoveShapeImageTrack(originalObject)
         {
             global_MatrixTransformer.MultiplyAppend(this.transform, this.originalObject.group.transform);
         }
-        if(isRealNumber(pageIndex))
+        if(AscFormat.isRealNumber(pageIndex))
             this.pageIndex = pageIndex;
     };
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -112,7 +125,7 @@ function MoveShapeImageTrack(originalObject)
                 this.originalObject.selectStartPage = this.pageIndex;
         }
         var scale_coefficients, ch_off_x, ch_off_y;
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         if(this.originalObject.group)
         {
             scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
@@ -143,7 +156,7 @@ function MoveShapeImageTrack(originalObject)
 
 MoveShapeImageTrack.prototype.getBounds = function()
 {
-    var boundsChecker = new  CSlideBoundsChecker();
+    var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker);
     var tr = this.transform;
     var arr_p_x = [];
@@ -186,17 +199,17 @@ function MoveShapeImageTrackInGroup(originalObject)
     }
     else
     {
-        var pen_brush = CreatePenBrushForChartTrack();
+        var pen_brush = AscFormat.CreatePenBrushForChartTrack();
         this.brush = pen_brush.brush;
         this.pen = pen_brush.pen;
     }
-    this.overlayObject = new OverlayObject(!(this.originalObject.getObjectType() === historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
+    this.overlayObject = new AscFormat.OverlayObject(!(this.originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace)&& this.originalObject.spPr && this.originalObject.spPr.geometry, this.originalObject.extX, this.originalObject.extY, this.brush, this.pen, this.transform);
     this.inv = global_MatrixTransformer.Invert(originalObject.group.transform);
     this.inv.tx = 0;
     this.inv.ty = 0;
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -240,7 +253,7 @@ function MoveShapeImageTrackInGroup(originalObject)
         var scale_scale_coefficients = this.originalObject.group.getResultScaleCoefficients();
         var xfrm = this.originalObject.group.spPr.xfrm;
 
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         var shape_xfrm = this.originalObject.spPr.xfrm;
         shape_xfrm.setOffX(this.x/scale_scale_coefficients.cx + xfrm.chOffX);
         shape_xfrm.setOffY(this.y/scale_scale_coefficients.cy + xfrm.chOffY);
@@ -265,7 +278,7 @@ function MoveGroupTrack(originalObject)
         var gr_obj_transform_copy = arr_graphic_objects[i].transform.CreateDublicate();
         global_MatrixTransformer.MultiplyAppend(gr_obj_transform_copy, group_invert_transform);
         this.arrTransforms2[i] = gr_obj_transform_copy;
-        this.overlayObjects[i] = new OverlayObject(!( arr_graphic_objects[i].getObjectType() === historyitem_type_ChartSpace)&& arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
+        this.overlayObjects[i] = new AscFormat.OverlayObject(!( arr_graphic_objects[i].getObjectType() === AscDFH.historyitem_type_ChartSpace)&& arr_graphic_objects[i].spPr.geometry, arr_graphic_objects[i].extX, arr_graphic_objects[i].extY,
             arr_graphic_objects[i].brush,  arr_graphic_objects[i].pen, new CMatrix());
     }
 
@@ -303,7 +316,7 @@ function MoveGroupTrack(originalObject)
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -315,7 +328,7 @@ function MoveGroupTrack(originalObject)
 
     this.getBounds = function()
     {
-        var bounds_checker = new CSlideBoundsChecker();
+        var bounds_checker = new AscFormat.CSlideBoundsChecker();
         for(var i = 0; i < this.overlayObjects.length; ++i)
         {
             this.overlayObjects[i].draw(bounds_checker);
@@ -334,7 +347,7 @@ function MoveGroupTrack(originalObject)
             this.x = 0;
             this.y = 0;
         }
-        CheckSpPrXfrm(this.originalObject);
+        AscFormat.CheckSpPrXfrm(this.originalObject);
         var xfrm = this.originalObject.spPr.xfrm;
         xfrm.setOffX(this.x);
         xfrm.setOffY(this.y);
@@ -382,3 +395,10 @@ function MoveComment(comment)
         this.comment.setPosition(this.x, this.y);
     };
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].MoveShapeImageTrack = MoveShapeImageTrack;
+    window['AscFormat'].MoveGroupTrack = MoveGroupTrack;
+    window['AscFormat'].MoveComment = MoveComment;
+})(window);

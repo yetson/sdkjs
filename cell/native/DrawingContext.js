@@ -29,7 +29,7 @@
  * Author: Dmitry.Sokolov@avsmedia.net
  * Date:   Nov 21, 2011
  */
-(function (/** jQuery */$, /** Window */window, undefined) {
+(function (/** Window */window, undefined) {
 
     /*
      * Import
@@ -37,8 +37,6 @@
      */
 
     var asc = window["Asc"];
-    var asc_round = asc.round;
-    var asc_floor = asc.floor;
 
     function colorObjToAscColor(color) {
         var oRes = null;
@@ -46,7 +44,7 @@
         var g = color.getG();
         var b = color.getB();
         var bTheme = false;
-        if(color instanceof ThemeColor && null != color.theme)
+        if(color instanceof AscCommonExcel.ThemeColor && null != color.theme)
         {
             var array_colors_types = [6, 15, 7, 16, 0, 1, 2, 3, 4, 5];
             var themePresentation = array_colors_types[color.theme];
@@ -54,8 +52,8 @@
             if(null != color.tint)
                 tintExcel = color.tint;
             var tintPresentation = 0;
-            var basecolor = g_oColorManager.getThemeColor(color.theme);
-            var oThemeColorTint = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+            var basecolor = AscCommonExcel.g_oColorManager.getThemeColor(color.theme);
+            var oThemeColorTint = AscCommonExcel.g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
             if(null != oThemeColorTint)
             {
                 for(var i = 0 , length = oThemeColorTint.length; i < length; ++i)
@@ -129,20 +127,6 @@
         return (y + p + a) / ppi * 72;
     }
 
-    function deg2rad(deg){
-        return deg * Math.PI / 180.0;
-    }
-
-    function rad2deg(rad){
-        return rad * 180.0 / Math.PI;
-    }
-
-
-
-    /** @const */
-    var MATRIX_ORDER_PREPEND = 0,
-        MATRIX_ORDER_APPEND  = 1;
-
     /**
      * @constructor
      */
@@ -194,9 +178,9 @@
     };
 
     Matrix.prototype.multiply = function (matrix, order) {
-        if (MATRIX_ORDER_PREPEND === order) {
+        if (AscCommon.MATRIX_ORDER_PREPEND === order) {
             var m = matrix.clone();
-            m.multiply(this, MATRIX_ORDER_APPEND);
+            m.multiply(this, AscCommon.MATRIX_ORDER_APPEND);
             this.copyFrom(m);
         } else {
             var t0   = this.sx  * matrix.sx  + this.shy * matrix.shx;
@@ -227,7 +211,7 @@
 
     Matrix.prototype.rotate = function (a, order) {
         var m = new Matrix();
-        var rad = deg2rad(a);
+        var rad = AscCommon.deg2rad(a);
         m.sx  = Math.cos(rad);
         m.shx = Math.sin(rad);
         m.shy = -Math.sin(rad);
@@ -279,7 +263,7 @@
         this.transformPoint(x1, y1);
         this.transformPoint(x2, y2);
         var a = Math.atan2(y2-y1, x2-x1);
-        return rad2deg(a);
+        return AscCommon.rad2deg(a);
     };
 
     /**
@@ -592,10 +576,10 @@
     DrawingContext.prototype.changeZoom = function (factor) {
         if (factor <= 0) {throw "Scale factor must be >= 0";}
 
-        factor = asc_round(factor * 1000) / 1000;
+        factor = Asc.round(factor * 1000) / 1000;
 
-        this.ppiX = asc_round(this.ppiX / this.scaleFactor * factor * 1000) / 1000;
-        this.ppiY = asc_round(this.ppiY / this.scaleFactor * factor * 1000) / 1000;
+        this.ppiX = Asc.round(this.ppiX / this.scaleFactor * factor * 1000) / 1000;
+        this.ppiY = Asc.round(this.ppiY / this.scaleFactor * factor * 1000) / 1000;
         this.scaleFactor = factor;
 
         // reinitialize
@@ -611,8 +595,8 @@
      * @param {Number} height  New height in current units
      */
     DrawingContext.prototype.resetSize = function (width, height) {
-        var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
-            h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
+        var w = Asc.round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
+            h = Asc.round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
         if (w !== this.canvas.width) {
             this.canvas.width = w;
         }
@@ -628,8 +612,8 @@
      * @param {Number} height  New height in current units
      */
     DrawingContext.prototype.expand = function (width, height) {
-        var w = asc_round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
-            h = asc_round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
+        var w = Asc.round( width  * getCvtRatio(this.units, 0/*px*/, this.ppiX) ),
+            h = Asc.round( height * getCvtRatio(this.units, 0/*px*/, this.ppiY) );
         if (w > this.canvas.width) {
             this.canvas.width = w;
         }
@@ -743,7 +727,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+     * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setFillStyle = function (val) {
@@ -763,7 +747,7 @@
     };
 
     /**
-     * @param {RgbColor || ThemeColor || AscCommon.CColor} val
+     * @param {AscCommonExcel.RgbColor || AscCommonExcel.ThemeColor || AscCommon.CColor} val
      * @returns {DrawingContext}
      */
     DrawingContext.prototype.setStrokeStyle = function (val) {
@@ -877,18 +861,18 @@
         italic = true === font.Italic;
         bold   = true === font.Bold;
 
-        fontStyle = FontStyle.FontStyleRegular;
+        fontStyle = AscFonts.FontStyle.FontStyleRegular;
         if ( !italic && bold )
-            fontStyle = FontStyle.FontStyleBold;
+            fontStyle = AscFonts.FontStyle.FontStyleBold;
         else if ( italic && !bold )
-            fontStyle = FontStyle.FontStyleItalic;
+            fontStyle = AscFonts.FontStyle.FontStyleItalic;
         else if ( italic && bold )
-            fontStyle = FontStyle.FontStyleBoldItalic;
+            fontStyle = AscFonts.FontStyle.FontStyleBoldItalic;
 
         var _fontinfo, _info, flag, napi_fontInfo;
 
         if (angle && 0 != angle) {
-            _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
+            _fontinfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
 
             flag = 0;
@@ -913,7 +897,7 @@
 
         } else {
 
-            _fontinfo = g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
+            _fontinfo = AscFonts.g_fontApplication.GetFontInfo(this.font.FontFamily.Name, fontStyle, this.LastFontOriginInfo);
             _info = GetLoadInfoForMeasurer(_fontinfo, fontStyle);
 
             flag = 0;
@@ -993,7 +977,7 @@
                 }
             };
 
-            w += asc_round(tmp.fAdvanceX); // asc_round - убрали что бы текст не скакал
+            w += Asc.round(tmp.fAdvanceX); // asc_round - убрали что бы текст не скакал
         }
         w2 = w - tmp.fAdvanceX + tmp.oBBox.fMaxX - tmp.oBBox.fMinX + 1;
         return this._calcTextMetrics(w * r, w2 * r, fm, r);
@@ -1005,8 +989,8 @@
 
         if ( !(nW > 0 && nH > 0) ) {return;}
 
-        var nX = asc_floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
-        var nY = asc_floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
+        var nX = Asc.floor(fmgr.m_oGlyphString.m_fX + pGlyph.fX + pGlyph.oBitmap.nX);
+        var nY = Asc.floor(fmgr.m_oGlyphString.m_fY + pGlyph.fY - pGlyph.oBitmap.nY);
 
         var _r = this.fillColor.r;
         var _g = this.fillColor.g;
@@ -1059,7 +1043,7 @@
 
             this.nctx["PD_FillText"](_x, _y, lUnicode);
 
-            _x += asc_round(g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
+            _x += Asc.round(g_oTextMeasurer.Measurer["MeasureChar"](lUnicode));
         }
 
         return this;
@@ -1307,27 +1291,27 @@
             _x = this._mft.transformPointX(x, y),
             _y = this._mft.transformPointY(x, y);
         return {
-            x: asc_round(_x),
-            y: asc_round(_y),
-            w: wh ? asc_round(this._mft.transformPointX(x2, y2) - _x) : undefined,
-            h: wh ? asc_round(this._mft.transformPointY(x2, y2) - _y) : undefined
+            x: Asc.round(_x),
+            y: Asc.round(_y),
+            w: wh ? Asc.round(this._mft.transformPointX(x2, y2) - _x) : undefined,
+            h: wh ? Asc.round(this._mft.transformPointY(x2, y2) - _y) : undefined
         };
     };
 
     DrawingContext.prototype._calcMFT = function () {
         this._mft = this._mct.clone();
-        this._mft.multiply(this._mbt, MATRIX_ORDER_PREPEND);
-        this._mft.multiply(this._mt, MATRIX_ORDER_PREPEND);
+        this._mft.multiply(this._mbt, AscCommon.MATRIX_ORDER_PREPEND);
+        this._mft.multiply(this._mt, AscCommon.MATRIX_ORDER_PREPEND);
 
         this._mift = this._mt.clone();
         this._mift.invert();
-        this._mift.multiply(this._mft, MATRIX_ORDER_PREPEND);
+        this._mift.multiply(this._mft, AscCommon.MATRIX_ORDER_PREPEND);
     };
 
     /**
      * @param {Number} w         Ширина текста
      * @param {Number} wBB       Ширина Bound Box текста
-     * @param {CFontManager} fm  Объект CFontManager для получения метрик шрифта
+     * @param {AscFonts.CFontManager} fm  Объект AscFonts.CFontManager для получения метрик шрифта
      * @param {Number} r         Коэффициент перевода pt -> в текущие единицы измерения (this.units)
      * @return {TextMetrics}
      */
@@ -1355,4 +1339,4 @@
     window["Asc"].DrawingContext   = DrawingContext;
     window["Asc"].Matrix           = Matrix;
 
-})(jQuery, window);
+})(window);

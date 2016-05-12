@@ -24,16 +24,11 @@
 */
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 13.12.11
- * Time: 14:51
- */
-
 // Import
 var hdrftr_Header = AscCommon.hdrftr_Header;
 var hdrftr_Footer = AscCommon.hdrftr_Footer;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 //-----------------------------------------------------------------------------------
 // Класс работающий с одним колонтитулом
@@ -1063,7 +1058,7 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------    
     Get_ParentObject_or_DocumentPos : function()
     {
-        return { Type : historyrecalctype_HdrFtr, Data : this };
+        return { Type : AscDFH.historyitem_recalctype_HdrFtr, Data : this };
     },
 
     Refresh_RecalcData : function(Data)
@@ -1078,7 +1073,7 @@ CHeaderFooter.prototype =
         this.RecalcInfo.SectPr     = {};
         this.RecalcInfo.CurPage    = -1;
         
-        History.RecalcData_Add( { Type : historyrecalctype_HdrFtr, Data : this } );
+        History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_HdrFtr, Data : this } );
     },
     
     Refresh_RecalcData_BySection : function(SectPr)
@@ -1152,7 +1147,7 @@ CHeaderFooter.prototype =
 //-----------------------------------------------------------------------------------
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_HdrFtr );
+        Writer.WriteLong( AscDFH.historyitem_type_HdrFtr );
 
         // String   : Id
         // Long     : Type
@@ -2074,7 +2069,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint(historydescription_Document_AddHeader);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_AddHeader);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Header, PageIndex );
                     this.LogicDocument.Recalculate();
@@ -2093,7 +2088,7 @@ CHeaderFooterController.prototype =
                 {
                     // Меняем старый режим редактирования, чтобы при Undo/Redo возвращаться в режим редактирования документа
                     this.LogicDocument.CurPos.Type = docpostype_Content;
-                    History.Create_NewPoint(historydescription_Document_AddFooter);
+                    History.Create_NewPoint(AscDFH.historydescription_Document_AddFooter);
                     this.LogicDocument.CurPos.Type = docpostype_HdrFtr;
                     HdrFtr = this.LogicDocument.Create_SectionHdrFtr( hdrftr_Footer, PageIndex );
                     this.LogicDocument.Recalculate();
@@ -2135,7 +2130,7 @@ CHeaderFooterController.prototype =
             if ( true === bActivate )
             {
                 var NewMouseEvent = {};
-                NewMouseEvent.Type       = g_mouse_event_type_up;
+                NewMouseEvent.Type       = AscCommon.g_mouse_event_type_up;
                 NewMouseEvent.ClickCount = 1;
                 this.CurHdrFtr.Selection_SetEnd( X, Y, PageIndex, NewMouseEvent );
                 this.CurHdrFtr.Content.Cursor_MoveToStartPos(false);
@@ -2447,3 +2442,8 @@ function CHdrFtrPage()
     this.Header = null;
     this.Footer = null;
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CHeaderFooter = CHeaderFooter;
+window['AscCommonWord'].CHeaderFooterController = CHeaderFooterController;

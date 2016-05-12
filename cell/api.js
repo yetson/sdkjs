@@ -30,11 +30,7 @@ var editor;
  * @param {undefined} undefined
  */
   function(window, undefined) {
-
   var asc = window["Asc"];
-  var asc_applyFunction = asc.applyFunction;
-  var asc_CCollaborativeEditing = asc.CCollaborativeEditing;
-  var asc_CAdjustPrint = asc.asc_CAdjustPrint;
   var prot;
 
   var c_oAscAdvancedOptionsAction = AscCommon.c_oAscAdvancedOptionsAction;
@@ -47,8 +43,6 @@ var editor;
   var parserHelp = AscCommon.parserHelp;
   var g_oIdCounter = AscCommon.g_oIdCounter;
   var g_oTableId = AscCommon.g_oTableId;
-  var oNumFormatCache = AscCommon.oNumFormatCache;
-  var g_aCultureInfos = AscCommon.g_aCultureInfos;
 
   var c_oAscLockTypeElem = AscCommonExcel.c_oAscLockTypeElem;
 
@@ -58,6 +52,8 @@ var editor;
   var c_oAscAdvancedOptionsID = asc.c_oAscAdvancedOptionsID;
   var c_oAscAsyncActionType = asc.c_oAscAsyncActionType;
 
+  var History = null;
+
 
   /**
    *
@@ -66,25 +62,25 @@ var editor;
    * @param eventsHandlers
    * @constructor
    * @returns {spreadsheet_api}
-   * @extends {baseEditorsApi}
+   * @extends {AscCommon.baseEditorsApi}
    */
   function spreadsheet_api(name, inputName, eventsHandlers) {
-    spreadsheet_api.superclass.constructor.call(this, name);
-    this.editorId = AscCommon.c_oEditorId.Spreadsheet;
+    spreadsheet_api.superclass.constructor.call(this, name, AscCommon.c_oEditorId.Spreadsheet);
 
     /************ private!!! **************/
     this.topLineEditorName = inputName;
     this.topLineEditorElement = null;
 
-    this.controller = new asc.asc_CEventsController();
+    this.controller = null;
 
-    this.handlers = new asc.asc_CHandlersList(eventsHandlers);
+    this.handlers = new AscCommonExcel.asc_CHandlersList(eventsHandlers);
     // Вид печати
     this.adjustPrint = null;
 
     this.fontRenderingMode = Asc.c_oAscFontRenderingModeType.hintingAndSubpixeling;
     this.wb = null;
     this.wbModel = null;
+    this.tmpLocale = null;
 
     this.documentFormatSave = c_oAscFileType.XLSX;
 
@@ -130,15 +126,15 @@ var editor;
     this._init();
     return this;
   }
-  AscCommon.extendClass(spreadsheet_api, baseEditorsApi);
+  AscCommon.extendClass(spreadsheet_api, AscCommon.baseEditorsApi);
 
   spreadsheet_api.prototype.sendEvent = function() {
     this.handlers.trigger.apply(this.handlers, arguments);
   };
 
   spreadsheet_api.prototype._init = function() {
+    spreadsheet_api.superclass._init.call(this);
     this.topLineEditorElement = document.getElementById(this.topLineEditorName);
-    this.formulasList = AscCommonExcel.getFormulasInfo();
     // ToDo нужно ли это
     asc['editor'] = ( asc['editor'] || this );
     AscCommon.AscBrowser.checkZoom();
@@ -150,7 +146,7 @@ var editor;
     var arr_colors = new Array(10);
     var _count = arr_colors.length;
     for (var i = 0; i < _count; ++i) {
-      var color = g_oColorManager.getThemeColor(i);
+      var color = AscCommonExcel.g_oColorManager.getThemeColor(i);
       arr_colors[i] = new CColor(color.getR(), color.getG(), color.getB());
     }
 
@@ -183,11 +179,12 @@ var editor;
   spreadsheet_api.prototype.asc_SendControlColors = function() {
     var standart_colors = null;
     if (!this.IsSendStandartColors) {
-      var _c_s = g_oStandartColors.length;
+      var standartColors = AscCommon.g_oStandartColors;
+      var _c_s = standartColors.length;
       standart_colors = new Array(_c_s);
 
       for (var i = 0; i < _c_s; ++i) {
-        standart_colors[i] = new CColor(g_oStandartColors[i]["R"], g_oStandartColors[i]["G"], g_oStandartColors[i]["B"]);
+        standart_colors[i] = new CColor(standartColors[i].R, standartColors[i].G, standartColors[i].B);
       }
 
       this.IsSendStandartColors = true;
@@ -199,11 +196,11 @@ var editor;
     var _cur_index = 0;
 
     for (var i = 0; i < _count; ++i) {
-      var basecolor = g_oColorManager.getThemeColor(i);
-      var aTints = g_oThemeColorsDefaultModsSpreadsheet[GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
+      var basecolor = AscCommonExcel.g_oColorManager.getThemeColor(i);
+      var aTints = AscCommonExcel.g_oThemeColorsDefaultModsSpreadsheet[AscCommon.GetDefaultColorModsIndex(basecolor.getR(), basecolor.getG(), basecolor.getB())];
       for (var j = 0, length = aTints.length; j < length; ++j) {
         var tint = aTints[j];
-        var color = g_oColorManager.getThemeColor(i, tint);
+        var color = AscCommonExcel.g_oColorManager.getThemeColor(i, tint);
         _ret_array[_cur_index] = new CColor(color.getR(), color.getG(), color.getB());
         _cur_index++;
       }
@@ -219,47 +216,48 @@ var editor;
     var _c = null;
 
     // user scheme
-    var _count_defaults = g_oUserColorScheme.length;
+    var oColorScheme = AscCommon.g_oUserColorScheme;
+    var _count_defaults = oColorScheme.length;
     for (var i = 0; i < _count_defaults; ++i) {
-      var _obj = g_oUserColorScheme[i];
+      var _obj = oColorScheme[i];
       infos[_index] = new AscCommon.CAscColorScheme();
-      infos[_index].Name = _obj["name"];
+      infos[_index].Name = _obj.name;
 
-      _c = _obj["dk1"];
-      infos[_index].Colors[0] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.dk1;
+      infos[_index].Colors[0] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["lt1"];
-      infos[_index].Colors[1] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.lt1;
+      infos[_index].Colors[1] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["dk2"];
-      infos[_index].Colors[2] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.dk2;
+      infos[_index].Colors[2] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["lt2"];
-      infos[_index].Colors[3] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.lt2;
+      infos[_index].Colors[3] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent1"];
-      infos[_index].Colors[4] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent1;
+      infos[_index].Colors[4] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent2"];
-      infos[_index].Colors[5] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent2;
+      infos[_index].Colors[5] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent3"];
-      infos[_index].Colors[6] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent3;
+      infos[_index].Colors[6] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent4"];
-      infos[_index].Colors[7] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent4;
+      infos[_index].Colors[7] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent5"];
-      infos[_index].Colors[8] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent5;
+      infos[_index].Colors[8] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["accent6"];
-      infos[_index].Colors[9] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.accent6;
+      infos[_index].Colors[9] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["hlink"];
-      infos[_index].Colors[10] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.hlink;
+      infos[_index].Colors[10] = new CColor(_c.R, _c.G, _c.B);
 
-      _c = _obj["folHlink"];
-      infos[_index].Colors[11] = new CColor(_c["R"], _c["G"], _c["B"]);
+      _c = _obj.folHlink;
+      infos[_index].Colors[11] = new CColor(_c.R, _c.G, _c.B);
 
       ++_index;
     }
@@ -331,9 +329,9 @@ var editor;
 
   spreadsheet_api.prototype.asc_getLocaleExample = function(val, number, date) {
     var res = '';
-    var cultureInfo = g_aCultureInfos[val];
+    var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (cultureInfo) {
-      var numFormatDigit = oNumFormatCache.get('#,##0.00');
+      var numFormatDigit = AscCommon.oNumFormatCache.get('#,##0.00');
 
       var dateElems = [];
       for (var i = 0; i < cultureInfo.ShortDatePattern.length; ++i) {
@@ -354,7 +352,7 @@ var editor;
       if (cultureInfo.AMDesignator && cultureInfo.PMDesignator) {
         formatDate += " AM/PM";
       }
-      var numFormatDate = oNumFormatCache.get(formatDate);
+      var numFormatDate = AscCommon.oNumFormatCache.get(formatDate);
 
       res += numFormatDigit.formatToChart(number, cultureInfo);
       res += '; ';
@@ -363,10 +361,9 @@ var editor;
     return res;
   };
   spreadsheet_api.prototype.asc_getLocaleCurrency = function(val) {
-    var res = '';
-    var cultureInfo = g_aCultureInfos[val];
+    var cultureInfo = AscCommon.g_aCultureInfos[val];
     if (!cultureInfo) {
-      cultureInfo = g_aCultureInfos[1033];
+      cultureInfo = AscCommon.g_aCultureInfos[1033];
     }
     var prefixs = ['_ ', '_-', '_(', '_)'];
     var prefix = prefixs[0];
@@ -465,11 +462,18 @@ var editor;
     return positiveFormat + ';' + negativeFormat + ';' + nullFormat + ';' + textFormat;
   };
   spreadsheet_api.prototype.asc_setLocale = function(val) {
+    if (!this.isLoadFullApi) {
+      this.tmpLocale = val;
+      return;
+    }
+    if (null === val) {
+      return;
+    }
     AscCommon.setCurrentCultureInfo(val);
     parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSeparator);
 	  if (this.wbModel) {
       AscCommon.oGeneralEditFormatCache.cleanCache();
-      oNumFormatCache.cleanCache();
+      AscCommon.oNumFormatCache.cleanCache();
       this.wbModel.rebuildColors();
       if (this.IsSendDocumentLoadCompleate) {
         this._onUpdateAfterApplyChanges();
@@ -479,19 +483,14 @@ var editor;
 
   spreadsheet_api.prototype.asc_LoadEmptyDocument = function() {
     this.CoAuthoringApi.auth(this.getViewMode());
-
-    var emptyWorkbook = getEmptyWorkbook() + "";
-    if (emptyWorkbook.length && (Asc.c_oSerFormat.Signature === emptyWorkbook.substring(0, Asc.c_oSerFormat.Signature.length))) {
-      this.isChartEditor = true;
-      this._startOpenDocument(emptyWorkbook);
-    }
+    this.onEndLoadFile(true);
   };
 
   spreadsheet_api.prototype._openDocument = function(data) {
-    var wb = new Workbook(this.handlers, this);
+    var wb = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(wb);
     this.wbModel = wb;
-    var oBinaryFileReader = new Asc.BinaryFileReader();
+    var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
     oBinaryFileReader.Read(data, wb);
     g_oIdCounter.Set_Load(false);
     return wb;
@@ -499,7 +498,7 @@ var editor;
 
   spreadsheet_api.prototype.initGlobalObjects = function(wbModel) {
     // History & global counters
-    History = new CHistory(wbModel);
+    History.init(wbModel);
 
     g_oTableId.init();
     AscCommonExcel.g_oUndoRedoCell = new AscCommonExcel.UndoRedoCell(wbModel);
@@ -517,7 +516,7 @@ var editor;
     }
 
     if (c_oAscFileType.PDF === typeFile) {
-      this.adjustPrint = new asc_CAdjustPrint();
+      this.adjustPrint = new Asc.asc_CAdjustPrint();
     }
     this._asc_downloadAs(typeFile, c_oAscAsyncAction.DownloadAs, {downloadType: bIsDownloadEvent ? DownloadType.Download: DownloadType.None});
   };
@@ -551,7 +550,7 @@ var editor;
       return;
     }
 
-    this.adjustPrint = adjustPrint ? adjustPrint : new asc_CAdjustPrint();
+    this.adjustPrint = adjustPrint ? adjustPrint : new Asc.asc_CAdjustPrint();
     this._asc_downloadAs(c_oAscFileType.PDF, c_oAscAsyncAction.Print, {downloadType: bIsDownloadEvent ? DownloadType.Print: DownloadType.None});
   };
 
@@ -729,10 +728,14 @@ var editor;
   };
 
   spreadsheet_api.prototype.getViewMode = function() {
-    return this.controller.getViewerMode();
+    return this.isViewMode;
   };
 
   spreadsheet_api.prototype.asc_setViewMode = function(isViewerMode) {
+    if (!this.isLoadFullApi) {
+      this.isViewMode = isViewerMode;
+      return;
+    }
     this.controller.setViewerMode(isViewerMode);
     if (this.collaborativeEditing) {
       this.collaborativeEditing.setViewerMode(isViewerMode);
@@ -782,7 +785,6 @@ var editor;
             "userid": this.documentUserId,
             "format": this.documentFormat,
             "vkey": this.documentVKey,
-            "editorid": this.editorId,
             "c": "reopen",
             "url": this.documentUrl,
             "title": this.documentTitle,
@@ -828,7 +830,7 @@ var editor;
         }
         var cp = JSON.parse(result);
         cp['encodings'] = AscCommon.getEncodingParams();
-        t.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
+        t.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), t.advancedOptionsAction);
       });
     } else {
       t.handlers.trigger("asc_onError", c_oAscError.ID.Unknown, c_oAscError.Level.NoCritical);
@@ -836,27 +838,27 @@ var editor;
   };
   spreadsheet_api.prototype._onOpenCommand = function(data) {
     var t = this;
-    AscCommon.openFileCommand(data, this.documentUrlChanges, Asc.c_oSerFormat.Signature, function(error, result) {
+    AscCommon.openFileCommand(data, this.documentUrlChanges, AscCommon.c_oSerFormat.Signature, function(error, result) {
       if (error || !result.bSerFormat) {
         var oError = {returnCode: c_oAscError.Level.Critical, val: c_oAscError.ID.Unknown};
         t.handlers.trigger("asc_onError", oError.val, oError.returnCode);
         return;
       }
 
-      t._startOpenDocument(result.data);
+      t.onEndLoadFile(result.data);
     });
   };
 
   spreadsheet_api.prototype._OfflineAppDocumentEndLoad = function() {
     var data = getTestWorkbook();
     var sData = data + "";
-    if (Asc.c_oSerFormat.Signature === sData.substring(0, Asc.c_oSerFormat.Signature.length)) {
-      this._startOpenDocument(sData);
+    if (AscCommon.c_oSerFormat.Signature === sData.substring(0, AscCommon.c_oSerFormat.Signature.length)) {
+      this.openDocument(sData);
     }
   };
 
   spreadsheet_api.prototype._asc_save2 = function() {
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     var dataContainer = {data: null, part: null, index: 0, count: 0};
     dataContainer.data = oBinaryFileWriter.Write();
     var filetype = 0x1002;
@@ -917,7 +919,7 @@ var editor;
     }
     if (c_oAscFileType.PDF === sFormat) {
       var printPagesData = this.wb.calcPagesPrint(this.adjustPrint);
-      var pdf_writer = new CPdfPrinter();
+      var pdf_writer = new AscCommonExcel.CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, printPagesData);
 
       dataContainer.data = pdf_writer.DocumentRenderer.Memory.GetBase64Memory();
@@ -928,11 +930,11 @@ var editor;
       }
       var cp = {'delimiter': AscCommon.c_oAscCsvDelimiter.Comma, 'codepage': AscCommon.c_oAscCodePageUtf8, 'encodings': AscCommon.getEncodingParams()};
       this.downloadType = options.downloadType;
-      this.handlers.trigger("asc_onAdvancedOptions", new asc.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
+      this.handlers.trigger("asc_onAdvancedOptions", new AscCommon.asc_CAdvancedOptions(c_oAscAdvancedOptionsID.CSV, cp), this.advancedOptionsAction);
       return;
     } else {
       this.wb._initCommentsToSave();
-      var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+      var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
       if (c_oAscFileType.CSV === sFormat) {
         if (options.CSVOptions instanceof asc.asc_CCSVAdvancedOptions) {
           oAdditionalData["codepage"] = options.CSVOptions.asc_getCodePage();
@@ -1030,6 +1032,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_registerCallback = function(name, callback, replaceOldCallback) {
     this.handlers.add(name, callback, replaceOldCallback);
+    return;
 
     /*
      Не самая хорошая схема для отправки эвентов:
@@ -1042,21 +1045,6 @@ var editor;
     } else if (null !== this._gui_color_schemes && "asc_onSendThemeColorSchemes" === name) {
       this.handlers.trigger("asc_onSendThemeColorSchemes", this._gui_color_schemes);
       this._gui_color_schemes = null;
-    } else if ("asc_onInitEditorShapes" === name) {
-      this.handlers.trigger("asc_onInitEditorShapes", g_oAutoShapesGroups, g_oAutoShapesTypes);
-    } else if ("asc_onInitEditorTextArts" === name) {
-      this.handlers.trigger("asc_onInitEditorTextArts", [g_oPresetTxWarpGroups, g_PresetTxWarpTypes]);
-    } else if ("asc_onInitStandartTextures" === name) {
-      var _count = g_oUserTexturePresets.length;
-      var arr = new Array(_count);
-      for (var i = 0; i < _count; ++i) {
-        arr[i] = new AscCommon.asc_CTexture();
-        arr[i].Id = i;
-        arr[i].Image = g_oUserTexturePresets[i];
-        this.ImageLoader.LoadImage(g_oUserTexturePresets[i], 1);
-      }
-
-      this.handlers.trigger("asc_onInitStandartTextures", arr);
     }
   };
 
@@ -1075,7 +1063,7 @@ var editor;
 
   spreadsheet_api.prototype.asc_SetFastCollaborative = function(bFast) {
     if (this.collaborativeEditing) {
-      CollaborativeEditing.Set_Fast(bFast);
+      AscCommon.CollaborativeEditing.Set_Fast(bFast);
       this.collaborativeEditing.setFast(bFast);
     }
   };
@@ -1118,12 +1106,22 @@ var editor;
     this.asyncMethodCallback = callback;
     var arrLoadFonts = [];
     for (var i in fonts)
-      arrLoadFonts.push(new CFont(i, 0, "", 0));
+      arrLoadFonts.push(new AscFonts.CFont(i, 0, "", 0));
     History.loadFonts(arrLoadFonts);
     this.FontLoader.LoadDocumentFonts2(arrLoadFonts);
   };
 
-  spreadsheet_api.prototype._startOpenDocument = function(sData) {
+  spreadsheet_api.prototype.openDocument = function(sData) {
+    if (true === sData) {
+      // Empty Document
+      sData = AscCommonExcel.getEmptyWorkbook() + "";
+      if (sData.length && (AscCommon.c_oSerFormat.Signature === sData.substring(0, AscCommon.c_oSerFormat.Signature.length))) {
+        this.isChartEditor = true;
+      } else {
+        return;
+      }
+    }
+
     this.wbModel = this._openDocument(sData);
 
     this.FontLoader.LoadDocumentFonts(this.wbModel.generateFontMap2());
@@ -1131,8 +1129,8 @@ var editor;
     // Какая-то непонятная заглушка, чтобы не падало в ipad
     if (this.isMobileVersion) {
       AscCommon.AscBrowser.isSafariMacOs = false;
-      PASTE_ELEMENT_ID = "wrd_pastebin";
-      ELEMENT_DISPAY_STYLE = "none";
+      AscCommon.PasteElementsId.PASTE_ELEMENT_ID = "wrd_pastebin";
+      AscCommon.PasteElementsId.ELEMENT_DISPAY_STYLE = "none";
     }
 
     if (AscCommon.AscBrowser.isSafariMacOs) {
@@ -1177,7 +1175,7 @@ var editor;
   /////////////////////////////////////////////////////////////////////////
   spreadsheet_api.prototype._coAuthoringInitEnd = function() {
     var t = this;
-    this.collaborativeEditing = new asc_CCollaborativeEditing(/*handlers*/{
+    this.collaborativeEditing = new AscCommonExcel.CCollaborativeEditing(/*handlers*/{
       "askLock": function() {
         t.CoAuthoringApi.askLock.apply(t.CoAuthoringApi, arguments);
       },
@@ -1441,7 +1439,7 @@ var editor;
     } else if (this.wb && !window["NATIVE_EDITOR_ENJINE"]) {
       // Нужно послать 'обновить свойства' (иначе для удаления данных не обновится строка формул).
       // ToDo Возможно стоит обновлять только строку формул
-      CollaborativeEditing.Load_Images();
+      AscCommon.CollaborativeEditing.Load_Images();
       this.wb._onWSSelectionChanged(null);
       this.wb.getWorksheet().updateVisibleRange();
     }
@@ -1546,13 +1544,15 @@ var editor;
       return;
     }
 
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, this.HtmlElement, this.topLineEditorElement, this, this.collaborativeEditing, this.fontRenderingMode);
 
     this.DocumentLoadComplete = true;
 
     this.asc_CheckGuiControlColors();
     this.asc_SendThemeColorScheme();
     this.asc_ApplyColorScheme(false);
+
+    this.sendStandartTextures();
 
     // Применяем пришедшие при открытии изменения
     this._applyFirstLoadChanges();
@@ -1615,7 +1615,7 @@ var editor;
         this.sync_StartAction(c_oAscAsyncActionType.Information, c_oAscAsyncAction.Save);
       }
 
-      CollaborativeEditing.Clear_CollaborativeMarks();
+      AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
       // Принимаем чужие изменения
       this.collaborativeEditing.applyChanges();
 
@@ -1671,16 +1671,16 @@ var editor;
   spreadsheet_api.prototype._getIsLockObjectSheet = function(lockInfo, callback) {
     if (false === this.collaborativeEditing.getCollaborativeEditing()) {
       // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-      asc_applyFunction(callback, true);
+      AscCommonExcel.applyFunction(callback, true);
       callback = undefined;
     }
     if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
       // Редактируем сами
-      asc_applyFunction(callback, true);
+      AscCommonExcel.applyFunction(callback, true);
       return;
     } else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
       // Уже ячейку кто-то редактирует
-      asc_applyFunction(callback, false);
+      AscCommonExcel.applyFunction(callback, false);
       return;
     }
 
@@ -1695,16 +1695,16 @@ var editor;
 
     if (false === this.collaborativeEditing.getCollaborativeEditing()) {
       // Пользователь редактирует один: не ждем ответа, а сразу продолжаем редактирование
-      asc_applyFunction(callback, true);
+      AscCommonExcel.applyFunction(callback, true);
       callback = undefined;
     }
     if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeMine, /*bCheckOnlyLockAll*/false)) {
       // Редактируем сами
-      asc_applyFunction(callback, true);
+      AscCommonExcel.applyFunction(callback, true);
       return;
     } else if (false !== this.collaborativeEditing.getLockIntersection(lockInfo, c_oAscLockTypes.kLockTypeOther, /*bCheckOnlyLockAll*/false)) {
       // Уже ячейку кто-то редактирует
-      asc_applyFunction(callback, false);
+      AscCommonExcel.applyFunction(callback, false);
       return;
     }
 
@@ -1738,7 +1738,7 @@ var editor;
     var t = this;
     var changeTabColorCallback = function(res) {
       if (res) {
-        color = CorrectAscColor(color);
+        color = AscCommonExcel.CorrectAscColor(color);
         t.wbModel.getWorksheet(index).setTabColor(color);
       }
     };
@@ -2054,6 +2054,11 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_enableKeyEvents = function(isEnabled) {
+    if (!this.isLoadFullApi) {
+      this.tmpFocus = isEnabled;
+      return;
+    }
+
     if (this.wb) {
       this.wb.enableKeyEventsHandler(isEnabled);
     }
@@ -2330,7 +2335,7 @@ var editor;
   // Для вставки диаграмм в Word
   spreadsheet_api.prototype.asc_getBinaryFileWriter = function() {
     this.wb._initCommentsToSave();
-    return new Asc.BinaryFileWriter(this.wbModel);
+    return new AscCommonExcel.BinaryFileWriter(this.wbModel);
   };
 
   spreadsheet_api.prototype.asc_getWordChartObject = function() {
@@ -2493,7 +2498,7 @@ var editor;
 
     var ws = this.wb.getWorksheet();
     var fReplaceCallback = null, sImageUrl = null;
-    if(!isNullOrEmptyString(props.ImageUrl)){
+    if(!AscCommon.isNullOrEmptyString(props.ImageUrl)){
       if(!g_oDocumentUrls.getImageLocal(props.ImageUrl)){
         sImageUrl = props.ImageUrl;
         fReplaceCallback = function(sLocalUrl){
@@ -2502,7 +2507,7 @@ var editor;
       }
     }
     else if(props.ShapeProperties && props.ShapeProperties.fill && props.ShapeProperties.fill.fill &&
-    !isNullOrEmptyString(props.ShapeProperties.fill.fill.url)){
+    !AscCommon.isNullOrEmptyString(props.ShapeProperties.fill.fill.url)){
       if(!g_oDocumentUrls.getImageLocal(props.ShapeProperties.fill.fill.url)){
         sImageUrl = props.ShapeProperties.fill.fill.url;
         fReplaceCallback = function(sLocalUrl){
@@ -2573,10 +2578,6 @@ var editor;
     return ws.objectRender.getOriginalImageSize();
   };
 
-  spreadsheet_api.prototype.asc_setInterfaceDrawImagePlaceShape = function(elementId) {
-    this.shapeElementId = elementId;
-  };
-
   spreadsheet_api.prototype.asc_setInterfaceDrawImagePlaceTextArt = function(elementId) {
     this.textArtElementId = elementId;
   };
@@ -2634,7 +2635,7 @@ var editor;
       var drawing_area = worksheet.objectRender.drawingArea;
       if (drawing_area) {
         for (var i = 0; i < drawing_area.frozenPlaces.length; ++i) {
-          worksheet.objectRender.showDrawingObjects(false, new GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
+          worksheet.objectRender.showDrawingObjects(false, new AscFormat.GraphicOption(worksheet, AscCommonExcel.c_oAscGraphicOption.ScrollVertical, drawing_area.frozenPlaces[i].range, {offsetX: 0, offsetY: 0}));
             worksheet.objectRender.controller && worksheet.objectRender.controller.getGraphicObjectProps();
         }
       }
@@ -2800,7 +2801,7 @@ var editor;
       ws.objectRender.controller.setCellTextColor(color);
     } else {
       if (color instanceof Asc.asc_CColor) {
-        color = CorrectAscColor(color);
+        color = AscCommonExcel.CorrectAscColor(color);
         this.wb.setFontAttributes("c", color);
         this.wb.restoreFocus();
       }
@@ -2815,7 +2816,7 @@ var editor;
     } else {
       if (color instanceof Asc.asc_CColor || null == color) {
         if (null != color) {
-          color = CorrectAscColor(color);
+          color = AscCommonExcel.CorrectAscColor(color);
         }
         this.wb.getWorksheet().setSelectionInfo("bc", color);
         this.wb.restoreFocus();
@@ -2966,48 +2967,49 @@ var editor;
         var theme = t.wbModel.theme;
 
         var oldClrScheme = theme.themeElements.clrScheme;
-        var _count_defaults = g_oUserColorScheme.length;
+        var oColorScheme = AscCommon.g_oUserColorScheme;
+        var _count_defaults = oColorScheme.length;
         if (index_scheme < _count_defaults) {
-          var _obj = g_oUserColorScheme[index_scheme];
-          var scheme = new ClrScheme();
-          scheme.name = _obj["name"];
+          var _obj = oColorScheme[index_scheme];
+          var scheme = new AscFormat.ClrScheme();
+          scheme.name = _obj.name;
           var _c;
 
-          _c = _obj["dk1"];
-          scheme.colors[8] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.dk1;
+          scheme.colors[8] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["lt1"];
-          scheme.colors[12] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.lt1;
+          scheme.colors[12] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["dk2"];
-          scheme.colors[9] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.dk2;
+          scheme.colors[9] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["lt2"];
-          scheme.colors[13] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.lt2;
+          scheme.colors[13] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent1"];
-          scheme.colors[0] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent1;
+          scheme.colors[0] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent2"];
-          scheme.colors[1] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent2;
+          scheme.colors[1] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent3"];
-          scheme.colors[2] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent3;
+          scheme.colors[2] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent4"];
-          scheme.colors[3] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent4;
+          scheme.colors[3] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent5"];
-          scheme.colors[4] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent5;
+          scheme.colors[4] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["accent6"];
-          scheme.colors[5] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.accent6;
+          scheme.colors[5] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["hlink"];
-          scheme.colors[11] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.hlink;
+          scheme.colors[11] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
-          _c = _obj["folHlink"];
-          scheme.colors[10] = CreateUniColorRGB(_c["R"], _c["G"], _c["B"]);
+          _c = _obj.folHlink;
+          scheme.colors[10] = AscFormat.CreateUniColorRGB(_c.R, _c.G, _c.B);
 
           theme.themeElements.clrScheme = scheme;
         } else {
@@ -3021,7 +3023,7 @@ var editor;
         }
         History.Create_NewPoint();
         //не делаем Duplicate потому что предполагаем что схема не будет менять частями, а только обьектом целиком.
-        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
+        History.Add(AscCommonExcel.g_oUndoRedoWorkbook, AscCH.historyitem_Workbook_ChangeColorScheme, null, null, new AscCommonExcel.UndoRedoData_ClrScheme(oldClrScheme, theme.themeElements.clrScheme));
         t.asc_AfterChangeColorScheme();
       }
     };
@@ -3071,7 +3073,7 @@ var editor;
     }
     if (!History.Is_Modified(true) && !(this.collaborativeEditing.getCollaborativeEditing() && 0 !== this.collaborativeEditing.getOwnLocksLength())) {
       if (this.collaborativeEditing.getFast() && this.collaborativeEditing.haveOtherChanges()) {
-        CollaborativeEditing.Clear_CollaborativeMarks();
+        AscCommon.CollaborativeEditing.Clear_CollaborativeMarks();
 
         // Принимаем чужие изменения
         this.collaborativeEditing.applyChanges();
@@ -3136,7 +3138,7 @@ var editor;
       AscCommonExcel.cFormulaFunctionToLocale = {};
       var localName;
       for (var i in AscCommonExcel.cFormulaFunction) {
-        localName = oLocalizedData[i] ? oLocalizedData[i]['n'] : null;
+        localName = oLocalizedData[i] ? oLocalizedData[i] : null;
         localName = localName ? localName : i;
         AscCommonExcel.cFormulaFunctionLocalized[localName] = AscCommonExcel.cFormulaFunction[i];
         AscCommonExcel.cFormulaFunctionToLocale[i] = localName;
@@ -3160,21 +3162,21 @@ var editor;
     this.User.setId("TM");
     this.User.setUserName("native");
 
-    this.wbModel = new Workbook(this.handlers, this);
+    this.wbModel = new AscCommonExcel.Workbook(this.handlers, this);
     this.initGlobalObjects(this.wbModel);
 
-    var oBinaryFileReader = new Asc.BinaryFileReader();
+    var oBinaryFileReader = new AscCommonExcel.BinaryFileReader();
 
     if (undefined === version) {
       oBinaryFileReader.Read(base64File, this.wbModel);
     } else {
-      g_nCurFileVersion = version;
+      AscCommon.CurFileVersion = version;
       oBinaryFileReader.ReadData(base64File, this.wbModel);
     }
     g_oIdCounter.Set_Load(false);
 
     this._coAuthoringInit();
-    this.wb = new asc.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
+    this.wb = new AscCommonExcel.WorkbookView(this.wbModel, this.controller, this.handlers, window["_null_object"], window["_null_object"], this, this.collaborativeEditing, this.fontRenderingMode);
   };
 
   spreadsheet_api.prototype.asc_nativeCalculateFile = function() {
@@ -3200,12 +3202,12 @@ var editor;
 
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
     this.wb._initCommentsToSave();
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
   };
   spreadsheet_api.prototype.asc_nativeGetFileData = function() {
     this.wb._initCommentsToSave();
-    var oBinaryFileWriter = new Asc.BinaryFileWriter(this.wbModel);
+    var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     oBinaryFileWriter.Write2();
 
     var _header = oBinaryFileWriter.WriteFileHeader(oBinaryFileWriter.Memory.GetCurPosition());
@@ -3237,7 +3239,7 @@ var editor;
       _memory2.WriteString2 = _memory1["WriteString2"];
     }
 
-    var _printer = new CPdfPrinter();
+    var _printer = new AscCommonExcel.CPdfPrinter();
     _printer.DocumentRenderer.Memory = _memory1;
     _printer.DocumentRenderer.VectorMemoryForPrint = _memory2;
     return _printer;
@@ -3247,7 +3249,7 @@ var editor;
   };
 
   spreadsheet_api.prototype.asc_nativePrint = function(_printer, _page, _param) {
-    var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new asc_CAdjustPrint();
+    var _adjustPrint = window.AscDesktopEditor_PrintData ? window.AscDesktopEditor_PrintData : new Asc.asc_CAdjustPrint();
     window.AscDesktopEditor_PrintData = undefined;
 
     if (1 == _param) {
@@ -3263,7 +3265,7 @@ var editor;
     var _printPagesData = this.wb.calcPagesPrint(_adjustPrint);
 
     if (undefined === _printer && _page === undefined) {
-      var pdf_writer = new CPdfPrinter();
+      var pdf_writer = new AscCommonExcel.CPdfPrinter();
       var isEndPrint = this.wb.printSheet(pdf_writer, _printPagesData);
 
       if (undefined !== window["AscDesktopEditor"]) {
@@ -3300,6 +3302,19 @@ var editor;
     window["native"]["Save_End"]("", _ret.GetCurPosition());
     return _ret.data;
   };
+
+  spreadsheet_api.prototype._onEndLoadSdk = function() {
+    History = AscCommon.History;
+
+    spreadsheet_api.superclass._onEndLoadSdk.call(this);
+
+    this.controller = new AscCommonExcel.asc_CEventsController();
+
+    this.formulasList = AscCommonExcel.getFormulasInfo();
+    this.asc_setLocale(this.tmpLocale);
+    this.asc_setViewMode(this.isViewMode);
+  };
+
   /*
    * Export
    * -----------------------------------------------------------------------------
@@ -3313,7 +3328,6 @@ var editor;
   prot = spreadsheet_api.prototype;
 
   prot["asc_GetFontThumbnailsPath"] = prot.asc_GetFontThumbnailsPath;
-  prot["asc_SetFontsPath"] = prot.asc_SetFontsPath;
   prot["asc_setDocInfo"] = prot.asc_setDocInfo;
   prot["asc_getLocaleExample"] = prot.asc_getLocaleExample;
   prot["asc_getLocaleCurrency"] = prot.asc_getLocaleCurrency;
@@ -3443,6 +3457,8 @@ var editor;
   prot["asc_setSelectedDrawingObjectLayer"] = prot.asc_setSelectedDrawingObjectLayer;
   prot["asc_getChartPreviews"] = prot.asc_getChartPreviews;
   prot["asc_getTextArtPreviews"] = prot.asc_getTextArtPreviews;
+  prot['asc_getPropertyEditorShapes'] = prot.asc_getPropertyEditorShapes;
+  prot['asc_getPropertyEditorTextArts'] = prot.asc_getPropertyEditorTextArts;
   prot["asc_checkDataRange"] = prot.asc_checkDataRange;
   prot["asc_getBinaryFileWriter"] = prot.asc_getBinaryFileWriter;
   prot["asc_getWordChartObject"] = prot.asc_getWordChartObject;

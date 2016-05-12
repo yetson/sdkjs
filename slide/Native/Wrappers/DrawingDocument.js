@@ -1,131 +1,11 @@
 "use strict";
 
-var g_fontManager = new CFontManager();
-g_fontManager.Initialize(true);
-
-var TRACK_CIRCLE_RADIUS     = 5;
-var TRACK_RECT_SIZE2        = 4;
-var TRACK_RECT_SIZE         = 8;
-var TRACK_DISTANCE_ROTATE   = 25;
-var TRACK_ADJUSTMENT_SIZE   = 10;
-
 var FOCUS_OBJECT_THUMBNAILS     = 0;
 var FOCUS_OBJECT_MAIN           = 1;
 var FOCUS_OBJECT_NOTES          = 2;
 
 var COMMENT_WIDTH   = 18;
 var COMMENT_HEIGHT  = 16;
-
-function CTableMarkup(Table)
-{
-    this.Internal =
-    {
-        RowIndex  : 0,
-        CellIndex : 0,
-        PageNum   : 0
-    };
-    this.Table = Table;
-    this.X = 0; // Смещение таблицы от начала страницы до первой колонки
-
-    this.Cols    = []; // массив ширин колонок
-    this.Margins = []; // массив левых и правых маргинов
-
-    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
-    // Rows = [ { Y : , H :  }, ... ]
-
-    this.CurCol = 0; // текущая колонка
-    this.CurRow = 0; // текущая строка
-
-    this.TransformX = 0;
-    this.TransformY = 0;
-}
-
-CTableMarkup.prototype =
-{
-    CreateDublicate : function()
-    {
-        var obj = new CTableMarkup(this.Table);
-
-        obj.Internal = { RowIndex : this.Internal.RowIndex, CellIndex : this.Internal.CellIndex, PageNum : this.Internal.PageNum };
-        obj.X = this.X;
-
-        var len = this.Cols.length;
-        for (var i = 0; i < len; i++)
-            obj.Cols[i] = this.Cols[i];
-
-        len = this.Margins.length;
-        for (var i = 0; i < len; i++)
-            obj.Margins[i] = { Left : this.Margins[i].Left, Right : this.Margins[i].Right };
-
-        len = this.Rows.length;
-        for (var i = 0; i < len; i++)
-            obj.Rows[i] = { Y : this.Rows[i].Y, H : this.Rows[i].H };
-
-        obj.CurRow = this.CurRow;
-        obj.CurCol = this.CurCol;
-
-        return obj;
-    },
-
-    CorrectFrom : function()
-    {
-        this.X += this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y += this.TransformY;
-        }
-    },
-
-    CorrectTo : function()
-    {
-        this.X -= this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y -= this.TransformY;
-        }
-    },
-
-    Get_X : function()
-    {
-        return this.X;
-    },
-
-    Get_Y : function()
-    {
-        var _Y = 0;
-        if (this.Rows.length > 0)
-        {
-            _Y = this.Rows[0].Y;
-        }
-        return _Y;
-    }
-};
-
-function CTableOutline(Table, PageNum, X, Y, W, H)
-{
-    this.Table = Table;
-    this.PageNum = PageNum;
-
-    this.X = X;
-    this.Y = Y;
-
-    this.W = W;
-    this.H = H;
-}
-
-
-
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-}
 
 function CDrawingPage()
 {
@@ -161,7 +41,7 @@ function CDrawingDocument()
     this.TargetCursorColor = {R: 0, G: 0, B: 0};
 
 
-    this.AutoShapesTrack = new CAutoshapeTrack();
+    this.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
 
     this.RenderPage = function(nPageIndex)
     {
@@ -479,7 +359,7 @@ function CDrawingDocument()
         if (matrix)
         {
             if (null == this.TextMatrix)
-                this.TextMatrix = new CMatrix();
+                this.TextMatrix = new AscCommon.CMatrix();
             this.TextMatrix.sx = matrix.sx;
             this.TextMatrix.shy = matrix.shy;
             this.TextMatrix.shx = matrix.shx;
@@ -571,3 +451,6 @@ function CDrawingDocument()
     };
 }
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CDrawingDocument = CDrawingDocument;

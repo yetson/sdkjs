@@ -48,6 +48,7 @@
 	var cElementType = AscCommonExcel.cElementType;
 	var c_oAscCellEditorSelectState = AscCommonExcel.c_oAscCellEditorSelectState;
 	var c_oAscCellEditorState = asc.c_oAscCellEditorState;
+	var Fragment = AscCommonExcel.Fragment;
 
 	var asc_calcnpt = asc.calcNearestPt;
 	var asc_getcvt = asc.getCvtRatio;
@@ -55,7 +56,7 @@
 	var asc_search = asc.search;
 	var asc_lastidx = asc.lastIndexOf;
 
-	var asc_HL = asc.HandlersList;
+	var asc_HL = AscCommonExcel.HandlersList;
 	var asc_incDecFonSize = asc.incDecFonSize;
 
 
@@ -183,7 +184,7 @@
 		this._formula = null;
 
 		// Обработчик кликов
-		this.clickCounter = new ClickCounter();
+		this.clickCounter = new AscFormat.ClickCounter();
 
 		this._init( settings );
 
@@ -220,7 +221,7 @@
 		t.overlayCtx = new asc.DrawingContext( {
 			canvas: t.canvasOverlay, units: 1/*pt*/, fmgrGraphics: this.fmgrGraphics, font: this.m_oFont
 		} );
-		t.textRender = new asc.CellTextRender( t.drawingCtx );
+		t.textRender = new AscCommonExcel.CellTextRender( t.drawingCtx );
 		t.textRender.setDefaultFont( settings.font.clone() );
 
 		// bind event handlers
@@ -345,7 +346,7 @@
 				// Делаем замену текста на автодополнение, если есть select и текст полностью совпал.
 				if (this.selectionBegin !== this.selectionEnd && !isFormula) {
 					var s = this._getFragmentsText(this.options.fragments);
-					if (!isNumber(s)) {
+					if (!AscCommon.isNumber(s)) {
 						var arrAutoComplete = this._getAutoComplete(s.toLowerCase());
 						if (1 === arrAutoComplete.length) {
 							var newValue = arrAutoComplete[0];
@@ -814,7 +815,7 @@
 	};
 
 	CellEditor.prototype._parseRangeStr = function ( s ) {
-		var range = asc.g_oRangeCache.getActiveRange( s );
+		var range = AscCommonExcel.g_oRangeCache.getActiveRange( s );
 		return range ? range.clone() : null;
 	};
 
@@ -2170,7 +2171,7 @@
 		}
 		tmp = this.options.fragments[tmp.index].format;
 
-		var result = new asc.asc_CFont();
+		var result = new AscCommonExcel.asc_CFont();
 		result.name = tmp.fn;
 		result.size = tmp.fs;
 		result.bold = tmp.b;
@@ -2578,7 +2579,7 @@
 		var newChar = String.fromCharCode( event.which );
 		t._addChars( newChar );
 		// При первом быстром вводе стоит добавить в конце проценты (для процентного формата и только для числа)
-		if ( t.options.isAddPersentFormat && isNumber( newChar ) ) {
+		if ( t.options.isAddPersentFormat && AscCommon.isNumber( newChar ) ) {
 			t.options.isAddPersentFormat = false;
 			tmpCursorPos = t.cursorPos;
 			t.undoMode = true;
@@ -2589,7 +2590,7 @@
 		}
 		if ( t.textRender.getEndOfText() === t.cursorPos && !t.isFormula() ) {
 			var s = t._getFragmentsText( t.options.fragments );
-			if ( !isNumber( s ) ) {
+			if ( !AscCommon.isNumber( s ) ) {
 				var arrAutoComplete = t._getAutoComplete( s.toLowerCase() );
 				var lengthInput = s.length;
 				if ( 1 === arrAutoComplete.length ) {
@@ -2736,9 +2737,7 @@
 	};
 
 
-	/*
-	 * Export
-	 * -----------------------------------------------------------------------------
-	 */
-	window["Asc"].CellEditor = CellEditor;
+	//------------------------------------------------------------export---------------------------------------------------
+	window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+	window["AscCommonExcel"].CellEditor = CellEditor;
 })( jQuery, window );

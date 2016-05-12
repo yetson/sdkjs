@@ -24,6 +24,9 @@
 */
 "use strict";
 
+// Import
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+
 // 0x300  accent grave
 // 0x301  accent acute
 // 0x307  one dot
@@ -489,7 +492,7 @@ function CAccent(props)
 }
 AscCommon.extendClass(CAccent, CMathBase);
 
-CAccent.prototype.ClassType = historyitem_type_acc;
+CAccent.prototype.ClassType = AscDFH.historyitem_type_acc;
 CAccent.prototype.kind      = MATH_ACCENT;
 
 CAccent.prototype.init = function(props)
@@ -688,5 +691,9 @@ function CMathMenuAccent(Accent)
     this.Type   = c_oAscMathInterfaceType.Accent;
 }
 AscCommon.extendClass(CMathMenuAccent, CMathMenuBase);
-window["CMathMenuAccent"] = CMathMenuAccent;
 
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CAccent = CAccent;
+
+window["CMathMenuAccent"] = CMathMenuAccent;

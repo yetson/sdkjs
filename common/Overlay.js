@@ -24,6 +24,9 @@
 */
 "use strict";
 
+(function(window, undefined){
+    var AscBrowser = AscCommon.AscBrowser;
+
 var TRACK_CIRCLE_RADIUS     = 5;
 var TRACK_RECT_SIZE2        = 4;
 var TRACK_RECT_SIZE         = 8;
@@ -32,6 +35,10 @@ var TRACK_DISTANCE_ROTATE2  = 25;
 var TRACK_ADJUSTMENT_SIZE   = 10;
 var TRACK_WRAPPOINTS_SIZE   = 6;
 var IMAGE_ROTATE_TRACK_W    = 21;
+
+if (AscBrowser.isRetina && AscBrowser.isMobile) {
+    TRACK_DISTANCE_ROTATE <<= 1;
+}
 
 var bIsUseImageRotateTrack  = true;
 if (bIsUseImageRotateTrack)
@@ -83,9 +90,9 @@ COverlay.prototype =
     init : function(context, controlName, x, y, w_pix, h_pix, w_mm, h_mm)
     {
         this.m_oContext = context;
-        this.m_oControl = CreateControl(controlName);
+        this.m_oControl = AscCommon.CreateControl(controlName);
 
-        this.m_oHtmlPage = new CHtmlPage();
+        this.m_oHtmlPage = new AscCommon.CHtmlPage();
         this.m_oHtmlPage.init(x, y, w_pix, h_pix, w_mm, h_mm);
     },
 
@@ -537,8 +544,6 @@ COverlay.prototype =
     }
 };
 
-
-
 function CAutoshapeTrack()
 {
     this.m_oContext = null;
@@ -564,7 +569,7 @@ CAutoshapeTrack.prototype =
         this.m_oOverlay = overlay;
         this.m_oContext = this.m_oOverlay.m_oContext;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 
@@ -749,7 +754,7 @@ CAutoshapeTrack.prototype =
 
         var drawPage = oPage.drawingPage;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
 
         var _scale = this.m_oOverlay.IsRetina? 2 : 1;
 
@@ -978,8 +983,9 @@ CAutoshapeTrack.prototype =
 
         switch (type)
         {
-            case TYPE_TRACK_SHAPE:
-            case TYPE_TRACK_GROUP:
+            case AscFormat.TYPE_TRACK.SHAPE:
+            case AscFormat.TYPE_TRACK.GROUP:
+            case AscFormat.TYPE_TRACK.CHART_TEXT:
             {
                 if (bIsClever)
                 {
@@ -1354,8 +1360,8 @@ CAutoshapeTrack.prototype =
 
                 break;
             }
-            case TYPE_TRACK_TEXT:
-            case TYPE_TRACK_GROUP_PASSIVE:
+            case AscFormat.TYPE_TRACK.TEXT:
+            case AscFormat.TYPE_TRACK.GROUP_PASSIVE:
             {
                 if (bIsClever)
                 {
@@ -1693,7 +1699,7 @@ CAutoshapeTrack.prototype =
 
                 break;
             }
-            case TYPE_TRACK_EMPTY_PH:
+            case AscFormat.TYPE_TRACK.EMPTY_PH:
             {
                 if (bIsClever)
                 {
@@ -2456,7 +2462,7 @@ CAutoshapeTrack.prototype =
 
     drawFlowAnchor : function(x, y)
     {
-        var _flow_anchor = this.m_oOverlay.IsRetina ? window.g_flow_anchor2 : window.g_flow_anchor;
+        var _flow_anchor = this.m_oOverlay.IsRetina ? AscCommon.g_flow_anchor2 : AscCommon.g_flow_anchor;
         if (!_flow_anchor || !_flow_anchor.asc_complete || (!editor || !editor.ShowParaMarks))
             return;
 
@@ -2532,3 +2538,10 @@ CAutoshapeTrack.prototype =
     }
 };
 
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].TRACK_CIRCLE_RADIUS = TRACK_CIRCLE_RADIUS;
+    window['AscCommon'].TRACK_DISTANCE_ROTATE = TRACK_DISTANCE_ROTATE;
+    window['AscCommon'].COverlay = COverlay;
+    window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;
+})(window);

@@ -24,6 +24,13 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 //-----------------------------------------------------------------------------------
 // Drawing area manager
 //-----------------------------------------------------------------------------------
@@ -681,7 +688,7 @@ DrawingArea.prototype.drawSelection = function(drawingDocument) {
     var chart;
     var controller = this.worksheet.objectRender.controller;
     var selected_objects = controller.selection.groupSelection ? controller.selection.groupSelection.selectedObjects : controller.selectedObjects;
-    if(selected_objects.length === 1 && selected_objects[0].getObjectType() === historyitem_type_ChartSpace)
+    if(selected_objects.length === 1 && selected_objects[0].getObjectType() === AscDFH.historyitem_type_ChartSpace)
     {
         chart = selected_objects[0];
         this.worksheet.objectRender.selectDrawingObjectRange(chart);
@@ -747,3 +754,8 @@ DrawingArea.prototype.getOffsets = function(x, y, bEvents) {
         }
         return null;
     };
+
+	//--------------------------------------------------------export----------------------------------------------------
+	window['AscFormat'] = window['AscFormat'] || {};
+	window['AscFormat'].DrawingArea = DrawingArea;
+})(window);

@@ -24,7 +24,10 @@
 */
 "use strict";
 
-
+(function(window, undefined){
+    // Import
+    var global_mouseEvent = AscCommon.global_mouseEvent;
+    
 function HitInLine(context, px, py, x0, y0, x1, y1)
 {
    /* var l = Math.min(x0, x1);
@@ -39,7 +42,7 @@ function HitInLine(context, px, py, x0, y0, x1, y1)
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
 
-    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    if(typeof global_mouseEvent !== "undefined" && AscCommon.isRealObject(global_mouseEvent) && AscFormat.isRealNumber(global_mouseEvent.KoefPixToMM))
     {
         d *= global_mouseEvent.KoefPixToMM;
     }
@@ -76,7 +79,7 @@ function HitInBezier4(context, px, py, x0, y0, x1, y1, x2, y2, x3, y3)
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
 
-    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    if(typeof global_mouseEvent !== "undefined" && AscCommon.isRealObject(global_mouseEvent) && AscFormat.isRealNumber(global_mouseEvent.KoefPixToMM))
     {
         d *= global_mouseEvent.KoefPixToMM;
     }
@@ -113,7 +116,7 @@ function HitInBezier3(context, px, py, x0, y0, x1, y1, x2, y2)
 
     d=1.5/Math.sqrt(tx*tx+ty*ty);
 
-    if(typeof global_mouseEvent !== "undefined" && isRealObject(global_mouseEvent) && isRealNumber(global_mouseEvent.KoefPixToMM))
+    if(typeof global_mouseEvent !== "undefined" && AscCommon.isRealObject(global_mouseEvent) && AscFormat.isRealNumber(global_mouseEvent.KoefPixToMM))
     {
         d *= global_mouseEvent.KoefPixToMM;
     }
@@ -136,5 +139,9 @@ function HitInBezier3(context, px, py, x0, y0, x1, y1, x2, y2)
     return context.isPointInPath(px, py);
 }
 
-
-
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].HitInLine = HitInLine;
+    window['AscFormat'].HitInBezier4 = HitInBezier4;
+    window['AscFormat'].HitInBezier3 = HitInBezier3;
+})(window);

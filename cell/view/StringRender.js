@@ -24,11 +24,6 @@
 */
 "use strict";
 
-/* StringRender.js
- *
- * Author: Dmitry.Sokolov@avsmedia.net
- * Date:   Dec 12, 2011
- */
 (
 	/**
 	 * @param {Window} window
@@ -237,7 +232,7 @@
                 this.drawingCtx.updateTransforms();
             } else {
 
-                mbt.translate((x + dx) * vector_koef, (y + dy) * vector_koef);
+                mbt.translate((x + dx) * AscCommonExcel.vector_koef, (y + dy) * AscCommonExcel.vector_koef);
                 mbt.multiply(m, 0);
 
                 drawingCtx.setTransform(mbt.sx, mbt.shy, mbt.shx, mbt.sy, mbt.tx, mbt.ty);
@@ -1137,12 +1132,8 @@
 		};
 
 
-		/*
-		 * Export
-		 * -----------------------------------------------------------------------------
-		 */
-		window["Asc"].StringRender = StringRender;
-
-
+		//------------------------------------------------------------export---------------------------------------------------
+		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
+		window["AscCommonExcel"].StringRender = StringRender;
 	}
 )(window);

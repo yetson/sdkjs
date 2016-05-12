@@ -24,6 +24,10 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+var CGroupShape = AscFormat.CGroupShape;
+
 CGroupShape.prototype.addToRecalculate = CShape.prototype.addToRecalculate;
 CGroupShape.prototype.handleUpdateTheme = CShape.prototype.handleUpdateTheme;
 CGroupShape.prototype.getSlideIndex = CShape.prototype.getSlideIndex;
@@ -75,7 +79,7 @@ CGroupShape.prototype.setRecalculateInfo = function()
         recalculateBounds: true,
         recalculateScaleCoefficients: true
     };
-    this.localTransform = new CMatrix();
+    this.localTransform = new AscCommon.CMatrix();
     this.bounds = {l: 0, t: 0, r: 0, b:0, w: 0, h:0};
 
     this.lockType = AscCommon.c_oAscLockTypes.kLockTypeNone;
@@ -110,7 +114,7 @@ CGroupShape.prototype.setDrawingObjects = function(drawingObjects)
 
 CGroupShape.prototype.setWorksheet = function(worksheet)
 {
-    History.Add(this, {Type: historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
+    AscCommon.History.Add(this, {Type: AscDFH.historyitem_AutoShapes_SetWorksheet, oldPr: this.worksheet, newPr: worksheet});
     this.worksheet = worksheet;
     for(var i = 0; i < this.spTree.length; ++i)
     {
@@ -208,7 +212,7 @@ CGroupShape.prototype.recalculate = function()
 {
     if(this.bDeleted || !this.parent)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         if(this.recalcInfo.recalculateBrush)
         {
@@ -223,7 +227,7 @@ CGroupShape.prototype.recalculate = function()
         if(this.recalcInfo.recalculateTransform)
         {
             this.recalculateTransform();
-            this.calculateSnapArrays();
+            this.recalculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
         if(this.recalcInfo.recalculateArrGraphicObjects)

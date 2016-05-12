@@ -24,13 +24,9 @@
 */
 "use strict";
 
-/**
- * Created with JetBrains WebStorm.
- * User: Sergey.Luzyanin
- * Date: 6/27/13
- * Time: 4:35 PM
- * To change this template use File | Settings | File Templates.
- */
+(function(window, undefined){
+    // Import
+    var global_MatrixTransformer = AscCommon.global_MatrixTransformer;
 
 var TRANSLATE_HANDLE_NO_FLIP = [];
 TRANSLATE_HANDLE_NO_FLIP[0] = 0;
@@ -71,81 +67,6 @@ TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V[4] = 0;
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V[5] = 1;
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V[6] = 2;
 TRANSLATE_HANDLE_FLIP_H_AND_FLIP_V[7] = 3;
-
-
-var SHAPE_ASPECTS = {};
-SHAPE_ASPECTS["can"] = 3616635/4810125;
-SHAPE_ASPECTS["moon"] = 457200/914400;
-SHAPE_ASPECTS["leftBracket"] = 73152/914400;
-SHAPE_ASPECTS["rightBracket"] = 73152/914400;
-SHAPE_ASPECTS["leftBrace"] = 155448/914400;
-SHAPE_ASPECTS["rightBrace"] = 155448/914400;
-SHAPE_ASPECTS["triangle"] = 1060704/914400;
-SHAPE_ASPECTS["parallelogram"] = 1216152/914400;
-SHAPE_ASPECTS["trapezoid"] = 914400/1216152;
-SHAPE_ASPECTS["pentagon"] = 960120/914400;
-SHAPE_ASPECTS["hexagon"] = 1060704/914400;
-SHAPE_ASPECTS["bracePair"] = 1069848/914400;
-SHAPE_ASPECTS["rightArrow"] = 978408/484632;
-SHAPE_ASPECTS["leftArrow"] = 978408/484632;
-SHAPE_ASPECTS["upArrow"] = 484632/978408;
-SHAPE_ASPECTS["downArrow"] = 484632/978408;
-SHAPE_ASPECTS["leftRightArrow"] = 1216152/484632;
-SHAPE_ASPECTS["upDownArrow"] = 484632/1216152;
-SHAPE_ASPECTS["bentArrow"] = 813816/868680;
-SHAPE_ASPECTS["uturnArrow"] = 886968/877824;
-SHAPE_ASPECTS["bentUpArrow"] = 850392/731520;
-SHAPE_ASPECTS["curvedRightArrow"] = 731520/1216152;
-SHAPE_ASPECTS["curvedLeftArrow"] = 731520/1216152;
-SHAPE_ASPECTS["curvedUpArrow"] = 1216152/731520;
-SHAPE_ASPECTS["curvedDownArrow"] = 1216152/731520;
-SHAPE_ASPECTS["stripedRightArrow"] = 978408/484632;
-SHAPE_ASPECTS["notchedRightArrow"] = 978408/484632;
-SHAPE_ASPECTS["homePlate"] = 978408/484632;
-SHAPE_ASPECTS["leftRightArrowCallout"] = 1216152/576072;
-SHAPE_ASPECTS["flowChartProcess"] = 914400/612648;
-SHAPE_ASPECTS["flowChartAlternateProcess"] = 914400/612648;
-SHAPE_ASPECTS["flowChartDecision"] = 914400/612648;
-SHAPE_ASPECTS["flowChartInputOutput"] = 914400/612648;
-SHAPE_ASPECTS["flowChartPredefinedProcess"] = 914400/612648;
-SHAPE_ASPECTS["flowChartDocument"] = 914400/612648;
-SHAPE_ASPECTS["flowChartMultidocument"] = 1060704/758952;
-SHAPE_ASPECTS["flowChartTerminator"] = 914400/301752;
-SHAPE_ASPECTS["flowChartPreparation"] = 1060704/612648;
-SHAPE_ASPECTS["flowChartManualInput"] = 914400/457200;
-SHAPE_ASPECTS["flowChartManualOperation"] = 914400/612648;
-SHAPE_ASPECTS["flowChartPunchedCard"] = 914400/804672;
-SHAPE_ASPECTS["flowChartPunchedTape"] = 914400/804672;
-SHAPE_ASPECTS["flowChartPunchedTape"] = 457200/914400;
-SHAPE_ASPECTS["flowChartSort"] = 457200/914400;
-SHAPE_ASPECTS["flowChartOnlineStorage"] = 914400/612648;
-SHAPE_ASPECTS["flowChartMagneticDisk"] = 914400/612648;
-SHAPE_ASPECTS["flowChartMagneticDrum"] = 914400/685800;
-SHAPE_ASPECTS["flowChartDisplay"] = 914400/612648;
-SHAPE_ASPECTS["ribbon2"] = 1216152/612648;
-SHAPE_ASPECTS["ribbon"] = 1216152/612648;
-SHAPE_ASPECTS["ellipseRibbon2"] = 1216152/758952;
-SHAPE_ASPECTS["ellipseRibbon"] = 1216152/758952;
-SHAPE_ASPECTS["verticalScroll"] = 1033272/1143000;
-SHAPE_ASPECTS["horizontalScroll"] = 1143000/1033272;
-SHAPE_ASPECTS["wedgeRectCallout"] = 914400/612648;
-SHAPE_ASPECTS["wedgeRoundRectCallout"] = 914400/612648;
-SHAPE_ASPECTS["wedgeEllipseCallout"] = 914400/612648;
-SHAPE_ASPECTS["cloudCallout"] = 914400/612648;
-SHAPE_ASPECTS["borderCallout1"] = 914400/612648;
-SHAPE_ASPECTS["borderCallout2"] = 914400/612648;
-SHAPE_ASPECTS["borderCallout3"] = 914400/612648;
-SHAPE_ASPECTS["accentCallout1"] = 914400/612648;
-SHAPE_ASPECTS["accentCallout2"] = 914400/612648;
-SHAPE_ASPECTS["accentCallout3"] = 914400/612648;
-SHAPE_ASPECTS["callout1"] = 914400/612648;
-SHAPE_ASPECTS["callout2"] = 914400/612648;
-SHAPE_ASPECTS["callout3"] = 914400/612648;
-SHAPE_ASPECTS["accentBorderCallout1"] = 914400/612648;
-SHAPE_ASPECTS["accentBorderCallout2"] = 914400/612648;
-SHAPE_ASPECTS["accentBorderCallout3"] = 914400/612648;
-
-
 
 var SHAPE_EXT = {};
 SHAPE_EXT["can"] = 3616635/36000;
@@ -237,26 +158,22 @@ SHAPE_EXT["flowChartMagneticTape"] = 612648/36000;
 SHAPE_EXT["actionButtonHome"] = 1042416/36000;
 
 var MIN_SHAPE_SIZE = 1.27;//размер меньше которого нельзя уменшить автофигуру или картинку по горизонтали или вертикали
-var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
-var MIN_ANGLE = 0.07;
-
-
 
 function CreatePenBrushForChartTrack()
 {
-    return ExecuteNoHistory(function()
+    return AscFormat.ExecuteNoHistory(function()
         {
-            var brush = new CUniFill();
-            brush.setFill(new CSolidFill());
-            brush.fill.setColor(new CUniColor());
+            var brush = new AscFormat.CUniFill();
+            brush.setFill(new AscFormat.CSolidFill());
+            brush.fill.setColor(new AscFormat.CUniColor());
             brush.fill.color.RGBA = {R:255, G:255, B:255, A:255};
-            brush.fill.color.setColor(new CRGBColor());
+            brush.fill.color.setColor(new AscFormat.CRGBColor());
             brush.fill.color.color.RGBA = {R:255, G:255, B:255, A:255};
-            var pen = new CLn();
-            pen.setFill(new CUniFill());
-            pen.Fill.setFill(new CSolidFill());
-            pen.Fill.fill.setColor(new CUniColor());
-            pen.Fill.fill.color.setColor(new CRGBColor());
+            var pen = new AscFormat.CLn();
+            pen.setFill(new AscFormat.CUniFill());
+            pen.Fill.setFill(new AscFormat.CSolidFill());
+            pen.Fill.fill.setColor(new AscFormat.CUniColor());
+            pen.Fill.fill.color.setColor(new AscFormat.CRGBColor());
             return {brush: brush, pen: pen};
         },
         this, []);
@@ -264,7 +181,7 @@ function CreatePenBrushForChartTrack()
 
 function ResizeTrackShapeImage(originalObject, cardDirection)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.originalObject = originalObject;
         this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
@@ -362,11 +279,19 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.resizedRot = originalObject.rot;
 
         this.transform = originalObject.transform.CreateDublicate();
-        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
+        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr && originalObject.spPr.geometry ?  originalObject.spPr.geometry.createDuplicate() : (function(){ var geometry = AscFormat.CreateGeometry("rect"); geometry.Recalculate(5, 5); return geometry})();
 
         if(!originalObject.isChart())
         {
-            this.brush = originalObject.brush;
+            if(originalObject.blipFill)
+            {
+                this.brush = new AscFormat.CUniFill();
+                this.brush.fill = originalObject.blipFill;
+            }
+            else
+            {
+                this.brush = originalObject.brush;
+            }
             this.pen = originalObject.pen;
         }
         else
@@ -380,7 +305,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
         this.isLine = originalObject.spPr && originalObject.spPr.geometry && originalObject.spPr.geometry.preset === "line";
         this.bChangeCoef = this.translatetNumberHandle % 2 === 0 && this.originalFlipH !== this.originalFlipV;
 
-        this.overlayObject = new OverlayObject(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.resizedExtX, this.resizedExtY, this.brush, this.pen, this.transform);
 
 
         this.track = function(kd1, kd2, e)
@@ -861,7 +786,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         this.draw = function(overlay, transform)
         {
-            if(isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
+            if(AscFormat.isRealNumber(this.originalObject.selectStartPage) && overlay.SetCurrentPage)
             {
                 overlay.SetCurrentPage(this.originalObject.selectStartPage);
             }
@@ -870,7 +795,7 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
         this.getBounds = function()
         {
-            var boundsChecker = new  CSlideBoundsChecker();
+            var boundsChecker = new  AscFormat.CSlideBoundsChecker();
             var tr = null;
             if(this.originalObject && this.originalObject.parent)
             {
@@ -933,19 +858,19 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
                     this.resizedPosY = 0;
                 }
             }
-            CheckSpPrXfrm(this.originalObject);
+            AscFormat.CheckSpPrXfrm(this.originalObject);
             var xfrm = this.originalObject.spPr.xfrm;
             xfrm.setOffX(this.resizedPosX/scale_coefficients.cx + ch_off_x);
             xfrm.setOffY(this.resizedPosY/scale_coefficients.cy + ch_off_y);
             xfrm.setExtX(this.resizedExtX/scale_coefficients.cx);
             xfrm.setExtY(this.resizedExtY/scale_coefficients.cy);
-            if(this.originalObject.getObjectType() !== historyitem_type_ChartSpace)
+            if(this.originalObject.getObjectType() !== AscDFH.historyitem_type_ChartSpace)
             {
                 xfrm.setFlipH(this.resizedflipH);
                 xfrm.setFlipV(this.resizedflipV);
             }
 
-            CheckShapeBodyAutoFitReset(this.originalObject);
+            AscFormat.CheckShapeBodyAutoFitReset(this.originalObject);
             this.originalObject.checkDrawingBaseCoords();
         };
     }, this, []);
@@ -953,14 +878,14 @@ function ResizeTrackShapeImage(originalObject, cardDirection)
 
 function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.original = originalObject;
 
         this.originalObject = originalObject;
         this.parentTrack = parentTrack;
         var numberHandle;
-        if(isRealNumber(cardDirection))
+        if(AscFormat.isRealNumber(cardDirection))
         {
             this.numberHandle = originalObject.getNumByCardDirection(cardDirection);
             numberHandle =  this.numberHandle;
@@ -974,7 +899,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(checkNormalRotate(this.rot));
+        this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.childs = [];
         var a = originalObject.spTree;
         for(var i = 0; i < a.length; ++i)
@@ -1532,7 +1457,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.draw = function(graphics)
         {
-            if( isRealNumber(this.originalObject.selectStartPage) && graphics.SetCurrentPage)
+            if( AscFormat.isRealNumber(this.originalObject.selectStartPage) && graphics.SetCurrentPage)
             {
                 graphics.SetCurrentPage(this.originalObject.selectStartPage);
             }
@@ -1543,7 +1468,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
         };
         this.getBounds = function()
         {
-            var boundsChecker = new  CSlideBoundsChecker();
+            var boundsChecker = new  AscFormat.CSlideBoundsChecker();
             this.draw(boundsChecker);
             var tr = this.transform;
             var arr_p_x = [];
@@ -1581,18 +1506,18 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
         this.trackEnd = function(bWord)
         {
-            if(!isRealObject(this.original.group))
+            if(!AscCommon.isRealObject(this.original.group))
             {
                 this.original.normalize();
             }
 
             if(!this.original.spPr)
             {
-                this.original.setSpPr(new CSpPr());
+                this.original.setSpPr(new AscFormat.CSpPr());
             }
             if(!this.original.spPr.xfrm)
             {
-                this.original.spPr.setXfrm(new CXfrm());
+                this.original.spPr.setXfrm(new AscFormat.CXfrm());
                 this.original.spPr.xfrm.setParent(this.original.spPr);
             }
             var xfrm = this.original.spPr.xfrm;
@@ -1616,7 +1541,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
             }
             this.original.checkDrawingBaseCoords();
 
-            CheckShapeBodyAutoFitReset(this.original);
+            AscFormat.CheckShapeBodyAutoFitReset(this.original);
 
 
         };
@@ -1627,7 +1552,7 @@ function ResizeTrackGroup(originalObject, cardDirection, parentTrack)
 
 function ShapeForResizeInGroup(originalObject, parentTrack)
 {
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         this.originalObject = originalObject;
         this.parentTrack = parentTrack;
@@ -1639,15 +1564,25 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         this.flipH = originalObject.flipH;
         this.flipV = originalObject.flipV;
         this.transform = originalObject.transform.CreateDublicate();
-        this.bSwapCoef = !(checkNormalRotate(this.rot));
+        this.bSwapCoef = !(AscFormat.checkNormalRotate(this.rot));
         this.centerDistX = this.x + this.extX*0.5 - this.parentTrack.extX*0.5;
         this.centerDistY = this.y + this.extY*0.5 - this.parentTrack.extY*0.5;
-        this.geometry = !(originalObject.getObjectType() === historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
+        this.geometry = !(originalObject.getObjectType() === AscDFH.historyitem_type_ChartSpace) && originalObject.spPr.geometry !== null ? originalObject.spPr.geometry.createDuplicate() : null;
         if(this.geometry)
         {
             this.geometry.Recalculate(this.extX, this.extY);
         }
-        this.overlayObject = new OverlayObject(this.geometry, this.extX, this.extY, originalObject.brush, originalObject.pen, this.transform);
+        var brush;
+        if(originalObject.blipFill)
+        {
+            brush = new AscFormat.CUniFill();
+            brush.fill = originalObject.blipFill;
+        }
+        else
+        {
+            brush = originalObject.brush;
+        }
+        this.overlayObject = new AscFormat.OverlayObject(this.geometry, this.extX, this.extY, brush, originalObject.pen, this.transform);
         this.updateSize = function(kw, kh)
         {
             var _kw, _kh;
@@ -1697,7 +1632,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
         this.getBounds = function()
         {
-            var bounds_checker = new  CSlideBoundsChecker();
+            var bounds_checker = new  AscFormat.CSlideBoundsChecker();
             bounds_checker.init(Page_Width, Page_Height, Page_Width, Page_Height);
             this.draw(bounds_checker);
             return {l: bounds_checker.Bounds.min_x, t: bounds_checker.Bounds.min_y, r: bounds_checker.Bounds.max_x , b: bounds_checker.Bounds.max_y};
@@ -1708,7 +1643,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
 
             if(!this.originalObject.spPr.xfrm)
             {
-                this.originalObject.spPr.setXfrm(new CXfrm());
+                this.originalObject.spPr.setXfrm(new AscFormat.CXfrm());
                 this.originalObject.spPr.xfrm.setParent(this.originalObject.spPr);
             }
             var xfrm = this.originalObject.spPr.xfrm;
@@ -1717,7 +1652,7 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
             xfrm.setExtX(this.extX);
             xfrm.setExtY(this.extY);
 
-            CheckShapeBodyAutoFitReset(this.originalObject);
+            AscFormat.CheckShapeBodyAutoFitReset(this.originalObject);
         };
 
         this.updateTransform = function()
@@ -1741,3 +1676,11 @@ function ShapeForResizeInGroup(originalObject, parentTrack)
         };
     }, this, []);
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].SHAPE_EXT = SHAPE_EXT;
+    window['AscFormat'].CreatePenBrushForChartTrack = CreatePenBrushForChartTrack;
+    window['AscFormat'].ResizeTrackShapeImage = ResizeTrackShapeImage;
+    window['AscFormat'].ResizeTrackGroup = ResizeTrackGroup;
+})(window);

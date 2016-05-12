@@ -1,3 +1,27 @@
+/*
+ *
+ * (c) Copyright Ascensio System Limited 2010-2016
+ *
+ * This program is freeware. You can redistribute it and/or modify it under the terms of the GNU 
+ * General Public License (GPL) version 3 as published by the Free Software Foundation (https://www.gnu.org/copyleft/gpl.html). 
+ * In accordance with Section 7(a) of the GNU GPL its Section 15 shall be amended to the effect that 
+ * Ascensio System SIA expressly excludes the warranty of non-infringement of any third-party rights.
+ *
+ * THIS PROGRAM IS DISTRIBUTED WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR
+ * FITNESS FOR A PARTICULAR PURPOSE. For more details, see GNU GPL at https://www.gnu.org/copyleft/gpl.html
+ *
+ * You can contact Ascensio System SIA by email at sales@onlyoffice.com
+ *
+ * The interactive user interfaces in modified source and object code versions of ONLYOFFICE must display 
+ * Appropriate Legal Notices, as required under Section 5 of the GNU GPL version 3.
+ *
+ * Pursuant to Section 7  3(b) of the GNU GPL you must retain the original ONLYOFFICE logo which contains 
+ * relevant author attributions when distributing the software. If the display of the logo in its graphic 
+ * form is not reasonably feasible for technical reasons, you must include the words "Powered by ONLYOFFICE" 
+ * in every copy of the program you distribute. 
+ * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
+ *
+ */
 "use strict";
 
 function CMathLimitPr()
@@ -186,7 +210,7 @@ function CLimit(props)
 }
 AscCommon.extendClass(CLimit, CMathBase);
 
-CLimit.prototype.ClassType = historyitem_type_lim;
+CLimit.prototype.ClassType = AscDFH.historyitem_type_lim;
 CLimit.prototype.kind      = MATH_LIMIT;
 
 CLimit.prototype.init = function(props)
@@ -259,7 +283,7 @@ CLimit.prototype.Apply_MenuProps = function(Props)
 
         if(this.Pr.type !== Type)
         {
-            History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
+            AscCommon.History.Add(this, new CChangesMathLimitType(Type, this.Pr.type));
             this.raw_SetType(Type);
         }
     }
@@ -333,7 +357,7 @@ function CMathFunc(props)
 }
 AscCommon.extendClass(CMathFunc, CMathBase);
 
-CMathFunc.prototype.ClassType = historyitem_type_mathFunc;
+CMathFunc.prototype.ClassType = AscDFH.historyitem_type_mathFunc;
 CMathFunc.prototype.kind      = MATH_FUNCTION;
 
 CMathFunc.prototype.init = function(props)
@@ -380,3 +404,8 @@ CMathFunc.prototype.fillContent = function()
     this.elements[0][0] = this.getFName();
     this.elements[0][1] = this.getArgument();
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CMathFunc = CMathFunc;
+window['AscCommonWord'].CLimit = CLimit;

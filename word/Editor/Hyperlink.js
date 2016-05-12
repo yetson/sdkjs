@@ -24,9 +24,8 @@
 */
 "use strict";
 
-/**
- * Created by Ilja.Kirillov on 17.02.14.
- */
+// Import
+var History = AscCommon.History;
 
 /**
  *
@@ -84,7 +83,7 @@ ParaHyperlink.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
         return;
     }
 
-    History.Add( this, { Type : historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
 
     ParaHyperlink.superclass.Add_ToContent.apply(this, arguments);
 };
@@ -93,7 +92,7 @@ ParaHyperlink.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
     ParaHyperlink.superclass.Remove_FromContent.apply(this, arguments);
 };
@@ -289,7 +288,7 @@ ParaHyperlink.prototype.Get_Visited = function()
 
 ParaHyperlink.prototype.Set_ToolTip = function(ToolTip)
 {
-    History.Add( this, { Type : historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
+    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_ToolTip, New : ToolTip, Old : this.ToolTip } );
     this.ToolTip = ToolTip;
 };
 
@@ -313,7 +312,7 @@ ParaHyperlink.prototype.Get_Value = function()
 
 ParaHyperlink.prototype.Set_Value = function(Value)
 {
-    History.Add( this, { Type : historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
+    History.Add( this, { Type : AscDFH.historyitem_Hyperlink_Value, New : Value, Old : this.Value } );
     this.Value = Value;
 };
 
@@ -325,7 +324,7 @@ ParaHyperlink.prototype.Undo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Hyperlink_AddItem :
+        case AscDFH.historyitem_Hyperlink_AddItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.private_UpdateTrackRevisions();
@@ -333,7 +332,7 @@ ParaHyperlink.prototype.Undo = function(Data)
             break;
         }
 
-        case historyitem_Hyperlink_RemoveItem :
+        case AscDFH.historyitem_Hyperlink_RemoveItem :
         {
             var Pos = Data.Pos;
 
@@ -346,13 +345,13 @@ ParaHyperlink.prototype.Undo = function(Data)
             break;
         }
 
-        case historyitem_Hyperlink_Value :
+        case AscDFH.historyitem_Hyperlink_Value :
         {
             this.Value = Data.Old;
             break;
         }
 
-        case historyitem_Hyperlink_ToolTip :
+        case AscDFH.historyitem_Hyperlink_ToolTip :
         {
             this.ToolTip = Data.Old;
             break;
@@ -365,7 +364,7 @@ ParaHyperlink.prototype.Redo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Hyperlink_AddItem :
+        case AscDFH.historyitem_Hyperlink_AddItem :
         {
             var Pos = Data.Pos;
 
@@ -378,7 +377,7 @@ ParaHyperlink.prototype.Redo = function(Data)
             break;
         }
 
-        case historyitem_Hyperlink_RemoveItem :
+        case AscDFH.historyitem_Hyperlink_RemoveItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.private_UpdateTrackRevisions();
@@ -386,13 +385,13 @@ ParaHyperlink.prototype.Redo = function(Data)
             break;
         }
 
-        case historyitem_Hyperlink_Value :
+        case AscDFH.historyitem_Hyperlink_Value :
         {
             this.Value = Data.New;
             break;
         }
 
-        case historyitem_Hyperlink_ToolTip :
+        case AscDFH.historyitem_Hyperlink_ToolTip :
         {
             this.ToolTip = Data.New;
             break;
@@ -408,7 +407,7 @@ ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
     // Long : тип класса
     // Long : тип изменений
 
-    Writer.WriteLong( historyitem_type_Hyperlink );
+    Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );
 
     var Type = Data.Type;
 
@@ -417,7 +416,7 @@ ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
 
     switch(Type)
     {
-        case historyitem_Hyperlink_AddItem :
+        case AscDFH.historyitem_Hyperlink_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -444,7 +443,7 @@ ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_Hyperlink_RemoveItem :
+        case AscDFH.historyitem_Hyperlink_RemoveItem :
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -477,14 +476,14 @@ ParaHyperlink.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_Hyperlink_Value :
+        case AscDFH.historyitem_Hyperlink_Value :
         {
             // String : Value
             Writer.WriteString2( Data.New );
             break;
         }
 
-        case historyitem_Hyperlink_ToolTip :
+        case AscDFH.historyitem_Hyperlink_ToolTip :
         {
             // String : ToolTip
             Writer.WriteString2( Data.New );
@@ -501,14 +500,14 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
     // Long : тип изменений
 
     var ClassType = Reader.GetLong();
-    if ( historyitem_type_Hyperlink != ClassType )
+    if ( AscDFH.historyitem_type_Hyperlink != ClassType )
         return;
 
     var Type = Reader.GetLong();
 
     switch ( Type )
     {
-        case historyitem_Hyperlink_AddItem :
+        case AscDFH.historyitem_Hyperlink_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -527,7 +526,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                 if ( null != Element )
                 {
                     this.Content.splice( Pos, 0, Element );
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
             this.private_UpdateTrackRevisions();
@@ -535,7 +534,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
             break;
         }
 
-        case historyitem_Hyperlink_RemoveItem:
+        case AscDFH.historyitem_Hyperlink_RemoveItem:
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -551,21 +550,21 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
                     continue;
 
                 this.Content.splice( ChangesPos, 1 );
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
             this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
             break;
         }
 
-        case historyitem_Hyperlink_Value:
+        case AscDFH.historyitem_Hyperlink_Value:
         {
             // String : Value
             this.Value = Reader.GetString2();
             break;
         }
 
-        case historyitem_Hyperlink_ToolTip :
+        case AscDFH.historyitem_Hyperlink_ToolTip :
         {
             // String : ToolTip
             this.ToolTip = Reader.GetString2();
@@ -577,7 +576,7 @@ ParaHyperlink.prototype.Load_Changes = function(Reader)
 
 ParaHyperlink.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong( historyitem_type_Hyperlink );
+    Writer.WriteLong( AscDFH.historyitem_type_Hyperlink );
 
     // String : Id
     // String : Value
@@ -639,7 +638,7 @@ ParaHyperlink.prototype.Document_UpdateInterfaceState = function()
     var HyperText = new CParagraphGetText();
     this.Get_Text( HyperText );
 
-    var HyperProps = new CHyperlinkProperty(this);
+    var HyperProps = new Asc.CHyperlinkProperty(this);
     HyperProps.put_Text( HyperText.Text );
 
     editor.sync_HyperlinkPropCallback(HyperProps);
@@ -657,3 +656,7 @@ function CParaHyperLinkStartState(HyperLink)
         this.Content.push(HyperLink.Content);
     }
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaHyperlink = ParaHyperlink;

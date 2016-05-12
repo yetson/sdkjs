@@ -24,9 +24,7 @@
 */
 "use strict";
 
-var K=1/4;
-
-var mt=0, lt=1, cb=2, cl=3;
+(function(window, undefined){
 
 function SplineCommandMoveTo(x, y)
 {
@@ -69,16 +67,16 @@ function SplineCommandBezier(x1, y1, x2, y2, x3, y3)
 function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
 {
 
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         this.pageIndex = pageIndex;
         this.path = [];
 
         this.drawingObjects = drawingObjects;
 
-        this.Matrix = new CMatrix();
-        this.TransformMatrix = new CMatrix();
+        this.Matrix = new AscCommon.CMatrix();
+        this.TransformMatrix = new AscCommon.CMatrix();
 
-        this.style  = CreateDefaultShapeStyle();
+        this.style  = AscFormat.CreateDefaultShapeStyle();
 
         var style = this.style;
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
@@ -100,13 +98,13 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
     this.draw = function(g)
     {
-        if(isRealNumber(this.pageIndex) && g.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && g.SetCurrentPage)
         {
             g.SetCurrentPage(this.pageIndex);
         }
@@ -201,7 +199,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
             }
             else
             {
-                var bezier_polygon = partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, APPROXIMATE_EPSILON);
+                var bezier_polygon = AscFormat.partition_bezier4(last_x, last_y, path_command.x1, path_command.y1, path_command.x2, path_command.y2, path_command.x3, path_command.y3, AscFormat.APPROXIMATE_EPSILON);
                 for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                 {
                     var cur_point = bezier_polygon[point_index];
@@ -230,9 +228,9 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         //    shape.setWorksheet(drawingObjects.getWorksheetModel());
         //    shape.addToDrawingObjects();
         //}
-        shape.setSpPr(new CSpPr());
+        shape.setSpPr(new AscFormat.CSpPr());
         shape.spPr.setParent(shape);
-        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.setXfrm(new AscFormat.CXfrm());
         shape.spPr.xfrm.setParent(shape.spPr);
         if(!bWord)
         {
@@ -247,9 +245,9 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
         }
         shape.spPr.xfrm.setExtX(xMax-xMin);
         shape.spPr.xfrm.setExtY(yMax - yMin);
-        shape.setStyle(CreateDefaultShapeStyle());
+        shape.setStyle(AscFormat.CreateDefaultShapeStyle());
 
-        var geometry = new Geometry();
+        var geometry = new AscFormat.Geometry();
         var w = xMax - xMin, h = yMax-yMin;
         var kw, kh, pathW, pathH;
         if(w > 0)
@@ -313,7 +311,7 @@ function Spline(drawingObjects, theme, master, layout, slide, pageIndex)
     };
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         boundsChecker.Bounds.posX = boundsChecker.Bounds.min_x;
         boundsChecker.Bounds.posY = boundsChecker.Bounds.min_y;
@@ -336,7 +334,7 @@ function SplineForDrawer(spline)
         graphics.SetIntegerGrid(false);
         graphics.transform3(this.Matrix);
 
-        var shape_drawer = new CShapeDrawer();
+        var shape_drawer = new AscCommon.CShapeDrawer();
         shape_drawer.fromShape(this, graphics);
         shape_drawer.draw(this);
     };
@@ -375,3 +373,11 @@ function SplineForDrawer(spline)
         g.ds();
     }
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].SplineCommandMoveTo = SplineCommandMoveTo;
+    window['AscFormat'].SplineCommandLineTo = SplineCommandLineTo;
+    window['AscFormat'].SplineCommandBezier = SplineCommandBezier;
+    window['AscFormat'].Spline = Spline;
+})(window);

@@ -24,6 +24,82 @@
 */
 "use strict";
 
+(function(window, undefined){
+
+    var MIN_SHAPE_SIZE = 1.27;//размер меньше которого нельзя уменшить автофигуру или картинку по горизонтали или вертикали
+    var MIN_SHAPE_SIZE_DIV2 = MIN_SHAPE_SIZE/2.0;
+
+    var SHAPE_ASPECTS = {};
+    SHAPE_ASPECTS["can"] = 3616635/4810125;
+    SHAPE_ASPECTS["moon"] = 457200/914400;
+    SHAPE_ASPECTS["leftBracket"] = 73152/914400;
+    SHAPE_ASPECTS["rightBracket"] = 73152/914400;
+    SHAPE_ASPECTS["leftBrace"] = 155448/914400;
+    SHAPE_ASPECTS["rightBrace"] = 155448/914400;
+    SHAPE_ASPECTS["triangle"] = 1060704/914400;
+    SHAPE_ASPECTS["parallelogram"] = 1216152/914400;
+    SHAPE_ASPECTS["trapezoid"] = 914400/1216152;
+    SHAPE_ASPECTS["pentagon"] = 960120/914400;
+    SHAPE_ASPECTS["hexagon"] = 1060704/914400;
+    SHAPE_ASPECTS["bracePair"] = 1069848/914400;
+    SHAPE_ASPECTS["rightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["leftArrow"] = 978408/484632;
+    SHAPE_ASPECTS["upArrow"] = 484632/978408;
+    SHAPE_ASPECTS["downArrow"] = 484632/978408;
+    SHAPE_ASPECTS["leftRightArrow"] = 1216152/484632;
+    SHAPE_ASPECTS["upDownArrow"] = 484632/1216152;
+    SHAPE_ASPECTS["bentArrow"] = 813816/868680;
+    SHAPE_ASPECTS["uturnArrow"] = 886968/877824;
+    SHAPE_ASPECTS["bentUpArrow"] = 850392/731520;
+    SHAPE_ASPECTS["curvedRightArrow"] = 731520/1216152;
+    SHAPE_ASPECTS["curvedLeftArrow"] = 731520/1216152;
+    SHAPE_ASPECTS["curvedUpArrow"] = 1216152/731520;
+    SHAPE_ASPECTS["curvedDownArrow"] = 1216152/731520;
+    SHAPE_ASPECTS["stripedRightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["notchedRightArrow"] = 978408/484632;
+    SHAPE_ASPECTS["homePlate"] = 978408/484632;
+    SHAPE_ASPECTS["leftRightArrowCallout"] = 1216152/576072;
+    SHAPE_ASPECTS["flowChartProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartAlternateProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartDecision"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartInputOutput"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartPredefinedProcess"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartDocument"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMultidocument"] = 1060704/758952;
+    SHAPE_ASPECTS["flowChartTerminator"] = 914400/301752;
+    SHAPE_ASPECTS["flowChartPreparation"] = 1060704/612648;
+    SHAPE_ASPECTS["flowChartManualInput"] = 914400/457200;
+    SHAPE_ASPECTS["flowChartManualOperation"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartPunchedCard"] = 914400/804672;
+    SHAPE_ASPECTS["flowChartPunchedTape"] = 914400/804672;
+    SHAPE_ASPECTS["flowChartPunchedTape"] = 457200/914400;
+    SHAPE_ASPECTS["flowChartSort"] = 457200/914400;
+    SHAPE_ASPECTS["flowChartOnlineStorage"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMagneticDisk"] = 914400/612648;
+    SHAPE_ASPECTS["flowChartMagneticDrum"] = 914400/685800;
+    SHAPE_ASPECTS["flowChartDisplay"] = 914400/612648;
+    SHAPE_ASPECTS["ribbon2"] = 1216152/612648;
+    SHAPE_ASPECTS["ribbon"] = 1216152/612648;
+    SHAPE_ASPECTS["ellipseRibbon2"] = 1216152/758952;
+    SHAPE_ASPECTS["ellipseRibbon"] = 1216152/758952;
+    SHAPE_ASPECTS["verticalScroll"] = 1033272/1143000;
+    SHAPE_ASPECTS["horizontalScroll"] = 1143000/1033272;
+    SHAPE_ASPECTS["wedgeRectCallout"] = 914400/612648;
+    SHAPE_ASPECTS["wedgeRoundRectCallout"] = 914400/612648;
+    SHAPE_ASPECTS["wedgeEllipseCallout"] = 914400/612648;
+    SHAPE_ASPECTS["cloudCallout"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["borderCallout3"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["accentCallout3"] = 914400/612648;
+    SHAPE_ASPECTS["callout1"] = 914400/612648;
+    SHAPE_ASPECTS["callout2"] = 914400/612648;
+    SHAPE_ASPECTS["callout3"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout1"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout2"] = 914400/612648;
+    SHAPE_ASPECTS["accentBorderCallout3"] = 914400/612648;
 
 function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide, pageIndex)
 {
@@ -36,11 +112,11 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
     this.extX = null;
     this.extY = null;
     this.arrowsCount = 0;
-    this.transform = new CMatrix();
+    this.transform = new AscCommon.CMatrix();
     this.pageIndex = pageIndex;
     this.theme = theme;
 
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         var style;
 
         if(presetGeom.indexOf("WithArrow") > -1)
@@ -65,11 +141,11 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
             else
             {
-                style = CreateDefaultShapeStyle(this.presetGeom);
+                style = AscFormat.CreateDefaultShapeStyle(this.presetGeom);
             }
         }
         else
-            style = CreateDefaultTextRectStyle();
+            style = AscFormat.CreateDefaultTextRectStyle();
         var brush = theme.getFillStyle(style.fillRef.idx);
         style.fillRef.Color.Calculate(theme, slide, layout, master, {R:0, G: 0, B:0, A:255});
         var RGBA = style.fillRef.Color.RGBA;
@@ -87,38 +163,38 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         if(presetGeom === "textRect")
         {
             var ln, fill;
-            ln = new CLn();
+            ln = new AscFormat.CLn();
             ln.w = 6350;
-            ln.Fill = new CUniFill();
-            ln.Fill.fill = new CSolidFill();
-            ln.Fill.fill.color = new CUniColor();
-            ln.Fill.fill.color.color  = new CPrstColor();
+            ln.Fill = new AscFormat.CUniFill();
+            ln.Fill.fill = new AscFormat.CSolidFill();
+            ln.Fill.fill.color = new AscFormat.CUniColor();
+            ln.Fill.fill.color.color  = new AscFormat.CPrstColor();
             ln.Fill.fill.color.color.id = "black";
 
-            fill = new CUniFill();
-            fill.fill = new CSolidFill();
-            fill.fill.color = new CUniColor();
-            fill.fill.color.color  = new CSchemeColor();
+            fill = new AscFormat.CUniFill();
+            fill.fill = new AscFormat.CSolidFill();
+            fill.fill.color = new AscFormat.CUniColor();
+            fill.fill.color.color  = new AscFormat.CSchemeColor();
             fill.fill.color.color.id = 12;
             pen.merge(ln);
             brush.merge(fill);
             if(slide)
             {
-                brush = CreateNoFillUniFill();
-                pen = CreateNoFillLine();
+                brush = AscFormat.CreateNoFillUniFill();
+                pen = AscFormat.CreateNoFillLine();
             }
         }
 
         if(this.arrowsCount > 0)
         {
-            pen.setTailEnd(new EndArrow());
-            pen.tailEnd.setType(LineEndType.Arrow);
-            pen.tailEnd.setLen(LineEndSize.Mid);
+            pen.setTailEnd(new AscFormat.EndArrow());
+            pen.tailEnd.setType(AscFormat.LineEndType.Arrow);
+            pen.tailEnd.setLen(AscFormat.LineEndSize.Mid);
             if(this.arrowsCount === 2)
             {
-                pen.setHeadEnd(new EndArrow());
-                pen.headEnd.setType(LineEndType.Arrow);
-                pen.headEnd.setLen(LineEndSize.Mid);
+                pen.setHeadEnd(new AscFormat.EndArrow());
+                pen.headEnd.setType(AscFormat.LineEndType.Arrow);
+                pen.headEnd.setLen(AscFormat.LineEndSize.Mid);
             }
         }
         if(presetGeom !== "textRect")
@@ -137,7 +213,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
             }
         }
 
-        var geometry = CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
+        var geometry = AscFormat.CreateGeometry(presetGeom !== "textRect" ? presetGeom : "rect");
 
         if(pen.Fill)
         {
@@ -147,7 +223,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
         this.isLine = this.presetGeom === "line";
 
-        this.overlayObject = new OverlayObject(geometry, 5, 5, brush, pen, this.transform);
+        this.overlayObject = new AscFormat.OverlayObject(geometry, 5, 5, brush, pen, this.transform);
         this.shape = null;
 
     }, this, []);
@@ -221,7 +297,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         {
 
             var new_width, new_height;
-            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            var prop_coefficient = (typeof AscFormat.SHAPE_ASPECTS[this.presetGeom] === "number" ? AscFormat.SHAPE_ASPECTS[this.presetGeom] : 1);
             if(abs_dist_y === 0)
             {
                 new_width = abs_dist_x > MIN_SHAPE_SIZE ? abs_dist_x : MIN_SHAPE_SIZE;
@@ -302,7 +378,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         else
         {
             var new_width, new_height;
-            var prop_coefficient = (typeof SHAPE_ASPECTS[this.presetGeom] === "number" ? SHAPE_ASPECTS[this.presetGeom] : 1);
+            var prop_coefficient = (typeof AscFormat.SHAPE_ASPECTS[this.presetGeom] === "number" ? AscFormat.SHAPE_ASPECTS[this.presetGeom] : 1);
             if(abs_dist_y === 0)
             {
                 new_width = abs_dist_x > MIN_SHAPE_SIZE_DIV2 ? abs_dist_x*2 : MIN_SHAPE_SIZE;
@@ -359,17 +435,17 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         this.transform.Reset();
         var hc = this.extX * 0.5;
         var vc = this.extY * 0.5;
-        global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
+        AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, -hc, -vc);
         if (this.flipH)
-            global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
+            AscCommon.global_MatrixTransformer.ScaleAppend(this.transform, -1, 1);
         if (this.flipV)
-            global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
-        global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
+            AscCommon.global_MatrixTransformer.ScaleAppend(this.transform, 1, -1);
+        AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, this.x + hc, this.y + vc);
     };
 
     this.draw = function(overlay)
     {
-        if(isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
+        if(AscFormat.isRealNumber(this.pageIndex) && overlay.SetCurrentPage)
         {
             overlay.SetCurrentPage(this.pageIndex);
         }
@@ -378,14 +454,14 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getShape = function(bFromWord, DrawingDocument, drawingObjects)
     {
-        var shape = new CShape();
+        var shape = new AscFormat.CShape();
         if(drawingObjects)
         {
             shape.setDrawingObjects(drawingObjects);
         }
-        shape.setSpPr(new CSpPr());
+        shape.setSpPr(new AscFormat.CSpPr());
         shape.spPr.setParent(shape);
-        shape.spPr.setXfrm(new CXfrm());
+        shape.spPr.setXfrm(new AscFormat.CXfrm());
         if(bFromWord)
         {
             shape.setWordShape(true);
@@ -413,69 +489,69 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
         if(this.presetGeom === "textRect")
         {
-            shape.spPr.setGeometry(CreateGeometry("rect"));
+            shape.spPr.setGeometry(AscFormat.CreateGeometry("rect"));
             shape.spPr.geometry.setParent(shape.spPr);
             var fill, ln;
             if(!drawingObjects || !drawingObjects.cSld)
             {
-                shape.setStyle(CreateDefaultTextRectStyle());
+                shape.setStyle(AscFormat.CreateDefaultTextRectStyle());
 
-                fill = new CUniFill();
-                fill.setFill(new CSolidFill());
-                fill.fill.setColor(new CUniColor());
-                fill.fill.color.setColor(new CSchemeColor());
+                fill = new AscFormat.CUniFill();
+                fill.setFill(new AscFormat.CSolidFill());
+                fill.fill.setColor(new AscFormat.CUniColor());
+                fill.fill.color.setColor(new AscFormat.CSchemeColor());
                 fill.fill.color.color.setId(12);
                 shape.spPr.setFill(fill);
 
-                ln = new CLn();
+                ln = new AscFormat.CLn();
                 ln.setW(6350);
-                ln.setFill(new CUniFill());
-                ln.Fill.setFill(new CSolidFill());
-                ln.Fill.fill.setColor(new CUniColor());
-                ln.Fill.fill.color.setColor(new CPrstColor());
+                ln.setFill(new AscFormat.CUniFill());
+                ln.Fill.setFill(new AscFormat.CSolidFill());
+                ln.Fill.fill.setColor(new AscFormat.CUniColor());
+                ln.Fill.fill.color.setColor(new AscFormat.CPrstColor());
                 ln.Fill.fill.color.color.setId("black");
                 shape.spPr.setLn(ln);
             }
             else
             {
-                fill = new CUniFill();
-                fill.setFill(new CNoFill());
+                fill = new AscFormat.CUniFill();
+                fill.setFill(new AscFormat.CNoFill());
                 shape.spPr.setFill(fill);
             }
             if(bFromWord)
             {
                 shape.setTextBoxContent(new CDocumentContent(shape, DrawingDocument, 0, 0, 0, 0, false, false, false));
-                var body_pr = new CBodyPr();
+                var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
                 shape.setBodyPr(body_pr);
             }
             else
             {
-                shape.setTxBody(new CTextBody());
+                shape.setTxBody(new AscFormat.CTextBody());
                 var content = new CDocumentContent(shape.txBody, DrawingDocument, 0, 0, 0, 0, false, false, true);
                 shape.txBody.setParent(shape);
                 shape.txBody.setContent(content);
-                var body_pr = new CBodyPr();
+                var body_pr = new AscFormat.CBodyPr();
                 body_pr.setDefault();
                 shape.txBody.setBodyPr(body_pr);
             }
         }
         else
         {
-            shape.spPr.setGeometry(CreateGeometry(this.presetGeom));
+            shape.spPr.setGeometry(AscFormat.CreateGeometry(this.presetGeom));
             shape.spPr.geometry.setParent(shape.spPr);
-            shape.setStyle(CreateDefaultShapeStyle(this.presetGeom));
+            shape.setStyle(AscFormat.CreateDefaultShapeStyle(this.presetGeom));
             if(this.arrowsCount > 0)
             {
-                var ln = new CLn();
-                ln.setTailEnd(new EndArrow());
-                ln.tailEnd.setType(LineEndType.Arrow);
-                ln.tailEnd.setLen(LineEndSize.Mid);
+                var ln = new AscFormat.CLn();
+                ln.setTailEnd(new AscFormat.EndArrow());
+                ln.tailEnd.setType(AscFormat.LineEndType.Arrow);
+                ln.tailEnd.setLen(AscFormat.LineEndSize.Mid);
                 if(this.arrowsCount === 2)
                 {
-                    ln.setHeadEnd(new EndArrow());
-                    ln.headEnd.setType(LineEndType.Arrow);
-                    ln.headEnd.setLen(LineEndSize.Mid);
+                    ln.setHeadEnd(new AscFormat.EndArrow());
+                    ln.headEnd.setType(AscFormat.LineEndType.Arrow);
+                    ln.headEnd.setLen(AscFormat.LineEndSize.Mid);
                 }
                 shape.spPr.setLn(ln);
             }
@@ -514,7 +590,7 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
 
     this.getBounds = function()
     {
-        var boundsChecker = new  CSlideBoundsChecker();
+        var boundsChecker = new  AscFormat.CSlideBoundsChecker();
         this.draw(boundsChecker);
         var tr = this.transform;
         var arr_p_x = [];
@@ -544,3 +620,8 @@ function NewShapeTrack(presetGeom, startX, startY, theme, master, layout, slide,
         return boundsChecker.Bounds;
     }
 }
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].SHAPE_ASPECTS = SHAPE_ASPECTS;
+    window['AscFormat'].NewShapeTrack = NewShapeTrack;
+})(window);

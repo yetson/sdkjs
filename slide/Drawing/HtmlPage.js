@@ -24,14 +24,22 @@
 */
 "use strict";
 
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
+// Import
+var MOVE_DELTA = AscFormat.MOVE_DELTA;
 
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+var g_anchor_left = AscCommon.g_anchor_left;
+var g_anchor_top = AscCommon.g_anchor_top;
+var g_anchor_right = AscCommon.g_anchor_right;
+var g_anchor_bottom = AscCommon.g_anchor_bottom;
+var CreateControlContainer = AscCommon.CreateControlContainer;
+var CreateControl = AscCommon.CreateControl;
+var global_keyboardEvent = AscCommon.global_keyboardEvent;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile = AscCommon.AscBrowser.isMobile;
-var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 297;
 var Page_Height    = 210;
@@ -41,12 +49,8 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var X_Left_Field   = X_Left_Margin;
 var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
-
-
 
 var GlobalSkinTeamlab = {
     Name : "classic",
@@ -86,6 +90,22 @@ var GlobalSkinFlat = {
 };
 
 var GlobalSkin = GlobalSkinTeamlab;
+
+function updateGlobalSkin(newSkin) {
+    GlobalSkin.Name = newSkin.Name;
+    GlobalSkin.RulersButton = newSkin.RulersButton;
+    GlobalSkin.NavigationButtons = newSkin.NavigationButtons;
+    GlobalSkin.BackgroundColor = newSkin.BackgroundColor;
+    GlobalSkin.RulerDark = newSkin.RulerDark;
+    GlobalSkin.RulerLight = newSkin.RulerLight;
+    GlobalSkin.BackgroundScroll = newSkin.BackgroundScroll;
+    GlobalSkin.RulerOutline = newSkin.RulerOutline;
+    GlobalSkin.RulerMarkersFillColor = newSkin.RulerMarkersFillColor;
+    GlobalSkin.PageOutline = newSkin.PageOutline;
+    GlobalSkin.STYLE_THUMBNAIL_WIDTH = newSkin.STYLE_THUMBNAIL_WIDTH;
+    GlobalSkin.STYLE_THUMBNAIL_HEIGHT = newSkin.STYLE_THUMBNAIL_HEIGHT;
+    GlobalSkin.isNeedInvertOnActive = newSkin.isNeedInvertOnActive;
+}
 
 function CEditorPage(api)
 {
@@ -142,7 +162,7 @@ function CEditorPage(api)
     this.m_oMainView        = null;
     this.m_oEditor          = null;
     this.m_oOverlay         = null;
-    this.m_oOverlayApi      = new COverlay();
+    this.m_oOverlayApi      = new AscCommon.COverlay();
     this.m_oOverlayApi.m_bIsAlwaysUpdateOverlay = true;
     // ->
     // ------------------------------------------------------------------
@@ -168,7 +188,7 @@ function CEditorPage(api)
     this.zoom_values = [50,60,70,80,90,100,110,120,130,140,150,160,170,180,190,200];
     this.m_nZoomType = 2; // 0 - custom, 1 - fitToWodth, 2 - fitToPage
 
-    this.m_oBoundsController = new CBoundsController();
+    this.m_oBoundsController = new AscFormat.CBoundsController();
     this.m_nTabsType        = 0;
 
     this.m_dScrollY         = 0;
@@ -196,7 +216,7 @@ function CEditorPage(api)
     this.m_oVerRuler        = new CVerRuler();
     this.m_oVerRuler.IsCanMoveMargins = false;
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oLayoutDrawer = new CLayoutThumbnailDrawer();
@@ -224,7 +244,7 @@ function CEditorPage(api)
 
     this.Thumbnails = new CThumbnailsManager();
     this.SlideDrawer = new CSlideDrawer();
-    this.SlideBoundsOnCalculateSize = new CBoundsController();
+    this.SlideBoundsOnCalculateSize = new AscFormat.CBoundsController();
     this.MainScrollsEnabledFlag = 0;
 
     this.bIsUseKeyPress = true;
@@ -521,7 +541,7 @@ function CEditorPage(api)
         this.m_oOverlayApi.m_oHtmlPage = this;
         this.m_oOverlayApi.Clear();
 
-        this.m_oDrawingDocument.AutoShapesTrack = new CAutoshapeTrack();
+        this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
         this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
 
         this.SlideDrawer.m_oWordControl = this;
@@ -596,9 +616,9 @@ function CEditorPage(api)
 
     this.initEvents = function()
     {
-        this.arrayEventHandlers[0] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
-        this.arrayEventHandlers[1] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
-        this.arrayEventHandlers[2] = new button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
+        this.arrayEventHandlers[0] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
+        this.arrayEventHandlers[1] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
+        this.arrayEventHandlers[2] = new AscCommon.button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
 
         this.m_oLeftRuler_buttonsTabs.HtmlElement.onclick = this.onButtonTabsClick;
 
@@ -810,7 +830,7 @@ function CEditorPage(api)
         this.m_nZoomType = type;
 
         // нужно проверить режим и сбросить кеш грамотно (ie version)
-        g_fontManager.ClearRasterMemory();
+        AscCommon.g_fontManager.ClearRasterMemory();
 
         var oWordControl = oThis;
 
@@ -1010,19 +1030,19 @@ function CEditorPage(api)
     this.onButtonTabsClick = function()
     {
         var oWordControl = oThis;
-        if (oWordControl.m_nTabsType == g_tabtype_left)
+        if (oWordControl.m_nTabsType == AscCommon.g_tabtype_left)
         {
-            oWordControl.m_nTabsType = g_tabtype_center;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_center;
             oWordControl.onButtonTabsDraw();
         }
-        else if (oWordControl.m_nTabsType == g_tabtype_center)
+        else if (oWordControl.m_nTabsType == AscCommon.g_tabtype_center)
         {
-            oWordControl.m_nTabsType = g_tabtype_right;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_right;
             oWordControl.onButtonTabsDraw();
         }
         else
         {
-            oWordControl.m_nTabsType = g_tabtype_left;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_left;
             oWordControl
                 .onButtonTabsDraw();
         }
@@ -1053,13 +1073,13 @@ function CEditorPage(api)
         _ctx.strokeStyle = "#3E3E3E";
 
         _ctx.lineWidth = 2;
-        if (this.m_nTabsType == g_tabtype_left)
+        if (this.m_nTabsType == AscCommon.g_tabtype_left)
         {
             _ctx.moveTo(8, 9);
             _ctx.lineTo(8, 14);
             _ctx.lineTo(13, 14);
         }
-        else if (this.m_nTabsType == g_tabtype_center)
+        else if (this.m_nTabsType == AscCommon.g_tabtype_center)
         {
             _ctx.moveTo(6, 14);
             _ctx.lineTo(14, 14);
@@ -1318,7 +1338,7 @@ function CEditorPage(api)
         var _isCatch = false;
 
         var downClick = global_mouseEvent.ClickCount;
-        check_MouseDownEvent(e, true);
+        AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.ClickCount = downClick;
         global_mouseEvent.LockMouse();
 
@@ -1365,7 +1385,7 @@ function CEditorPage(api)
 
         var _isCatch = false;
 
-        check_MouseMoveEvent(e, true);
+        AscCommon.check_MouseMoveEvent(e, true);
 
         var oWordControl = oThis;
 
@@ -1481,7 +1501,7 @@ function CEditorPage(api)
 
         var _isCatch = false;
 
-        check_MouseUpEvent(e, true);
+        AscCommon.check_MouseUpEvent(e, true);
 
         var oWordControl = oThis;
         oWordControl.m_oDrawingDocument.UnlockCursorType();
@@ -1558,10 +1578,10 @@ function CEditorPage(api)
             _yOffset += (7 * g_dKoef_mm_to_pix);
         }
 
-        if (window.closeDialogs != undefined)
-            closeDialogs();
+        if (window['closeDialogs'] != undefined)
+            window['closeDialogs']();
 
-        check_MouseDownEvent(e, true);
+        AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.LockMouse();
 
         if ((0 == global_mouseEvent.Button) || (undefined == global_mouseEvent.Button))
@@ -1622,7 +1642,7 @@ function CEditorPage(api)
         if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
             return;
 
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
         var pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
         if (pos.Page == -1)
             return;
@@ -1671,7 +1691,7 @@ function CEditorPage(api)
             return false;
         }
 
-        check_MouseUpEvent(e);
+        AscCommon.check_MouseUpEvent(e);
 
         if (oWordControl.m_oDrawingDocument.IsEmptyPresentation)
             return;
@@ -1729,9 +1749,9 @@ function CEditorPage(api)
         global_mouseEvent.X = x;
         global_mouseEvent.Y = y;
 
-        global_mouseEvent.Type = g_mouse_event_type_up;
+        global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
 
-        g_bIsMouseUpLockedSend = true;
+        AscCommon.MouseUpLock.MouseUpLockedSend = true;
         global_mouseEvent.Sender = null;
 
         global_mouseEvent.UnLockMouse();
@@ -1883,7 +1903,7 @@ function CEditorPage(api)
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
@@ -1893,7 +1913,7 @@ function CEditorPage(api)
 
         if (oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
@@ -1933,7 +1953,7 @@ function CEditorPage(api)
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         oWordControl.StartUpdateOverlay();
 
@@ -1977,7 +1997,7 @@ function CEditorPage(api)
         if (false === oWordControl.m_oApi.bInit_word_control || oWordControl.IsFocus === false || oWordControl.m_oApi.isLongAction() || oWordControl.m_bIsMouseLock === true)
             return;
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         oWordControl.IsKeyDownButNoPress = true;
 
@@ -2000,7 +2020,7 @@ function CEditorPage(api)
             {
                 oWordControl.TextBoxInputFocus = false;
 
-                CollaborativeEditing.m_bGlobalLock = false;
+                AscCommon.CollaborativeEditing.m_bGlobalLock = false;
                 this.TextBoxInput.style.zIndex = -1;
                 this.TextBoxInput.style.top = "-1000px";
                 this.TextBoxInputFocus = false;
@@ -2041,7 +2061,7 @@ function CEditorPage(api)
         {
             oWordControl.TextBoxInputFocus = false;
 
-            CollaborativeEditing.m_bGlobalLock = false;
+            AscCommon.CollaborativeEditing.m_bGlobalLock = false;
             this.TextBoxInput.style.zIndex = -1;
             this.TextBoxInput.style.top = "-1000px";
             this.TextBoxInputFocus = false;
@@ -2064,7 +2084,7 @@ function CEditorPage(api)
             if (oThis.bIsUseKeyPress === false)
                 return;
 
-            check_KeyboardEvent(e);
+            AscCommon.check_KeyboardEvent(e);
 
             var Code;
             if (null != global_keyboardEvent.Which)
@@ -2105,7 +2125,7 @@ function CEditorPage(api)
         if (null == oWordControl.m_oLogicDocument)
             return;
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         oWordControl.StartUpdateOverlay();
 
@@ -2302,17 +2322,17 @@ function CEditorPage(api)
             if (this.m_oScrollHor_)
                 this.m_oScrollHor_.Repos(settings, true, undefined);//unbind("scrollhorizontal")
             else {
-                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll",settings);
+                this.m_oScrollHor_ = new AscCommon.ScrollObject( "id_horizontal_scroll",settings);
                 this.m_oScrollHor_.bind("scrollhorizontal",function(evt){
                     oThis.horizontalScroll(this,evt.scrollD,evt.maxScrollX);
                 });
 
                 this.m_oScrollHor_.onLockMouse = function(evt){
-                    check_MouseDownEvent(evt, true);
+                    AscCommon.check_MouseDownEvent(evt, true);
                     global_mouseEvent.LockMouse();
                 };
                 this.m_oScrollHor_.offLockMouse = function(evt){
-                    check_MouseUpEvent(evt);
+                    AscCommon.check_MouseUpEvent(evt);
                 };
 
                 this.m_oScrollHorApi = this.m_oScrollHor_;
@@ -2326,16 +2346,16 @@ function CEditorPage(api)
         else
         {
 
-            this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll",
+            this.m_oScrollVer_ = new AscCommon.ScrollObject( "id_vertical_scroll",
                 settings
             );
 
             this.m_oScrollVer_.onLockMouse = function(evt){
-                check_MouseDownEvent(evt, true);
+                AscCommon.check_MouseDownEvent(evt, true);
                 global_mouseEvent.LockMouse();
             };
             this.m_oScrollVer_.offLockMouse = function(evt){
-                check_MouseUpEvent(evt);
+                AscCommon.check_MouseUpEvent(evt);
             };
 
             this.m_oScrollVer_.bind("scrollvertical",function(evt){
@@ -2361,7 +2381,7 @@ function CEditorPage(api)
             }
             else
             {
-                this.m_oScrollNotes_ = new ScrollObject( "id_vertical_scroll_notes",settings);
+                this.m_oScrollNotes_ = new AscCommon.ScrollObject( "id_vertical_scroll_notes",settings);
                 this.m_oScrollNotes_.bind("scrollvertical",function(evt){
                 });
                 this.m_oScrollNotesApi = this.m_oScrollNotes_;
@@ -3127,7 +3147,7 @@ function CEditorPage(api)
 
             if (!_bIsWaitScheme)
             {
-                var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
+                var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval && !oWordControl.m_oDrawingDocument.TransitionSlide.IsPlaying() && !oWordControl.m_oApi.isLongAction())
                 {
@@ -3368,6 +3388,9 @@ function CEditorPage(api)
             this.m_oDrawingDocument.IsEmptyPresentation = true;
         }
 
+        if (this.m_oDrawingDocument.TransitionSlide.IsPlaying())
+            this.m_oDrawingDocument.TransitionSlide.End(true);
+
         if (lPageNum != -1 && (lPageNum < 0 || lPageNum >= drDoc.SlidesCount))
             return;
 
@@ -3528,7 +3551,7 @@ function CEditorPage(api)
             return;
 
         oThis.TextBoxInputFocus = true;
-        CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
         oThis.TextBoxInput.style.zIndex = 90;
     }
@@ -3596,7 +3619,7 @@ function CEditorPage(api)
 
     this.TextBoxOnKeyDown = function(e)
     {
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         if (global_keyboardEvent.KeyCode == 9)
         {
             e.preventDefault();
@@ -3606,7 +3629,7 @@ function CEditorPage(api)
 
     this.onChangeTB = function()
     {
-        CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
         this.TextBoxInput.style.zIndex = -1;
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;
@@ -3656,7 +3679,7 @@ function CEditorPage(api)
 
     this.SaveDocument = function()
     {
-        var writer = new CBinaryFileWriter();
+        var writer = new AscCommon.CBinaryFileWriter();
         this.m_oLogicDocument.CalculateComments();
         var str = writer.WriteDocument(this.m_oLogicDocument);
 		return str;
@@ -3664,7 +3687,17 @@ function CEditorPage(api)
     }
 }
 
-function sendStatus(Message)
-{
-    editor.sync_StatusMessage(Message);
-}
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonSlide'] = window['AscCommonSlide'] || {};
+window['AscCommonSlide'].GlobalSkinFlat = GlobalSkinFlat;
+window['AscCommonSlide'].GlobalSkin = GlobalSkin;
+window['AscCommonSlide'].updateGlobalSkin = updateGlobalSkin;
+window['AscCommonSlide'].CEditorPage = CEditorPage;
+
+window['AscCommon'].Page_Width = Page_Width;
+window['AscCommon'].Page_Height = Page_Height;
+window['AscCommon'].X_Left_Margin = X_Left_Margin;
+window['AscCommon'].X_Right_Margin = X_Right_Margin;
+window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
+window['AscCommon'].Y_Top_Margin = Y_Top_Margin;

@@ -1,15 +1,12 @@
 "use strict";
 
-/**
- * Created by Ilja.Kirillov on 18.03.14.
- */
-
 // Import
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var g_oTableId = AscCommon.g_oTableId;
+var History = AscCommon.History;
 
 var g_dMathArgSizeKoeff_1 = 0.76;
 var g_dMathArgSizeKoeff_2 = 0.6498; // 0.76 * 0.855
@@ -2544,9 +2541,9 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     History.TurnOn();
 
-    window.IsShapeToImageConverter = true;
+    AscCommon.IsShapeToImageConverter = true;
 
-    var dKoef = g_dKoef_mm_to_pix;
+    var dKoef = AscCommon.g_dKoef_mm_to_pix;
 
     var JointSize = this.Get_JointSize();
 
@@ -2576,7 +2573,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
 
     var _ctx = _canvas.getContext('2d');
 
-    var g = new CGraphics();
+    var g = new AscCommon.CGraphics();
     g.init(_ctx, w_px, h_px, w_mm, h_mm);
     g.m_oFontManager = g_fontManager;
 
@@ -2603,7 +2600,7 @@ ParaMath.prototype.MathToImageConverter = function(bCopy, _canvasInput, _widthPx
     if (true === isShowParaMarks)
         par.LogicDocument.Set_ShowParagraphMarks(true, false);
 
-    window.IsShapeToImageConverter = false;
+    AscCommon.IsShapeToImageConverter = false;
 
     if (undefined === _canvasInput)
     {
@@ -3021,7 +3018,7 @@ ParaMath.prototype.Load_Changes = function(Reader)
 
 ParaMath.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong( historyitem_type_Math );
+    Writer.WriteLong( AscDFH.historyitem_type_Math );
 
     // String : this.Id
     // Long   : this.Type
@@ -3339,65 +3336,6 @@ ParaMath.prototype.Set_ContentPosition = function(DocPos, Depth, Flag)
 //----------------------------------------------------------------------------------------------------------------------
 // Классы с изменениями
 //----------------------------------------------------------------------------------------------------------------------
-var historyitem_Math_AddItem                   =  1; // Добавляем элемент
-var historyitem_Math_RemoveItem                =  2; // Удаляем элемент
-var historyitem_Math_CtrPrpFSize               =  3; // CtrPrp
-var historyitem_Math_ParaJc                    =  4; // ParaMath.Jc
-var historyitem_Math_CtrPrpShd                 =  5;
-var historyitem_Math_AddItems_ToMathBase       =  6;
-var historyitem_Math_CtrPrpColor               =  7;
-var historyitem_Math_CtrPrpUnifill             =  8;
-var historyitem_Math_CtrPrpUnderline           =  9;
-var historyitem_Math_CtrPrpStrikeout           =  10;
-var historyitem_Math_CtrPrpDoubleStrikeout     =  11;
-var historyitem_Math_CtrPrpItalic              =  12;
-var historyitem_Math_CtrPrpBold                =  13;
-var historyitem_Math_RFontsAscii               =  14;
-var historyitem_Math_RFontsHAnsi               =  15;
-var historyitem_Math_RFontsCS                  =  16;
-var historyitem_Math_RFontsEastAsia            =  17;
-var historyitem_Math_RFontsHint                =  18;
-var historyitem_Math_CtrPrpHighLight           =  19;
-var historyitem_Math_ArgSize                   =  20;
-var historyitem_Math_ReviewType                =  21;
-var historyitem_Math_CtrPrpTextFill            =  22;
-var historyitem_Math_CtrPrpTextOutline         =  23;
-var historyitem_Math_BoxAlnAt                  =  24;
-var historyitem_Math_FractionType              =  25;
-var historyitem_Math_RadicalHideDegree         =  26;
-var historyitem_Math_NaryLimLoc                =  27;
-var historyitem_Math_NaryUpperLimit            =  28;
-var historyitem_Math_NaryLowerLimit            =  29;
-var historyitem_Math_DelimBegOper              =  30;
-var historyitem_Math_DelimEndOper              =  31;
-var historyitem_Math_BaseSetColumn             =  32;
-var historyitem_Math_BaseRemoveItems           =  33;
-var historyitem_Math_DelimiterGrow             =  34;
-var historyitem_Math_DelimiterShape            =  35;
-var historyitem_Math_GroupCharPr               =  36;
-var historyitem_Math_LimitType                 =  37;
-var historyitem_Math_BorderBoxTop              =  38;
-var historyitem_Math_BorderBoxBot              =  39;
-var historyitem_Math_BorderBoxLeft             =  40;
-var historyitem_Math_BorderBoxRight            =  41;
-var historyitem_Math_BorderBoxHor              =  42;
-var historyitem_Math_BorderBoxVer              =  43;
-var historyitem_Math_BorderBoxTopLTR           =  44;
-var historyitem_Math_BorderBoxTopRTL           =  45;
-var historyitem_Math_MatrixAddRow              =  46;
-var historyitem_Math_MatrixRemoveRow           =  47;
-var historyitem_Math_MatrixAddColumn           =  48;
-var historyitem_Math_MatrixRemoveColumn        =  49;
-var historyitem_Math_MatrixBaseJc              =  50;
-var historyitem_Math_MatrixColumnJc            =  51;
-var historyitem_Math_MatrixInterval            =  52;
-var historyitem_Math_MatrixPlh                 =  53;
-var historyitem_Math_MatrixMinColumnWidth      =  54;
-var historyitem_Math_BarLinePos                =  55;
-var historyitem_Math_BoxForcedBreak            =  56;
-var historyitem_Math_DegreeSubSupType          =  57;
-
-
 function ReadChanges_FromBinary(Reader, Class)
 {
     var Type = Reader.GetLong();
@@ -3405,60 +3343,60 @@ function ReadChanges_FromBinary(Reader, Class)
 
     switch(Type)
     {
-        case historyitem_Math_CtrPrpFSize           : Changes = new CChangesMathFontSize(); break;
-        case historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
-        case historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
-        case historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
-        case historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
-        case historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
-        case historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
-        case historyitem_Math_CtrPrpStrikeout       : Changes = new CChangesMathStrikeout(); break;
-        case historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
-        case historyitem_Math_CtrPrpItalic          : Changes = new CChangesMathItalic(); break;
-        case historyitem_Math_CtrPrpBold            : Changes = new CChangesMathBold(); break;
-        case historyitem_Math_RFontsAscii           : Changes = new CChangesMath_RFontsAscii(); break;
-        case historyitem_Math_RFontsHAnsi           : Changes = new CChangesMath_RFontsHAnsi(); break;
-        case historyitem_Math_RFontsCS              : Changes = new CChangesMath_RFontsCS(); break;
-        case historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
-        case historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
-        case historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
-        case historyitem_Math_ReviewType            : Changes = new CChangesMathBaseReviewType(); break;
-        case historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
-        case historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
-		case historyitem_Math_BoxAlnAt              : Changes = new CChangesMathBoxAlnAt(); break;
-        case historyitem_Math_FractionType          : Changes = new CChangesMathFractionType(); break;
-        case historyitem_Math_RadicalHideDegree     : Changes = new CChangesMathRadicalHideDegree(); break;
-        case historyitem_Math_NaryLimLoc            : Changes = new CChangesMathNaryLimLoc(); break;
-        case historyitem_Math_NaryUpperLimit        : Changes = new CChangesMathNaryUpperLimit(); break;
-        case historyitem_Math_NaryLowerLimit        : Changes = new CChangesMathNaryLowerLimit(); break;
-        case historyitem_Math_DelimBegOper          : Changes = new CChangesMathDelimBegOper(); break;
-        case historyitem_Math_DelimEndOper          : Changes = new CChangesMathDelimEndOper(); break;
-        case historyitem_Math_BaseSetColumn         : Changes = new CChangesMathBaseSetColumn(); break;
-        case historyitem_Math_BaseRemoveItems       : Changes = new CChangesMathRemoveItems(); break;
-        case historyitem_Math_DelimiterGrow         : Changes = new CChangesMathDelimiterGrow(); break;
-        case historyitem_Math_DelimiterShape        : Changes = new CChangesMathDelimiterShape(); break;
-        case historyitem_Math_GroupCharPr           : Changes = new CChangesMathGroupCharPr(); break;
-        case historyitem_Math_LimitType             : Changes = new CChangesMathLimitType(); break;
-        case historyitem_Math_BorderBoxTop          : Changes = new CChangesMathBorderBoxTop(); break;         
-        case historyitem_Math_BorderBoxBot          : Changes = new CChangesMathBorderBoxBot(); break;
-        case historyitem_Math_BorderBoxLeft         : Changes = new CChangesMathBorderBoxLeft(); break;
-        case historyitem_Math_BorderBoxRight        : Changes = new CChangesMathBorderBoxRight(); break;
-        case historyitem_Math_BorderBoxHor          : Changes = new CChangesMathBorderBoxHor(); break;
-        case historyitem_Math_BorderBoxVer          : Changes = new CChangesMathBorderBoxVer(); break;
-        case historyitem_Math_BorderBoxTopLTR       : Changes = new CChangesMathBorderBoxTopLTR(); break;
-        case historyitem_Math_BorderBoxTopRTL       : Changes = new CChangesMathBorderBoxTopRTL(); break;
-        case historyitem_Math_MatrixAddRow          : Changes = new CChangesMathMatrixAddRow(); break;
-        case historyitem_Math_MatrixRemoveRow       : Changes = new CChangesMathMatrixRemoveRow(); break;
-        case historyitem_Math_MatrixAddColumn       : Changes = new CChangesMathMatrixAddColumn(); break;
-        case historyitem_Math_MatrixRemoveColumn    : Changes = new CChangesMathMatrixRemoveColumn(); break;
-        case historyitem_Math_MatrixBaseJc          : Changes = new CChangesMathMatrixBaseJc(); break;
-        case historyitem_Math_MatrixColumnJc        : Changes = new CChangesMathMatrixColumnJc(); break;
-        case historyitem_Math_MatrixInterval        : Changes = new CChangesMathMatrixInterval(); break;
-        case historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
-        case historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
-        case historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
-        case historyitem_Math_BoxForcedBreak        : Changes = new CChangesMathBoxForcedBreak(); break;
-        case historyitem_Math_DegreeSubSupType      : Changes = new CChangesMathDegreeSubSupType(); break;
+        case AscDFH.historyitem_Math_CtrPrpFSize           : Changes = new CChangesMathFontSize(); break;
+        case AscDFH.historyitem_Math_ParaJc                : Changes = new CChangesMathParaJc(); break;
+        case AscDFH.historyitem_Math_CtrPrpShd             : Changes = new CChangesMathShd(); break;
+        case AscDFH.historyitem_Math_AddItems_ToMathBase   : Changes = new CChangesMathAddItems(); break;
+        case AscDFH.historyitem_Math_CtrPrpColor           : Changes = new CChangesMathColor(); break;
+        case AscDFH.historyitem_Math_CtrPrpUnifill         : Changes = new CChangesMathUnifill(); break;
+        case AscDFH.historyitem_Math_CtrPrpUnderline       : Changes = new CChangesMathUnderline(); break;
+        case AscDFH.historyitem_Math_CtrPrpStrikeout       : Changes = new CChangesMathStrikeout(); break;
+        case AscDFH.historyitem_Math_CtrPrpDoubleStrikeout : Changes = new CChangesMath_DoubleStrikeout(); break;
+        case AscDFH.historyitem_Math_CtrPrpItalic          : Changes = new CChangesMathItalic(); break;
+        case AscDFH.historyitem_Math_CtrPrpBold            : Changes = new CChangesMathBold(); break;
+        case AscDFH.historyitem_Math_RFontsAscii           : Changes = new CChangesMath_RFontsAscii(); break;
+        case AscDFH.historyitem_Math_RFontsHAnsi           : Changes = new CChangesMath_RFontsHAnsi(); break;
+        case AscDFH.historyitem_Math_RFontsCS              : Changes = new CChangesMath_RFontsCS(); break;
+        case AscDFH.historyitem_Math_RFontsEastAsia        : Changes = new CChangesMath_RFontsEastAsia(); break;
+        case AscDFH.historyitem_Math_RFontsHint            : Changes = new CChangesMath_RFontsHint(); break;
+        case AscDFH.historyitem_Math_CtrPrpHighLight       : Changes = new CChangesMathHighLight(); break;
+        case AscDFH.historyitem_Math_ReviewType            : Changes = new CChangesMathBaseReviewType(); break;
+        case AscDFH.historyitem_Math_CtrPrpTextFill        : Changes = new CChangesMathTextFill(); break;
+        case AscDFH.historyitem_Math_CtrPrpTextOutline     : Changes = new CChangesMathTextOutline(); break;
+		case AscDFH.historyitem_Math_BoxAlnAt              : Changes = new CChangesMathBoxAlnAt(); break;
+        case AscDFH.historyitem_Math_FractionType          : Changes = new CChangesMathFractionType(); break;
+        case AscDFH.historyitem_Math_RadicalHideDegree     : Changes = new CChangesMathRadicalHideDegree(); break;
+        case AscDFH.historyitem_Math_NaryLimLoc            : Changes = new CChangesMathNaryLimLoc(); break;
+        case AscDFH.historyitem_Math_NaryUpperLimit        : Changes = new CChangesMathNaryUpperLimit(); break;
+        case AscDFH.historyitem_Math_NaryLowerLimit        : Changes = new CChangesMathNaryLowerLimit(); break;
+        case AscDFH.historyitem_Math_DelimBegOper          : Changes = new CChangesMathDelimBegOper(); break;
+        case AscDFH.historyitem_Math_DelimEndOper          : Changes = new CChangesMathDelimEndOper(); break;
+        case AscDFH.historyitem_Math_BaseSetColumn         : Changes = new CChangesMathBaseSetColumn(); break;
+        case AscDFH.historyitem_Math_BaseRemoveItems       : Changes = new CChangesMathRemoveItems(); break;
+        case AscDFH.historyitem_Math_DelimiterGrow         : Changes = new CChangesMathDelimiterGrow(); break;
+        case AscDFH.historyitem_Math_DelimiterShape        : Changes = new CChangesMathDelimiterShape(); break;
+        case AscDFH.historyitem_Math_GroupCharPr           : Changes = new CChangesMathGroupCharPr(); break;
+        case AscDFH.historyitem_Math_LimitType             : Changes = new CChangesMathLimitType(); break;
+        case AscDFH.historyitem_Math_BorderBoxTop          : Changes = new CChangesMathBorderBoxTop(); break;
+        case AscDFH.historyitem_Math_BorderBoxBot          : Changes = new CChangesMathBorderBoxBot(); break;
+        case AscDFH.historyitem_Math_BorderBoxLeft         : Changes = new CChangesMathBorderBoxLeft(); break;
+        case AscDFH.historyitem_Math_BorderBoxRight        : Changes = new CChangesMathBorderBoxRight(); break;
+        case AscDFH.historyitem_Math_BorderBoxHor          : Changes = new CChangesMathBorderBoxHor(); break;
+        case AscDFH.historyitem_Math_BorderBoxVer          : Changes = new CChangesMathBorderBoxVer(); break;
+        case AscDFH.historyitem_Math_BorderBoxTopLTR       : Changes = new CChangesMathBorderBoxTopLTR(); break;
+        case AscDFH.historyitem_Math_BorderBoxTopRTL       : Changes = new CChangesMathBorderBoxTopRTL(); break;
+        case AscDFH.historyitem_Math_MatrixAddRow          : Changes = new CChangesMathMatrixAddRow(); break;
+        case AscDFH.historyitem_Math_MatrixRemoveRow       : Changes = new CChangesMathMatrixRemoveRow(); break;
+        case AscDFH.historyitem_Math_MatrixAddColumn       : Changes = new CChangesMathMatrixAddColumn(); break;
+        case AscDFH.historyitem_Math_MatrixRemoveColumn    : Changes = new CChangesMathMatrixRemoveColumn(); break;
+        case AscDFH.historyitem_Math_MatrixBaseJc          : Changes = new CChangesMathMatrixBaseJc(); break;
+        case AscDFH.historyitem_Math_MatrixColumnJc        : Changes = new CChangesMathMatrixColumnJc(); break;
+        case AscDFH.historyitem_Math_MatrixInterval        : Changes = new CChangesMathMatrixInterval(); break;
+        case AscDFH.historyitem_Math_MatrixPlh             : Changes = new CChangesMathMatrixPlh(); break;
+        case AscDFH.historyitem_Math_MatrixMinColumnWidth  : Changes = new CChangesMathMatrixMinColumnWidth(); break;
+        case AscDFH.historyitem_Math_BarLinePos            : Changes = new CChangesMathBarLinePos(); break;
+        case AscDFH.historyitem_Math_BoxForcedBreak        : Changes = new CChangesMathBoxForcedBreak(); break;
+        case AscDFH.historyitem_Math_DegreeSubSupType      : Changes = new CChangesMathDegreeSubSupType(); break;
     }
 
     if (null !== Changes)
@@ -3480,7 +3418,7 @@ function CChangesMathFontSize(NewValue, OldValue)
     this.Old = OldValue;
 }
 
-CChangesMathFontSize.prototype.Type = historyitem_Math_CtrPrpFSize;
+CChangesMathFontSize.prototype.Type = AscDFH.historyitem_Math_CtrPrpFSize;
 
 CChangesMathFontSize.prototype.Undo = function(Class)
 {
@@ -3520,7 +3458,7 @@ function CChangesMathShd(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathShd.prototype.Type = historyitem_Math_CtrPrpShd;
+CChangesMathShd.prototype.Type = AscDFH.historyitem_Math_CtrPrpShd;
 CChangesMathShd.prototype.Undo = function(Class)
 {
     Class.raw_SetShd(this.Old);
@@ -3564,7 +3502,7 @@ function CChangesMathHighLight(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathHighLight.prototype.Type = historyitem_Math_CtrPrpHighLight;
+CChangesMathHighLight.prototype.Type = AscDFH.historyitem_Math_CtrPrpHighLight;
 CChangesMathHighLight.prototype.Undo = function(Class)
 {
     Class.raw_SetHighLight(this.Old);
@@ -3612,7 +3550,7 @@ function CChangesMathColor(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathColor.prototype.Type = historyitem_Math_CtrPrpColor;
+CChangesMathColor.prototype.Type = AscDFH.historyitem_Math_CtrPrpColor;
 CChangesMathColor.prototype.Undo = function(Class)
 {
     Class.raw_SetColor(this.Old);
@@ -3657,7 +3595,7 @@ function CChangesMathUnifill(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathUnifill.prototype.Type = historyitem_Math_CtrPrpUnifill;
+CChangesMathUnifill.prototype.Type = AscDFH.historyitem_Math_CtrPrpUnifill;
 CChangesMathUnifill.prototype.Undo = function(Class)
 {
     Class.raw_SetUnifill(this.Old);
@@ -3686,7 +3624,7 @@ CChangesMathUnifill.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CUniFill();
+        this.New = new AscFormat.CUniFill();
         this.New.Read_FromBinary(Reader);
     }
     else
@@ -3701,7 +3639,7 @@ function CChangesMathTextFill(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathTextFill.prototype.Type = historyitem_Math_CtrPrpTextFill;
+CChangesMathTextFill.prototype.Type = AscDFH.historyitem_Math_CtrPrpTextFill;
 CChangesMathTextFill.prototype.Undo = function(Class)
 {
     Class.raw_SetTextFill(this.Old);
@@ -3730,7 +3668,7 @@ CChangesMathTextFill.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CUniFill();
+        this.New = new AscFormat.CUniFill();
         this.New.Read_FromBinary(Reader);
     }
     else
@@ -3744,7 +3682,7 @@ function CChangesMathTextOutline(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathTextOutline.prototype.Type = historyitem_Math_CtrPrpTextOutline;
+CChangesMathTextOutline.prototype.Type = AscDFH.historyitem_Math_CtrPrpTextOutline;
 CChangesMathTextOutline.prototype.Undo = function(Class)
 {
     Class.raw_SetTextOutline(this.Old);
@@ -3773,7 +3711,7 @@ CChangesMathTextOutline.prototype.Load_Changes = function(Reader, Class)
 
     if ( Reader.GetBool() == false)
     {
-        this.New = new CLn();
+        this.New = new AscFormat.CLn();
         this.New.Read_FromBinary(Reader);
     }
     else
@@ -3787,7 +3725,7 @@ function CChangesMathUnderline(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathUnderline.prototype.Type = historyitem_Math_CtrPrpUnderline;
+CChangesMathUnderline.prototype.Type = AscDFH.historyitem_Math_CtrPrpUnderline;
 CChangesMathUnderline.prototype.Undo = function(Class)
 {
     Class.raw_SetUnderline(this.Old);
@@ -3828,7 +3766,7 @@ function CChangesMathStrikeout(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathStrikeout.prototype.Type = historyitem_Math_CtrPrpStrikeout;
+CChangesMathStrikeout.prototype.Type = AscDFH.historyitem_Math_CtrPrpStrikeout;
 CChangesMathStrikeout.prototype.Undo = function(Class)
 {
     Class.raw_SetStrikeout(this.Old);
@@ -3868,7 +3806,7 @@ function CChangesMath_DoubleStrikeout(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_DoubleStrikeout.prototype.Type = historyitem_Math_CtrPrpDoubleStrikeout;
+CChangesMath_DoubleStrikeout.prototype.Type = AscDFH.historyitem_Math_CtrPrpDoubleStrikeout;
 CChangesMath_DoubleStrikeout.prototype.Undo = function(Class)
 {
     Class.raw_Set_DoubleStrikeout(this.Old);
@@ -3908,7 +3846,7 @@ function CChangesMathItalic(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathItalic.prototype.Type = historyitem_Math_CtrPrpItalic;
+CChangesMathItalic.prototype.Type = AscDFH.historyitem_Math_CtrPrpItalic;
 CChangesMathItalic.prototype.Undo = function(Class)
 {
     Class.raw_SetItalic(this.Old);
@@ -3950,7 +3888,7 @@ function CChangesMathBold(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBold.prototype.Type = historyitem_Math_CtrPrpBold;
+CChangesMathBold.prototype.Type = AscDFH.historyitem_Math_CtrPrpBold;
 CChangesMathBold.prototype.Undo = function(Class)
 {
     Class.raw_SetBold(this.Old);
@@ -3993,7 +3931,7 @@ function CChangesMath_RFontsAscii(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_RFontsAscii.prototype.Type = historyitem_Math_RFontsAscii;
+CChangesMath_RFontsAscii.prototype.Type = AscDFH.historyitem_Math_RFontsAscii;
 CChangesMath_RFontsAscii.prototype.Undo = function(Class)
 {
     Class.raw_SetRFontsAscii(this.Old);
@@ -4041,7 +3979,7 @@ function CChangesMath_RFontsHAnsi(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_RFontsHAnsi.prototype.Type = historyitem_Math_RFontsHAnsi;
+CChangesMath_RFontsHAnsi.prototype.Type = AscDFH.historyitem_Math_RFontsHAnsi;
 CChangesMath_RFontsHAnsi.prototype.Undo = function(Class)
 {
     Class.raw_SetRFontsHAnsi(this.Old);
@@ -4090,7 +4028,7 @@ function CChangesMath_RFontsCS(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_RFontsCS.prototype.Type = historyitem_Math_RFontsCS;
+CChangesMath_RFontsCS.prototype.Type = AscDFH.historyitem_Math_RFontsCS;
 CChangesMath_RFontsCS.prototype.Undo = function(Class)
 {
     Class.raw_SetRFontsCS(this.Old);
@@ -4138,7 +4076,7 @@ function CChangesMath_RFontsEastAsia(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_RFontsEastAsia.prototype.Type = historyitem_Math_RFontsEastAsia;
+CChangesMath_RFontsEastAsia.prototype.Type = AscDFH.historyitem_Math_RFontsEastAsia;
 CChangesMath_RFontsEastAsia.prototype.Undo = function(Class)
 {
     Class.raw_SetRFontsEastAsia(this.Old);
@@ -4188,7 +4126,7 @@ function CChangesMath_RFontsHint(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMath_RFontsHint.prototype.Type = historyitem_Math_RFontsHint;
+CChangesMath_RFontsHint.prototype.Type = AscDFH.historyitem_Math_RFontsHint;
 CChangesMath_RFontsHint.prototype.Undo = function(Class)
 {
     Class.raw_SetRFontsHint(this.Old);
@@ -4231,7 +4169,7 @@ function CChangesMathAddItems(Pos, Items)
     this.Pos   = Pos;
     this.Items = Items;
 }
-CChangesMathAddItems.prototype.Type = historyitem_Math_AddItems_ToMathBase;
+CChangesMathAddItems.prototype.Type = AscDFH.historyitem_Math_AddItems_ToMathBase;
 CChangesMathAddItems.prototype.Undo = function(Class)
 {
     Class.raw_RemoveFromContent(this.Pos, this.Items.length);
@@ -4281,7 +4219,7 @@ function CChangesMathParaJc(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathParaJc.prototype.Type = historyitem_Math_ParaJc;
+CChangesMathParaJc.prototype.Type = AscDFH.historyitem_Math_ParaJc;
 CChangesMathParaJc.prototype.Undo = function(Class)
 {
     Class.raw_SetAlign(this.Old);
@@ -4319,7 +4257,7 @@ function CChangesMathBaseReviewType(NewType, NewInfo, OldType, OldInfo)
     this.OldType = OldType;
     this.OldInfo = OldInfo ? OldInfo.Copy() : undefined;
 }
-CChangesMathBaseReviewType.prototype.Type = historyitem_Math_ReviewType;
+CChangesMathBaseReviewType.prototype.Type = AscDFH.historyitem_Math_ReviewType;
 CChangesMathBaseReviewType.prototype.Undo = function(Class)
 {
     Class.raw_SetReviewType(this.OldType, this.OldInfo);
@@ -4371,7 +4309,7 @@ function CChangesMathBoxAlnAt(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBoxAlnAt.prototype.Type = historyitem_Math_BoxAlnAt;
+CChangesMathBoxAlnAt.prototype.Type = AscDFH.historyitem_Math_BoxAlnAt;
 CChangesMathBoxAlnAt.prototype.Undo = function(Class)
 {
     Class.raw_setAlnAt(this.Old);
@@ -4407,7 +4345,7 @@ function CChangesMathFractionType(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathFractionType.prototype.Type = historyitem_Math_FractionType;
+CChangesMathFractionType.prototype.Type = AscDFH.historyitem_Math_FractionType;
 CChangesMathFractionType.prototype.Undo = function(Class)
 {
     Class.raw_SetFractionType(this.Old);
@@ -4443,7 +4381,7 @@ function CChangesMathRadicalHideDegree(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathRadicalHideDegree.prototype.Type = historyitem_Math_RadicalHideDegree;
+CChangesMathRadicalHideDegree.prototype.Type = AscDFH.historyitem_Math_RadicalHideDegree;
 CChangesMathRadicalHideDegree.prototype.Undo = function(Class)
 {
     Class.raw_SetHideDegree(this.Old);
@@ -4478,7 +4416,7 @@ function CChangesMathNaryLimLoc(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathNaryLimLoc.prototype.Type = historyitem_Math_NaryLimLoc;
+CChangesMathNaryLimLoc.prototype.Type = AscDFH.historyitem_Math_NaryLimLoc;
 CChangesMathNaryLimLoc.prototype.Undo = function(Class)
 {
     Class.raw_SetLimLoc(this.Old);
@@ -4514,7 +4452,7 @@ function CChangesMathNaryUpperLimit(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathNaryUpperLimit.prototype.Type = historyitem_Math_NaryUpperLimit;
+CChangesMathNaryUpperLimit.prototype.Type = AscDFH.historyitem_Math_NaryUpperLimit;
 CChangesMathNaryUpperLimit.prototype.Undo = function(Class)
 {
     Class.raw_HideUpperIterator(this.Old);
@@ -4550,7 +4488,7 @@ function CChangesMathNaryLowerLimit(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathNaryLowerLimit.prototype.Type = historyitem_Math_NaryLowerLimit;
+CChangesMathNaryLowerLimit.prototype.Type = AscDFH.historyitem_Math_NaryLowerLimit;
 CChangesMathNaryLowerLimit.prototype.Undo = function(Class)
 {
     Class.raw_HideLowerIterator(this.Old);
@@ -4586,7 +4524,7 @@ function CChangesMathDelimBegOper(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathDelimBegOper.prototype.Type = historyitem_Math_DelimBegOper;
+CChangesMathDelimBegOper.prototype.Type = AscDFH.historyitem_Math_DelimBegOper;
 CChangesMathDelimBegOper.prototype.Undo = function(Class)
 {
     Class.raw_HideBegOperator(this.Old);
@@ -4622,7 +4560,7 @@ function CChangesMathDelimEndOper(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathDelimEndOper.prototype.Type = historyitem_Math_DelimEndOper;
+CChangesMathDelimEndOper.prototype.Type = AscDFH.historyitem_Math_DelimEndOper;
 CChangesMathDelimEndOper.prototype.Undo = function(Class)
 {
     Class.raw_HideEndOperator(this.Old);
@@ -4658,7 +4596,7 @@ function CChangesMathBaseSetColumn(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBaseSetColumn.prototype.Type = historyitem_Math_BaseSetColumn;
+CChangesMathBaseSetColumn.prototype.Type = AscDFH.historyitem_Math_BaseSetColumn;
 CChangesMathBaseSetColumn.prototype.Undo = function(Class)
 {
     Class.raw_SetColumn(this.Old);
@@ -4694,7 +4632,7 @@ function CChangesMathRemoveItems(Pos, Items)
     this.Pos   = Pos;
     this.Items = Items;
 }
-CChangesMathRemoveItems.prototype.Type = historyitem_Math_BaseRemoveItems;
+CChangesMathRemoveItems.prototype.Type = AscDFH.historyitem_Math_BaseRemoveItems;
 CChangesMathRemoveItems.prototype.Undo = function(Class)
 {
     Class.raw_AddToContent(this.Pos, this.Items, false);
@@ -4738,7 +4676,7 @@ CChangesMathRemoveItems.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathDelimiterGrow(NewValue, OldValue)
@@ -4746,7 +4684,7 @@ function CChangesMathDelimiterGrow(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathDelimiterGrow.prototype.Type = historyitem_Math_DelimiterGrow;
+CChangesMathDelimiterGrow.prototype.Type = AscDFH.historyitem_Math_DelimiterGrow;
 CChangesMathDelimiterGrow.prototype.Undo = function(Class)
 {
     Class.raw_SetGrow(this.Old);
@@ -4782,7 +4720,7 @@ function CChangesMathDelimiterShape(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathDelimiterShape.prototype.Type = historyitem_Math_DelimiterShape;
+CChangesMathDelimiterShape.prototype.Type = AscDFH.historyitem_Math_DelimiterShape;
 
 CChangesMathDelimiterShape.prototype.Undo = function(Class)
 {
@@ -4819,7 +4757,7 @@ function CChangesMathGroupCharPr(NewPr, OldPr)
     this.New = NewPr;
     this.Old = OldPr;
 }
-CChangesMathGroupCharPr.prototype.Type = historyitem_Math_GroupCharPr;
+CChangesMathGroupCharPr.prototype.Type = AscDFH.historyitem_Math_GroupCharPr;
 CChangesMathGroupCharPr.prototype.Undo = function(Class)
 {
     Class.raw_SetPr(this.Old);
@@ -4858,7 +4796,7 @@ function CChangesMathLimitType(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathLimitType.prototype.Type = historyitem_Math_LimitType;
+CChangesMathLimitType.prototype.Type = AscDFH.historyitem_Math_LimitType;
 
 CChangesMathLimitType.prototype.Undo = function(Class)
 {
@@ -4895,7 +4833,7 @@ function CChangesMathBorderBoxTop(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxTop.prototype.Type = historyitem_Math_BorderBoxTop;
+CChangesMathBorderBoxTop.prototype.Type = AscDFH.historyitem_Math_BorderBoxTop;
 CChangesMathBorderBoxTop.prototype.Undo = function(Class)
 {
     Class.raw_SetTop(this.Old);
@@ -4932,7 +4870,7 @@ function CChangesMathBorderBoxBot(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxBot.prototype.Type = historyitem_Math_BorderBoxBot;
+CChangesMathBorderBoxBot.prototype.Type = AscDFH.historyitem_Math_BorderBoxBot;
 CChangesMathBorderBoxBot.prototype.Undo = function(Class)
 {
     Class.raw_SetBot(this.Old);
@@ -4968,7 +4906,7 @@ function CChangesMathBorderBoxLeft(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxLeft.prototype.Type = historyitem_Math_BorderBoxLeft;
+CChangesMathBorderBoxLeft.prototype.Type = AscDFH.historyitem_Math_BorderBoxLeft;
 CChangesMathBorderBoxLeft.prototype.Undo = function(Class)
 {
     Class.raw_SetLeft(this.Old);
@@ -5004,7 +4942,7 @@ function CChangesMathBorderBoxRight(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxRight.prototype.Type = historyitem_Math_BorderBoxRight;
+CChangesMathBorderBoxRight.prototype.Type = AscDFH.historyitem_Math_BorderBoxRight;
 CChangesMathBorderBoxRight.prototype.Undo = function(Class)
 {
     Class.raw_SetRight(this.Old);
@@ -5040,7 +4978,7 @@ function CChangesMathBorderBoxHor(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxHor.prototype.Type = historyitem_Math_BorderBoxHor;
+CChangesMathBorderBoxHor.prototype.Type = AscDFH.historyitem_Math_BorderBoxHor;
 CChangesMathBorderBoxHor.prototype.Undo = function(Class)
 {
     Class.raw_SetHor(this.Old);
@@ -5076,7 +5014,7 @@ function CChangesMathBorderBoxVer(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxVer.prototype.Type = historyitem_Math_BorderBoxVer;
+CChangesMathBorderBoxVer.prototype.Type = AscDFH.historyitem_Math_BorderBoxVer;
 CChangesMathBorderBoxVer.prototype.Undo = function(Class)
 {
     Class.raw_SetVer(this.Old);
@@ -5112,7 +5050,7 @@ function CChangesMathBorderBoxTopLTR(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxTopLTR.prototype.Type = historyitem_Math_BorderBoxTopLTR;
+CChangesMathBorderBoxTopLTR.prototype.Type = AscDFH.historyitem_Math_BorderBoxTopLTR;
 CChangesMathBorderBoxTopLTR.prototype.Undo = function(Class)
 {
     Class.raw_SetTopLTR(this.Old);
@@ -5148,7 +5086,7 @@ function CChangesMathBorderBoxTopRTL(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBorderBoxTopRTL.prototype.Type = historyitem_Math_BorderBoxTopRTL;
+CChangesMathBorderBoxTopRTL.prototype.Type = AscDFH.historyitem_Math_BorderBoxTopRTL;
 CChangesMathBorderBoxTopRTL.prototype.Undo = function(Class)
 {
     Class.raw_SetTopRTL(this.Old);
@@ -5184,7 +5122,7 @@ function CChangesMathMatrixAddRow(Pos, Items)
     this.Pos         = Pos;
     this.Items       = Items;
 }
-CChangesMathMatrixAddRow.prototype.Type = historyitem_Math_MatrixAddRow;
+CChangesMathMatrixAddRow.prototype.Type = AscDFH.historyitem_Math_MatrixAddRow;
 CChangesMathMatrixAddRow.prototype.Undo = function(Class)
 {
     Class.raw_RemoveRow(this.Pos, this.Items.length);
@@ -5234,7 +5172,7 @@ function CChangesMathMatrixRemoveRow(Pos, Items)
     this.Pos         = Pos;
     this.Items       = Items;
 }
-CChangesMathMatrixRemoveRow.prototype.Type = historyitem_Math_MatrixRemoveRow;
+CChangesMathMatrixRemoveRow.prototype.Type = AscDFH.historyitem_Math_MatrixRemoveRow;
 CChangesMathMatrixRemoveRow.prototype.Undo = function(Class)
 {
     Class.raw_AddRow(this.Pos, this.Items);
@@ -5278,7 +5216,7 @@ CChangesMathMatrixRemoveRow.prototype.Load_Changes = function(Reader, Class)
 
     this.Redo(Class);
 
-    CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
+    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(Class, this.Pos, Count);
 };
 
 function CChangesMathMatrixAddColumn(Pos, Items)
@@ -5286,7 +5224,7 @@ function CChangesMathMatrixAddColumn(Pos, Items)
     this.Pos           = Pos;
     this.Items         = Items;
 }
-CChangesMathMatrixAddColumn.prototype.Type = historyitem_Math_MatrixAddColumn;
+CChangesMathMatrixAddColumn.prototype.Type = AscDFH.historyitem_Math_MatrixAddColumn;
 CChangesMathMatrixAddColumn.prototype.Undo = function(Class)
 {
     Class.raw_RemoveColumn(this.Pos, this.Items.length);
@@ -5336,7 +5274,7 @@ function CChangesMathMatrixRemoveColumn(Pos, Items)
     this.Pos           = Pos;
     this.Items         = Items;
 }
-CChangesMathMatrixRemoveColumn.prototype.Type = historyitem_Math_MatrixRemoveColumn;
+CChangesMathMatrixRemoveColumn.prototype.Type = AscDFH.historyitem_Math_MatrixRemoveColumn;
 CChangesMathMatrixRemoveColumn.prototype.Undo = function(Class)
 {
     Class.raw_AddColumn(this.Pos, this.Items);
@@ -5390,7 +5328,7 @@ function CChangesMathMatrixBaseJc(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathMatrixBaseJc.prototype.Type = historyitem_Math_MatrixBaseJc;
+CChangesMathMatrixBaseJc.prototype.Type = AscDFH.historyitem_Math_MatrixBaseJc;
 CChangesMathMatrixBaseJc.prototype.Undo = function(Class)
 {
     Class.raw_SetBaseJc(this.Old);
@@ -5427,7 +5365,7 @@ function CChangesMathMatrixColumnJc(NewValue, OldValue, ColumnPos)
     this.Old       = OldValue;
     this.ColumnPos = ColumnPos;
 }
-CChangesMathMatrixColumnJc.prototype.Type = historyitem_Math_MatrixColumnJc;
+CChangesMathMatrixColumnJc.prototype.Type = AscDFH.historyitem_Math_MatrixColumnJc;
 CChangesMathMatrixColumnJc.prototype.Undo = function(Class)
 {
     Class.raw_SetColumnJc(this.Old, this.ColumnPos);
@@ -5477,7 +5415,7 @@ function CChangesMathMatrixInterval(Params)
         this.OldGap   = Params.OldGap;
     }
 }
-CChangesMathMatrixInterval.prototype.Type = historyitem_Math_MatrixInterval;
+CChangesMathMatrixInterval.prototype.Type = AscDFH.historyitem_Math_MatrixInterval;
 CChangesMathMatrixInterval.prototype.Undo = function(Class)
 {
     Class.raw_SetInterval(this.ItemType, this.OldRule, this.OldGap);
@@ -5540,7 +5478,7 @@ function CChangesMathMatrixPlh(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathMatrixPlh.prototype.Type = historyitem_Math_MatrixPlh;
+CChangesMathMatrixPlh.prototype.Type = AscDFH.historyitem_Math_MatrixPlh;
 CChangesMathMatrixPlh.prototype.Undo = function(Class)
 {
     Class.raw_HidePlh(this.Old);
@@ -5576,7 +5514,7 @@ function CChangesMathMatrixMinColumnWidth(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathMatrixMinColumnWidth.prototype.Type = historyitem_Math_MatrixMinColumnWidth;
+CChangesMathMatrixMinColumnWidth.prototype.Type = AscDFH.historyitem_Math_MatrixMinColumnWidth;
 CChangesMathMatrixMinColumnWidth.prototype.Undo = function(Class)
 {
     Class.raw_Set_MinColumnWidth(this.Old);
@@ -5612,7 +5550,7 @@ function CChangesMathBarLinePos(NewValue, OldValue)
     this.New = NewValue;
     this.Old = OldValue;
 }
-CChangesMathBarLinePos.prototype.Type = historyitem_Math_BarLinePos;
+CChangesMathBarLinePos.prototype.Type = AscDFH.historyitem_Math_BarLinePos;
 CChangesMathBarLinePos.prototype.Undo = function(Class)
 {
     Class.raw_SetLinePos(this.Old);
@@ -5650,7 +5588,7 @@ function CChangesMathBoxForcedBreak(NewBreak, OldBreak, OldAlnAt)
     this.OldBreak = OldBreak;
     this.OldAlnAt = OldAlnAt;
 }
-CChangesMathBoxForcedBreak.prototype.Type = historyitem_Math_BoxForcedBreak;
+CChangesMathBoxForcedBreak.prototype.Type = AscDFH.historyitem_Math_BoxForcedBreak;
 CChangesMathBoxForcedBreak.prototype.Undo = function(Class)
 {
     Class.raw_ForcedBreak(this.OldBreak, this.OldAlnAt);
@@ -5687,7 +5625,7 @@ function CChangesMathDegreeSubSupType(NewType, OldType)
     this.New = NewType;
     this.Old = OldType;
 }
-CChangesMathDegreeSubSupType.prototype.Type = historyitem_Math_DegreeSubSupType;
+CChangesMathDegreeSubSupType.prototype.Type = AscDFH.historyitem_Math_DegreeSubSupType;
 CChangesMathDegreeSubSupType.prototype.Undo = function(Class)
 {
     Class.raw_SetType(this.Old);
@@ -5846,3 +5784,8 @@ CMathRecalculateObject.prototype.Compare = function(PageInfo)
 
     return result;
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].MathMenu = MathMenu;
+window['AscCommonWord'].ParaMath = ParaMath;

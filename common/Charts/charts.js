@@ -24,9 +24,20 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
 // Import
+
+	var CreateNoFillLine = AscFormat.CreateNoFillLine;
+	var CreateNoFillUniFill = AscFormat.CreateNoFillUniFill;
+	
 var c_oAscChartTypeSettings = Asc.c_oAscChartTypeSettings;
 var c_oAscTickMark = Asc.c_oAscTickMark;
+var c_oAscTickLabelsPos = Asc.c_oAscTickLabelsPos;
 
 function ChartPreviewManager() {
 	this.previewGroups = [];
@@ -49,41 +60,41 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 	{
 		case c_oAscChartTypeSettings.lineNormal:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(3), createItem(2), createItem(3) ];
 			series.push(ser);
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(2) ];
 			series.push(ser);
 			break;
 		}
         case c_oAscChartTypeSettings.line3d:
         {
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(1), createItem(2), createItem(1), createItem(2) ];
             series.push(ser);
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(3), createItem(2.5), createItem(3), createItem(3.5) ];
             series.push(ser);
             break;
         }
 		case c_oAscChartTypeSettings.lineStacked:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(6), createItem(2), createItem(8) ];
 			series.push(ser);
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(5) ];
 			series.push(ser);
 			break;
 		}
 		case c_oAscChartTypeSettings.lineStackedPer:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(4), createItem(2), createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(2), createItem(2), createItem(2) ];
 			series.push(ser);
 			break;
@@ -92,19 +103,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarNormal:
 		case c_oAscChartTypeSettings.hBarNormal3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1) ];
 			series.push(ser);
 			break;
@@ -113,11 +124,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarStacked:
 		case c_oAscChartTypeSettings.hBarStacked3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(3), createItem(2), createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(5), createItem(4), createItem(3), createItem(2) ];
 			series.push(ser);
 			break;
@@ -126,11 +137,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.hBarStackedPer:
 		case c_oAscChartTypeSettings.hBarStackedPer3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(7), createItem(5), createItem(3), createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(7), createItem(6), createItem(5), createItem(4) ];
 			series.push(ser);
 			break;
@@ -139,19 +150,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barNormal:
 		case c_oAscChartTypeSettings.barNormal3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4) ];
 			series.push(ser);
 			break;
@@ -160,11 +171,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barStacked:
 		case c_oAscChartTypeSettings.barStacked3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
 			series.push(ser);
 			break;
@@ -173,22 +184,22 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.barStackedPer:
 		case c_oAscChartTypeSettings.barStackedPer3d:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5), createItem(7) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(5), createItem(6), createItem(7) ];
 			series.push(ser);
 			break;
 		}
         case c_oAscChartTypeSettings.barNormal3dPerspective:
         {
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(1), createItem(2), createItem(3), createItem(4) ];
             series.push(ser);
 
-            ser = new asc_CChartSeria();
+            ser = new AscFormat.asc_CChartSeria();
             ser.Val.NumCache = [ createItem(2), createItem(3), createItem(4), createItem(5) ];
             series.push(ser);
             break;
@@ -196,7 +207,7 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 		case c_oAscChartTypeSettings.pie:
 		case c_oAscChartTypeSettings.doughnut:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3), createItem(1) ];
 			series.push(ser);
 			break;
@@ -204,11 +215,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaNormal:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(6) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(4), createItem(2), createItem(9) ];
 			series.push(ser);
 			break;
@@ -216,11 +227,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaStacked:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(8), createItem(5), createItem(11) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
 			series.push(ser);
 			break;
@@ -228,11 +239,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.areaStackedPer:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(0), createItem(4), createItem(1), createItem(16) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(4), createItem(4), createItem(4), createItem(4) ];
 			series.push(ser);
 			break;
@@ -240,11 +251,11 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		case c_oAscChartTypeSettings.scatter:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(5) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(2), createItem(6) ];
 			series.push(ser);
 			break;
@@ -252,19 +263,19 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 		default:
 		{
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(3), createItem(5), createItem(7) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(10), createItem(12), createItem(14) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(1), createItem(3), createItem(5) ];
 			series.push(ser);
 
-			ser = new asc_CChartSeria();
+			ser = new AscFormat.asc_CChartSeria();
 			ser.Val.NumCache = [ createItem(8), createItem(10), createItem(12) ];
 			series.push(ser);
 			break;
@@ -275,26 +286,23 @@ ChartPreviewManager.prototype.getAscChartSeriesDefault = function(type) {
 
 ChartPreviewManager.prototype.getChartByType = function(type)
 {
-	return ExecuteNoHistory(function()
+	return AscFormat.ExecuteNoHistory(function()
 	{
 		var settings = new AscCommon.asc_ChartSettings();
 		settings.type = type;
 		var chartSeries = {series: this.getAscChartSeriesDefault(type), parsedHeaders: {bLeft: true, bTop: true}};
-		var chart_space = DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
+		var chart_space = AscFormat.DrawingObjectsController.prototype._getChartSpace(chartSeries, settings, true);
         chart_space.bPreview = true;
-		if(window["Asc"]["editor"])
-		{
-			var api_sheet = window["Asc"]["editor"];
+		if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId()) {
+			var api_sheet = Asc['editor'];
 			chart_space.setWorksheet(api_sheet.wb.getWorksheet().model);
+		} else {
+			if (editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides &&
+				editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]) {
+				chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+			}
 		}
-        else
-        {
-            if(editor && editor.WordControl && editor.WordControl.m_oLogicDocument.Slides && editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
-            {
-                chart_space.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-            }
-        }
-		CheckSpPrXfrm(chart_space);
+		AscFormat.CheckSpPrXfrm(chart_space);
 		chart_space.spPr.xfrm.setOffX(0);
 		chart_space.spPr.xfrm.setOffY(0);
 		chart_space.spPr.xfrm.setExtX(50);
@@ -310,7 +318,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var val_ax_props = new AscCommon.asc_ValAxisSettings();
 		val_ax_props.putMinValRule(Asc.c_oAscValAxisRule.auto);
 		val_ax_props.putMaxValRule(Asc.c_oAscValAxisRule.auto);
-		val_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		val_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		val_ax_props.putInvertValOrder(false);
 		val_ax_props.putDispUnitsRule(Asc.c_oAscValAxUnits.none);
 		val_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -321,7 +329,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		var cat_ax_props = new AscCommon.asc_CatAxisSettings();
 		cat_ax_props.putIntervalBetweenLabelsRule(Asc.c_oAscBetweenLabelsRule.auto);
 		cat_ax_props.putLabelsPosition(Asc.c_oAscLabelsPosition.betweenDivisions);
-		cat_ax_props.putTickLabelsPos(Asc.c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+		cat_ax_props.putTickLabelsPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
 		cat_ax_props.putLabelsAxisDistance(100);
 		cat_ax_props.putMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 		cat_ax_props.putMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
@@ -358,7 +366,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
             case c_oAscChartTypeSettings.areaStacked:
             case c_oAscChartTypeSettings.areaStackedPer:
             {
-                cat_ax_props.putLabelsPosition(CROSS_BETWEEN_BETWEEN);
+                cat_ax_props.putLabelsPosition(AscFormat.CROSS_BETWEEN_BETWEEN);
                 vert_axis_settings = val_ax_props;
                 hor_axis_settings = cat_ax_props;
                 break;
@@ -375,7 +383,7 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		settings.putVertAxisProps(vert_axis_settings);
 		settings.putHorAxisProps(hor_axis_settings);
 
-		DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
+		AscFormat.DrawingObjectsController.prototype.applyPropsToChartSpace(settings, chart_space);
 		chart_space.setBDeleted(false);
 		chart_space.updateLinks();
 		if(!(isScatter || type === c_oAscChartTypeSettings.stock))
@@ -389,23 +397,23 @@ ChartPreviewManager.prototype.getChartByType = function(type)
 		{
 			if(chart_space.chart.plotArea.valAx)
 			{
-				chart_space.chart.plotArea.valAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
-				chart_space.chart.plotArea.valAx.setMajorTickMark(TICK_MARK_NONE);
-				chart_space.chart.plotArea.valAx.setMinorTickMark(TICK_MARK_NONE);
+				chart_space.chart.plotArea.valAx.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+				chart_space.chart.plotArea.valAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+				chart_space.chart.plotArea.valAx.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 			}
 			if(chart_space.chart.plotArea.catAx)
 			{
-				chart_space.chart.plotArea.catAx.setTickLblPos(TICK_LABEL_POSITION_NONE);
-				chart_space.chart.plotArea.catAx.setMajorTickMark(TICK_MARK_NONE);
-				chart_space.chart.plotArea.catAx.setMinorTickMark(TICK_MARK_NONE);
+				chart_space.chart.plotArea.catAx.setTickLblPos(c_oAscTickLabelsPos.TICK_LABEL_POSITION_NONE);
+				chart_space.chart.plotArea.catAx.setMajorTickMark(c_oAscTickMark.TICK_MARK_NONE);
+				chart_space.chart.plotArea.catAx.setMinorTickMark(c_oAscTickMark.TICK_MARK_NONE);
 			}
 		}
 		if(!chart_space.spPr)
-			chart_space.setSpPr(new CSpPr());
+			chart_space.setSpPr(new AscFormat.CSpPr());
 
-		var new_line = new CLn();
-		new_line.setFill(new CUniFill());
-		new_line.Fill.setFill(new CNoFill());
+		var new_line = new AscFormat.CLn();
+		new_line.setFill(new AscFormat.CUniFill());
+		new_line.Fill.setFill(new AscFormat.CNoFill());
 		chart_space.spPr.setLn(new_line);
         chart_space.recalcInfo.recalculateReferences = false;
 		chart_space.recalculate();
@@ -419,7 +427,7 @@ ChartPreviewManager.prototype.clearPreviews = function()
 	this.previewGroups.length = 0;
 };
 ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
-    return ExecuteNoHistory(function(){
+    return AscFormat.ExecuteNoHistory(function(){
         if(!this.chartsByTypes[type])
             this.chartsByTypes[type] = this.getChartByType(type);
         var chart_space = this.chartsByTypes[type];
@@ -451,9 +459,9 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
 
         var _canvas = this._canvas_charts;
         var ctx = _canvas.getContext('2d');
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         graphics.init(ctx, _canvas.width, _canvas.height, 50, 50);
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
         graphics.transform(1,0,0,1,0,0);
         chart_space.draw(graphics);
         return _canvas.toDataURL("image/png");
@@ -462,7 +470,7 @@ ChartPreviewManager.prototype.createChartPreview = function(type, styleIndex) {
 };
 
 ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
-	if (isRealNumber(chartType)) {
+	if (AscFormat.isRealNumber(chartType)) {
 		if (!this.previewGroups.hasOwnProperty(chartType)) {
 			this.previewGroups[chartType] = [];
 			var arr = this.previewGroups[chartType];
@@ -473,7 +481,7 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 		var objectGroup = [];
 
 		for (var style = 0; style <  group.length; ++style) {
-			var chartStyle = new asc_CChartStyle();
+			var chartStyle = new AscFormat.asc_CChartStyle();
 			chartStyle.asc_setStyle(style + 1);
 			chartStyle.asc_setImageUrl(group[style]);
 			objectGroup.push(chartStyle);
@@ -484,19 +492,6 @@ ChartPreviewManager.prototype.getChartPreviews = function(chartType) {
 	else
 		return null;
 };
-
-function arrReverse(arr) {
-	if(!arr || !arr.length)
-		return;
-	var newarr = [];
-	for (var i = 0; i < arr[0].length; ++i) {
-		newarr[i] = [];
-		for (var j = 0; j < arr.length; ++j) {
-			newarr[i][j] = arr[j][i];
-		}
-	}
-	return newarr;
-}
 
 function CreateAscColorByIndex(nIndex)
 {
@@ -552,21 +547,21 @@ TextArtPreviewManager.prototype.initStyles = function()
 
 	var oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(24), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(24), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[0] = oTextPr;
 	this.aStylesByIndexToApply[0] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(52, 24, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[4] = oTextPr;
 	this.aStylesByIndexToApply[4] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(44, 42, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[8] = oTextPr;
 	this.aStylesByIndexToApply[8] = oTextPr;
@@ -574,90 +569,90 @@ TextArtPreviewManager.prototype.initStyles = function()
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(34), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[1] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(34), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(34), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[1] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(59), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[5] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(59), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(59), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[5] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000)*this.dKoeff);
 	this.aStylesByIndex[9] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
 	oTextPr.TextFill = CreateNoFillUniFill();
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (15773/36000));
 	this.aStylesByIndexToApply[9] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(27), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[2] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(27), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(52), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(27), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(52), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[2] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(42), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(46), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[6] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(42), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(46), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(42), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(46), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[6] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(57), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(54), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000)*this.dKoeff);
 	this.aStylesByIndex[10] = oTextPr;
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscFillByIndex(57), new CUniFill(), 0);
-	oTextPr.TextOutline = CreatePenFromParams(CorrectUniFill(CreateAscFillByIndex(54), new CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscFillByIndex(57), new AscFormat.CUniFill(), 0);
+	oTextPr.TextOutline = AscFormat.CreatePenFromParams(AscFormat.CorrectUniFill(CreateAscFillByIndex(54), new AscFormat.CUniFill(), 0), undefined, undefined, undefined, undefined, (12700/36000));
 	this.aStylesByIndexToApply[10] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(45, 57, 0), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[3] = oTextPr;
 	this.aStylesByIndexToApply[3] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(52, 33, 0), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[7] = oTextPr;
 	this.aStylesByIndexToApply[7] = oTextPr;
 
 	oTextPr = new CTextPr();
 	oTextPr.Bold = true;
-	oTextPr.TextFill = CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new CUniFill(), 0);
+	oTextPr.TextFill = AscFormat.CorrectUniFill(CreateAscGradFillByIndex(27, 45, 5400000), new AscFormat.CUniFill(), 0);
 	oTextPr.TextOutline = CreateNoFillLine();
 	this.aStylesByIndex[11] = oTextPr;
 	this.aStylesByIndexToApply[11] = oTextPr;
-}
+};
 
 TextArtPreviewManager.prototype.getStylesToApply = function()
 {
@@ -832,7 +827,7 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 	oContent.Set_ApplyToAll(false);
 
 	var oBodypr = oShape.getBodyPr().createDuplicate();
-	oBodypr.prstTxWarp = ExecuteNoHistory(
+	oBodypr.prstTxWarp = AscFormat.ExecuteNoHistory(
 		function()
 		{
 			return  CreatePrstTxWarpGeometry(prst)
@@ -851,38 +846,31 @@ TextArtPreviewManager.prototype.getShapeByPrst = function(prst)
 };
 TextArtPreviewManager.prototype.getShape =  function()
 {
-	var oShape = new CShape();
+	var oShape = new AscFormat.CShape();
 	var oParent = null, oWorkSheet = null;
 	var bWord = true;
-	if(window["Asc"]["editor"])
-	{
-		var api_sheet = window["Asc"]["editor"];
+	if (Asc['editor'] && AscCommon.c_oEditorId.Spreadsheet === Asc['editor'].getEditorId()) {
+		var api_sheet = Asc['editor'];
 		oShape.setWorksheet(api_sheet.wb.getWorksheet().model);
 		oWorkSheet = api_sheet.wb.getWorksheet().model;
 		bWord = false;
-	}
-	else
-	{
-		if(editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides))
-		{
-            if(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage])
-            {
-                oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
-                oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
-                bWord = false;
-            }
-            else
-            {
-                return null;
-            }
+	} else {
+		if (editor && editor.WordControl && Array.isArray(editor.WordControl.m_oLogicDocument.Slides)) {
+			if (editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]) {
+				oShape.setParent(editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage]);
+				oParent = editor.WordControl.m_oLogicDocument.Slides[editor.WordControl.m_oLogicDocument.CurPage];
+				bWord = false;
+			} else {
+				return null;
+			}
 		}
 	}
 	var oParentObjects = oShape.getParentObjects();
-	var oTrack = new NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
+	var oTrack = new AscFormat.NewShapeTrack("textRect", 0, 0, oParentObjects.theme, oParentObjects.master, oParentObjects.layout, oParentObjects.slide, 0);
 	oTrack.track({}, oShape.convertPixToMM(this.canvasWidth), oShape.convertPixToMM(this.canvasHeight));
 	oShape = oTrack.getShape(bWord, oShape.getDrawingDocument(), oShape.drawingObjects);
     oShape.setStyle(null);
-    oShape.spPr.setFill(CreateUnfilFromRGB(255, 255, 255));
+    oShape.spPr.setFill(AscFormat.CreateUnfilFromRGB(255, 255, 255));
 	var oBodypr = oShape.getBodyPr().createDuplicate();
 	oBodypr.lIns = 0;
 	oBodypr.tIns = 0;
@@ -897,7 +885,7 @@ TextArtPreviewManager.prototype.getShape =  function()
 	{
 		oShape.setBodyPr(oBodypr);
 	}
-	oShape.spPr.setLn(CreatePenFromParams(CreateNoFillUniFill(), null, null, null, 2, null));
+	oShape.spPr.setLn(AscFormat.CreatePenFromParams(CreateNoFillUniFill(), null, null, null, 2, null));
 	if(oWorkSheet)
 	{
 		oShape.setWorksheet(oWorkSheet);
@@ -943,14 +931,14 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 {
 	var _canvas = this.getCanvas();
 	var ctx = _canvas.getContext('2d');
-	var graphics = new CGraphics();
+	var graphics = new AscCommon.CGraphics();
 	var oShape = this.getShapeByPrst(prst);
     if(!oShape)
     {
         return "";
     }
 	graphics.init(ctx, _canvas.width, _canvas.height, oShape.extX, oShape.extY);
-	graphics.m_oFontManager = g_fontManager;
+	graphics.m_oFontManager = AscCommon.g_fontManager;
 	graphics.transform(1,0,0,1,0,0);
 
 	var oldShowParaMarks;
@@ -970,7 +958,7 @@ TextArtPreviewManager.prototype.getWordArtPreview = function(prst)
 
 TextArtPreviewManager.prototype.generateTextArtStyles = function()
 {
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
 
         if(this.aStylesByIndex.length === 0)
         {
@@ -978,7 +966,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         }
         var _canvas = this.getCanvas();
         var ctx = _canvas.getContext('2d');
-        var graphics = new CGraphics();
+        var graphics = new AscCommon.CGraphics();
         var oShape = this.getTAShape();
         if(!oShape)
         {
@@ -987,7 +975,7 @@ TextArtPreviewManager.prototype.generateTextArtStyles = function()
         }
         oShape.recalculate();
 
-        graphics.m_oFontManager = g_fontManager;
+        graphics.m_oFontManager = AscCommon.g_fontManager;
 
         var oldShowParaMarks;
         if(editor)
@@ -1029,14 +1017,14 @@ function GenerateWordArtPrewiewCode()
 {
 	var oWordArtPreview = new TextArtPreviewManager();
 	var i, j;
-	var oRetString =  "g_PresetTxWarpTypes = \n ["
+	var oRetString =  "g_PresetTxWarpTypes = \n [";
 	for(i = 0; i < g_PresetTxWarpTypes.length; ++i)
 	{
 		var aByTypes = g_PresetTxWarpTypes[i];
 		oRetString += "\n\t[";
 		for(j = 0; j < aByTypes.length; ++j)
 		{
-			oRetString += "\n\t\t{Type: \"" + aByTypes[j].Type + "\", Image: \"" + oWordArtPreview.getWordArtPreview(aByTypes[j].Type) + "\"}" + ((j === aByTypes.length - 1) ? "" : ",");
+			oRetString += "\n\t\t{Type: \"" + aByTypes[j]['Type'] + "\", Image: \"" + oWordArtPreview.getWordArtPreview(aByTypes[j]['Image']) + "\"}" + ((j === aByTypes.length - 1) ? "" : ",");
 		}
 		oRetString += "\n\t]" + (i < (g_PresetTxWarpTypes.length - 1) ? "," : "");
 	}
@@ -1044,3 +1032,8 @@ function GenerateWordArtPrewiewCode()
 	return oRetString;
 }
 
+	//----------------------------------------------------------export----------------------------------------------------
+	window['AscCommon'] = window['AscCommon'] || {};
+	window['AscCommon'].ChartPreviewManager = ChartPreviewManager;
+	window['AscCommon'].TextArtPreviewManager = TextArtPreviewManager;
+})(window);

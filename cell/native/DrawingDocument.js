@@ -24,149 +24,12 @@
 */
 "use strict";
 
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
-
-var g_fontManager = new CFontManager();
-g_fontManager.Initialize(true);
-
-function SetHintsProps(bIsHinting, bIsSubpixHinting)
-{
-    if (undefined === g_fontManager.m_oLibrary.tt_hint_props)
-        return;
-
-    if (bIsHinting && bIsSubpixHinting)
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = true;
-
-        g_fontManager.LOAD_MODE = 40968;
-    }
-    else if (bIsHinting)
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-        g_fontManager.LOAD_MODE = 40968;
-    }
-    else
-    {
-        g_fontManager.m_oLibrary.tt_hint_props.TT_USE_BYTECODE_INTERPRETER = true;
-        g_fontManager.m_oLibrary.tt_hint_props.TT_CONFIG_OPTION_SUBPIXEL_HINTING = false;
-
-        g_fontManager.LOAD_MODE = 40970;
-    }
-}
-
-SetHintsProps(true, true);
-
-function CTableMarkup(Table)
-{
-    this.Internal =
-    {
-        RowIndex  : 0,
-        CellIndex : 0,
-        PageNum   : 0
-    };
-    this.Table = Table;
-    this.X = 0; // Смещение таблицы от начала страницы до первой колонки
-
-    this.Cols    = []; // массив ширин колонок
-    this.Margins = []; // массив левых и правых маргинов
-
-    this.Rows    = []; // массив позиций, высот строк(для данной страницы)
-                                // Rows = [ { Y : , H :  }, ... ]
-
-    this.CurCol = 0; // текущая колонка
-    this.CurRow = 0; // текущая строка
-
-    this.TransformX = 0;
-    this.TransformY = 0;
-}
-
-CTableMarkup.prototype =
-{
-    CreateDublicate : function()
-    {
-        var obj = new CTableMarkup(this.Table);
-
-        obj.Internal = { RowIndex : this.Internal.RowIndex, CellIndex : this.Internal.CellIndex, PageNum : this.Internal.PageNum };
-        obj.X = this.X;
-
-        var len = this.Cols.length;
-        for (var i = 0; i < len; i++)
-            obj.Cols[i] = this.Cols[i];
-
-        len = this.Margins.length;
-        for (var i = 0; i < len; i++)
-            obj.Margins[i] = { Left : this.Margins[i].Left, Right : this.Margins[i].Right };
-
-        len = this.Rows.length;
-        for (var i = 0; i < len; i++)
-            obj.Rows[i] = { Y : this.Rows[i].Y, H : this.Rows[i].H };
-
-        obj.CurRow = this.CurRow;
-        obj.CurCol = this.CurCol;
-
-        return obj;
-    },
-
-    CorrectFrom : function()
-    {
-        this.X += this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y += this.TransformY;
-        }
-    },
-
-    CorrectTo : function()
-    {
-        this.X -= this.TransformX;
-
-        var _len = this.Rows.length;
-        for (var i = 0; i < _len; i++)
-        {
-            this.Rows[i].Y -= this.TransformY;
-        }
-    },
-
-    Get_X : function()
-    {
-        return this.X;
-    },
-
-    Get_Y : function()
-    {
-        var _Y = 0;
-        if (this.Rows.length > 0)
-        {
-            _Y = this.Rows[0].Y;
-        }
-        return _Y;
-    }
-};
-
-function CTableOutline(Table, PageNum, X, Y, W, H)
-{
-    this.Table = Table;
-    this.PageNum = PageNum;
-
-    this.X = X;
-    this.Y = Y;
-
-    this.W = W;
-    this.H = H;
-}
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 function CTextMeasurer()
 {
-    this.m_oManager     = new CFontManager();
+    this.m_oManager     = new window['AscFonts'].CFontManager();
 
     this.m_oFont        = null;
 
@@ -205,7 +68,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = font.FontSize;
             _lastSetUp.SetUpStyle = oFontStyle;
 
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, AscCommon.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -218,7 +81,7 @@ function CTextMeasurer()
             _lastSetUp.SetUpSize = _size;
             _lastSetUp.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastSetUp.SetUpName, window.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            g_fontApplication.LoadFont(_lastSetUp.SetUpName, AscCommon.g_font_loader, this.m_oManager, _lastSetUp.SetUpSize, _lastSetUp.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -302,7 +165,7 @@ function CTextMeasurer()
             _lastFont.SetUpSize = _lastFont.Size;
             _lastFont.SetUpStyle = _style;
 
-            g_fontApplication.LoadFont(_lastFont.SetUpName, window.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
+            g_fontApplication.LoadFont(_lastFont.SetUpName, AscCommon.g_font_loader, this.m_oManager, _lastFont.SetUpSize, _lastFont.SetUpStyle, 72, 72, undefined, this.LastFontOriginInfo);
         }
     };
 
@@ -401,9 +264,6 @@ function CTextMeasurer()
     };
 }
 
-var g_oTextMeasurer = new CTextMeasurer();
-g_oTextMeasurer.Init();
-
 function CTableOutlineDr()
 {
     var image_64 = "u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u/+7u7v/u7u7/7u7u//6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6//r6+v/6+vr/+vr6/4+Pj/+7u7v/9vb2//b29v/39/f/9/f3//f39/83aMT/9/f3//f39//39/f/9/f3//f39/+Pj4//u7u7//Ly8v/y8vL/8vLy//Pz8/83aMT/N2jE/zdoxP/z8/P/8/Pz//Pz8//z8/P/j4+P/7u7u//u7u7/7u7u/+7u7v/u7u7/7u7u/zdoxP/u7u7/7u7u/+7u7v/u7u7/7u7u/4+Pj/+7u7v/6Ojo/+jo6P83aMT/6enp/+np6f83aMT/6enp/+np6f83aMT/6enp/+np6f+Pj4//u7u7/+Pj4/83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP83aMT/N2jE/zdoxP/k5OT/j4+P/7u7u//o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/zdoxP/o6Oj/6Ojo/4+Pj/+7u7v/7e3t/+3t7f/t7e3/7e3t/+3t7f83aMT/7e3t/+zs7P/s7Oz/7Ozs/+zs7P+Pj4//u7u7//Ly8v/y8vL/8vLy//Ly8v83aMT/N2jE/zdoxP/x8fH/8fHx//Hx8f/x8fH/j4+P/7u7u//19fX/9fX1//X19f/19fX/9fX1/zdoxP/19fX/9fX1//X19f/19fX/9fX1/4+Pj/+7u7v/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//n5+f/5+fn/+fn5//j4+P+Pj4//u7u7/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/4+Pj/+Pj4//j4+P/w==";
@@ -415,7 +275,7 @@ function CTableOutlineDr()
     var ctx = this.image.getContext('2d');
     var _data = ctx.createImageData(13, 13);
 
-    DecodeBase64(_data, image_64);
+    AscFonts.DecodeBase64(_data, image_64);
     ctx.putImageData(_data, 0, 0);
 
     _data = null;
@@ -450,7 +310,7 @@ function CTableOutlineDr()
         this.IsChangeSmall = true;
         this.ChangeSmallPoint = pos;
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             if (word_control.MobileTouchManager)
             {
@@ -545,7 +405,7 @@ function CTableOutlineDr()
         {
             if (word_control.MobileTouchManager)
             {
-                var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+                var _invert = AscCommon.global_MatrixTransformer.Invert(this.TableMatrix);
                 var _posx = _invert.TransformPointX(pos.X, pos.Y);
                 var _posy = _invert.TransformPointY(pos.X, pos.Y);
 
@@ -569,7 +429,7 @@ function CTableOutlineDr()
                 return false;
             }
 
-            var _invert = global_MatrixTransformer.Invert(this.TableMatrix);
+            var _invert = AscCommon.global_MatrixTransformer.Invert(this.TableMatrix);
             var _posx = _invert.TransformPointX(pos.X, pos.Y);
             var _posy = _invert.TransformPointY(pos.X, pos.Y);
             switch (this.TrackTablePos)
@@ -792,7 +652,7 @@ function CTableOutlineDr()
         if (transform)
             this.TableMatrix = transform.CreateDublicate();
 
-        if (!this.TableMatrix || global_MatrixTransformer.IsIdentity(this.TableMatrix))
+        if (!this.TableMatrix || AscCommon.global_MatrixTransformer.IsIdentity(this.TableMatrix))
         {
             var pos = word_control.m_oDrawingDocument.ConvertCoordsToCursor(this.TableOutline.X, this.TableOutline.Y, this.TableOutline.PageNum, true);
 
@@ -950,14 +810,6 @@ function CCacheManager()
     }
 }
 
-function _rect()
-{
-    this.x = 0;
-    this.y = 0;
-    this.w = 0;
-    this.h = 0;
-}
-
 function CDrawingPage()
 {
     this.left   = 0;
@@ -1009,7 +861,7 @@ function CPage()
 
         var selectionArray = this.selectionArray;
 
-        if (null == TextMatrix || global_MatrixTransformer.IsIdentity(TextMatrix))
+        if (null == TextMatrix || AscCommon.global_MatrixTransformer.IsIdentity(TextMatrix))
         {
             for (var i = 0; i < selectionArray.length; i++)
             {
@@ -1615,7 +1467,7 @@ function CPage()
             var ctx = overlay.m_oContext;
 
 
-            var _ft = new CMatrix();
+            var _ft = new AscCommon.CMatrix();
             _ft.sx = transform.sx;
             _ft.shx = transform.shx;
             _ft.shy = transform.shy;
@@ -1623,13 +1475,13 @@ function CPage()
             _ft.tx = transform.tx;
             _ft.ty = transform.ty;
 
-            var coords = new CMatrix();
+            var coords = new AscCommon.CMatrix();
             coords.sx = wDst / this.width_mm;
             coords.sy = hDst / this.height_mm;
             coords.tx = xDst;
             coords.ty = yDst;
 
-            global_MatrixTransformer.MultiplyAppend(_ft, coords);
+            AscCommon.global_MatrixTransformer.MultiplyAppend(_ft, coords);
 
             ctx.transform(_ft.sx,_ft.shy,_ft.shx,_ft.sy,_ft.tx,_ft.ty);
 
@@ -1686,74 +1538,6 @@ function CDrawingDocument(drawingObjects)
 
     this.drawingObjects = drawingObjects;
     this.IsLockObjectsEnable = false;
-
-    this.cursorMarkerFormat = "";
-    if (bIsIE)
-    {
-        // Пути указаны относительно html в меню, не надо их исправлять
-        // и коммитить на пути относительно тестового меню
-        this.cursorMarkerFormat = "url(../../../sdk/Common/Images/marker_format.cur), pointer";
-    }
-    else if (window.opera)
-    {
-        this.cursorMarkerFormat = "pointer";
-    }
-    else
-    {
-        this.cursorMarkerFormat = "url('data:image/png;base64,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\
-        mWhBvQBxpekAAAAASUVORK5CYII=') 14 8, pointer";
-    }
 
     this.m_oWordControl     = null;
     this.m_oLogicDocument   = null;
@@ -1870,23 +1654,6 @@ function CDrawingDocument(drawingObjects)
             this.Native["DD_SetCursorType"](sType, Data);
         else
             this.Native["DD_SetCursorType"](this.m_sLockedCursorType, Data);
-
-//        if ("" == this.m_sLockedCursorType)
-//        {
-//            if (this.m_oWordControl.m_oApi.isPaintFormat && "default" == sType)
-//                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = kCurFormatPainterWord;
-//            else if (this.m_oWordControl.m_oApi.isMarkerFormat && "default" == sType)
-//                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.cursorMarkerFormat;
-//            else
-//                this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = sType;
-//        }
-//        else
-//            this.m_oWordControl.m_oMainContent.HtmlElement.style.cursor = this.m_sLockedCursorType;
-//
-//        if ( "undefined" === typeof(Data) || null === Data )
-//            Data = new CMouseMoveData();
-//
-//        editor.sync_MouseMoveCallback( Data );
     }
     this.LockCursorType = function(sType)
     {
@@ -2011,8 +1778,8 @@ function CDrawingDocument(drawingObjects)
 
     this.ToRenderer = function()
     {
-        var Renderer = new CDocumentRenderer();
-        Renderer.VectorMemoryForPrint = new CMemory();
+        var Renderer = new AscCommon.CDocumentRenderer();
+        Renderer.VectorMemoryForPrint = new AscCommon.CMemory();
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
         this.RenderDocument(Renderer);
@@ -2024,7 +1791,7 @@ function CDrawingDocument(drawingObjects)
 
     this.ToRenderer2 = function()
     {
-        var Renderer = new CDocumentRenderer();
+        var Renderer = new AscCommon.CDocumentRenderer();
 
         var old_marks = this.m_oWordControl.m_oApi.ShowParaMarks;
         this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2075,8 +1842,8 @@ function CDrawingDocument(drawingObjects)
 
         if (-1 == this.m_lCurrentRendererPage)
         {
-            this.m_oDocRenderer = new CDocumentRenderer();
-            this.m_oDocRenderer.VectorMemoryForPrint = new CMemory();
+            this.m_oDocRenderer = new AscCommon.CDocumentRenderer();
+            this.m_oDocRenderer.VectorMemoryForPrint = new AscCommon.CMemory();
             this.m_lCurrentRendererPage = 0;
             this.m_bOldShowMarks = this.m_oWordControl.m_oApi.ShowParaMarks;
             this.m_oWordControl.m_oApi.ShowParaMarks = false;
@@ -2679,7 +2446,7 @@ function CDrawingDocument(drawingObjects)
         if (matrix)
         {
             if (null == this.TextMatrix)
-                this.TextMatrix = new CMatrix();
+                this.TextMatrix = new AscCommon.CMatrix();
             this.TextMatrix.sx = matrix.sx;
             this.TextMatrix.shy = matrix.shy;
             this.TextMatrix.shx = matrix.shx;
@@ -3807,7 +3574,7 @@ function CDrawingDocument(drawingObjects)
         var bIsChanged = false;
         if (null == this.TableStylesLastLook)
         {
-            this.TableStylesLastLook = new CTablePropLook();
+            this.TableStylesLastLook = new Asc.CTablePropLook();
 
             this.TableStylesLastLook.FirstCol = tableLook.FirstCol;
             this.TableStylesLastLook.FirstRow = tableLook.FirstRow;
@@ -3885,7 +3652,7 @@ function CDrawingDocument(drawingObjects)
         _canvas.height = TABLE_STYLE_HEIGHT_PIX;
         var ctx = _canvas.getContext('2d');
 
-        History.TurnOff();
+        AscCommon.History.TurnOff();
         for (var i1 = 0; i1 < _styles_len; i1++)
         {
             var i = _styles[i1];
@@ -3903,9 +3670,9 @@ function CDrawingDocument(drawingObjects)
             ctx.fillStyle = "#FFFFFF";
             ctx.fillRect(0, 0, _canvas.width, _canvas.height);
 
-            var graphics = new CGraphics();
+            var graphics = new AscCommon.CGraphics();
             graphics.init(ctx, _canvas.width, _canvas.height, _pageW, _pageH);
-            graphics.m_oFontManager = g_fontManager;
+            graphics.m_oFontManager = AscCommon.g_fontManager;
             graphics.transform(1,0,0,1,0,0);
 
             table.Recalculate_Page(0);
@@ -3917,7 +3684,7 @@ function CDrawingDocument(drawingObjects)
             _styleD.Id = i;
             _dst_styles.push(_styleD);
         }
-        History.TurnOn();
+        AscCommon.History.TurnOn();
 
         this.m_oWordControl.m_oApi.sync_InitEditorTableStyles(_dst_styles);
     }
@@ -3932,3 +3699,8 @@ function CDrawingDocument(drawingObjects)
     }
 
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CPage = CPage;
+window['AscCommon'].CDrawingDocument = CDrawingDocument;

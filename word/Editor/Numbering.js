@@ -24,15 +24,11 @@
 */
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 07.11.11
- * Time: 14:49
- */
-
 // Import
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
+var g_oTextMeasurer = AscCommon.g_oTextMeasurer;
+var History = AscCommon.History;
 
 var numbering_numfmt_None        = 0x0000;
 var numbering_numfmt_Bullet      = 0x1001;
@@ -224,8 +220,8 @@ function CAbstractNum(Type)
     if ( false === AscCommon.g_oIdCounter.m_bLoad )
     {
         this.Lock.Set_Type(AscCommon.locktype_Mine, false);
-        if (typeof CollaborativeEditing !== "undefined")
-            CollaborativeEditing.Add_Unlock2( this );
+        if (typeof AscCommon.CollaborativeEditing !== "undefined")
+            AscCommon.CollaborativeEditing.Add_Unlock2( this );
     }
 
     this.NumStyleLink = undefined;
@@ -302,7 +298,7 @@ CAbstractNum.prototype =
         {
             var Lvl_new = this.Internal_CopyLvl(AbstractNum.Lvl[Index]);
             var Lvl_old = this.Lvl[Index];
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
 
             this.Lvl[Index] = Lvl_new;
         }
@@ -320,7 +316,7 @@ CAbstractNum.prototype =
 
             this.Internal_SetLvl(Index, Lvl_new);
 
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
 
         var LogicDocument = editor.WordControl.m_oLogicDocument;
@@ -362,7 +358,7 @@ CAbstractNum.prototype =
 
         var Lvl_old    = this.Lvl[iLvl];
         this.Lvl[iLvl] = Lvl_new;
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // Определяем многоуровненый список по умолчанию
@@ -410,7 +406,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = new CTextPr();
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
@@ -457,7 +453,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
@@ -535,7 +531,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
@@ -602,7 +598,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
@@ -651,7 +647,7 @@ CAbstractNum.prototype =
             Lvl.TextPr = TextPr;
 
             var Lvl_new = this.Internal_CopyLvl(Lvl);
-            History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
+            History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : Index, Old : Lvl_old, New : Lvl_new});
         }
     },
 
@@ -667,7 +663,7 @@ CAbstractNum.prototype =
         Lvl.LvlText = [];
         Lvl.TextPr  = new CTextPr();
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_Bullet : function(iLvl, LvlText, TextPr)
@@ -685,7 +681,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = TextPr;
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1) right
@@ -706,7 +702,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1. right
@@ -727,7 +723,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1. left
@@ -748,7 +744,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // 1) left
@@ -769,7 +765,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // I. right
@@ -790,7 +786,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // A. left
@@ -811,7 +807,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // a) left
@@ -832,7 +828,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // a. left
@@ -853,7 +849,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // i. left
@@ -874,7 +870,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_ByFormat : function(iLvl, nType, sFormatText, nAlign)
@@ -914,7 +910,7 @@ CAbstractNum.prototype =
         Lvl.TextPr = new CTextPr();
 
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_Restart : function(iLvl, isRestart)
@@ -926,7 +922,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Restart = (isRestart ? -1 : 0);
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_Start : function(iLvl, nStart)
@@ -938,7 +934,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Start = nStart;
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     Set_Lvl_Suff : function(iLvl, nSuff)
@@ -950,7 +946,7 @@ CAbstractNum.prototype =
         var Lvl_old = this.Internal_CopyLvl(Lvl);
         Lvl.Suff = nSuff;
         var Lvl_new = this.Internal_CopyLvl(Lvl);
-        History.Add(this, {Type : historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_LvlChange, Index : iLvl, Old : Lvl_old, New : Lvl_new});
     },
 
     // X, Y, Context - параметры для рисование
@@ -1486,18 +1482,18 @@ CAbstractNum.prototype =
         CurTextPr.Merge(TextPr);
         var TextPr_new = CurTextPr.Copy();
 
-        History.Add( this, { Type : historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : TextPr_old, New : TextPr_new } );
+        History.Add( this, { Type : AscDFH.historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : TextPr_old, New : TextPr_new } );
     },
 
     Set_TextPr : function(Lvl, TextPr)
     {
-        History.Add(this, {Type : historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : this.Lvl[Lvl].TextPr, New : TextPr});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_TextPrChange, Index : Lvl, Old : this.Lvl[Lvl].TextPr, New : TextPr});
         this.Lvl[Lvl].TextPr = TextPr;
     },
     
     Set_ParaPr : function(Lvl, ParaPr)
     {
-        History.Add(this, {Type : historyitem_AbstractNum_ParaPrChange, Index : Lvl, Old : this.Lvl[Lvl].ParaPr, New : ParaPr});
+        History.Add(this, {Type : AscDFH.historyitem_AbstractNum_ParaPrChange, Index : Lvl, Old : this.Lvl[Lvl].ParaPr, New : ParaPr});
         this.Lvl[Lvl].ParaPr = ParaPr;
     },
 //-----------------------------------------------------------------------------------
@@ -1604,7 +1600,7 @@ CAbstractNum.prototype =
 
         switch ( Type )
         {
-            case historyitem_AbstractNum_LvlChange:
+            case AscDFH.historyitem_AbstractNum_LvlChange:
             {
                 this.Internal_SetLvl( Data.Index, Data.Old );
 
@@ -1613,7 +1609,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_TextPrChange:
+            case AscDFH.historyitem_AbstractNum_TextPrChange:
             {
                 this.Lvl[Data.Index].TextPr = Data.Old;
 
@@ -1623,7 +1619,7 @@ CAbstractNum.prototype =
             }
 
 
-            case historyitem_AbstractNum_ParaPrChange:
+            case AscDFH.historyitem_AbstractNum_ParaPrChange:
             {
                 this.Lvl[Data.Index].ParaPr = Data.Old;
 
@@ -1640,7 +1636,7 @@ CAbstractNum.prototype =
 
         switch ( Type )
         {
-            case historyitem_AbstractNum_LvlChange:
+            case AscDFH.historyitem_AbstractNum_LvlChange:
             {
                 this.Internal_SetLvl( Data.Index, Data.New );
 
@@ -1649,7 +1645,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_TextPrChange:
+            case AscDFH.historyitem_AbstractNum_TextPrChange:
             {
                 this.Lvl[Data.Index].TextPr = Data.New;
 
@@ -1658,7 +1654,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_ParaPrChange:
+            case AscDFH.historyitem_AbstractNum_ParaPrChange:
             {
                 this.Lvl[Data.Index].ParaPr = Data.New;
 
@@ -1682,7 +1678,7 @@ CAbstractNum.prototype =
         for ( var Index = 0; Index < Count; Index++ )
         {
             var Para = AllParagraphs[Index];
-            Para.Refresh_RecalcData( { Type : historyitem_Paragraph_Numbering } );
+            Para.Refresh_RecalcData( { Type : AscDFH.historyitem_Paragraph_Numbering } );
         }
     },
 //-----------------------------------------------------------------------------------
@@ -1694,7 +1690,7 @@ CAbstractNum.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_AbstractNum );
+        Writer.WriteLong( AscDFH.historyitem_type_AbstractNum );
 
         var Type = Data.Type;
 
@@ -1703,7 +1699,7 @@ CAbstractNum.prototype =
 
         switch ( Type )
         {
-            case historyitem_AbstractNum_LvlChange:
+            case AscDFH.historyitem_AbstractNum_LvlChange:
             {
                 // Long     : iLvl
                 // Variable : Lvl
@@ -1714,7 +1710,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_TextPrChange:
+            case AscDFH.historyitem_AbstractNum_TextPrChange:
             {
                 // Long     : iLvl
                 // Vairable : TextPr
@@ -1725,7 +1721,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_ParaPrChange:
+            case AscDFH.historyitem_AbstractNum_ParaPrChange:
             {
                 // Long     : iLvl
                 // Vairable : ParaPr
@@ -1754,7 +1750,7 @@ CAbstractNum.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_AbstractNum != ClassType )
+        if ( AscDFH.historyitem_type_AbstractNum != ClassType )
             return;
 
         var Type = Reader.GetLong();
@@ -1762,7 +1758,7 @@ CAbstractNum.prototype =
         var iLvl = 0;
         switch ( Type )
         {
-            case historyitem_AbstractNum_LvlChange:
+            case AscDFH.historyitem_AbstractNum_LvlChange:
             {
                 // Long     : iLvl
                 // Variable : Lvl
@@ -1773,7 +1769,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_TextPrChange:
+            case AscDFH.historyitem_AbstractNum_TextPrChange:
             {
                 // Long     : iLvl
                 // Vairable : TextPr
@@ -1785,7 +1781,7 @@ CAbstractNum.prototype =
                 break;
             }
 
-            case historyitem_AbstractNum_ParaPrChange:
+            case AscDFH.historyitem_AbstractNum_ParaPrChange:
             {
                 // Long     : iLvl
                 // Vairable : ParaPr
@@ -1799,12 +1795,12 @@ CAbstractNum.prototype =
         }
 
         // Сразу нельзя запускать пересчет, т.к. возможно еще не все ссылки проставлены
-        CollaborativeEditing.Add_EndActions(this, {iLvl : iLvl});
+        AscCommon.CollaborativeEditing.Add_EndActions(this, {iLvl : iLvl});
     },
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_AbstractNum );
+        Writer.WriteLong( AscDFH.historyitem_type_AbstractNum );
 
         // String          : Id
         // Variable[9 Lvl] : 9 уровней
@@ -2422,4 +2418,89 @@ function CPresentationBullet()
         this.m_bSizeTx  = Reader.GetBool();
         this.m_bSizePct = Reader.GetBool();
     };
-};
+}
+
+function getNumInfoLvl(Lvl) {
+    var NumType    = -1;
+    var NumSubType = -1;
+
+    var NumFormat = Lvl.Format;
+    var NumText   = Lvl.LvlText;
+    var TextLen;
+
+    if ( numbering_numfmt_Bullet === NumFormat )
+    {
+        NumType    = 0;
+        NumSubType = 0;
+
+        TextLen = NumText.length;
+        if ( 1 === TextLen && numbering_lvltext_Text === NumText[0].Type )
+        {
+            var NumVal = NumText[0].Value.charCodeAt(0);
+
+            if ( 0x00B7 === NumVal )
+                NumSubType = 1;
+            else if ( 0x006F === NumVal )
+                NumSubType = 2;
+            else if ( 0x00A7 === NumVal )
+                NumSubType = 3;
+            else if ( 0x0076 === NumVal )
+                NumSubType = 4;
+            else if ( 0x00D8 === NumVal )
+                NumSubType = 5;
+            else if ( 0x00FC === NumVal )
+                NumSubType = 6;
+            else if ( 0x00A8 === NumVal )
+                NumSubType = 7;
+        }
+    }
+    else
+    {
+        NumType    = 1;
+        NumSubType = 0;
+
+        TextLen = NumText.length;
+        if ( 2 === TextLen && numbering_lvltext_Num === NumText[0].Type && numbering_lvltext_Text === NumText[1].Type )
+        {
+            var NumVal2 = NumText[1].Value;
+
+            if ( numbering_numfmt_Decimal === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 1;
+                else if ( ")" === NumVal2 )
+                    NumSubType = 2;
+            }
+            else if ( numbering_numfmt_UpperRoman === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 3;
+            }
+            else if ( numbering_numfmt_UpperLetter === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 4;
+            }
+            else if ( numbering_numfmt_LowerLetter === NumFormat )
+            {
+                if ( ")" === NumVal2 )
+                    NumSubType = 5;
+                else if ( "." === NumVal2 )
+                    NumSubType = 6;
+            }
+            else if ( numbering_numfmt_LowerRoman === NumFormat )
+            {
+                if ( "." === NumVal2 )
+                    NumSubType = 7;
+            }
+        }
+    }
+
+    return {NumType: NumType, NumSubType: NumSubType};
+}
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CAbstractNum = CAbstractNum;
+window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
+window['AscCommonWord'].g_NumberingArr = g_NumberingArr;

@@ -24,6 +24,10 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+var CChartSpace = AscFormat.CChartSpace;
+
 function getChartTranslateManager()
 {
     return editor.chartTranslate;
@@ -65,7 +69,6 @@ CChartSpace.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CChartSpace.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CChartSpace.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CChartSpace.prototype.check_bounds = CShape.prototype.check_bounds;
-CChartSpace.prototype.normalize = CShape.prototype.normalize;
 CChartSpace.prototype.getFullFlipH = CShape.prototype.getFullFlipH;
 CChartSpace.prototype.getFullFlipV = CShape.prototype.getFullFlipV;
 CChartSpace.prototype.Get_Theme = CShape.prototype.Get_Theme;
@@ -121,10 +124,7 @@ CChartSpace.prototype.setRecalculateInfo = function()
     this.baseColors = [];
 
     this.chartObj = null;
-    this.localTransform = new CMatrix();
-    this.snapArrayX = [];
-    this.snapArrayY = [];
-    this.rectGeometry = ExecuteNoHistory(function(){return  CreateGeometry("rect");},  this, []);
+    this.rectGeometry = AscFormat.ExecuteNoHistory(function(){return  AscFormat.CreateGeometry("rect");},  this, []);
     this.bNeedUpdatePosition = true;
 };
 CChartSpace.prototype.recalcTransform = function()
@@ -159,9 +159,9 @@ CChartSpace.prototype.recalcDLbls = function()
 
 CChartSpace.prototype.addToSetPosition = function(dLbl)
 {
-    if(dLbl instanceof CDLbl)
+    if(dLbl instanceof AscFormat.CDLbl)
         this.recalcInfo.dataLbls.push(dLbl);
-    else if(dLbl instanceof CTitle)
+    else if(dLbl instanceof AscFormat.CTitle)
         this.recalcInfo.axisLabels.push(dLbl);
 };
 
@@ -216,7 +216,7 @@ CChartSpace.prototype.recalculateTransform = CShape.prototype.recalculateTransfo
 CChartSpace.prototype.recalculateChart = function()
 {
     if(this.chartObj == null)
-        this.chartObj =  new CChartsDrawer();
+        this.chartObj =  new AscFormat.CChartsDrawer();
     this.chartObj.reCalculate(this);
 };
 CChartSpace.prototype.canResize = CShape.prototype.canResize;
@@ -275,7 +275,7 @@ CChartSpace.prototype.recalculate = function()
 {
     if(this.bDeleted)
         return;
-    ExecuteNoHistory(function()
+    AscFormat.ExecuteNoHistory(function()
     {
         var bOldTrackRevision =  editor.WordControl.m_oLogicDocument.TrackRevisions;
         if(bOldTrackRevision){
@@ -461,8 +461,18 @@ CChartSpace.prototype.recalculate = function()
 
         if(b_recalc_legend && this.chart && this.chart.legend)
         {
+            var bResetLegendPos = false;
+            if(!AscFormat.isRealNumber(this.chart.legend.legendPos))
+            {
+                this.chart.legend.legendPos = Asc.c_oAscChartLegendShowSettings.bottom;
+                bResetLegendPos = true;
+            }
             var pos = this.chartObj.reCalculatePositionText("legend", this, this.chart.legend);
             this.chart.legend.setPosition(pos.x, pos.y);
+            if(bResetLegendPos)
+            {
+                this.chart.legend.legendPos = null;
+            }
         }
         if(this.recalcInfo.recalculateTextPr)
         {
@@ -482,7 +492,7 @@ CChartSpace.prototype.recalculate = function()
         }
         this.recalcInfo.axisLabels.length = 0;
         this.bNeedUpdatePosition = true;
-        if(isRealNumber(this.posX) && isRealNumber(this.posY))
+        if(AscFormat.isRealNumber(this.posX) && AscFormat.isRealNumber(this.posY))
         {
             this.updatePosition(this.posX, this.posY);
         }
@@ -526,7 +536,7 @@ CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
                         for(var i = 0; i < series.length; ++i)
                         {
                             var ser = series[i];
-                            var pts = getPtsFromSeries(ser);
+                            var pts = AscFormat.getPtsFromSeries(ser);
                             for(var j = 0; j < pts.length; ++j)
                             {
                                 if(pts[j].compiledDlb)
@@ -575,7 +585,7 @@ CChartSpace.prototype.updateTransformMatrix  = function()
     var posY = this.localTransform.ty + this.posY;
 
     this.transform = this.localTransform.CreateDublicate();
-    global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
+    AscCommon.global_MatrixTransformer.TranslateAppend(this.transform, this.posX, this.posY);
 
     var oParentTransform = null;
     if(this.parent && this.parent.Get_ParentParagraph)
@@ -587,12 +597,12 @@ CChartSpace.prototype.updateTransformMatrix  = function()
 
             if(oParentTransform)
             {
-                global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
+                AscCommon.global_MatrixTransformer.MultiplyAppend(this.transform, oParentTransform);
             }
         }
     }
 
-    this.invertTransform = global_MatrixTransformer.Invert(this.transform);
+    this.invertTransform = AscCommon.global_MatrixTransformer.Invert(this.transform);
     this.updateChildLabelsTransform(posX,posY);
     this.checkShapeChildTransform(oParentTransform);
 };
@@ -606,24 +616,29 @@ CChartSpace.prototype.Is_UseInDocument = CShape.prototype.Is_UseInDocument;
 
 function CreateUnifillSolidFillSchemeColor(colorId, tintOrShade)
 {
-    var unifill = new CUniFill();
-    unifill.setFill(new CSolidFill());
-    unifill.fill.setColor(new CUniColor());
-    unifill.fill.color.setColor(new CSchemeColor());
+    var unifill = new AscFormat.CUniFill();
+    unifill.setFill(new AscFormat.CSolidFill());
+    unifill.fill.setColor(new AscFormat.CUniColor());
+    unifill.fill.color.setColor(new AscFormat.CSchemeColor());
     unifill.fill.color.color.setId(colorId);
-    return CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
+    return AscFormat.CreateUniFillSolidFillWidthTintOrShade(unifill, tintOrShade);
 }
 
 function CreateNoFillLine()
 {
-    var ret = new CLn();
-    ret.setFill(CreateNoFillUniFill());
+    var ret = new AscFormat.CLn();
+    ret.setFill(AscFormat.CreateNoFillUniFill());
     return ret;
 }
 
 function CreateNoFillUniFill()
 {
-    var ret = new CUniFill();
-    ret.setFill(new CNoFill());
+    var ret = new AscFormat.CUniFill();
+    ret.setFill(new AscFormat.CNoFill());
     return ret;
 }
+
+window['AscFormat'].CreateUnifillSolidFillSchemeColor = CreateUnifillSolidFillSchemeColor;
+window['AscFormat'].CreateNoFillLine = CreateNoFillLine;
+window['AscFormat'].CreateNoFillUniFill = CreateNoFillUniFill;
+window['AscFormat'].getChartTranslateManager = getChartTranslateManager;

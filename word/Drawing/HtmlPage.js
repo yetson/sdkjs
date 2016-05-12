@@ -22,19 +22,25 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
+"use strict";
 
 // Import
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var AscBrowser = AscCommon.AscBrowser;
-
-var g_dDpiX = 96.0;
-var g_dDpiY = 96.0;
-
-var g_dKoef_mm_to_pix = g_dDpiX / 25.4;
-var g_dKoef_pix_to_mm = 25.4 / g_dDpiX;
+var g_anchor_left = AscCommon.g_anchor_left;
+var g_anchor_top = AscCommon.g_anchor_top;
+var g_anchor_right = AscCommon.g_anchor_right;
+var g_anchor_bottom = AscCommon.g_anchor_bottom;
+var CreateControlContainer = AscCommon.CreateControlContainer;
+var CreateControl = AscCommon.CreateControl;
+var global_keyboardEvent = AscCommon.global_keyboardEvent;
+var global_mouseEvent = AscCommon.global_mouseEvent;
+var History = AscCommon.History;
+var g_dKoef_pix_to_mm = AscCommon.g_dKoef_pix_to_mm;
+var g_dKoef_mm_to_pix = AscCommon.g_dKoef_mm_to_pix;
 
 var g_bIsMobile =  AscBrowser.isMobile;
-var g_bIsMouseUpLockedSend = false;
 
 var Page_Width     = 210;
 var Page_Height    = 297;
@@ -44,20 +50,8 @@ var X_Right_Margin  = 15;  // 1.5 cm
 var Y_Bottom_Margin = 20;  // 2   cm
 var Y_Top_Margin    = 20;  // 2   cm
 
-var X_Left_Field   = X_Left_Margin;
 var X_Right_Field  = Page_Width  - X_Right_Margin;
 var Y_Bottom_Field = Page_Height - Y_Bottom_Margin;
-var Y_Top_Field    = Y_Top_Margin;
-
-var docpostype_Content     = 0x00;
-var docpostype_HdrFtr      = 0x02;
-
-var selectionflag_Common        = 0x00;
-var selectionflag_Numbering     = 0x01;
-var selectionflag_DrawingObject = 0x002;
-
-var orientation_Portrait  = 0x00;
-var orientation_Landscape = 0x01;
 
 var tableSpacingMinValue = 0.02;//0.02мм
 
@@ -93,8 +87,21 @@ var GlobalSkinFlat = {
 
 var GlobalSkin = GlobalSkinTeamlab;
 
-window.IS_USE_INPUT = undefined;
-window.IS_USE_INPUT;
+function updateGlobalSkin(newSkin) {
+    GlobalSkin.Name = newSkin.Name;
+    GlobalSkin.RulersButton = newSkin.RulersButton;
+    GlobalSkin.NavigationButtons = newSkin.NavigationButtons;
+    GlobalSkin.BackgroundColor = newSkin.BackgroundColor;
+    GlobalSkin.RulerDark = newSkin.RulerDark;
+    GlobalSkin.RulerLight = newSkin.RulerLight;
+    GlobalSkin.BackgroundScroll = newSkin.BackgroundScroll;
+    GlobalSkin.RulerOutline = newSkin.RulerOutline;
+    GlobalSkin.RulerMarkersFillColor = newSkin.RulerMarkersFillColor;
+    GlobalSkin.PageOutline = newSkin.PageOutline;
+    GlobalSkin.STYLE_THUMBNAIL_WIDTH = newSkin.STYLE_THUMBNAIL_WIDTH;
+    GlobalSkin.STYLE_THUMBNAIL_HEIGHT = newSkin.STYLE_THUMBNAIL_HEIGHT;
+    GlobalSkin.isNeedInvertOnActive = newSkin.isNeedInvertOnActive;
+}
 
 function CEditorPage(api)
 {
@@ -121,7 +128,7 @@ function CEditorPage(api)
     this.ReaderModeDivWrapper = null;
     this.ReaderModeDiv      = null;
 
-    this.m_oOverlayApi      = new COverlay();
+    this.m_oOverlayApi      = new AscCommon.COverlay();
     this.m_bIsIE            = (AscBrowser.isIE || window.opera) ? true : false;
 
     this.m_oPanelRight_buttonRulers    = null;
@@ -139,7 +146,7 @@ function CEditorPage(api)
     this.m_bDocumentPlaceChangedEnabled = false;
 
     this.m_nZoomValue       = 100;
-    this.m_oBoundsController = new CBoundsController();
+    this.m_oBoundsController = new AscFormat.CBoundsController();
     this.m_nTabsType        = 0;
 
     this.m_dScrollY         = 0;
@@ -161,7 +168,7 @@ function CEditorPage(api)
     this.m_oHorRuler        = new CHorRuler();
     this.m_oVerRuler        = new CVerRuler();
 
-    this.m_oDrawingDocument = new CDrawingDocument();
+    this.m_oDrawingDocument = new AscCommon.CDrawingDocument();
     this.m_oLogicDocument   = null;
 
     this.m_oDrawingDocument.m_oWordControl = this;
@@ -423,7 +430,7 @@ function CEditorPage(api)
         if (this.m_oApi.isMobileVersion)
         {
             var _tag_background = "textarea";
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
                 _tag_background = "input";
 
             var _text_bx_back = document.createElement(_tag_background);
@@ -431,7 +438,7 @@ function CEditorPage(api)
             _text_bx_back.setAttribute("style", "background:transparent;border-style:none;border-color:transparent;overflow:hidden;z-index:4;font-family:arial;font-size:12pt;position:absolute;resize:none;padding:0px;margin:0px;font-weight:normal;box-sizing:content-box;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;");
             _text_bx_back.setAttribute("spellcheck", "false");
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 _text_bx_back.setAttribute("autocomplete", "off");
                 _text_bx_back.setAttribute("type", "password");
@@ -464,7 +471,7 @@ function CEditorPage(api)
 
         if (this.m_oApi.isMobileVersion)
         {
-            this.MobileTouchManager = new CMobileTouchManager();
+            this.MobileTouchManager = new AscCommon.CMobileTouchManager();
             this.MobileTouchManager.Init(this);
         }
 
@@ -476,7 +483,7 @@ function CEditorPage(api)
         this.m_oOverlayApi.m_oHtmlPage = this;
         this.m_oOverlayApi.Clear();
 
-        this.m_oDrawingDocument.AutoShapesTrack = new CAutoshapeTrack();
+        this.m_oDrawingDocument.AutoShapesTrack = new AscCommon.CAutoshapeTrack();
         this.m_oDrawingDocument.AutoShapesTrack.init2(this.m_oOverlayApi);
 
         this.OnResize(true);
@@ -532,9 +539,9 @@ function CEditorPage(api)
 
     this.initEvents2 = function()
     {
-        this.arrayEventHandlers[0] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
-        this.arrayEventHandlers[1] = new button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
-        this.arrayEventHandlers[2] = new button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
+        this.arrayEventHandlers[0] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonRulers,this.onButtonRulersClick);
+        this.arrayEventHandlers[1] = new AscCommon.button_eventHandlers("","0px 0px","0px -16px", "0px -32px",this.m_oPanelRight_buttonPrevPage,this.onPrevPage);
+        this.arrayEventHandlers[2] = new AscCommon.button_eventHandlers("","0px -48px","0px -64px", "0px -80px",this.m_oPanelRight_buttonNextPage,this.onNextPage);
 
         this.m_oLeftRuler_buttonsTabs.HtmlElement.onclick = this.onButtonTabsClick;//new Function("onButtonTabsClick();");
 
@@ -724,7 +731,7 @@ function CEditorPage(api)
                 }
             }
 
-            if (bIsAndroid)
+            if (AscBrowser.isAndroid)
             {
                 /*
                 var moveCursorToEnd = function(el)
@@ -785,24 +792,10 @@ function CEditorPage(api)
                 };
                 */
 
-                window.IS_USE_INPUT = true;
                 this.TextBoxBackground.HtmlElement["oninput"] = function(e)
                 {
                     var val = oThis.TextBoxBackground.HtmlElement.value;
                     oThis.TextBoxBackground.HtmlElement.value = "a";
-
-                    /*
-                    if (!window.IS_USE_INPUT && val == "aa")
-                    {
-                        if (e.preventDefault)
-                            e.preventDefault();
-
-                        e.returnValue = false;
-
-                        window.IS_USE_INPUT = true;
-                        return;
-                    }
-                    */
 
                     if (val.length == 2)
                     {
@@ -935,7 +928,7 @@ function CEditorPage(api)
         oThis.OnResize(true);
     }
 
-    this.zoom_FitToWidth = function()
+    this.calculate_zoom_FitToWidth = function()
     {
         var w = this.m_oEditor.AbsolutePosition.R - this.m_oEditor.AbsolutePosition.L;
 
@@ -957,7 +950,12 @@ function CEditorPage(api)
                 Zoom = 100 * _w * g_dKoef_pix_to_mm / this.m_dDocumentPageWidth;
             }
         }
-        var _new_value = parseInt(Zoom - 0.5);
+        return (Zoom - 0.5) >> 0;
+    }
+
+    this.zoom_FitToWidth = function()
+    {
+        var _new_value = this.calculate_zoom_FitToWidth();
 
         this.m_nZoomType = 1;
         if (_new_value != this.m_nZoomValue)
@@ -1021,10 +1019,10 @@ function CEditorPage(api)
             return;
 
         // нужно проверить режим и сбросить кеш грамотно (ie version)
-        g_fontManager.ClearRasterMemory();
+        AscCommon.g_fontManager.ClearRasterMemory();
 
-        if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-            window.g_fontManager2.ClearRasterMemory();
+        if (AscCommon.g_fontManager2)
+            AscCommon.g_fontManager2.ClearRasterMemory();
 
         var oWordControl = oThis;
 
@@ -1298,19 +1296,19 @@ function CEditorPage(api)
     this.onButtonTabsClick = function()
     {
         var oWordControl = oThis;
-        if (oWordControl.m_nTabsType == g_tabtype_left)
+        if (oWordControl.m_nTabsType == AscCommon.g_tabtype_left)
         {
-            oWordControl.m_nTabsType = g_tabtype_center;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_center;
             oWordControl.onButtonTabsDraw();
         }
-        else if (oWordControl.m_nTabsType == g_tabtype_center)
+        else if (oWordControl.m_nTabsType == AscCommon.g_tabtype_center)
         {
-            oWordControl.m_nTabsType = g_tabtype_right;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_right;
             oWordControl.onButtonTabsDraw();
         }
         else
         {
-            oWordControl.m_nTabsType = g_tabtype_left;
+            oWordControl.m_nTabsType = AscCommon.g_tabtype_left;
             oWordControl
                 .onButtonTabsDraw();
         }
@@ -1341,13 +1339,13 @@ function CEditorPage(api)
         _ctx.strokeStyle = "#3E3E3E";
 
         _ctx.lineWidth = 2;
-        if (this.m_nTabsType == g_tabtype_left)
+        if (this.m_nTabsType == AscCommon.g_tabtype_left)
         {
             _ctx.moveTo(8, 9);
             _ctx.lineTo(8, 14);
             _ctx.lineTo(13, 14);
         }
-        else if (this.m_nTabsType == g_tabtype_center)
+        else if (this.m_nTabsType == AscCommon.g_tabtype_center)
         {
             _ctx.moveTo(6, 14);
             _ctx.lineTo(14, 14);
@@ -1517,6 +1515,14 @@ function CEditorPage(api)
             positionMinY = (oWordControl.m_oMainContent.AbsolutePosition.T + oWordControl.m_oTopRuler_horRuler.AbsolutePosition.B) * g_dKoef_mm_to_pix +
                 oWordControl.Y;
 
+        // если находимся в самом верху (без тулбара) - то наверх не будем скроллиться
+        // делаем заглушку
+        var minPosY = 20;
+        if (oThis.bIsRetinaSupport)
+            minPosY *= 2;
+        if (positionMinY < minPosY)
+            positionMinY = minPosY;
+
         var positionMaxY = oWordControl.m_oMainContent.AbsolutePosition.B * g_dKoef_mm_to_pix + oWordControl.Y;
 
         var scrollYVal = 0;
@@ -1612,10 +1618,10 @@ function CEditorPage(api)
             _yOffset += (7 * g_dKoef_mm_to_pix);
         }
 
-        if (window.closeDialogs != undefined)
-            closeDialogs();
+        if (window['closeDialogs'] != undefined)
+            window['closeDialogs']();
 
-        check_MouseDownEvent(e, true);
+        AscCommon.check_MouseDownEvent(e, true);
         global_mouseEvent.LockMouse();
 
         // у Илюхи есть проблема при вводе с клавы, пока нажата кнопка мыши
@@ -1699,7 +1705,7 @@ function CEditorPage(api)
         //if (this.id == "id_viewer" && oThis.m_oOverlay.HtmlElement.style.display == "block")
         //    return;
 
-        check_MouseMoveEvent(e);
+        AscCommon.check_MouseMoveEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
             pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1811,7 +1817,7 @@ function CEditorPage(api)
             oWordControl.m_oScrollHorApi.evt_mouseup(e);
         }
 
-        check_MouseUpEvent(e);
+        AscCommon.check_MouseUpEvent(e);
         var pos = null;
         if (oWordControl.m_oDrawingDocument.AutoShapesTrackLockPageNum == -1)
             pos = oWordControl.m_oDrawingDocument.ConvertCoordsFromCursor2(global_mouseEvent.X, global_mouseEvent.Y);
@@ -1876,9 +1882,9 @@ function CEditorPage(api)
 
 		var oWordControl = oThis;
 
-		global_mouseEvent.Type = g_mouse_event_type_up;
+		global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
 
-		g_bIsMouseUpLockedSend = true;
+		AscCommon.MouseUpLock.MouseUpLockedSend = true;
 
 		global_mouseEvent.Sender = null;
 
@@ -1904,9 +1910,9 @@ function CEditorPage(api)
         global_mouseEvent.X = x;
         global_mouseEvent.Y = y;
 
-        global_mouseEvent.Type = g_mouse_event_type_up;
+        global_mouseEvent.Type = AscCommon.g_mouse_event_type_up;
 
-        g_bIsMouseUpLockedSend = true;
+        AscCommon.MouseUpLock.MouseUpLockedSend = true;
 
         if (oWordControl.m_oHorRuler.m_bIsMouseDown)
             oWordControl.m_oHorRuler.OnMouseUpExternal();
@@ -2154,7 +2160,7 @@ function CEditorPage(api)
         {
             if ( false === e.ShiftKey )
             {
-                Editor_Copy(oThis.m_oApi);
+                AscCommon.Editor_Copy(oThis.m_oApi);
                 //не возвращаем true чтобы не было preventDefault
             }
         }
@@ -2242,7 +2248,7 @@ function CEditorPage(api)
 
         this.ReaderModeDiv = document.getElementById("reader_id");
 
-        this.ReaderTouchManager = new CReaderTouchManager();
+        this.ReaderTouchManager = new AscCommon.CReaderTouchManager();
         this.ReaderTouchManager.Init(this);
 
         this.TransformDivUseAnimation(this.ReaderModeDivWrapper, 0);
@@ -2343,14 +2349,14 @@ function CEditorPage(api)
         var oWordControl = oThis;
         if (false === oWordControl.m_oApi.bInit_word_control)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
 
         if (oWordControl.m_bIsRuler && oWordControl.m_oHorRuler.m_bIsMouseDown)
         {
-            check_KeyboardEvent2(e);
+            AscCommon.check_KeyboardEvent2(e);
             e.preventDefault();
             return;
         }
@@ -2361,7 +2367,7 @@ function CEditorPage(api)
         {
             if (!window.USER_AGENT_MACOS)
             {
-                check_KeyboardEvent2(e);
+                AscCommon.check_KeyboardEvent2(e);
                 e.preventDefault();
                 return;
             }
@@ -2373,7 +2379,7 @@ function CEditorPage(api)
             oWordControl.onMouseUpExternal(global_mouseEvent.X, global_mouseEvent.Y);
         }
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         if (oWordControl.IsFocus === false)
         {
             // некоторые команды нужно продолжать обрабатывать
@@ -2485,7 +2491,7 @@ function CEditorPage(api)
 
         if (null == oWordControl.m_oLogicDocument)
         {
-            check_KeyboardEvent(e);
+            AscCommon.check_KeyboardEvent(e);
             var bIsPrev = (oWordControl.m_oDrawingDocument.m_oDocumentRenderer.OnKeyDown(global_keyboardEvent) === true) ? false : true;
             if (false === bIsPrev)
             {
@@ -2497,7 +2503,7 @@ function CEditorPage(api)
         if (oWordControl.m_oDrawingDocument.IsFreezePage(oWordControl.m_oDrawingDocument.m_lCurrentPage))
             return;
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         oWordControl.IsKeyDownButNoPress = true;
 
@@ -2520,7 +2526,7 @@ function CEditorPage(api)
             {
                 oWordControl.TextBoxInputFocus = false;
 
-                CollaborativeEditing.m_bGlobalLock = false;
+                AscCommon.CollaborativeEditing.m_bGlobalLock = false;
                 this.TextBoxInput.style.zIndex = -1;
                 this.TextBoxInput.style.top = "-1000px";
                 this.TextBoxInputFocus = false;
@@ -2560,7 +2566,7 @@ function CEditorPage(api)
         {
             oWordControl.TextBoxInputFocus = false;
 
-            CollaborativeEditing.m_bGlobalLock = false;
+            AscCommon.CollaborativeEditing.m_bGlobalLock = false;
             this.TextBoxInput.style.zIndex = -1;
             this.TextBoxInput.style.top = "-1000px";
             this.TextBoxInputFocus = false;
@@ -2591,7 +2597,7 @@ function CEditorPage(api)
             if (oThis.bIsUseKeyPress === false)
                 return;
 
-            check_KeyboardEvent(e);
+            AscCommon.check_KeyboardEvent(e);
 
             var Code;
             if (null != global_keyboardEvent.Which)
@@ -2637,7 +2643,7 @@ function CEditorPage(api)
             return;
         */
 
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
 
         /*
         if (oWordControl.m_oApi.isViewMode)
@@ -2795,14 +2801,14 @@ function CEditorPage(api)
             if (this.m_oScrollHor_)
                 this.m_oScrollHor_.Repos(settings, this.m_bIsHorScrollVisible);
             else {
-                this.m_oScrollHor_ = new ScrollObject( "id_horizontal_scroll", settings );
+                this.m_oScrollHor_ = new AscCommon.ScrollObject( "id_horizontal_scroll", settings );
 
 				this.m_oScrollHor_.onLockMouse = function(evt){
-					check_MouseDownEvent(evt, true);
+            AscCommon.check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();
 				}
 				this.m_oScrollHor_.offLockMouse = function(evt){
-					check_MouseUpEvent(evt);
+            AscCommon.check_MouseUpEvent(evt);
 				}
                 this.m_oScrollHor_.bind("scrollhorizontal",function(evt){
                      oThis.horizontalScroll(this,evt.scrollD,evt.maxScrollX);
@@ -2814,14 +2820,14 @@ function CEditorPage(api)
                 this.m_oScrollVer_.Repos(settings, undefined, true);
             }
             else {
-                this.m_oScrollVer_ = new ScrollObject( "id_vertical_scroll", settings );
+                this.m_oScrollVer_ = new AscCommon.ScrollObject( "id_vertical_scroll", settings );
 
 				this.m_oScrollVer_.onLockMouse = function(evt){
-					check_MouseDownEvent(evt, true);
+            AscCommon.check_MouseDownEvent(evt, true);
 					global_mouseEvent.LockMouse();
 				}
 				this.m_oScrollVer_.offLockMouse = function(evt){
-					check_MouseUpEvent(evt);
+            AscCommon.check_MouseUpEvent(evt);
 				}
                 this.m_oScrollVer_.bind("scrollvertical",function(evt){
                      oThis.verticalScroll(this,evt.scrollD,evt.maxScrollY);
@@ -3202,7 +3208,7 @@ function CEditorPage(api)
                 }
                 ctx.beginPath();
 
-                if (drDoc.CurrentSearchNavi)
+                if (drDoc.CurrentSearchNavi && drDoc.m_oDocumentRenderer.SearchResults.Show)
                 {
                     var _pageNum = drDoc.CurrentSearchNavi[0].PageNum;
                     ctx.fillStyle = "rgba(51,102,204,255)";
@@ -3388,7 +3394,7 @@ function CEditorPage(api)
 
             if (!this.bIsRetinaSupport)
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left;
                 _cur_page_rect.y = drawPage.top;
                 _cur_page_rect.w = drawPage.right - drawPage.left;
@@ -3398,7 +3404,7 @@ function CEditorPage(api)
             }
             else
             {
-                var _cur_page_rect = new _rect();
+                var _cur_page_rect = new AscCommon._rect();
                 _cur_page_rect.x = drawPage.left << 1;
                 _cur_page_rect.y = drawPage.top << 1;
                 _cur_page_rect.w = (drawPage.right << 1) - _cur_page_rect.x;
@@ -3556,17 +3562,17 @@ function CEditorPage(api)
             {
                 if (49 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(false, false);
+                    AscCommon.SetHintsProps(false, false);
                     bFlag = true;
                 }
                 else if (50 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, false);
+                    AscCommon.SetHintsProps(true, false);
                     bFlag = true;
                 }
                 else if (51 == global_keyboardEvent.KeyCode)
                 {
-                    SetHintsProps(true, true);
+                    AscCommon.SetHintsProps(true, true);
                     bFlag = true;
                 }
             }
@@ -3575,10 +3581,10 @@ function CEditorPage(api)
         if (bFlag)
         {
             this.m_oDrawingDocument.ClearCachePages();
-            g_fontManager.ClearFontsRasterCache();
+            AscCommon.g_fontManager.ClearFontsRasterCache();
 
-            if (window.g_fontManager2 !== undefined && window.g_fontManager2 !== null)
-                window.g_fontManager2.ClearFontsRasterCache();
+            if (AscCommon.g_fontManager2)
+                AscCommon.g_fontManager2.ClearFontsRasterCache();
         }
 
         return bFlag;
@@ -3671,6 +3677,26 @@ function CEditorPage(api)
     this.InitControl = function()
     {
         this.CalculateDocumentSize();
+
+        if (window["AscDesktopEditor"] && this.m_oDrawingDocument.m_oDocumentRenderer)
+        {
+            var _new_value = this.calculate_zoom_FitToWidth();
+            if (_new_value < this.m_nZoomValue)
+            {
+                // сначала добавим нужные параметры зума
+                var _newValues = [];
+                _new_value = ((_new_value / 10) >> 0) * 10 - 1;
+                for (var _test_param = 10; _test_param < this.zoom_values[0]; _test_param += 10)
+                {
+                    if (_new_value < _test_param)
+                        _newValues.push(_test_param);
+                }
+                this.zoom_values = [].concat(_newValues, this.zoom_values);
+
+                this.zoom_FitToWidth();
+            }
+        }
+
         //setInterval(this.onTimerScroll, this.m_nTimerScrollInterval);
 
         if (!this.m_oApi.isOnlyReaderMode)
@@ -3803,7 +3829,7 @@ function CEditorPage(api)
 
             if (!_bIsWaitScheme)
             {
-                var _interval = (CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
+                var _interval = (AscCommon.CollaborativeEditing.m_nUseType <= 0) ? oWordControl.m_nIntervalSlowAutosave : oWordControl.m_nIntervalFastAutosave;
 
                 if ((_curTime - oWordControl.m_nLastAutosaveTime) > _interval)
                 {
@@ -3817,9 +3843,6 @@ function CEditorPage(api)
         }
 		
 		oWordControl.m_oApi.asc_fireCallback("asc_onPaintTimer");
-
-		if (true !== is_no_timer)
-			this.m_nPaintTimerId = setTimeout(oWordControl.onTimerScroll2, oWordControl.m_nTimerScrollInterval);
         //window.requestAnimationFrame(oWordControl.onTimerScroll2);
     }
 	this.onTimerScroll2 = function(is_no_timer)
@@ -3830,7 +3853,10 @@ function CEditorPage(api)
 		}
 		catch (err)
 		{			
-		}			
+		}
+
+        if (true !== is_no_timer)
+            this.m_nPaintTimerId = setTimeout(oThis.onTimerScroll2, oThis.m_nTimerScrollInterval);
     }
 
     this.onTimerScroll2_sync = function()
@@ -4120,7 +4146,7 @@ function CEditorPage(api)
             return;
 
         oThis.TextBoxInputFocus = true;
-        CollaborativeEditing.m_bGlobalLock = true;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = true;
         oThis.CheckTextBoxInputPos();
         this.ReinitTB(true);
         oThis.TextBoxInput.style.zIndex = 90;
@@ -4192,7 +4218,7 @@ function CEditorPage(api)
 
     this.TextBoxOnKeyDown = function(e)
     {
-        check_KeyboardEvent(e);
+        AscCommon.check_KeyboardEvent(e);
         if (global_keyboardEvent.KeyCode == 9)
         {
             e.preventDefault();
@@ -4202,7 +4228,7 @@ function CEditorPage(api)
 
     this.onChangeTB = function()
     {
-        CollaborativeEditing.m_bGlobalLock = false;
+        AscCommon.CollaborativeEditing.m_bGlobalLock = false;
         this.TextBoxInput.style.zIndex = -1;
         this.TextBoxInput.style.top = "-1000px";
         this.TextBoxInputFocus = false;
@@ -4245,7 +4271,7 @@ function CEditorPage(api)
             }
         }*/
 
-        if (_language == LanguagesFontSelectTypes.Unknown)
+        if (_language == AscFonts.LanguagesFontSelectTypes.Unknown)
         {
             oThis.m_oLogicDocument.TextBox_Put(oThis.TextBoxInput.value);
             this.ReinitTB();
@@ -4257,7 +4283,7 @@ function CEditorPage(api)
             var _check_obj = _fontSelections.checkPasteText(_textPr, _language);
             if (_check_obj.is_async)
             {
-                var loader = window.g_font_loader;
+                var loader = AscCommon.g_font_loader;
                 var fontinfo = g_fontApplication.GetFontInfo(_check_obj.name);
                 var isasync = loader.LoadFont(fontinfo);
                 if (false === isasync)
@@ -4324,7 +4350,17 @@ function CEditorPage(api)
 
 var _message_update = "zero_delay_update";
 
-function sendStatus(Message)
-{
-    editor.sync_StatusMessage(Message);
-}
+//------------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].GlobalSkinFlat = GlobalSkinFlat;
+window['AscCommonWord'].GlobalSkin = GlobalSkin;
+window['AscCommonWord'].updateGlobalSkin = updateGlobalSkin;
+window['AscCommonWord'].CEditorPage = CEditorPage;
+
+window['AscCommon'].Page_Width = Page_Width;
+window['AscCommon'].Page_Height = Page_Height;
+window['AscCommon'].X_Left_Margin = X_Left_Margin;
+window['AscCommon'].X_Right_Margin = X_Right_Margin;
+window['AscCommon'].Y_Bottom_Margin = Y_Bottom_Margin;
+window['AscCommon'].Y_Top_Margin = Y_Top_Margin;

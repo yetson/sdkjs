@@ -312,7 +312,7 @@ CGraphicPage.prototype =
             }
         }
 
-        if(!isRealObject(docContent))
+        if(!AscCommon.isRealObject(docContent))
             docContent = this.graphicObjects.document;
 
         findInArrayAndRemoveFromDrawingPage(this, docContent, editor.WordControl.m_oLogicDocument);
@@ -344,14 +344,14 @@ CGraphicPage.prototype =
             _graphic_object = _graphic_objects[_object_index].graphicObject;
             var _transform = _graphic_object.getTransformMatrix();
             if(_transform === null)
-                _transform = new CMatrix();
+                _transform = new AscCommon.CMatrix();
 
             var _extensions = _graphic_object.getExtensions();
             if(_extensions === null)
                 _extensions = {extX: 0, extY: 0};
 
 
-            this.drawingDocument.DrawTrack(TYPE_TRACK_SHAPE , _transform, 0, 0, _extensions.extX, _extensions.extY, /*shape.geometry ? shape.geometry.preset == "line"  : false*/false);
+            this.drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE , _transform, 0, 0, _extensions.extX, _extensions.extY, /*shape.geometry ? shape.geometry.preset == "line"  : false*/false);
         }
     },
 

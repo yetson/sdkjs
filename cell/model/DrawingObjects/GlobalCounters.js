@@ -22,22 +22,21 @@
  * Pursuant to Section 7  3(e) we decline to grant you any rights under trademark law for use of our trademarks.
  *
 */
-﻿"use strict";
-//-----------------------------------------------------------------------------------
-// Global counters
-//-----------------------------------------------------------------------------------
+"use strict";
+
+(function(window, undefined){
 
 /**
  *
  * @constructor
- * @extends {CCollaborativeEditingBase}
+ * @extends {AscCommon.CCollaborativeEditingBase}
  */
 function CCollaborativeEditing()
 {
     CCollaborativeEditing.superclass.constructor.call(this);
 }
 
-AscCommon.extendClass(CCollaborativeEditing, CCollaborativeEditingBase);
+AscCommon.extendClass(CCollaborativeEditing, AscCommon.CCollaborativeEditingBase);
 
 CCollaborativeEditing.prototype.Have_OtherChanges = function()
 {
@@ -126,7 +125,7 @@ CCollaborativeEditing.prototype.Load_Images = function(){
         var old_val =  Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages;
         Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = true;
         Asc["editor"].ImageLoader.LoadDocumentImages(this.m_aNewImages, null);
-        CollaborativeEditing.m_aNewImages.length = 0;
+        AscCommon.CollaborativeEditing.m_aNewImages.length = 0;
         Asc["editor"].ImageLoader.bIsAsyncLoadDocumentImages = old_val;
     }
 }
@@ -220,4 +219,7 @@ CCollaborativeEditing.prototype.Clear_CollaborativeMarks = function()
     this.m_aChangedClasses = {};
 };
 
-var CollaborativeEditing = new CCollaborativeEditing();
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscCommon'] = window['AscCommon'] || {};
+    window['AscCommon'].CollaborativeEditing = new CCollaborativeEditing();
+})(window);

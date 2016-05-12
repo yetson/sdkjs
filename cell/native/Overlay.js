@@ -517,7 +517,7 @@ CAutoshapeTrack.prototype =
         this.m_oOverlay = overlay;
         this.m_oContext = this.m_oOverlay.m_oContext;
 
-        this.Graphics = new CGraphics();
+        this.Graphics = new AscCommon.CGraphics();
         this.Graphics.init(this.m_oContext, r - x, b - y, w_mm, h_mm);
 
         this.Graphics.m_oCoordTransform.tx = x;
@@ -977,8 +977,8 @@ CAutoshapeTrack.prototype =
 //
 //        switch (type)
 //        {
-//            case TYPE_TRACK_SHAPE:
-//            case TYPE_TRACK_GROUP:
+//            case AscFormat.TYPE_TRACK.SHAPE:
+//            case AscFormat.TYPE_TRACK.GROUP:
 //            {
 //                if (bIsClever)
 //                {
@@ -1350,8 +1350,8 @@ CAutoshapeTrack.prototype =
 //
 //                break;
 //            }
-//            case TYPE_TRACK_TEXT:
-//            case TYPE_TRACK_GROUP_PASSIVE:
+//            case AscFormat.TYPE_TRACK.TEXT:
+//            case AscFormat.TYPE_TRACK.GROUP_PASSIVE:
 //            {
 //                if (bIsClever)
 //                {
@@ -1688,7 +1688,7 @@ CAutoshapeTrack.prototype =
 //
 //                break;
 //            }
-//            case TYPE_TRACK_EMPTY_PH:
+//            case AscFormat.TYPE_TRACK.EMPTY_PH:
 //            {
 //                if (bIsClever)
 //                {
@@ -2587,9 +2587,9 @@ function CSlideBoundsChecker()
 
     this.m_oCurFont     = null;
 
-    this.m_oCoordTransform  = new CMatrixL();
-    this.m_oTransform       = new CMatrixL();
-    this.m_oFullTransform   = new CMatrixL();
+    this.m_oCoordTransform  = new AscCommon.CMatrixL();
+    this.m_oTransform       = new AscCommon.CMatrixL();
+    this.m_oFullTransform   = new AscCommon.CMatrixL();
 
     this.IsNoSupportTextDraw = true;
 
@@ -2679,7 +2679,7 @@ CSlideBoundsChecker.prototype =
         this.m_oFullTransform.sy = this.m_oTransform.sy;
         this.m_oFullTransform.tx = this.m_oTransform.tx;
         this.m_oFullTransform.ty = this.m_oTransform.ty;
-        global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
+        AscCommon.global_MatrixTransformer.MultiplyAppend(this.m_oFullTransform, this.m_oCoordTransform);
     },
 	
 	SetTextPr: function()
@@ -3053,3 +3053,8 @@ CSlideBoundsChecker.prototype =
         }
     }
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].COverlay = COverlay;
+window['AscCommon'].CAutoshapeTrack = CAutoshapeTrack;

@@ -38,6 +38,8 @@ function (window, undefined) {
   var FormulaSeparators = AscCommon.FormulaSeparators;
   var parserHelp = AscCommon.parserHelp;
   var g_oFormatParser = AscCommon.g_oFormatParser;
+  var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+  var CellAddress = AscCommon.CellAddress;
 
   var c_oAscError = Asc.c_oAscError;
   
@@ -983,7 +985,7 @@ cArea3D.prototype.changeSheet = function(lastName, newName) {
 };
 cArea3D.prototype.toString = function() {
   var wsFrom = this._wb.getWorksheetById(this.wsFrom).getName(), wsTo = this._wb.getWorksheetById(this.wsTo)
-    .getName(), name = Asc.g_oRangeCache.getActiveRange(this._cells);
+    .getName(), name = AscCommonExcel.g_oRangeCache.getActiveRange(this._cells);
   name = name && name.getName ? name.getName() : this._cells;
 
   return parserHelp.get3DRef(wsFrom !== wsTo ? wsFrom + ':' + wsTo : wsFrom, name);
@@ -1739,7 +1741,7 @@ cStrucTable.prototype.createArea = function(val, cell) {
   return this.area;
 };
 cStrucTable.prototype.buildLocalTableString = function(reservedColumn, local) {
-  return parserHelp.getColumnNameByType();
+  return parserHelp.getColumnNameByType(reservedColumn, local);
 };
 
 /** @constructor */
@@ -2787,11 +2789,11 @@ function getFormulasInfo() {
 
   var list = [], a, b, f;
   for (var type in cFormulaFunctionGroup) {
-    b = new Asc.asc_CFormulaGroup(type);
+    b = new AscCommon.asc_CFormulaGroup(type);
     for (var i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
       a = new cFormulaFunctionGroup[type][i]();
       if (a.getInfo) {
-        f = new Asc.asc_CFormula(a.getInfo());
+        f = new AscCommon.asc_CFormula(a.getInfo());
         b.asc_addFormulaElement(f);
         cFormulaFunction[f.asc_getName()] = cFormulaFunctionGroup[type][i];
       }

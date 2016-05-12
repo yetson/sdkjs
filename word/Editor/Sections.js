@@ -33,12 +33,7 @@
 
 // Import
 var g_oTableId = AscCommon.g_oTableId;
-
-var section_type_NextPage   = 0x00;
-var section_type_OddPage    = 0x01;
-var section_type_EvenPage   = 0x02;
-var section_type_Continuous = 0x03;
-var section_type_Column     = 0x04;
+var History = AscCommon.History;
 
 var section_borders_DisplayAllPages     = 0x00;
 var section_borders_DisplayFirstPage    = 0x01;
@@ -54,7 +49,7 @@ function CSectionPr(LogicDocument)
 {
     this.Id = AscCommon.g_oIdCounter.Get_NewId();
 
-    this.Type          = section_type_NextPage;
+    this.Type          = 'undefined' !== typeof c_oAscSectionBreakType ? c_oAscSectionBreakType.NextPage : undefined;
     this.PageSize      = new CSectionPageSize();
     this.PageMargins   = new CSectionPageMargins();
 
@@ -221,7 +216,7 @@ CSectionPr.prototype =
     {
         if ( this.Type !== Type )
         {
-            History.Add(this, { Type: historyitem_Section_Type, Old: this.Type, New: Type });
+            History.Add(this, { Type: AscDFH.historyitem_Section_Type, Old: this.Type, New: Type });
             this.Type = Type;
         }
     },
@@ -235,7 +230,7 @@ CSectionPr.prototype =
     {
         if ( Math.abs( W - this.PageSize.W ) > 0.001 || Math.abs( H - this.PageSize.H ) > 0.001 )
         {
-            History.Add(this, { Type: historyitem_Section_PageSize_Size, Old: { W : this.PageSize.W, H : this.PageSize.H }, New: { W : W, H : H } });
+            History.Add(this, { Type: AscDFH.historyitem_Section_PageSize_Size, Old: { W : this.PageSize.W, H : this.PageSize.H }, New: { W : W, H : H } });
 
             H = Math.max(2.6, H);
             W = Math.max(12.7, W);
@@ -265,7 +260,7 @@ CSectionPr.prototype =
 
         if ( Math.abs( L - this.PageMargins.Left ) > 0.001 || Math.abs( T - this.PageMargins.Top ) > 0.001 || Math.abs( R - this.PageMargins.Right ) > 0.001 || Math.abs( B - this.PageMargins.Bottom ) > 0.001 )
         {
-            History.Add( this, { Type : historyitem_Section_PageMargins, Old : { L : this.PageMargins.Left, T : this.PageMargins.Top, R : this.PageMargins.Right, B : this.PageMargins.Bottom }, New : { L : L, T : T, R : R, B : B }  } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_PageMargins, Old : { L : this.PageMargins.Left, T : this.PageMargins.Top, R : this.PageMargins.Right, B : this.PageMargins.Bottom }, New : { L : L, T : T, R : R, B : B }  } );
 
             this.PageMargins.Left   = L;
             this.PageMargins.Top    = T;
@@ -298,7 +293,7 @@ CSectionPr.prototype =
     {
         if ( this.PageSize.Orient !== Orient )
         {            
-            History.Add(this, { Type: historyitem_Section_PageSize_Orient, Old: this.PageSize.Orient, New: Orient });
+            History.Add(this, { Type: AscDFH.historyitem_Section_PageSize_Orient, Old: this.PageSize.Orient, New: Orient });
             this.PageSize.Orient = Orient;
             
             if ( true === ApplySize )
@@ -315,7 +310,7 @@ CSectionPr.prototype =
                 
                 this.Set_PageSize(H, W);
                 
-                if ( orientation_Portrait === Orient )
+                if ( Asc.c_oAscPageOrientation.PagePortrait === Orient )
                     this.Set_PageMargins( T, R, B, L );
                 else
                     this.Set_PageMargins( B, L, T, R );
@@ -332,7 +327,7 @@ CSectionPr.prototype =
     {
         if ( true !== this.Borders.Left.Compare( Border ) )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_Left, Old : this.Borders.Left, New : Border } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_Left, Old : this.Borders.Left, New : Border } );
             this.Borders.Left = Border;
         }
     },
@@ -346,7 +341,7 @@ CSectionPr.prototype =
     {
         if ( true !== this.Borders.Top.Compare( Border ) )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_Top, Old : this.Borders.Top, New : Border } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_Top, Old : this.Borders.Top, New : Border } );
             this.Borders.Top = Border;
         }
     },
@@ -360,7 +355,7 @@ CSectionPr.prototype =
     {
         if ( true !== this.Borders.Right.Compare( Border ) )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_Right, Old : this.Borders.Right, New : Border } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_Right, Old : this.Borders.Right, New : Border } );
             this.Borders.Right = Border;
         }
     },
@@ -374,7 +369,7 @@ CSectionPr.prototype =
     {
         if ( true !== this.Borders.Bottom.Compare( Border ) )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_Bottom, Old : this.Borders.Bottom, New : Border } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_Bottom, Old : this.Borders.Bottom, New : Border } );
             this.Borders.Bottom = Border;
         }
     },
@@ -388,7 +383,7 @@ CSectionPr.prototype =
     {
         if ( Display !== this.Borders.Display )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_Display, Old : this.Borders.Display, New : Display } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_Display, Old : this.Borders.Display, New : Display } );
             this.Borders.Display = Display;
         }
     },
@@ -402,7 +397,7 @@ CSectionPr.prototype =
     {
         if ( OffsetFrom !== this.Borders.OffsetFrom )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_OffsetFrom, Old : this.Borders.OffsetFrom, New : OffsetFrom } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_OffsetFrom, Old : this.Borders.OffsetFrom, New : OffsetFrom } );
             this.Borders.OffsetFrom = OffsetFrom;
         }
     },
@@ -416,7 +411,7 @@ CSectionPr.prototype =
     {
         if ( ZOrder !== this.Borders.ZOrder )
         {
-            History.Add( this, { Type : historyitem_Section_Borders_ZOrder, Old : this.Borders.ZOrder, New : ZOrder } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Borders_ZOrder, Old : this.Borders.ZOrder, New : ZOrder } );
             this.Borders.ZOrder = ZOrder;
         }
     },
@@ -430,7 +425,7 @@ CSectionPr.prototype =
     {
         if ( Footer !== this.FooterFirst )
         {
-            History.Add( this, { Type : historyitem_Section_Footer_First, Old : this.FooterFirst, New : Footer } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Footer_First, Old : this.FooterFirst, New : Footer } );
             this.FooterFirst = Footer;
         }
     },
@@ -444,7 +439,7 @@ CSectionPr.prototype =
     {
         if ( Footer !== this.FooterEven )
         {
-            History.Add( this, { Type : historyitem_Section_Footer_Even, Old : this.FooterEven, New : Footer } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Footer_Even, Old : this.FooterEven, New : Footer } );
             this.FooterEven = Footer;
         }
     },
@@ -458,7 +453,7 @@ CSectionPr.prototype =
     {
         if ( Footer !== this.FooterDefault )
         {
-            History.Add( this, { Type : historyitem_Section_Footer_Default, Old : this.FooterDefault, New : Footer } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Footer_Default, Old : this.FooterDefault, New : Footer } );
             this.FooterDefault = Footer;
         }
     },
@@ -472,7 +467,7 @@ CSectionPr.prototype =
     {
         if ( Header !== this.HeaderFirst )
         {
-            History.Add( this, { Type : historyitem_Section_Header_First, Old : this.HeaderFirst, New : Header } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Header_First, Old : this.HeaderFirst, New : Header } );
             this.HeaderFirst = Header;
         }
     },
@@ -486,7 +481,7 @@ CSectionPr.prototype =
     {
         if ( Header !== this.HeaderEven )
         {
-            History.Add( this, { Type : historyitem_Section_Header_Even, Old : this.HeaderEven, New : Header } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Header_Even, Old : this.HeaderEven, New : Header } );
             this.HeaderEven = Header;
         }
     },
@@ -500,7 +495,7 @@ CSectionPr.prototype =
     {
         if ( Header !== this.HeaderDefault )
         {
-            History.Add( this, { Type : historyitem_Section_Header_Default, Old : this.HeaderDefault, New : Header } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Header_Default, Old : this.HeaderDefault, New : Header } );
             this.HeaderDefault = Header;
         }
     },
@@ -514,7 +509,7 @@ CSectionPr.prototype =
     {
         if ( Value !== this.TitlePage )
         {
-            History.Add( this, { Type : historyitem_Section_TitlePage, Old : this.TitlePage, New : Value } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_TitlePage, Old : this.TitlePage, New : Value } );
             this.TitlePage = Value;
         }
     },
@@ -528,7 +523,7 @@ CSectionPr.prototype =
     {
         if ( Header !== this.PageMargins.Header )
         {
-            History.Add( this, { Type : historyitem_Section_PageMargins_Header, Old : this.PageMargins.Header, New : Header } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_PageMargins_Header, Old : this.PageMargins.Header, New : Header } );
             this.PageMargins.Header = Header;
         }
     },
@@ -542,7 +537,7 @@ CSectionPr.prototype =
     {
         if ( Footer !== this.PageMargins.Footer )
         {
-            History.Add( this, { Type : historyitem_Section_PageMargins_Footer, Old : this.PageMargins.Footer, New : Footer } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_PageMargins_Footer, Old : this.PageMargins.Footer, New : Footer } );
             this.PageMargins.Footer = Footer;
         }
     },
@@ -618,7 +613,7 @@ CSectionPr.prototype =
     {
         if ( Start !== this.PageNumType.Start )
         {
-            History.Add( this, { Type : historyitem_Section_PageNumType_Start, Old : this.PageNumType.Start, New : Start } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_PageNumType_Start, Old : this.PageNumType.Start, New : Start } );
             this.PageNumType.Start = Start;
         }
     },
@@ -647,7 +642,7 @@ CSectionPr.prototype =
     {
         if ( Equal !== this.Columns.Equal )
         {
-            History.Add( this, { Type : historyitem_Section_Columns_EqualWidth, Old : this.Columns.EqualWidth, New : Equal } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Columns_EqualWidth, Old : this.Columns.EqualWidth, New : Equal } );
             this.Columns.EqualWidth = Equal;
         }
     },
@@ -656,7 +651,7 @@ CSectionPr.prototype =
     {
         if ( Space !== this.Columns.Space )
         {
-            History.Add( this, { Type : historyitem_Section_Columns_Space, Old : this.Columns.Space, New : Space } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Columns_Space, Old : this.Columns.Space, New : Space } );
             this.Columns.Space = Space;
         }
     },
@@ -667,7 +662,7 @@ CSectionPr.prototype =
         
         if ( Num !== this.Columns.Num )
         {
-            History.Add( this, { Type : historyitem_Section_Columns_Num, Old : this.Columns.Num, New : Num } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Columns_Num, Old : this.Columns.Num, New : Num } );
             this.Columns.Num = Num;
         }
     },
@@ -676,14 +671,14 @@ CSectionPr.prototype =
     {
         if ( Sep !== this.Columns.Sep )
         {
-            History.Add( this, { Type : historyitem_Section_Columns_Sep, Old : this.Columns.Sep, New : Sep } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Columns_Sep, Old : this.Columns.Sep, New : Sep } );
             this.Columns.Sep = Sep;
         }
     },
 
     Set_Columns_Cols : function(Cols)
     {
-        History.Add(this, {Type : historyitem_Section_Columns_SetCols, Old : this.Columns.Cols, New : Cols});
+        History.Add(this, {Type : AscDFH.historyitem_Section_Columns_SetCols, Old : this.Columns.Cols, New : Cols});
         this.Columns.Cols = Cols;
     },
 
@@ -697,7 +692,7 @@ CSectionPr.prototype =
             NewCol.W     = W;
             NewCol.Space = Space;
             
-            History.Add( this, { Type : historyitem_Section_Columns_Col, Index : Index, Old : OldCol, New : NewCol } );
+            History.Add( this, { Type : AscDFH.historyitem_Section_Columns_Col, Index : Index, Old : OldCol, New : NewCol } );
             this.Columns.Cols[Index] = NewCol;
         }
     },   
@@ -791,14 +786,14 @@ CSectionPr.prototype =
 
         switch (Type)
         {
-            case historyitem_Section_PageSize_Orient :
+            case AscDFH.historyitem_Section_PageSize_Orient :
             {
                 this.PageSize.Orient = Data.Old;
 
                 break;
             }
 
-            case  historyitem_Section_PageSize_Size:
+            case  AscDFH.historyitem_Section_PageSize_Size:
             {
                 this.PageSize.W = Data.Old.W;
                 this.PageSize.H = Data.Old.H;
@@ -806,7 +801,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins:
+            case AscDFH.historyitem_Section_PageMargins:
             {
                 this.PageMargins.Left   = Data.Old.L;
                 this.PageMargins.Top    = Data.Old.T;
@@ -816,146 +811,146 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Type:
+            case AscDFH.historyitem_Section_Type:
             {
                 this.Type = Data.Old;
 
                 break;
             }
 
-            case historyitem_Section_Borders_Left:
+            case AscDFH.historyitem_Section_Borders_Left:
             {
                 this.Borders.Left = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_Top:
+            case AscDFH.historyitem_Section_Borders_Top:
             {
                 this.Borders.Top = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_Right:
+            case AscDFH.historyitem_Section_Borders_Right:
             {
                 this.Borders.Right = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_Bottom:
+            case AscDFH.historyitem_Section_Borders_Bottom:
             {
                 this.Borders.Bottom = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_Display:
+            case AscDFH.historyitem_Section_Borders_Display:
             {
                 this.Borders.Display = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_OffsetFrom:
+            case AscDFH.historyitem_Section_Borders_OffsetFrom:
             {
                 this.Borders.OffsetFrom = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Borders_ZOrder:
+            case AscDFH.historyitem_Section_Borders_ZOrder:
             {
                 this.Borders.ZOrder = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Header_First:
+            case AscDFH.historyitem_Section_Header_First:
             {
                 this.HeaderFirst = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Header_Even:
+            case AscDFH.historyitem_Section_Header_Even:
             {
                 this.HeaderEven = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Header_Default:
+            case AscDFH.historyitem_Section_Header_Default:
             {
                 this.HeaderDefault = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Footer_First:
+            case AscDFH.historyitem_Section_Footer_First:
             {
                 this.FooterFirst = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Footer_Even:
+            case AscDFH.historyitem_Section_Footer_Even:
             {
                 this.FooterEven = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Footer_Default:
+            case AscDFH.historyitem_Section_Footer_Default:
             {
                 this.FooterDefault = Data.Old;
                 break;
             }
 
-            case historyitem_Section_TitlePage:
+            case AscDFH.historyitem_Section_TitlePage:
             {
                 this.TitlePage = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_PageMargins_Header:
+            case AscDFH.historyitem_Section_PageMargins_Header:
             {
                 this.PageMargins.Header = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_PageMargins_Footer:
+            case AscDFH.historyitem_Section_PageMargins_Footer:
             {
                 this.PageMargins.Footer = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_PageNumType_Start:
+            case AscDFH.historyitem_Section_PageNumType_Start:
             {
                 this.PageNumType.Start = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Columns_EqualWidth:
+            case AscDFH.historyitem_Section_Columns_EqualWidth:
             {
                 this.Columns.EqualWidth = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Columns_Space:
+            case AscDFH.historyitem_Section_Columns_Space:
             {
                 this.Columns.Space = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Columns_Num:
+            case AscDFH.historyitem_Section_Columns_Num:
             {
                 this.Columns.Num = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Columns_Sep:
+            case AscDFH.historyitem_Section_Columns_Sep:
             {
                 this.Columns.Sep = Data.Old;
                 break;
             }
                 
-            case historyitem_Section_Columns_Col:
+            case AscDFH.historyitem_Section_Columns_Col:
             {
                 this.Columns.Cols[Data.Index] = Data.Old;
                 break;
             }
 
-            case historyitem_Section_Columns_SetCols:
+            case AscDFH.historyitem_Section_Columns_SetCols:
             {
                 this.Columns.Cols = Data.Old;
                 break;
@@ -969,14 +964,14 @@ CSectionPr.prototype =
 
         switch (Type)
         {
-            case historyitem_Section_PageSize_Orient :
+            case AscDFH.historyitem_Section_PageSize_Orient :
             {
                 this.PageSize.Orient = Data.New;
 
                 break;
             }
 
-            case  historyitem_Section_PageSize_Size:
+            case  AscDFH.historyitem_Section_PageSize_Size:
             {
                 this.PageSize.W = Data.New.W;
                 this.PageSize.H = Data.New.H;
@@ -984,7 +979,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins:
+            case AscDFH.historyitem_Section_PageMargins:
             {
                 this.PageMargins.Left   = Data.New.L;
                 this.PageMargins.Top    = Data.New.T;
@@ -994,146 +989,146 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Type:
+            case AscDFH.historyitem_Section_Type:
             {
                 this.Type = Data.New;
 
                 break;
             }
 
-            case historyitem_Section_Borders_Left:
+            case AscDFH.historyitem_Section_Borders_Left:
             {
                 this.Borders.Left = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_Top:
+            case AscDFH.historyitem_Section_Borders_Top:
             {
                 this.Borders.Top = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_Right:
+            case AscDFH.historyitem_Section_Borders_Right:
             {
                 this.Borders.Right = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_Bottom:
+            case AscDFH.historyitem_Section_Borders_Bottom:
             {
                 this.Borders.Bottom = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_Display:
+            case AscDFH.historyitem_Section_Borders_Display:
             {
                 this.Borders.Display = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_OffsetFrom:
+            case AscDFH.historyitem_Section_Borders_OffsetFrom:
             {
                 this.Borders.OffsetFrom = Data.New;
                 break;
             }
 
-            case historyitem_Section_Borders_ZOrder:
+            case AscDFH.historyitem_Section_Borders_ZOrder:
             {
                 this.Borders.ZOrder = Data.New;
                 break;
             }
                 
-            case historyitem_Section_Header_First:
+            case AscDFH.historyitem_Section_Header_First:
             {
                 this.HeaderFirst = Data.New;
                 break;
             }
 
-            case historyitem_Section_Header_Even:
+            case AscDFH.historyitem_Section_Header_Even:
             {
                 this.HeaderEven = Data.New;
                 break;
             }
 
-            case historyitem_Section_Header_Default:
+            case AscDFH.historyitem_Section_Header_Default:
             {
                 this.HeaderDefault = Data.New;
                 break;
             }
 
-            case historyitem_Section_Footer_First:
+            case AscDFH.historyitem_Section_Footer_First:
             {
                 this.FooterFirst = Data.New;
                 break;
             }
 
-            case historyitem_Section_Footer_Even:
+            case AscDFH.historyitem_Section_Footer_Even:
             {
                 this.FooterEven = Data.New;
                 break;
             }
 
-            case historyitem_Section_Footer_Default:
+            case AscDFH.historyitem_Section_Footer_Default:
             {
                 this.FooterDefault = Data.New;
                 break;
             }
 
-            case historyitem_Section_TitlePage:
+            case AscDFH.historyitem_Section_TitlePage:
             {
                 this.TitlePage = Data.New;
                 break;
             }
 
-            case historyitem_Section_PageMargins_Header:
+            case AscDFH.historyitem_Section_PageMargins_Header:
             {
                 this.PageMargins.Header = Data.New;
                 break;
             }
 
-            case historyitem_Section_PageMargins_Footer:
+            case AscDFH.historyitem_Section_PageMargins_Footer:
             {
                 this.PageMargins.Footer = Data.New;
                 break;
             }
 
-            case historyitem_Section_PageNumType_Start:
+            case AscDFH.historyitem_Section_PageNumType_Start:
             {
                 this.PageNumType.Start = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_EqualWidth:
+            case AscDFH.historyitem_Section_Columns_EqualWidth:
             {
                 this.Columns.EqualWidth = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_Space:
+            case AscDFH.historyitem_Section_Columns_Space:
             {
                 this.Columns.Space = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_Num:
+            case AscDFH.historyitem_Section_Columns_Num:
             {
                 this.Columns.Num = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_Sep:
+            case AscDFH.historyitem_Section_Columns_Sep:
             {
                 this.Columns.Sep = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_Col:
+            case AscDFH.historyitem_Section_Columns_Col:
             {
                 this.Columns.Cols[Data.Index] = Data.New;
                 break;
             }
 
-            case historyitem_Section_Columns_SetCols:
+            case AscDFH.historyitem_Section_Columns_SetCols:
             {
                 this.Columns.Cols = Data.New;
                 break;
@@ -1153,9 +1148,9 @@ CSectionPr.prototype =
         // у данной секции флаг TitlePage = False, а значит пересчет надо запускать с места где данный колонтитул
         // первый раз начнет использоваться, а не с текущей секции.
 
-        if ( (historyitem_Section_Header_First === Data.Type || historyitem_Section_Footer_First === Data.Type) && false === this.TitlePage )
+        if ( (AscDFH.historyitem_Section_Header_First === Data.Type || AscDFH.historyitem_Section_Footer_First === Data.Type) && false === this.TitlePage )
         {
-            var bHeader = historyitem_Section_Header_First === Data.Type ? true : false
+            var bHeader = AscDFH.historyitem_Section_Header_First === Data.Type ? true : false
             var SectionsCount = this.LogicDocument.SectionsInfo.Get_SectionsCount();
             while ( Index < SectionsCount - 1 )
             {
@@ -1210,7 +1205,7 @@ CSectionPr.prototype =
         // Long : тип класса
         // Long : тип изменений
 
-        Writer.WriteLong( historyitem_type_Section );
+        Writer.WriteLong( AscDFH.historyitem_type_Section );
 
         var Type = Data.Type;
 
@@ -1219,7 +1214,7 @@ CSectionPr.prototype =
 
         switch ( Type )
         {
-            case historyitem_Section_PageSize_Orient:
+            case AscDFH.historyitem_Section_PageSize_Orient:
             {
                 // Byte : Orient
                 Writer.WriteByte( Data.New );
@@ -1227,7 +1222,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case  historyitem_Section_PageSize_Size:
+            case  AscDFH.historyitem_Section_PageSize_Size:
             {
                 // Double : W
                 // Double : H
@@ -1237,7 +1232,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins:
+            case AscDFH.historyitem_Section_PageMargins:
             {
                 // Double : Left
                 // Double : Top
@@ -1252,7 +1247,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Type:
+            case AscDFH.historyitem_Section_Type:
             {
                 // Byte : Type
                 Writer.WriteByte( Data.New );
@@ -1260,31 +1255,31 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Borders_Left:
-            case historyitem_Section_Borders_Top:
-            case historyitem_Section_Borders_Right:
-            case historyitem_Section_Borders_Bottom:
+            case AscDFH.historyitem_Section_Borders_Left:
+            case AscDFH.historyitem_Section_Borders_Top:
+            case AscDFH.historyitem_Section_Borders_Right:
+            case AscDFH.historyitem_Section_Borders_Bottom:
             {
                 // Variable : CDocumentBorder
                 Data.New.Write_ToBinary( Writer );
                 break;
             }
 
-            case historyitem_Section_Borders_Display:
-            case historyitem_Section_Borders_OffsetFrom:
-            case historyitem_Section_Borders_ZOrder:
+            case AscDFH.historyitem_Section_Borders_Display:
+            case AscDFH.historyitem_Section_Borders_OffsetFrom:
+            case AscDFH.historyitem_Section_Borders_ZOrder:
             {
                 // Byte : Value
                 Writer.WriteByte( Data.New );
                 break;
             }
 
-            case historyitem_Section_Header_First:            
-            case historyitem_Section_Header_Even:            
-            case historyitem_Section_Header_Default:            
-            case historyitem_Section_Footer_First:            
-            case historyitem_Section_Footer_Even:            
-            case historyitem_Section_Footer_Default:
+            case AscDFH.historyitem_Section_Header_First:            
+            case AscDFH.historyitem_Section_Header_Even:            
+            case AscDFH.historyitem_Section_Header_Default:            
+            case AscDFH.historyitem_Section_Footer_First:            
+            case AscDFH.historyitem_Section_Footer_Even:            
+            case AscDFH.historyitem_Section_Footer_Default:
             {
                 // Bool : Is null
                 // false ->
@@ -1301,7 +1296,7 @@ CSectionPr.prototype =
                 break;
             }
                 
-            case historyitem_Section_TitlePage:
+            case AscDFH.historyitem_Section_TitlePage:
             {
                 // Bool : TitlePage
                 
@@ -1310,8 +1305,8 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins_Header:
-            case historyitem_Section_PageMargins_Footer:                
+            case AscDFH.historyitem_Section_PageMargins_Header:
+            case AscDFH.historyitem_Section_PageMargins_Footer:                
             {
                 // Double : Header/Footer distance
                 
@@ -1320,7 +1315,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageNumType_Start:
+            case AscDFH.historyitem_Section_PageNumType_Start:
             {
                 // Long : PageNumType.Start
                 
@@ -1328,35 +1323,35 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Columns_EqualWidth:
+            case AscDFH.historyitem_Section_Columns_EqualWidth:
             {
                 // Bool : Equal
                 Writer.WriteBool( Data.New );
                 break;
             }
 
-            case historyitem_Section_Columns_Space:
+            case AscDFH.historyitem_Section_Columns_Space:
             {
                 // Double : Space
                 Writer.WriteDouble( Data.New );
                 break;
             }
 
-            case historyitem_Section_Columns_Num:
+            case AscDFH.historyitem_Section_Columns_Num:
             {
                 // Long : Num
                 Writer.WriteLong( Data.New );
                 break;
             }
 
-            case historyitem_Section_Columns_Sep:
+            case AscDFH.historyitem_Section_Columns_Sep:
             {
                 // Bool : Sep
                 Writer.WriteBool( Data.New );
                 break;
             }
 
-            case historyitem_Section_Columns_Col:
+            case AscDFH.historyitem_Section_Columns_Col:
             {
                 // Long : Index
                 // Bool : undefined ?
@@ -1375,7 +1370,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Columns_SetCols:
+            case AscDFH.historyitem_Section_Columns_SetCols:
             {
                 // Long : Count
                 // Array of variable : array of CSectionColumn
@@ -1399,14 +1394,14 @@ CSectionPr.prototype =
         // Long : тип изменений
 
         var ClassType = Reader.GetLong();
-        if ( historyitem_type_Section != ClassType )
+        if ( AscDFH.historyitem_type_Section != ClassType )
             return;
 
         var Type = Reader.GetLong();
 
         switch ( Type )
         {
-            case  historyitem_Section_PageSize_Orient:
+            case  AscDFH.historyitem_Section_PageSize_Orient:
             {
                 // Byte : Orient
                 this.PageSize.Orient = Reader.GetByte();
@@ -1414,7 +1409,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case  historyitem_Section_PageSize_Size:
+            case  AscDFH.historyitem_Section_PageSize_Size:
             {
                 // Double : W
                 // Double : H
@@ -1424,7 +1419,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins:
+            case AscDFH.historyitem_Section_PageMargins:
             {
                 // Double : Left
                 // Double : Top
@@ -1439,7 +1434,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Type:
+            case AscDFH.historyitem_Section_Type:
             {
                 // Byte : Type
                 this.Type = Reader.GetByte();
@@ -1447,56 +1442,56 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Borders_Left:
+            case AscDFH.historyitem_Section_Borders_Left:
             {
                 // Variable : CDocumentBorder
                 this.Borders.Left.Read_FromBinary(Reader);
                 break;
             }
 
-            case historyitem_Section_Borders_Top:
+            case AscDFH.historyitem_Section_Borders_Top:
             {
                 // Variable : CDocumentBorder
                 this.Borders.Top.Read_FromBinary(Reader);
                 break;
             }
 
-            case historyitem_Section_Borders_Right:
+            case AscDFH.historyitem_Section_Borders_Right:
             {
                 // Variable : CDocumentBorder
                 this.Borders.Right.Read_FromBinary(Reader);
                 break;
             }
 
-            case historyitem_Section_Borders_Bottom:
+            case AscDFH.historyitem_Section_Borders_Bottom:
             {
                 // Variable : CDocumentBorder
                 this.Borders.Bottom.Read_FromBinary(Reader);
                 break;
             }
 
-            case historyitem_Section_Borders_Display:
+            case AscDFH.historyitem_Section_Borders_Display:
             {
                 // Byte : Value
                 this.Borders.Display = Reader.GetByte();
                 break;
             }
 
-            case historyitem_Section_Borders_OffsetFrom:
+            case AscDFH.historyitem_Section_Borders_OffsetFrom:
             {
                 // Byte : Value
                 this.Borders.OffsetFrom = Reader.GetByte();
                 break;
             }
 
-            case historyitem_Section_Borders_ZOrder:
+            case AscDFH.historyitem_Section_Borders_ZOrder:
             {
                 // Byte : Value
                 this.Borders.ZOrder = Reader.GetByte();
                 break;
             }
 
-            case historyitem_Section_Header_First:
+            case AscDFH.historyitem_Section_Header_First:
             {
                 // Bool : Is null
                 // false ->
@@ -1510,7 +1505,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Header_Even:
+            case AscDFH.historyitem_Section_Header_Even:
             {
                 // Bool : Is null
                 // false ->
@@ -1524,7 +1519,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Header_Default:
+            case AscDFH.historyitem_Section_Header_Default:
             {
                 // Bool : Is null
                 // false ->
@@ -1538,7 +1533,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Footer_First:
+            case AscDFH.historyitem_Section_Footer_First:
             {
                 // Bool : Is null
                 // false ->
@@ -1552,7 +1547,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Footer_Even:
+            case AscDFH.historyitem_Section_Footer_Even:
             {
                 // Bool : Is null
                 // false ->
@@ -1566,7 +1561,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Footer_Default:
+            case AscDFH.historyitem_Section_Footer_Default:
             {
                 // Bool : Is null
                 // false ->
@@ -1580,7 +1575,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_TitlePage:
+            case AscDFH.historyitem_Section_TitlePage:
             {
                 // Bool : TitlePage
 
@@ -1589,7 +1584,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins_Header:
+            case AscDFH.historyitem_Section_PageMargins_Header:
             {
                 // Double : Header distance
 
@@ -1598,7 +1593,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageMargins_Footer:
+            case AscDFH.historyitem_Section_PageMargins_Footer:
             {
                 // Double : Footer distance
 
@@ -1607,7 +1602,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_PageNumType_Start:
+            case AscDFH.historyitem_Section_PageNumType_Start:
             {
                 // Long : PageNumType.Start
 
@@ -1616,35 +1611,35 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Columns_EqualWidth:
+            case AscDFH.historyitem_Section_Columns_EqualWidth:
             {
                 // Bool : Equal
                 this.Columns.EqualWidth = Reader.GetBool();
                 break;
             }
 
-            case historyitem_Section_Columns_Space:
+            case AscDFH.historyitem_Section_Columns_Space:
             {
                 // Double : Space
                 this.Columns.Space = Reader.GetDouble();
                 break;
             }
 
-            case historyitem_Section_Columns_Num:
+            case AscDFH.historyitem_Section_Columns_Num:
             {
                 // Long : Num
                 this.Columns.Num = Reader.GetLong();
                 break;
             }
 
-            case historyitem_Section_Columns_Sep:
+            case AscDFH.historyitem_Section_Columns_Sep:
             {
                 // Bool : Sep
                 this.Columns.Sep = Reader.GetBool();
                 break;
             }
 
-            case historyitem_Section_Columns_Col:
+            case AscDFH.historyitem_Section_Columns_Col:
             {
                 // Long : Index
                 // Bool : undefined ?
@@ -1664,7 +1659,7 @@ CSectionPr.prototype =
                 break;
             }
 
-            case historyitem_Section_Columns_SetCols:
+            case AscDFH.historyitem_Section_Columns_SetCols:
             {
                 // Long : Count
                 // Array of variable : array of CSectionColumn
@@ -1683,7 +1678,7 @@ CSectionPr.prototype =
 
     Write_ToBinary2 : function(Writer)
     {
-        Writer.WriteLong( historyitem_type_Section );
+        Writer.WriteLong( AscDFH.historyitem_type_Section );
 
         // String2  : Id
         // String2  : Id LogicDocument
@@ -1732,7 +1727,7 @@ function CSectionPageSize()
 {
     this.W      = 210;
     this.H      = 297;
-    this.Orient = orientation_Portrait;
+    this.Orient = Asc.c_oAscPageOrientation.PagePortrait;
 }
 
 CSectionPageSize.prototype =
@@ -2045,3 +2040,7 @@ function CSectionLayoutInfo(X, Y, XLimit, YLimit)
     this.YLimit  = YLimit;
     this.Columns = [];
 }
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].CSectionPr = CSectionPr;

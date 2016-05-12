@@ -24,11 +24,8 @@
 */
 "use strict";
 
-/**
- * User: Ilja.Kirillov
- * Date: 19.01.15
- * Time: 12:13
- */
+// Import
+var History = AscCommon.History;
 
 var fieldtype_UNKNOWN    = 0x0000;
 var fieldtype_MERGEFIELD = 0x0001;
@@ -99,14 +96,14 @@ ParaField.prototype.Get_Bounds = function()
 };
 ParaField.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
-    History.Add( this, { Type : historyitem_Field_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
+    History.Add( this, { Type : AscDFH.historyitem_Field_AddItem, Pos : Pos, EndPos : Pos, Items : [ Item ] } );
     ParaField.superclass.Add_ToContent.apply(this, arguments);
 };
 ParaField.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
     // Получим массив удаляемых элементов
     var DeletedItems = this.Content.slice( Pos, Pos + Count );
-    History.Add( this, { Type : historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
+    History.Add( this, { Type : AscDFH.historyitem_Field_RemoveItem, Pos : Pos, EndPos : Pos + Count - 1, Items : DeletedItems } );
 
     ParaField.superclass.Remove_FromContent.apply(this, arguments);
 };
@@ -271,7 +268,7 @@ ParaField.prototype.Restore_StandardTemplate = function()
     // В любом случае сначала восстанавливаем исходное содержимое.
     this.Restore_Template();
 
-    if (fieldtype_MERGEFIELD === this.FieldType && true === CollaborativeEditing.Is_SingleUser() && 1 === this.Arguments.length)
+    if (fieldtype_MERGEFIELD === this.FieldType && true === AscCommon.CollaborativeEditing.Is_SingleUser() && 1 === this.Arguments.length)
     {
         var oRun = this.private_GetMappedRun("«" + this.Arguments[0] + "»");
         this.Remove_FromContent(0, this.Content.length);
@@ -373,7 +370,7 @@ ParaField.prototype.Undo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.protected_UpdateSpellChecking();
@@ -381,7 +378,7 @@ ParaField.prototype.Undo = function(Data)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             var Pos = Data.Pos;
 
@@ -400,7 +397,7 @@ ParaField.prototype.Redo = function(Data)
     var Type = Data.Type;
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             var Pos = Data.Pos;
 
@@ -413,7 +410,7 @@ ParaField.prototype.Redo = function(Data)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             this.Content.splice( Data.Pos, Data.EndPos - Data.Pos + 1 );
             this.private_UpdateTrackRevisions();
@@ -431,7 +428,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
     // Long : тип класса
     // Long : тип изменений
 
-    Writer.WriteLong(historyitem_type_Field);
+    Writer.WriteLong(AscDFH.historyitem_type_Field);
 
     var Type = Data.Type;
 
@@ -440,7 +437,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
 
     switch(Type)
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -467,7 +464,7 @@ ParaField.prototype.Save_Changes = function(Data, Writer)
             break;
         }
 
-        case historyitem_Field_RemoveItem :
+        case AscDFH.historyitem_Field_RemoveItem :
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -508,14 +505,14 @@ ParaField.prototype.Load_Changes = function(Reader)
     // Long : тип изменений
 
     var ClassType = Reader.GetLong();
-    if ( historyitem_type_Field != ClassType )
+    if ( AscDFH.historyitem_type_Field != ClassType )
         return;
 
     var Type = Reader.GetLong();
 
     switch ( Type )
     {
-        case historyitem_Field_AddItem :
+        case AscDFH.historyitem_Field_AddItem :
         {
             // Long     : Количество элементов
             // Array of :
@@ -534,7 +531,7 @@ ParaField.prototype.Load_Changes = function(Reader)
                 if ( null != Element )
                 {
                     this.Content.splice( Pos, 0, Element );
-                    CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
+                    AscCommon.CollaborativeEditing.Update_DocumentPositionsOnAdd(this, Pos);
                 }
             }
             this.private_UpdateTrackRevisions();
@@ -542,7 +539,7 @@ ParaField.prototype.Load_Changes = function(Reader)
             break;
         }
 
-        case historyitem_Field_RemoveItem:
+        case AscDFH.historyitem_Field_RemoveItem:
         {
             // Long          : Количество удаляемых элементов
             // Array of Long : позиции удаляемых элементов
@@ -558,7 +555,7 @@ ParaField.prototype.Load_Changes = function(Reader)
                     continue;
 
                 this.Content.splice( ChangesPos, 1 );
-                CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
+                AscCommon.CollaborativeEditing.Update_DocumentPositionsOnRemove(this, ChangesPos, 1);
             }
             this.private_UpdateTrackRevisions();
             this.protected_UpdateSpellChecking();
@@ -568,7 +565,7 @@ ParaField.prototype.Load_Changes = function(Reader)
 };
 ParaField.prototype.Write_ToBinary2 = function(Writer)
 {
-    Writer.WriteLong(historyitem_type_Field);
+    Writer.WriteLong(AscDFH.historyitem_type_Field);
 
     // String : Id
     // Long   : FieldType
@@ -635,3 +632,7 @@ ParaField.prototype.Read_FromBinary2 = function(Reader)
     if (editor)
         editor.WordControl.m_oLogicDocument.Register_Field(this);
 };
+
+//--------------------------------------------------------export----------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window['AscCommonWord'].ParaField = ParaField;

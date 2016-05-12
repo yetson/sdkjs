@@ -24,10 +24,19 @@
 */
 "use strict";
 
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+
 // Import
 var CreateAscColor = AscCommon.CreateAscColor;
 var g_oIdCounter = AscCommon.g_oIdCounter;
 var g_oTableId = AscCommon.g_oTableId;
+var isRealObject = AscCommon.isRealObject;
+var History = AscCommon.History;
 
 var c_oAscColor = Asc.c_oAscColor;
 var c_oAscFill = Asc.c_oAscFill;
@@ -36,6 +45,7 @@ var c_oAscFillGradType = Asc.c_oAscFillGradType;
 var c_oAscFillBlipType = Asc.c_oAscFillBlipType;
 var c_oAscStrokeType = Asc.c_oAscStrokeType;
 var asc_CShapeProperty = Asc.asc_CShapeProperty;
+
 
 // COLOR -----------------------
 /*
@@ -291,11 +301,6 @@ function checkThemeFonts(oFontMap, font_scheme)
 
 function ExecuteNoHistory(f, oThis, args)
 {
-    if(!(History instanceof CHistory))
-    {
-        History = {Add: function(){}};
-    }
-
     History.TurnOff && History.TurnOff();
 
     var b_table_id = false;
@@ -342,7 +347,7 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     }
     else
     {
-        color_map = G_O_DEFAULT_COLOR_MAP;
+        color_map = AscFormat.G_O_DEFAULT_COLOR_MAP;
     }
 
     checkObjectUnifill(cellPr.Shd, theme, color_map);
@@ -358,6 +363,22 @@ function checkTableCellPr(cellPr, slide, layout, master, theme)
     return cellPr;
 }
 
+var Ax_Counter = {
+    GLOBAL_AX_ID_COUNTER : 1000
+};
+var TYPE_TRACK = {
+    SHAPE : 0,
+    GROUP : 0,
+    GROUP_PASSIVE : 1,
+    TEXT : 2,
+    EMPTY_PH : 3,
+    CHART_TEXT : 4
+};
+var TYPE_KIND = {
+    SLIDE : 0,
+    LAYOUT : 1,
+    MASTER : 2
+};
 
 var TYPE_TRACK_SHAPE = 0;
 var TYPE_TRACK_GROUP = TYPE_TRACK_SHAPE;
@@ -563,41 +584,17 @@ map_prst_color["whiteSmoke"] = 		0xF5F5F5;
 map_prst_color["yellow"] = 			0xFFFF00;
 map_prst_color["yellowGreen"] = 	0x9ACD32;
 
-
-
-
-
-
-
-
-
 function CColorMod()
 {
     this.name = "";
     this.val = 0;
 }
 
-function _create_mod(default_obj)
-{
-	var ret = new CColorMod();
-	ret.name = default_obj["name"];
-	ret.val = default_obj["val"];
-	return ret;
-}
-
-function _create_mods(arr_defaults)
-{
-	var ret = [];
-	for (var i = 0; i < arr_defaults.length; i++)
-		ret.push(_create_mod(arr_defaults[i]));
-	return ret;
-}
-
 CColorMod.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_ColorMod;
+        return AscDFH.historyitem_type_ColorMod;
     },
 
     Get_Id: function()
@@ -641,7 +638,7 @@ CColorModifiers.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_ColorModifiers;
+        return AscDFH.historyitem_type_ColorModifiers;
     },
 
     Get_Id: function()
@@ -1068,7 +1065,7 @@ CSysColor.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SysColor;
+        return AscDFH.historyitem_type_SysColor;
     },
 
     Write_ToBinary: function (w)
@@ -1133,7 +1130,7 @@ CPrstColor.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_PrstColor;
+        return AscDFH.historyitem_type_PrstColor;
     },
 
 
@@ -1234,7 +1231,7 @@ CRGBColor.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_RGBColor;
+        return AscDFH.historyitem_type_RGBColor;
     },
 
     writeToBinaryLong: function(w)
@@ -1355,7 +1352,7 @@ CSchemeColor.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SchemeColor;
+        return AscDFH.historyitem_type_SchemeColor;
     },
 
 
@@ -1416,7 +1413,7 @@ CSchemeColor.prototype =
                 }
                 else
                 {
-                    clrMap = DEFAULT_COLOR_MAP.color_map;
+                    clrMap = AscFormat.DEFAULT_COLOR_MAP.color_map;
                 }
                 if (clrMap[this.id]!=null && theme.themeElements.clrScheme.colors[clrMap[this.id]] != null)
                     this.RGBA = theme.themeElements.clrScheme.colors[clrMap[this.id]].color.RGBA;
@@ -1546,7 +1543,7 @@ CUniColor.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_UniColor;
+        return AscDFH.historyitem_type_UniColor;
     },
 
 
@@ -1842,7 +1839,7 @@ CSrcRect.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SrcRect;
+        return AscDFH.historyitem_type_SrcRect;
     },
 
     setLTRB: function(l, t, r, b)
@@ -1880,22 +1877,6 @@ CSrcRect.prototype =
     }
 };
 
-
-var TILE_FLIP_MODE_NONE = 0;
-var TILE_FLIP_MODE_X    = 1;
-var TILE_FLIP_MODE_Y    = 2;
-var TILE_FLIP_MODE_XY   = 3;
-
-var TILE_RECT_ALIGN_B    = 0;
-var TILE_RECT_ALIGN_BL   = 1;
-var TILE_RECT_ALIGN_BR   = 2;
-var TILE_RECT_ALIGN_CTR  = 3;
-var TILE_RECT_ALIGN_L    = 4;
-var TILE_RECT_ALIGN_R    = 5;
-var TILE_RECT_ALIGN_T    = 6;
-var TILE_RECT_ALIGN_TL   = 7;
-var TILE_RECT_ALIGN_TR   = 8;
-
 function CBlipFillTile()
 {
     this.tx = null;
@@ -1923,7 +1904,6 @@ CBlipFillTile.prototype.Read_FromBinary = function(r)
     this.flip = readLong(r);
     this.algn = readLong(r);
 };
-
 CBlipFillTile.prototype.createDuplicate = function()
 {
     var ret = new CBlipFillTile();
@@ -1935,8 +1915,6 @@ CBlipFillTile.prototype.createDuplicate = function()
     ret.algn = this.algn;
     return ret;
 };
-
-
 CBlipFillTile.prototype.IsIdentical = function(o)
 {
     if(!o)
@@ -2073,7 +2051,7 @@ CBlipFill.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_BlipFill;
+        return AscDFH.historyitem_type_BlipFill;
     },
 
     setRasterImageId: function(rasterImageId)
@@ -2237,7 +2215,7 @@ CSolidFill.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SolidFill;
+        return AscDFH.historyitem_type_SolidFill;
     },
 
     setColor: function(color)
@@ -2345,7 +2323,7 @@ CGs.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Gs;
+        return AscDFH.historyitem_type_Gs;
     },
 
     setColor: function(color)
@@ -2439,7 +2417,7 @@ GradLin.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_GradLin;
+        return AscDFH.historyitem_type_GradLin;
     },
 
     setAngle: function(angle)
@@ -2505,7 +2483,7 @@ GradPath.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_GradPath;
+        return AscDFH.historyitem_type_GradPath;
     },
 
     setPath: function(path)
@@ -2592,7 +2570,7 @@ CGradFill.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_GradFill;
+        return AscDFH.historyitem_type_GradFill;
     },
 
     checkWordMods: function()
@@ -2801,7 +2779,7 @@ CPattFill.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_PathFill;
+        return AscDFH.historyitem_type_PathFill;
     },
 
     check: function(theme, colorMap)
@@ -2969,7 +2947,7 @@ CNoFill.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_NoFill;
+        return AscDFH.historyitem_type_NoFill;
     },
 
 
@@ -3030,6 +3008,87 @@ CNoFill.prototype =
     }
 };
 
+function CGrpFill()
+{
+    this.type = c_oAscFill.FILL_TYPE_GRP;
+}
+
+CGrpFill.prototype =
+{
+    Get_Id: function()
+    {
+        return this.Id;
+    },
+
+    Refresh_RecalcData: function()
+    {},
+
+    check: function()
+    {},
+
+    getObjectType: function()
+    {
+        return AscDFH.historyitem_type_GrpFill;
+    },
+
+
+
+    Write_ToBinary: function(w)
+    {
+        w.WriteLong(c_oAscFill.FILL_TYPE_GRP);
+    },
+
+    Read_FromBinary: function(r)
+    {
+    },
+
+
+    checkWordMods: function()
+    {
+        return false;
+
+    },
+
+    convertToPPTXMods: function()
+    {
+    },
+
+    canConvertPPTXModsToWord: function()
+    {
+        return false;
+    },
+
+    convertToWordMods: function()
+    {
+    },
+
+    createDuplicate : function()
+    {
+        return new CGrpFill();
+    },
+
+    IsIdentical : function(fill)
+    {
+        if(fill == null)
+        {
+            return false;
+        }
+        return fill.type ===  c_oAscFill.FILL_TYPE_GRP;
+    },
+    compare : function(grpfill)
+    {
+        if(grpfill == null)
+        {
+            return null;
+        }
+        if(grpfill.type === this.type)
+        {
+            return new CGrpFill();
+        }
+        return null;
+    }
+};
+
 
 function CreateBlackRGBUnifill()
 {
@@ -3082,6 +3141,7 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_NONE:
                 case c_oAscFill.FILL_TYPE_BLIP:
                 case c_oAscFill.FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_GRP:
                 {
                     break;
                 }
@@ -3129,6 +3189,7 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_NONE:
                 case c_oAscFill.FILL_TYPE_BLIP:
                 case c_oAscFill.FILL_TYPE_NOFILL:
+                case c_oAscFill.FILL_TYPE_GRP:
                 {
                     break;
                 }
@@ -3190,7 +3251,7 @@ CUniFill.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_UniFill;
+        return AscDFH.historyitem_type_UniFill;
     },
 
     setFill: function(fill)
@@ -3256,6 +3317,12 @@ CUniFill.prototype =
                 case c_oAscFill.FILL_TYPE_PATT:
                 {
                     this.fill = new CPattFill();
+                    this.fill.Read_FromBinary(r);
+                    break;
+                }
+                case c_oAscFill.FILL_TYPE_GRP:
+                {
+                    this.fill = new CGrpFill();
                     this.fill.Read_FromBinary(r);
                     break;
                 }
@@ -3820,7 +3887,7 @@ EndArrow.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_EndArrow;
+        return AscDFH.historyitem_type_EndArrow;
     },
 
     setType: function(type)
@@ -3903,7 +3970,7 @@ LineJoin.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_LineJoin;
+        return AscDFH.historyitem_type_LineJoin;
     },
 
     createDuplicate: function()
@@ -3958,7 +4025,7 @@ CLn.prototype =
 {
     getObjectType: function()
     {
-        return historyitem_type_Ln;
+        return AscDFH.historyitem_type_Ln;
     },
 
     compare: function(line)
@@ -4240,30 +4307,30 @@ DefaultShapeDefinition.prototype=
     {},
     getObjectType: function()
     {
-        return historyitem_type_DefaultShapeDefinition;
+        return AscDFH.historyitem_type_DefaultShapeDefinition;
     },
 
     setSpPr: function(spPr)
     {
-        History.Add(this, {Type: historyitem_DefaultShapeDefinition_SetSpPr, oldSpPr: this.spPr, newSpPr: spPr});
+        History.Add(this, {Type: AscDFH.historyitem_DefaultShapeDefinition_SetSpPr, oldSpPr: this.spPr, newSpPr: spPr});
         this.spPr = spPr;
     },
 
     setBodyPr: function(bodyPr)
     {
-        History.Add(this, {Type: historyitem_DefaultShapeDefinition_SetBodyPr, oldBodyPr: this.bodyPr, newBodyPr: bodyPr});
+        History.Add(this, {Type: AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr, oldBodyPr: this.bodyPr, newBodyPr: bodyPr});
         this.bodyPr = bodyPr;
     },
 
     setLstStyle: function(lstStyle)
     {
-        History.Add(this, {Type: historyitem_DefaultShapeDefinition_SetLstStyle, oldLstStyle: this.lstStyle, newLstStyle: lstStyle});
+        History.Add(this, {Type: AscDFH.historyitem_DefaultShapeDefinition_SetLstStyle, oldLstStyle: this.lstStyle, newLstStyle: lstStyle});
         this.lstStyle = lstStyle;
     },
 
     setStyle: function(style)
     {
-        History.Add(this, {Type: historyitem_DefaultShapeDefinition_SetStyle, oldStyle: this.style, newStyle: style});
+        History.Add(this, {Type: AscDFH.historyitem_DefaultShapeDefinition_SetStyle, oldStyle: this.style, newStyle: style});
         this.style = style;
     },
 
@@ -4271,22 +4338,22 @@ DefaultShapeDefinition.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_DefaultShapeDefinition_SetSpPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetSpPr:
             {
                 this.spPr = data.oldSpPr;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr:
             {
                 this.bodyPr = data.oldBodyPr;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetLstStyle:
             {
                 this.lstStyle = data.oldLstStyle;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetStyle:
             {
                 this.style = data.oldStyle;
                 break;
@@ -4298,22 +4365,22 @@ DefaultShapeDefinition.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_DefaultShapeDefinition_SetSpPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetSpPr:
             {
                 this.spPr = data.newSpPr;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr:
             {
                 this.bodyPr = data.newBodyPr;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetLstStyle:
             {
                 this.lstStyle = data.newLstStyle;
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetStyle:
             {
                 this.style = data.newStyle;
                 break;
@@ -4327,7 +4394,7 @@ DefaultShapeDefinition.prototype=
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_DefaultShapeDefinition_SetSpPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetSpPr:
             {
                 w.WriteBool(isRealObject(data.newSpPr));
                 if(isRealObject(data.newSpPr))
@@ -4336,7 +4403,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr:
             {
                 w.WriteBool(isRealObject(data.newBodyPr));
                 if(isRealObject(data.newBodyPr))
@@ -4345,7 +4412,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetLstStyle:
             {
                 w.WriteBool(isRealObject(data.newLstStyle));
                 if(isRealObject(data.newLstStyle))
@@ -4354,7 +4421,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetStyle:
             {
                 w.WriteBool(isRealObject(data.newStyle));
                 if(isRealObject(data.newStyle))
@@ -4373,7 +4440,7 @@ DefaultShapeDefinition.prototype=
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_DefaultShapeDefinition_SetSpPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetSpPr:
             {
                 if(r.GetBool())
                 {
@@ -4385,7 +4452,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetBodyPr:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetBodyPr:
             {
                 if(r.GetBool())
                 {
@@ -4397,7 +4464,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetLstStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetLstStyle:
             {
                 if(r.GetBool())
                 {
@@ -4409,7 +4476,7 @@ DefaultShapeDefinition.prototype=
                 }
                 break;
             }
-            case historyitem_DefaultShapeDefinition_SetStyle:
+            case AscDFH.historyitem_DefaultShapeDefinition_SetStyle:
             {
                 if(r.GetBool())
                 {
@@ -4450,7 +4517,7 @@ CNvPr.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_CNvPr;
+        return AscDFH.historyitem_type_CNvPr;
     },
 
     createDuplicate: function()
@@ -4464,19 +4531,19 @@ CNvPr.prototype =
 
     setId: function(id)
     {
-        History.Add(this, {Type: historyitem_CNvPr_SetId, oldId: this.id, newId: id});
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetId, oldId: this.id, newId: id});
         this.id = id;
     },
 
     setName: function(name)
     {
-        History.Add(this, {Type: historyitem_CNvPr_SetName, oldName: this.name, newName: name});
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetName, oldName: this.name, newName: name});
         this.name = name;
     },
 
     setIsHidden: function(isHidden)
     {
-        History.Add(this, {Type: historyitem_CNvPr_SetIsHidden, oldIsHidden: this.isHidden, newIsHidden: isHidden});
+        History.Add(this, {Type: AscDFH.historyitem_CNvPr_SetIsHidden, oldIsHidden: this.isHidden, newIsHidden: isHidden});
         this.isHidden = isHidden;
     },
 
@@ -4484,17 +4551,17 @@ CNvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CNvPr_SetId:
+            case AscDFH.historyitem_CNvPr_SetId:
             {
                 this.id = data.oldId;
                 break;
             }
-            case historyitem_CNvPr_SetName:
+            case AscDFH.historyitem_CNvPr_SetName:
             {
                 this.name = data.oldName;
                 break;
             }
-            case historyitem_CNvPr_SetIsHidden:
+            case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.oldIsHidden;
                 break;
@@ -4506,17 +4573,17 @@ CNvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_CNvPr_SetId:
+            case AscDFH.historyitem_CNvPr_SetId:
             {
                 this.id = data.newId;
                 break;
             }
-            case historyitem_CNvPr_SetName:
+            case AscDFH.historyitem_CNvPr_SetName:
             {
                 this.name = data.newName;
                 break;
             }
-            case historyitem_CNvPr_SetIsHidden:
+            case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = data.newIsHidden;
                 break;
@@ -4530,7 +4597,7 @@ CNvPr.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_CNvPr_SetId:
+            case AscDFH.historyitem_CNvPr_SetId:
             {
                 w.WriteBool(isRealNumber(data.newId));
                 if(isRealNumber(data.newId))
@@ -4539,12 +4606,12 @@ CNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_CNvPr_SetName:
+            case AscDFH.historyitem_CNvPr_SetName:
             {
                 writeString(w, data.newName);
                 break;
             }
-            case historyitem_CNvPr_SetIsHidden:
+            case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 writeBool(w, data.newIsHidden);
                 break;
@@ -4560,7 +4627,7 @@ CNvPr.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_CNvPr_SetId:
+            case AscDFH.historyitem_CNvPr_SetId:
             {
                 if(r.GetBool())
                 {
@@ -4572,12 +4639,12 @@ CNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_CNvPr_SetName:
+            case AscDFH.historyitem_CNvPr_SetName:
             {
                 this.name = readString(r);
                 break;
             }
-            case historyitem_CNvPr_SetIsHidden:
+            case AscDFH.historyitem_CNvPr_SetIsHidden:
             {
                 this.isHidden = readBool(r);
                 break;
@@ -4619,24 +4686,24 @@ NvPr.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_NvPr;
+        return AscDFH.historyitem_type_NvPr;
     },
 
     setIsPhoto: function(isPhoto)
     {
-        History.Add(this, {Type:historyitem_NvPr_SetIsPhoto, oldIsPhoto: this.isPhoto, newIsPhoto: isPhoto});
+        History.Add(this, {Type:AscDFH.historyitem_NvPr_SetIsPhoto, oldIsPhoto: this.isPhoto, newIsPhoto: isPhoto});
         this.isPhoto = isPhoto;
     },
 
     setUserDrawn: function(userDrawn)
     {
-        History.Add(this, {Type:historyitem_NvPr_SetUserDrawn, oldUserDrawn: this.userDrawn, newUserDrawn: userDrawn});
+        History.Add(this, {Type:AscDFH.historyitem_NvPr_SetUserDrawn, oldUserDrawn: this.userDrawn, newUserDrawn: userDrawn});
         this.userDrawn = userDrawn;
     },
 
     setPh: function(ph)
     {
-        History.Add(this, {Type: historyitem_NvPr_SetPh, oldPh: this.ph, newPh: ph});
+        History.Add(this, {Type: AscDFH.historyitem_NvPr_SetPh, oldPh: this.ph, newPh: ph});
         this.ph = ph;
     },
 
@@ -4680,17 +4747,17 @@ NvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_NvPr_SetIsPhoto:
+            case AscDFH.historyitem_NvPr_SetIsPhoto:
             {
                 this.isPhoto = data.oldIsPhoto;
                 break;
             }
-            case historyitem_NvPr_SetUserDrawn:
+            case AscDFH.historyitem_NvPr_SetUserDrawn:
             {
                 this.userDrawn = data.oldUserDrawn;
                 break;
             }
-            case historyitem_NvPr_SetPh:
+            case AscDFH.historyitem_NvPr_SetPh:
             {
                 this.ph = data.oldPh;
                 break;
@@ -4703,17 +4770,17 @@ NvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_NvPr_SetIsPhoto:
+            case AscDFH.historyitem_NvPr_SetIsPhoto:
             {
                 this.isPhoto = data.newIsPhoto;
                 break;
             }
-            case historyitem_NvPr_SetUserDrawn:
+            case AscDFH.historyitem_NvPr_SetUserDrawn:
             {
                 this.userDrawn = data.newUserDrawn;
                 break;
             }
-            case historyitem_NvPr_SetPh:
+            case AscDFH.historyitem_NvPr_SetPh:
             {
                 this.ph = data.newPh;
                 break;
@@ -4728,7 +4795,7 @@ NvPr.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_NvPr_SetIsPhoto:
+            case AscDFH.historyitem_NvPr_SetIsPhoto:
             {
                 w.WriteBool(isRealBool(data.newIsPhoto));
                 if(isRealBool(data.newIsPhoto))
@@ -4737,7 +4804,7 @@ NvPr.prototype =
                 }
                 break;
             }
-            case historyitem_NvPr_SetUserDrawn:
+            case AscDFH.historyitem_NvPr_SetUserDrawn:
             {
                 w.WriteBool(isRealBool(data.newUserDrawn));
                 if(isRealBool(data.newUserDrawn))
@@ -4746,7 +4813,7 @@ NvPr.prototype =
                 }
                 break;
             }
-            case historyitem_NvPr_SetPh:
+            case AscDFH.historyitem_NvPr_SetPh:
             {
                 w.WriteBool(isRealObject(data.newPh));
                 if(isRealObject(data.newPh))
@@ -4766,7 +4833,7 @@ NvPr.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_NvPr_SetIsPhoto:
+            case AscDFH.historyitem_NvPr_SetIsPhoto:
             {
                 if(r.GetBool())
                 {
@@ -4778,7 +4845,7 @@ NvPr.prototype =
                 }
                 break;
             }
-            case historyitem_NvPr_SetUserDrawn:
+            case AscDFH.historyitem_NvPr_SetUserDrawn:
             {
                 if(r.GetBool())
                 {
@@ -4790,7 +4857,7 @@ NvPr.prototype =
                 }
                 break;
             }
-            case historyitem_NvPr_SetPh:
+            case AscDFH.historyitem_NvPr_SetPh:
             {
                 if(r.GetBool())
                 {
@@ -4816,24 +4883,6 @@ NvPr.prototype =
         this.Id = r.GetString2();
     }
 };
-
-//типы плейсхолдеров
-var phType_body     = 0,
-    phType_chart    = 1,
-    phType_clipArt  = 2, //(Clip Art)
-    phType_ctrTitle = 3, //(Centered Title)
-    phType_dgm      = 4, //(Diagram)
-    phType_dt       = 5, //(Date and Time)
-    phType_ftr      = 6, //(Footer)
-    phType_hdr      = 7, //(Header)
-    phType_media    = 8, //(Media)
-    phType_obj      = 9, //(Object)
-    phType_pic      = 10, //(Picture)
-    phType_sldImg   = 11, //(Slide Image)
-    phType_sldNum   = 12, //(Slide Number)
-    phType_subTitle = 13, //(Subtitle)
-    phType_tbl      = 14, //(Table)
-    phType_title    = 15; //(Title)
 
 var szPh_full    = 0,
     szPh_half    = 1,
@@ -4876,36 +4925,36 @@ Ph.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Ph;
+        return AscDFH.historyitem_type_Ph;
     },
 
     setHasCustomPrompt: function(hasCustomPrompt)
     {
-        History.Add(this, {Type: historyitem_Ph_SetHasCustomPrompt, oldHasCutomPrompt: this.hasCustomPrompt, newHasCustomPrompt:hasCustomPrompt});
+        History.Add(this, {Type: AscDFH.historyitem_Ph_SetHasCustomPrompt, oldHasCutomPrompt: this.hasCustomPrompt, newHasCustomPrompt:hasCustomPrompt});
         this.hasCustomPrompt = hasCustomPrompt;
     },
 
     setIdx: function(idx)
     {
-        History.Add(this, {Type: historyitem_Ph_SetIdx, oldIdx: this.idx, newIdx:idx});
+        History.Add(this, {Type: AscDFH.historyitem_Ph_SetIdx, oldIdx: this.idx, newIdx:idx});
         this.idx = idx;
     },
 
     setOrient: function(orient)
     {
-        History.Add(this, {Type: historyitem_Ph_SetOrient, oldOrient: this.orient, newIdx:orient});
+        History.Add(this, {Type: AscDFH.historyitem_Ph_SetOrient, oldOrient: this.orient, newIdx:orient});
         this.orient = orient;
     },
 
     setSz: function(sz)
     {
-        History.Add(this, {Type: historyitem_Ph_SetSz, oldSz: this.sz, newSz:sz});
+        History.Add(this, {Type: AscDFH.historyitem_Ph_SetSz, oldSz: this.sz, newSz:sz});
         this.sz = sz;
     },
 
     setType: function(type)
     {
-        History.Add(this, {Type: historyitem_Ph_SetType, oldType: this.type, newType:type});
+        History.Add(this, {Type: AscDFH.historyitem_Ph_SetType, oldType: this.type, newType:type});
         this.type = type;
     },
 
@@ -4913,27 +4962,27 @@ Ph.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_Ph_SetHasCustomPrompt:
+            case AscDFH.historyitem_Ph_SetHasCustomPrompt:
             {
                 this.hasCustomPrompt = data.oldHasCustomPrompt;
                 break;
             }
-            case historyitem_Ph_SetIdx:
+            case AscDFH.historyitem_Ph_SetIdx:
             {
                 this.idx = data.oldIdx;
                 break;
             }
-            case historyitem_Ph_SetOrient:
+            case AscDFH.historyitem_Ph_SetOrient:
             {
                 this.orient = data.oldOrient;
                 break;
             }
-            case historyitem_Ph_SetSz:
+            case AscDFH.historyitem_Ph_SetSz:
             {
                 this.sz = data.oldSz;
                 break;
             }
-            case historyitem_Ph_SetType:
+            case AscDFH.historyitem_Ph_SetType:
             {
                 this.type = data.oldType;
                 break;
@@ -4945,27 +4994,27 @@ Ph.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_Ph_SetHasCustomPrompt:
+            case AscDFH.historyitem_Ph_SetHasCustomPrompt:
             {
                 this.hasCustomPrompt = data.newHasCustomPrompt;
                 break;
             }
-            case historyitem_Ph_SetIdx:
+            case AscDFH.historyitem_Ph_SetIdx:
             {
                 this.idx = data.newIdx;
                 break;
             }
-            case historyitem_Ph_SetOrient:
+            case AscDFH.historyitem_Ph_SetOrient:
             {
                 this.orient = data.newOrient;
                 break;
             }
-            case historyitem_Ph_SetSz:
+            case AscDFH.historyitem_Ph_SetSz:
             {
                 this.sz = data.newSz;
                 break;
             }
-            case historyitem_Ph_SetType:
+            case AscDFH.historyitem_Ph_SetType:
             {
                 this.type = data.newType;
                 break;
@@ -4980,7 +5029,7 @@ Ph.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_Ph_SetHasCustomPrompt:
+            case AscDFH.historyitem_Ph_SetHasCustomPrompt:
             {
                 w.WriteBool(isRealBool(data.newHasCustomPrompt));
                 if(isRealBool(data.newHasCustomPrompt))
@@ -4989,7 +5038,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetIdx:
+            case AscDFH.historyitem_Ph_SetIdx:
             {
                 w.WriteBool(typeof data.newIdx === "string" || isRealNumber(data.newIdx));
                 if(typeof data.newIdx === "string" || isRealNumber(data.newIdx))
@@ -5006,7 +5055,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetOrient:
+            case AscDFH.historyitem_Ph_SetOrient:
             {
                 w.WriteBool(isRealNumber(data.newOrient));
                 if(isRealNumber(data.newOrient))
@@ -5015,7 +5064,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetSz:
+            case AscDFH.historyitem_Ph_SetSz:
             {
                 w.WriteBool(isRealNumber(data.newSz));
                 if(isRealNumber(data.newSz))
@@ -5024,7 +5073,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetType:
+            case AscDFH.historyitem_Ph_SetType:
             {
                 w.WriteBool(isRealNumber(data.newType));
                 if(isRealNumber(data.newType))
@@ -5043,7 +5092,7 @@ Ph.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_Ph_SetHasCustomPrompt:
+            case AscDFH.historyitem_Ph_SetHasCustomPrompt:
             {
                 if(r.GetBool())
                 {
@@ -5055,7 +5104,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetIdx:
+            case AscDFH.historyitem_Ph_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -5074,7 +5123,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetOrient:
+            case AscDFH.historyitem_Ph_SetOrient:
             {
                 if(r.GetBool())
                 {
@@ -5086,7 +5135,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetSz:
+            case AscDFH.historyitem_Ph_SetSz:
             {
                 if(r.GetBool())
                 {
@@ -5098,7 +5147,7 @@ Ph.prototype =
                 }
                 break;
             }
-            case historyitem_Ph_SetType:
+            case AscDFH.historyitem_Ph_SetType:
             {
                 if(r.GetBool())
                 {
@@ -5147,24 +5196,24 @@ UniNvPr.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_UniNvPr;
+        return AscDFH.historyitem_type_UniNvPr;
     },
 
     setCNvPr: function(cNvPr)
     {
-        History.Add(this, {Type: historyitem_UniNvPr_SetCNvPr, oldCNvPr: this.cNvPr, newCNvPr: cNvPr});
+        History.Add(this, {Type: AscDFH.historyitem_UniNvPr_SetCNvPr, oldCNvPr: this.cNvPr, newCNvPr: cNvPr});
         this.cNvPr = cNvPr;
     },
 
     setUniPr: function(uniPr)
     {
-        History.Add(this, {Type: historyitem_UniNvPr_SetUniPr, oldUniPr: this.UniPr, newUniPr: uniPr});
+        History.Add(this, {Type: AscDFH.historyitem_UniNvPr_SetUniPr, oldUniPr: this.UniPr, newUniPr: uniPr});
         this.UniPr = uniPr;
     },
 
     setNvPr: function(nvPr)
     {
-        History.Add(this, {Type: historyitem_UniNvPr_SetNvPr, oldNvPr: this.nvPr, newNvPr: nvPr});
+        History.Add(this, {Type: AscDFH.historyitem_UniNvPr_SetNvPr, oldNvPr: this.nvPr, newNvPr: nvPr});
         this.nvPr = nvPr;
     },
 
@@ -5172,17 +5221,17 @@ UniNvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_UniNvPr_SetCNvPr:
+            case AscDFH.historyitem_UniNvPr_SetCNvPr:
             {
                 this.cNvPr = data.oldCNvPr;
                 break;
             }
-            case historyitem_UniNvPr_SetUniPr:
+            case AscDFH.historyitem_UniNvPr_SetUniPr:
             {
                 this.UniPr = data.oldUniPr;
                 break;
             }
-            case historyitem_UniNvPr_SetNvPr:
+            case AscDFH.historyitem_UniNvPr_SetNvPr:
             {
                 this.nvPr = data.oldNvPr;
                 break;
@@ -5194,17 +5243,17 @@ UniNvPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_UniNvPr_SetCNvPr:
+            case AscDFH.historyitem_UniNvPr_SetCNvPr:
             {
                 this.cNvPr = data.newCNvPr;
                 break;
             }
-            case historyitem_UniNvPr_SetUniPr:
+            case AscDFH.historyitem_UniNvPr_SetUniPr:
             {
                 this.UniPr = data.newUniPr;
                 break;
             }
-            case historyitem_UniNvPr_SetNvPr:
+            case AscDFH.historyitem_UniNvPr_SetNvPr:
             {
                 this.nvPr = data.newNvPr;
                 break;
@@ -5218,7 +5267,7 @@ UniNvPr.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_UniNvPr_SetCNvPr:
+            case AscDFH.historyitem_UniNvPr_SetCNvPr:
             {
                 w.WriteBool(isRealObject(data.newCNvPr));
                 if(isRealObject(data.newCNvPr))
@@ -5227,7 +5276,7 @@ UniNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_UniNvPr_SetUniPr:
+            case AscDFH.historyitem_UniNvPr_SetUniPr:
             {
                 w.WriteBool(isRealObject(data.newUniPr));
                 if(isRealObject(data.newUniPr))
@@ -5236,7 +5285,7 @@ UniNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_UniNvPr_SetNvPr:
+            case AscDFH.historyitem_UniNvPr_SetNvPr:
             {
                 w.WriteBool(isRealObject(data.newNvPr));
                 if(isRealObject(data.newNvPr))
@@ -5254,7 +5303,7 @@ UniNvPr.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_UniNvPr_SetCNvPr:
+            case AscDFH.historyitem_UniNvPr_SetCNvPr:
             {
                 if(r.GetBool())
                 {
@@ -5266,7 +5315,7 @@ UniNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_UniNvPr_SetUniPr:
+            case AscDFH.historyitem_UniNvPr_SetUniPr:
             {
                 if(r.GetBool())
                 {
@@ -5278,7 +5327,7 @@ UniNvPr.prototype =
                 }
                 break;
             }
-            case historyitem_UniNvPr_SetNvPr:
+            case AscDFH.historyitem_UniNvPr_SetNvPr:
             {
                 if(r.GetBool())
                 {
@@ -5353,18 +5402,18 @@ StyleRef.prototype =
 
     getObjectType: function()
     {
-        return  historyitem_type_StyleRef;
+        return  AscDFH.historyitem_type_StyleRef;
     },
 
     setIdx: function(idx)
     {
-        //History.Add(this, {Type: historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        //History.Add(this, {Type: AscDFH.historyitem_StyleRef_SetIdx, oldIdx:this.idx, newIdx: idx});
         this.idx= idx;
     },
 
     setColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
+        //History.Add(this, {Type: AscDFH.historyitem_StyleRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
     },
 
@@ -5384,12 +5433,12 @@ StyleRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_StyleRef_SetIdx:
+            case AscDFH.historyitem_StyleRef_SetIdx:
             {
                 this.idx = data.oldIdx;
                 break;
             }
-            case historyitem_StyleRef_SetColor:
+            case AscDFH.historyitem_StyleRef_SetColor:
             {
                 this.Color = data.oldColor;
                 break;
@@ -5401,12 +5450,12 @@ StyleRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_StyleRef_SetIdx:
+            case AscDFH.historyitem_StyleRef_SetIdx:
             {
                 this.idx = data.newIdx;
                 break;
             }
-            case historyitem_StyleRef_SetColor:
+            case AscDFH.historyitem_StyleRef_SetColor:
             {
                 this.Color = data.newColor;
                 break;
@@ -5420,7 +5469,7 @@ StyleRef.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_StyleRef_SetIdx:
+            case AscDFH.historyitem_StyleRef_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newIdx));
                 if(isRealNumber(data.newIdx))
@@ -5429,7 +5478,7 @@ StyleRef.prototype =
                 }
                 break;
             }
-            case historyitem_StyleRef_SetColor:
+            case AscDFH.historyitem_StyleRef_SetColor:
             {
                 w.WriteBool(isRealObject(data.newColor));
                 if(isRealObject(data.newColor))
@@ -5448,7 +5497,7 @@ StyleRef.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_StyleRef_SetIdx:
+            case AscDFH.historyitem_StyleRef_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -5460,7 +5509,7 @@ StyleRef.prototype =
                 }
                 break;
             }
-            case historyitem_StyleRef_SetColor:
+            case AscDFH.historyitem_StyleRef_SetColor:
             {
                 if(r.GetBool())
                 {
@@ -5509,13 +5558,9 @@ StyleRef.prototype =
     }
 };
 
-var fntStyleInd_none = 2;
-var fntStyleInd_major = 0;
-var fntStyleInd_minor = 1;
-
 function FontRef()
 {
-    this.idx = fntStyleInd_none;
+    this.idx = AscFormat.fntStyleInd_none;
     this.Color = null;//new CUniColor();
 
 
@@ -5535,18 +5580,18 @@ FontRef.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_FontRef;
+        return AscDFH.historyitem_type_FontRef;
     },
 
     setIdx: function(idx)
     {
-        //History.Add(this, {Type: historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
+        //History.Add(this, {Type: AscDFH.historyitem_FontRef_SetIdx, oldIdx:this.idx, newIdx: idx});
         this.idx= idx;
     },
 
     setColor: function(color)
     {
-        //History.Add(this, {Type: historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
+        //History.Add(this, {Type: AscDFH.historyitem_FontRef_SetColor, oldColor:this.Color, newColor: color});
         this.Color = color;
     },
 
@@ -5563,12 +5608,12 @@ FontRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontRef_SetIdx:
+            case AscDFH.historyitem_FontRef_SetIdx:
             {
                 this.idx = data.oldIdx;
                 break;
             }
-            case historyitem_FontRef_SetColor:
+            case AscDFH.historyitem_FontRef_SetColor:
             {
                 this.Color = data.oldColor;
                 break;
@@ -5580,12 +5625,12 @@ FontRef.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontRef_SetIdx:
+            case AscDFH.historyitem_FontRef_SetIdx:
             {
                 this.idx = data.newIdx;
                 break;
             }
-            case historyitem_FontRef_SetColor:
+            case AscDFH.historyitem_FontRef_SetColor:
             {
                 this.Color = data.newColor;
                 break;
@@ -5599,7 +5644,7 @@ FontRef.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_FontRef_SetIdx:
+            case AscDFH.historyitem_FontRef_SetIdx:
             {
                 w.WriteBool(isRealNumber(data.newIdx));
                 if(isRealNumber(data.newIdx))
@@ -5608,7 +5653,7 @@ FontRef.prototype =
                 }
                 break;
             }
-            case historyitem_FontRef_SetColor:
+            case AscDFH.historyitem_FontRef_SetColor:
             {
                 w.WriteBool(isRealObject(data.newColor));
                 if(isRealObject(data.newColor))
@@ -5627,7 +5672,7 @@ FontRef.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_FontRef_SetIdx:
+            case AscDFH.historyitem_FontRef_SetIdx:
             {
                 if(r.GetBool())
                 {
@@ -5639,7 +5684,7 @@ FontRef.prototype =
                 }
                 break;
             }
-            case historyitem_FontRef_SetColor:
+            case AscDFH.historyitem_FontRef_SetColor:
             {
                 if(r.GetBool())
                 {
@@ -5770,28 +5815,28 @@ CShapeStyle.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ShapeStyle;
+        return AscDFH.historyitem_type_ShapeStyle;
     },
 
     setLnRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeStyle_SetLnRef, oldPr: this.lnRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeStyle_SetLnRef, oldPr: this.lnRef, newPr: pr});
         this.lnRef = pr;
     },
     setFillRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeStyle_SetFillRef, oldPr: this.fillRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeStyle_SetFillRef, oldPr: this.fillRef, newPr: pr});
         this.fillRef = pr;
     },
     setFontRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeStyle_SetFontRef, oldPr: this.fontRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeStyle_SetFontRef, oldPr: this.fontRef, newPr: pr});
         this.fontRef = pr;
     },
 
     setEffectRef: function(pr)
     {
-        History.Add(this, {Type: historyitem_ShapeStyle_SetEffectRef, oldPr: this.effectRef, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ShapeStyle_SetEffectRef, oldPr: this.effectRef, newPr: pr});
         this.effectRef = pr;
     },
 
@@ -5799,22 +5844,22 @@ CShapeStyle.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ShapeStyle_SetLnRef:
+            case AscDFH.historyitem_ShapeStyle_SetLnRef:
             {
                 this.lnRef = data.oldPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetFillRef:
+            case AscDFH.historyitem_ShapeStyle_SetFillRef:
             {
                 this.fillRef = data.oldPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetFontRef:
+            case AscDFH.historyitem_ShapeStyle_SetFontRef:
             {
                 this.fontRef = data.oldPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetEffectRef:
+            case AscDFH.historyitem_ShapeStyle_SetEffectRef:
             {
                 this.effectRef = data.oldPr;
                 break;
@@ -5826,22 +5871,22 @@ CShapeStyle.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_ShapeStyle_SetLnRef:
+            case AscDFH.historyitem_ShapeStyle_SetLnRef:
             {
                 this.lnRef = data.newPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetFillRef:
+            case AscDFH.historyitem_ShapeStyle_SetFillRef:
             {
                 this.fillRef = data.newPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetFontRef:
+            case AscDFH.historyitem_ShapeStyle_SetFontRef:
             {
                 this.fontRef = data.newPr;
                 break;
             }
-            case historyitem_ShapeStyle_SetEffectRef:
+            case AscDFH.historyitem_ShapeStyle_SetEffectRef:
             {
                 this.effectRef = data.newPr;
                 break;
@@ -5854,10 +5899,10 @@ CShapeStyle.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ShapeStyle_SetLnRef:
-            case historyitem_ShapeStyle_SetFillRef:
-            case historyitem_ShapeStyle_SetFontRef:
-            case historyitem_ShapeStyle_SetEffectRef:
+            case AscDFH.historyitem_ShapeStyle_SetLnRef:
+            case AscDFH.historyitem_ShapeStyle_SetFillRef:
+            case AscDFH.historyitem_ShapeStyle_SetFontRef:
+            case AscDFH.historyitem_ShapeStyle_SetEffectRef:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -5874,7 +5919,7 @@ CShapeStyle.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_ShapeStyle_SetLnRef:
+            case AscDFH.historyitem_ShapeStyle_SetLnRef:
             {
                 if(r.GetBool())
                 {
@@ -5883,7 +5928,7 @@ CShapeStyle.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeStyle_SetFillRef:
+            case AscDFH.historyitem_ShapeStyle_SetFillRef:
             {
                 if(r.GetBool())
                 {
@@ -5892,7 +5937,7 @@ CShapeStyle.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeStyle_SetFontRef:
+            case AscDFH.historyitem_ShapeStyle_SetFontRef:
             {
                 if(r.GetBool())
                 {
@@ -5901,7 +5946,7 @@ CShapeStyle.prototype =
                 }
                 break;
             }
-            case historyitem_ShapeStyle_SetEffectRef:
+            case AscDFH.historyitem_ShapeStyle_SetEffectRef:
             {
                 if(r.GetBool())
                 {
@@ -5982,7 +6027,7 @@ function CreateDefaultShapeStyle(preset)
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(tx_color ? 15 : 12);
-    fontRef.setIdx(fntStyleInd_minor);
+    fontRef.setIdx(AscFormat.fntStyleInd_minor);
     fontRef.setColor(unicolor);
     style.setFontRef(fontRef);
     return style;
@@ -6021,7 +6066,7 @@ CXfrm.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Xfrm;
+        return AscDFH.historyitem_type_Xfrm;
     },
 
     Write_ToBinary2: function (w)
@@ -6143,84 +6188,84 @@ CXfrm.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_Xfrm_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setOffX: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetOffX, oldPr: this.offX, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetOffX, oldPr: this.offX, newPr: pr});
         this.offX = pr;
         this.handleUpdatePosition();
     },
     setOffY: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetOffY, oldPr: this.offY, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetOffY, oldPr: this.offY, newPr: pr});
         this.offY = pr;
         this.handleUpdatePosition();
     },
     setExtX: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetExtX, oldPr: this.extX, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetExtX, oldPr: this.extX, newPr: pr});
         this.extX = pr;
         this.handleUpdateExtents();
     },
     setExtY: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetExtY, oldPr: this.extY, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetExtY, oldPr: this.extY, newPr: pr});
         this.extY = pr;
         this.handleUpdateExtents();
     },
     setChOffX: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetChOffX, oldPr: this.chOffX, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetChOffX, oldPr: this.chOffX, newPr: pr});
         this.chOffX = pr;
         this.handleUpdateChildOffset();
     },
     setChOffY: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetChOffY, oldPr: this.chOffY, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetChOffY, oldPr: this.chOffY, newPr: pr});
         this.chOffY = pr;
         this.handleUpdateChildOffset();
     },
     setChExtX: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetChExtX, oldPr: this.chExtX, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetChExtX, oldPr: this.chExtX, newPr: pr});
         this.chExtX = pr;
         this.handleUpdateChildExtents();
     },
     setChExtY: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetChExtY, oldPr: this.chExtY, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetChExtY, oldPr: this.chExtY, newPr: pr});
         this.chExtY = pr;
         this.handleUpdateChildExtents();
     },
     setFlipH: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetFlipH, oldPr: this.flipH, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetFlipH, oldPr: this.flipH, newPr: pr});
         this.flipH = pr;
         this.handleUpdateFlip();
     },
     setFlipV: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetFlipV, oldPr: this.flipV, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetFlipV, oldPr: this.flipV, newPr: pr});
         this.flipV = pr;
         this.handleUpdateFlip();
     },
     setRot: function(pr)
     {
         this.checkFromSerialize();
-        History.Add(this, {Type: historyitem_Xfrm_SetRot, oldPr: this.rot, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_Xfrm_SetRot, oldPr: this.rot, newPr: pr});
         this.rot = pr;
         this.handleUpdateRot();
     },
@@ -6278,57 +6323,57 @@ CXfrm.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Xfrm_SetOffX:
+            case AscDFH.historyitem_Xfrm_SetOffX:
             {
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetOffY:
+            case AscDFH.historyitem_Xfrm_SetOffY:
             {
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetExtX:
+            case AscDFH.historyitem_Xfrm_SetExtX:
             {
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetExtY:
+            case AscDFH.historyitem_Xfrm_SetExtY:
             {
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChOffX:
+            case AscDFH.historyitem_Xfrm_SetChOffX:
             {
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChOffY:
+            case AscDFH.historyitem_Xfrm_SetChOffY:
             {
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChExtX:
+            case AscDFH.historyitem_Xfrm_SetChExtX:
             {
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChExtY:
+            case AscDFH.historyitem_Xfrm_SetChExtY:
             {
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetFlipH:
+            case AscDFH.historyitem_Xfrm_SetFlipH:
             {
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetFlipV:
+            case AscDFH.historyitem_Xfrm_SetFlipV:
             {
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetRot:
+            case AscDFH.historyitem_Xfrm_SetRot:
             {
                 this.handleUpdateRot();
                 break;
@@ -6341,72 +6386,72 @@ CXfrm.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Xfrm_SetParent:
+            case AscDFH.historyitem_Xfrm_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_Xfrm_SetOffX:
+            case AscDFH.historyitem_Xfrm_SetOffX:
             {
                 this.offX = data.oldPr;
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetOffY:
+            case AscDFH.historyitem_Xfrm_SetOffY:
             {
                 this.offY = data.oldPr;
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetExtX:
+            case AscDFH.historyitem_Xfrm_SetExtX:
             {
                 this.extX = data.oldPr;
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetExtY:
+            case AscDFH.historyitem_Xfrm_SetExtY:
             {
                 this.extY = data.oldPr;
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChOffX:
+            case AscDFH.historyitem_Xfrm_SetChOffX:
             {
                 this.chOffX = data.oldPr;
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChOffY:
+            case AscDFH.historyitem_Xfrm_SetChOffY:
             {
                 this.chOffY = data.oldPr;
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChExtX:
+            case AscDFH.historyitem_Xfrm_SetChExtX:
             {
                 this.chExtX = data.oldPr;
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChExtY:
+            case AscDFH.historyitem_Xfrm_SetChExtY:
             {
                 this.chExtY = data.oldPr;
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetFlipH:
+            case AscDFH.historyitem_Xfrm_SetFlipH:
             {
                 this.flipH = data.oldPr;
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetFlipV:
+            case AscDFH.historyitem_Xfrm_SetFlipV:
             {
                 this.flipV = data.oldPr;
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetRot:
+            case AscDFH.historyitem_Xfrm_SetRot:
             {
                 this.rot = data.oldPr;
                 this.handleUpdateRot();
@@ -6419,72 +6464,72 @@ CXfrm.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_Xfrm_SetParent:
+            case AscDFH.historyitem_Xfrm_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_Xfrm_SetOffX:
+            case AscDFH.historyitem_Xfrm_SetOffX:
             {
                 this.offX = data.newPr;
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetOffY:
+            case AscDFH.historyitem_Xfrm_SetOffY:
             {
                 this.offY = data.newPr;
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetExtX:
+            case AscDFH.historyitem_Xfrm_SetExtX:
             {
                 this.extX = data.newPr;
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetExtY:
+            case AscDFH.historyitem_Xfrm_SetExtY:
             {
                 this.extY = data.newPr;
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChOffX:
+            case AscDFH.historyitem_Xfrm_SetChOffX:
             {
                 this.chOffX = data.newPr;
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChOffY:
+            case AscDFH.historyitem_Xfrm_SetChOffY:
             {
                 this.chOffY = data.newPr;
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChExtX:
+            case AscDFH.historyitem_Xfrm_SetChExtX:
             {
                 this.chExtX = data.newPr;
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChExtY:
+            case AscDFH.historyitem_Xfrm_SetChExtY:
             {
                 this.chExtY = data.newPr;
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetFlipH:
+            case AscDFH.historyitem_Xfrm_SetFlipH:
             {
                 this.flipH = data.newPr;
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetFlipV:
+            case AscDFH.historyitem_Xfrm_SetFlipV:
             {
                 this.flipV = data.newPr;
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetRot:
+            case AscDFH.historyitem_Xfrm_SetRot:
             {
                 this.rot = data.newPr;
                 this.handleUpdateRot();
@@ -6498,27 +6543,27 @@ CXfrm.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_Xfrm_SetOffX:
-            case historyitem_Xfrm_SetOffY:
-            case historyitem_Xfrm_SetExtX:
-            case historyitem_Xfrm_SetExtY:
-            case historyitem_Xfrm_SetChOffX:
-            case historyitem_Xfrm_SetChOffY:
-            case historyitem_Xfrm_SetChExtX:
-            case historyitem_Xfrm_SetChExtY:
-            case historyitem_Xfrm_SetRot:
+            case AscDFH.historyitem_Xfrm_SetOffX:
+            case AscDFH.historyitem_Xfrm_SetOffY:
+            case AscDFH.historyitem_Xfrm_SetExtX:
+            case AscDFH.historyitem_Xfrm_SetExtY:
+            case AscDFH.historyitem_Xfrm_SetChOffX:
+            case AscDFH.historyitem_Xfrm_SetChOffY:
+            case AscDFH.historyitem_Xfrm_SetChExtX:
+            case AscDFH.historyitem_Xfrm_SetChExtY:
+            case AscDFH.historyitem_Xfrm_SetRot:
             {
                 writeDouble(w, data.newPr);
                 break;
             }
 
-            case historyitem_Xfrm_SetFlipH:
-            case historyitem_Xfrm_SetFlipV:
+            case AscDFH.historyitem_Xfrm_SetFlipH:
+            case AscDFH.historyitem_Xfrm_SetFlipV:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_Xfrm_SetParent:
+            case AscDFH.historyitem_Xfrm_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -6531,80 +6576,80 @@ CXfrm.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_Xfrm_SetOffX:
+            case AscDFH.historyitem_Xfrm_SetOffX:
             {
                 this.offX = readDouble(r);
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetOffY:
+            case AscDFH.historyitem_Xfrm_SetOffY:
             {
                 this.offY = readDouble(r);
                 this.handleUpdatePosition();
                 break;
             }
-            case historyitem_Xfrm_SetExtX:
+            case AscDFH.historyitem_Xfrm_SetExtX:
             {
                 this.extX = readDouble(r);
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetExtY:
+            case AscDFH.historyitem_Xfrm_SetExtY:
             {
                 this.extY = readDouble(r);
                 this.handleUpdateExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChOffX:
+            case AscDFH.historyitem_Xfrm_SetChOffX:
             {
                 this.chOffX = readDouble(r);
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChOffY:
+            case AscDFH.historyitem_Xfrm_SetChOffY:
             {
                 this.chOffY = readDouble(r);
                 this.handleUpdateChildOffset();
                 break;
             }
-            case historyitem_Xfrm_SetChExtX:
+            case AscDFH.historyitem_Xfrm_SetChExtX:
             {
                 this.chExtX = readDouble(r);
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetChExtY:
+            case AscDFH.historyitem_Xfrm_SetChExtY:
             {
                 this.chExtY = readDouble(r);
                 this.handleUpdateChildExtents();
                 break;
             }
-            case historyitem_Xfrm_SetFlipH:
+            case AscDFH.historyitem_Xfrm_SetFlipH:
             {
                 this.flipH = readBool(r);
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetFlipV:
+            case AscDFH.historyitem_Xfrm_SetFlipV:
             {
                 this.flipV = readBool(r);
                 this.handleUpdateFlip();
                 break;
             }
-            case historyitem_Xfrm_SetRot:
+            case AscDFH.historyitem_Xfrm_SetRot:
             {
                 this.rot = readDouble(r);
                 this.handleUpdateRot();
                 break;
             }
-            case historyitem_Xfrm_SetParent:
+            case AscDFH.historyitem_Xfrm_SetParent:
             {
                 this.parent = readObject(r);
                 break;
             }
         }
 
-        if(type ===  historyitem_Xfrm_SetOffX || type === historyitem_Xfrm_SetOffY)
+        if(type ===  AscDFH.historyitem_Xfrm_SetOffX || type === AscDFH.historyitem_Xfrm_SetOffY)
             return this;
     }
 };
@@ -6635,29 +6680,29 @@ CSpPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SpPr_SetParent:
+            case AscDFH.historyitem_SpPr_SetParent:
             {
                 break;
             }
-            case historyitem_SpPr_SetBwMode:
+            case AscDFH.historyitem_SpPr_SetBwMode:
             {
                 break;
             }
-            case historyitem_SpPr_SetXfrm:
+            case AscDFH.historyitem_SpPr_SetXfrm:
             {
                 break;
             }
-            case historyitem_SpPr_SetGeometry:
+            case AscDFH.historyitem_SpPr_SetGeometry:
             {
                 this.handleUpdateGeometry();
                 break;
             }
-            case historyitem_SpPr_SetFill:
+            case AscDFH.historyitem_SpPr_SetFill:
             {
                 this.handleUpdateFill();
                 break;
             }
-            case historyitem_SpPr_SetLn:
+            case AscDFH.historyitem_SpPr_SetLn:
             {
                 this.handleUpdateLn();
                 break;
@@ -6740,7 +6785,7 @@ CSpPr.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_SpPr;
+        return AscDFH.historyitem_type_SpPr;
     },
 
     Write_ToBinary2: function (w)
@@ -6764,32 +6809,32 @@ CSpPr.prototype =
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setBwMode: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetBwMode, oldPr: this.bwMode, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetBwMode, oldPr: this.bwMode, newPr: pr});
         this.bwMode = pr;
     },
 
     setXfrm: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetXfrm, oldPr: this.xfrm, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetXfrm, oldPr: this.xfrm, newPr: pr});
         this.xfrm = pr;
     },
 
     setGeometry: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetGeometry, oldPr: this.geometry, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetGeometry, oldPr: this.geometry, newPr: pr});
         this.geometry = pr;
         this.handleUpdateGeometry();
     },
 
     setFill: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetFill, oldPr: this.Fill, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetFill, oldPr: this.Fill, newPr: pr});
         this.Fill = pr;
         if(this.parent && this.parent.handleUpdateFill)
         {
@@ -6799,7 +6844,7 @@ CSpPr.prototype =
 
     setLn: function(pr)
     {
-        History.Add(this, {Type: historyitem_SpPr_SetLn, oldPr: this.ln, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_SpPr_SetLn, oldPr: this.ln, newPr: pr});
         this.ln = pr;
         if(this.parent && this.parent.handleUpdateLn)
         {
@@ -6884,34 +6929,34 @@ CSpPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SpPr_SetParent:
+            case AscDFH.historyitem_SpPr_SetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_SpPr_SetBwMode:
+            case AscDFH.historyitem_SpPr_SetBwMode:
             {
                 this.bwMode = data.oldPr;
                 break;
             }
-            case historyitem_SpPr_SetXfrm:
+            case AscDFH.historyitem_SpPr_SetXfrm:
             {
                 this.xfrm = data.oldPr;
                 break;
             }
-            case historyitem_SpPr_SetGeometry:
+            case AscDFH.historyitem_SpPr_SetGeometry:
             {
                 this.geometry = data.oldPr;
                 this.handleUpdateGeometry();
                 break;
             }
-            case historyitem_SpPr_SetFill:
+            case AscDFH.historyitem_SpPr_SetFill:
             {
                 this.Fill = data.oldPr;
                 this.handleUpdateFill();
                 break;
             }
-            case historyitem_SpPr_SetLn:
+            case AscDFH.historyitem_SpPr_SetLn:
             {
                 this.ln = data.oldPr;
                 this.handleUpdateLn();
@@ -6924,34 +6969,34 @@ CSpPr.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_SpPr_SetParent:
+            case AscDFH.historyitem_SpPr_SetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_SpPr_SetBwMode:
+            case AscDFH.historyitem_SpPr_SetBwMode:
             {
                 this.bwMode = data.newPr;
                 break;
             }
-            case historyitem_SpPr_SetXfrm:
+            case AscDFH.historyitem_SpPr_SetXfrm:
             {
                 this.xfrm = data.newPr;
                 break;
             }
-            case historyitem_SpPr_SetGeometry:
+            case AscDFH.historyitem_SpPr_SetGeometry:
             {
                 this.geometry = data.newPr;
                 this.handleUpdateGeometry();
                 break;
             }
-            case historyitem_SpPr_SetFill:
+            case AscDFH.historyitem_SpPr_SetFill:
             {
                 this.Fill = data.newPr;
                 this.handleUpdateFill();
                 break;
             }
-            case historyitem_SpPr_SetLn:
+            case AscDFH.historyitem_SpPr_SetLn:
             {
                 this.ln = data.newPr;
                 this.handleUpdateLn();
@@ -6965,20 +7010,20 @@ CSpPr.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_SpPr_SetBwMode:
+            case AscDFH.historyitem_SpPr_SetBwMode:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_SpPr_SetXfrm:
-            case historyitem_SpPr_SetGeometry:
-            case historyitem_SpPr_SetParent:
+            case AscDFH.historyitem_SpPr_SetXfrm:
+            case AscDFH.historyitem_SpPr_SetGeometry:
+            case AscDFH.historyitem_SpPr_SetParent:
             {
                 writeObject(w, data.newPr);
                 break;
             }
 
-            case historyitem_SpPr_SetFill:
+            case AscDFH.historyitem_SpPr_SetFill:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -6988,7 +7033,7 @@ CSpPr.prototype =
                 break;
             }
 
-            case historyitem_SpPr_SetLn:
+            case AscDFH.historyitem_SpPr_SetLn:
             {
                 w.WriteBool(isRealObject(data.newPr));
                 if(isRealObject(data.newPr))
@@ -7005,23 +7050,23 @@ CSpPr.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_SpPr_SetBwMode:
+            case AscDFH.historyitem_SpPr_SetBwMode:
             {
                 this.bwMode = readBool(r);
                 break;
             }
-            case historyitem_SpPr_SetXfrm:
+            case AscDFH.historyitem_SpPr_SetXfrm:
             {
                 this.xfrm = readObject(r);
                 break;
             }
-            case historyitem_SpPr_SetGeometry:
+            case AscDFH.historyitem_SpPr_SetGeometry:
             {
                 this.geometry = readObject(r);
                 this.handleUpdateGeometry();
                 break;
             }
-            case historyitem_SpPr_SetFill:
+            case AscDFH.historyitem_SpPr_SetFill:
             {
                 if(r.GetBool())
                 {
@@ -7029,11 +7074,11 @@ CSpPr.prototype =
                     this.Fill.Read_FromBinary(r);
 
 
-                    if(typeof CollaborativeEditing !== "undefined")
+                    if(typeof AscCommon.CollaborativeEditing !== "undefined")
                     {
                         if(this.Fill.fill && this.Fill.fill.type === c_oAscFill.FILL_TYPE_BLIP && typeof this.Fill.fill.RasterImageId === "string" && this.Fill.fill.RasterImageId.length > 0)
                         {
-							CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.Fill.fill.RasterImageId));
+                            AscCommon.CollaborativeEditing.Add_NewImage(AscCommon.getFullImageSrc2(this.Fill.fill.RasterImageId));
                         }
                     }
                 }
@@ -7045,7 +7090,7 @@ CSpPr.prototype =
                 break;
             }
 
-            case historyitem_SpPr_SetLn:
+            case AscDFH.historyitem_SpPr_SetLn:
             {
                 if(r.GetBool())
                 {
@@ -7060,7 +7105,7 @@ CSpPr.prototype =
                 break;
             }
 
-            case historyitem_SpPr_SetParent:
+            case AscDFH.historyitem_SpPr_SetParent:
             {
                 this.parent = readObject(r);
                 break;
@@ -7117,7 +7162,7 @@ ClrScheme.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_ClrScheme;
+        return AscDFH.historyitem_type_ClrScheme;
     },
 
     Write_ToBinary2: function (w)
@@ -7199,13 +7244,13 @@ ClrScheme.prototype =
 
     setName: function(name)
     {
-      //  History.Add(this, {Type: historyitem_ClrScheme_SetName, oldPr: this.name, newPr: name});
+      //  History.Add(this, {Type: AscDFH.historyitem_ClrScheme_SetName, oldPr: this.name, newPr: name});
         this.name = name;
     },
 
     addColor: function(index, color)
     {
-       // History.Add(this, {Type: historyitem_ClrScheme_AddClr, index: index, newColor: color, oldColor: this.colors[index]});
+       // History.Add(this, {Type: AscDFH.historyitem_ClrScheme_AddClr, index: index, newColor: color, oldColor: this.colors[index]});
         this.colors[index] = color;
     }/*,
 
@@ -7213,12 +7258,12 @@ ClrScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ClrScheme_SetName:
+            case AscDFH.historyitem_ClrScheme_SetName:
             {
                 this.name = data.oldPr;
                 break;
             }
-            case historyitem_ClrScheme_AddClr:
+            case AscDFH.historyitem_ClrScheme_AddClr:
             {
                 this.colors[data.index] = data.oldColor;
             }
@@ -7229,12 +7274,12 @@ ClrScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ClrScheme_SetName:
+            case AscDFH.historyitem_ClrScheme_SetName:
             {
                 this.name = data.newPr;
                 break;
             }
-            case historyitem_ClrScheme_AddClr:
+            case AscDFH.historyitem_ClrScheme_AddClr:
             {
                 this.colors[data.index] = data.newColor;
             }
@@ -7246,12 +7291,12 @@ ClrScheme.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ClrScheme_SetName:
+            case AscDFH.historyitem_ClrScheme_SetName:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_ClrScheme_AddClr:
+            case AscDFH.historyitem_ClrScheme_AddClr:
             {
                 writeLong(w, data.index);
                 writeObject(w, data.newColor);
@@ -7264,12 +7309,12 @@ ClrScheme.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_ClrScheme_SetName:
+            case AscDFH.historyitem_ClrScheme_SetName:
             {
                 this.name = readString(r);
                 break;
             }
-            case historyitem_ClrScheme_AddClr:
+            case AscDFH.historyitem_ClrScheme_AddClr:
             {
                 var index = readLong(r);
                 var color = readObject(r);
@@ -7339,7 +7384,7 @@ ClrMap.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ClrMap;
+        return AscDFH.historyitem_type_ClrMap;
     },
 
     Write_ToBinary2: function (w)
@@ -7355,7 +7400,7 @@ ClrMap.prototype =
 
     setClr: function(index, clr)
     {
-        History.Add(this, {Type: historyitem_ClrMap_SetClr, oldColor: this.color_map[index], newColor: clr, index: index});
+        History.Add(this, {Type: AscDFH.historyitem_ClrMap_SetClr, oldColor: this.color_map[index], newColor: clr, index: index});
         this.color_map[index] = clr;
     },
 
@@ -7363,7 +7408,7 @@ ClrMap.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ClrMap_SetClr:
+            case AscDFH.historyitem_ClrMap_SetClr:
             {
                 this.color_map[data.index] = data.oldColor;
                 break;
@@ -7375,7 +7420,7 @@ ClrMap.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ClrMap_SetClr:
+            case AscDFH.historyitem_ClrMap_SetClr:
             {
                 this.color_map[data.index] = data.newColor;
                 break;
@@ -7388,7 +7433,7 @@ ClrMap.prototype =
         w.WriteLong(data.Type);
         switch (data.Type)
         {
-            case historyitem_ClrMap_SetClr:
+            case AscDFH.historyitem_ClrMap_SetClr:
             {
                 writeLong(w, data.index);
                 writeLong(w, data.newColor);
@@ -7402,7 +7447,7 @@ ClrMap.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_ClrMap_SetClr:
+            case AscDFH.historyitem_ClrMap_SetClr:
             {
                 var index = readLong(r);
                 this.color_map[index] = readLong(r);
@@ -7432,18 +7477,18 @@ ExtraClrScheme.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_ExtraClrScheme;
+        return AscDFH.historyitem_type_ExtraClrScheme;
     },
 
     setClrScheme: function(pr)
     {
-        History.Add(this, {Type: historyitem_ExtraClrScheme_SetClrScheme, oldPr: this.clrScheme, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ExtraClrScheme_SetClrScheme, oldPr: this.clrScheme, newPr: pr});
         this.clrScheme = pr;
     },
 
     setClrMap: function(pr)
     {
-        History.Add(this, {Type: historyitem_ExtraClrScheme_SetClrMap, oldPr: this.clrMap, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_ExtraClrScheme_SetClrMap, oldPr: this.clrMap, newPr: pr});
         this.clrMap = pr;
     },
 
@@ -7452,12 +7497,12 @@ ExtraClrScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ExtraClrScheme_SetClrScheme:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrScheme:
             {
                 this.clrScheme = data.oldPr;
                 break;
             }
-            case historyitem_ExtraClrScheme_SetClrMap:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrMap:
             {
                 this.clrMap = data.oldPr;
                 break;
@@ -7470,12 +7515,12 @@ ExtraClrScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ExtraClrScheme_SetClrScheme:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrScheme:
             {
                 this.clrScheme = data.newPr;
                 break;
             }
-            case historyitem_ExtraClrScheme_SetClrMap:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrMap:
             {
                 this.clrMap = data.newPr;
                 break;
@@ -7488,8 +7533,8 @@ ExtraClrScheme.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_ExtraClrScheme_SetClrScheme:
-            case historyitem_ExtraClrScheme_SetClrMap:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrScheme:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrMap:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -7503,12 +7548,12 @@ ExtraClrScheme.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_ExtraClrScheme_SetClrScheme:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrScheme:
             {
                 this.clrScheme = readObject(r);
                 break;
             }
-            case historyitem_ExtraClrScheme_SetClrMap:
+            case AscDFH.historyitem_ExtraClrScheme_SetClrMap:
             {
                 this.clrMap = readObject(r);
                 break;
@@ -7555,19 +7600,19 @@ FontCollection.prototype =
 
     setFontScheme: function(fontScheme)
     {
-       // History.Add(this, {Type: historyitem_FontCollection_SetFontScheme, oldPr: this.fontScheme, newPr: fontScheme});
+       // History.Add(this, {Type: AscDFH.historyitem_FontCollection_SetFontScheme, oldPr: this.fontScheme, newPr: fontScheme});
         this.fontScheme = fontScheme;
     },
 
     getObjectType: function()
     {
-        return historyitem_type_FontCollection;
+        return AscDFH.historyitem_type_FontCollection;
     },
 
 
     setLatin: function(pr)
     {
-       // History.Add(this, {Type: historyitem_FontCollection_SetLatin, oldPr: this.latin, newPr: pr});
+       // History.Add(this, {Type: AscDFH.historyitem_FontCollection_SetLatin, oldPr: this.latin, newPr: pr});
         this.latin = pr;
         if(this.fontScheme)
             this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_LT);
@@ -7575,7 +7620,7 @@ FontCollection.prototype =
 
     setEA: function(pr)
     {
-      //  History.Add(this, {Type: historyitem_FontCollection_SetEA, oldPr: this.ea, newPr: pr});
+      //  History.Add(this, {Type: AscDFH.historyitem_FontCollection_SetEA, oldPr: this.ea, newPr: pr});
         this.ea = pr;
 
         if(this.fontScheme)
@@ -7584,7 +7629,7 @@ FontCollection.prototype =
 
     setCS: function(pr)
     {
-       // History.Add(this, {Type: historyitem_FontCollection_SetCS, oldPr: this.cs, newPr: pr});
+       // History.Add(this, {Type: AscDFH.historyitem_FontCollection_SetCS, oldPr: this.cs, newPr: pr});
         this.cs = pr;
         if(this.fontScheme)
             this.fontScheme.checkFromFontCollection(pr, this, FONT_REGION_CS);
@@ -7616,7 +7661,7 @@ FontCollection.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontCollection_SetLatin:
+            case AscDFH.historyitem_FontCollection_SetLatin:
             {
                 this.latin = data.oldPr;
 
@@ -7624,7 +7669,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_LT);
                 break;
             }
-            case historyitem_FontCollection_SetEA:
+            case AscDFH.historyitem_FontCollection_SetEA:
             {
                 this.ea = data.oldPr;
 
@@ -7632,7 +7677,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_EA);
                 break;
             }
-            case historyitem_FontCollection_SetCS:
+            case AscDFH.historyitem_FontCollection_SetCS:
             {
                 this.cs = data.oldPr;
 
@@ -7640,7 +7685,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.oldPr, this, FONT_REGION_CS);
                 break;
             }
-            case historyitem_FontCollection_SetFontScheme:
+            case AscDFH.historyitem_FontCollection_SetFontScheme:
             {
                 this.fontScheme = data.oldPr;
 
@@ -7654,7 +7699,7 @@ FontCollection.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontCollection_SetLatin:
+            case AscDFH.historyitem_FontCollection_SetLatin:
             {
                 this.latin = data.newPr;
 
@@ -7662,7 +7707,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_LT);
                 break;
             }
-            case historyitem_FontCollection_SetEA:
+            case AscDFH.historyitem_FontCollection_SetEA:
             {
                 this.ea = data.newPr;
 
@@ -7670,7 +7715,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_EA);
                 break;
             }
-            case historyitem_FontCollection_SetCS:
+            case AscDFH.historyitem_FontCollection_SetCS:
             {
                 this.cs = data.newPr;
 
@@ -7679,7 +7724,7 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(data.newPr, this, FONT_REGION_CS);
                 break;
             }
-            case historyitem_FontCollection_SetFontScheme:
+            case AscDFH.historyitem_FontCollection_SetFontScheme:
             {
                 this.fontScheme = data.newPr;
                 break;
@@ -7692,14 +7737,14 @@ FontCollection.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_FontCollection_SetLatin:
-            case historyitem_FontCollection_SetEA:
-            case historyitem_FontCollection_SetCS:
+            case AscDFH.historyitem_FontCollection_SetLatin:
+            case AscDFH.historyitem_FontCollection_SetEA:
+            case AscDFH.historyitem_FontCollection_SetCS:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_FontCollection_SetFontScheme:
+            case AscDFH.historyitem_FontCollection_SetFontScheme:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -7712,7 +7757,7 @@ FontCollection.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_FontCollection_SetLatin:
+            case AscDFH.historyitem_FontCollection_SetLatin:
             {
                 this.latin = readString(r);
 
@@ -7721,14 +7766,14 @@ FontCollection.prototype =
                     this.fontScheme.checkFromFontCollection(this.latin, this, FONT_REGION_LT);
                 break;
             }
-            case historyitem_FontCollection_SetEA:
+            case AscDFH.historyitem_FontCollection_SetEA:
             {
                 this.ea = readString(r);
                 if(this.fontScheme)
                     this.fontScheme.checkFromFontCollection(this.ea, this, FONT_REGION_EA);
                 break;
             }
-            case historyitem_FontCollection_SetCS:
+            case AscDFH.historyitem_FontCollection_SetCS:
             {
                 this.cs = readString(r);
                 if(this.fontScheme)
@@ -7736,7 +7781,7 @@ FontCollection.prototype =
                 break;
             }
 
-            case historyitem_FontCollection_SetFontScheme:
+            case AscDFH.historyitem_FontCollection_SetFontScheme:
             {
                 this.fontScheme = readObject(r);
                 break;
@@ -7889,24 +7934,24 @@ FontScheme.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_FontScheme;
+        return AscDFH.historyitem_type_FontScheme;
     },
 
 
     setName: function(pr)
     {
-       // History.Add(this, {Type: historyitem_FontScheme_SetName, oldPr: this.name, newPr: pr});
+       // History.Add(this, {Type: AscDFH.historyitem_FontScheme_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
 
     setMajorFont: function(pr)
     {
-        //History.Add(this, {Type: historyitem_FontScheme_SetMajorFont, oldPr: this.majorFont, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_FontScheme_SetMajorFont, oldPr: this.majorFont, newPr: pr});
         this.majorFont = pr;
     },
     setMinorFont: function(pr)
     {
-       // History.Add(this, {Type: historyitem_FontScheme_SetMinorFont, oldPr: this.minorFont, newPr: pr});
+       // History.Add(this, {Type: AscDFH.historyitem_FontScheme_SetMinorFont, oldPr: this.minorFont, newPr: pr});
         this.minorFont = pr;
     },
 
@@ -7914,17 +7959,17 @@ FontScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontScheme_SetName:
+            case AscDFH.historyitem_FontScheme_SetName:
             {
                 this.name = data.oldPr;
                 break;
             }
-            case historyitem_FontScheme_SetMajorFont:
+            case AscDFH.historyitem_FontScheme_SetMajorFont:
             {
                 this.majorFont = data.oldPr;
                 break;
             }
-            case historyitem_FontScheme_SetMinorFont:
+            case AscDFH.historyitem_FontScheme_SetMinorFont:
             {
                 this.minorFont = data.oldPr;
                 break;
@@ -7936,17 +7981,17 @@ FontScheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_FontScheme_SetName:
+            case AscDFH.historyitem_FontScheme_SetName:
             {
                 this.name = data.newPr;
                 break;
             }
-            case historyitem_FontScheme_SetMajorFont:
+            case AscDFH.historyitem_FontScheme_SetMajorFont:
             {
                 this.majorFont = data.newPr;
                 break;
             }
-            case historyitem_FontScheme_SetMinorFont:
+            case AscDFH.historyitem_FontScheme_SetMinorFont:
             {
                 this.minorFont = data.newPr;
                 break;
@@ -7959,13 +8004,13 @@ FontScheme.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_FontScheme_SetName:
+            case AscDFH.historyitem_FontScheme_SetName:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_FontScheme_SetMajorFont:
-            case historyitem_FontScheme_SetMinorFont:
+            case AscDFH.historyitem_FontScheme_SetMajorFont:
+            case AscDFH.historyitem_FontScheme_SetMinorFont:
             {
                 writeObject(w, data.newPr);
                 this.majorFont = data.newPr;
@@ -7978,17 +8023,17 @@ FontScheme.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_FontScheme_SetName:
+            case AscDFH.historyitem_FontScheme_SetName:
             {
                 this.name = readString(r);
                 break;
             }
-            case historyitem_FontScheme_SetMajorFont:
+            case AscDFH.historyitem_FontScheme_SetMajorFont:
             {
                 this.majorFont = readObject(r);
                 break;
             }
-            case historyitem_FontScheme_SetMinorFont:
+            case AscDFH.historyitem_FontScheme_SetMinorFont:
             {
                 this.minorFont = readObject(r);
                 break;
@@ -8045,7 +8090,7 @@ FmtScheme.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_FormatScheme;
+        return AscDFH.historyitem_type_FormatScheme;
     },
     Write_ToBinary2: function (w)
     {
@@ -8128,27 +8173,27 @@ FmtScheme.prototype =
 
     setName: function(pr)
     {
-       // History.Add(this, {Type:historyitem_FormatScheme_SetName, oldPr: this.name, newPr: pr});
+       // History.Add(this, {Type:AscDFH.historyitem_FormatScheme_SetName, oldPr: this.name, newPr: pr});
         this.name = pr;
     },
     addFillToStyleLst: function(pr)
     {
-      // History.Add(this, {Type:historyitem_FormatScheme_AddFillToStyleLst, pr: pr});
+      // History.Add(this, {Type:AscDFH.historyitem_FormatScheme_AddFillToStyleLst, pr: pr});
         this.fillStyleLst.push(pr);
     },
     addLnToStyleLst: function(pr)
     {
-      //  History.Add(this, {Type:historyitem_FormatScheme_AddLnToStyleLst, pr: pr});
+      //  History.Add(this, {Type:AscDFH.historyitem_FormatScheme_AddLnToStyleLst, pr: pr});
         this.lnStyleLst.push(pr);
     },
     addEffectToStyleLst: function(pr)
     {
-      //  History.Add(this, {Type:historyitem_FormatScheme_AddEffectToStyleLst, pr: pr});
+      //  History.Add(this, {Type:AscDFH.historyitem_FormatScheme_AddEffectToStyleLst, pr: pr});
         this.effectStyleLst.push(pr);
     },
     addBgFillToStyleLst: function(pr)
     {
-        //History.Add(this, {Type:historyitem_FormatScheme_AddBgFillToStyleLst, pr: pr});
+        //History.Add(this, {Type:AscDFH.historyitem_FormatScheme_AddBgFillToStyleLst, pr: pr});
         this.bgFillStyleLst.push(pr);
     }/*,
 
@@ -8156,12 +8201,12 @@ FmtScheme.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_FormatScheme_SetName:
+            case AscDFH.historyitem_FormatScheme_SetName:
             {
                 this.name = data.oldPr;
                 break;
             }
-            case historyitem_FormatScheme_SetFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetFillStyleLst:
             {
                 for(var i = this.fillStyleLst.length - 1; i > -1; --i)
                 {
@@ -8173,7 +8218,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetLnStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetLnStyleLst:
             {
                 for(var i = this.lnStyleLst.length - 1; i > -1; --i)
                 {
@@ -8185,7 +8230,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetEffectStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetEffectStyleLst:
             {
                 for(var i = this.effectStyleLst.length - 1; i > -1; --i)
                 {
@@ -8197,7 +8242,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetBgFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetBgFillStyleLst:
             {
                 for(var i = this.bgFillStyleLst.length - 1; i > -1; --i)
                 {
@@ -8216,27 +8261,27 @@ FmtScheme.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_FormatScheme_SetName:
+            case AscDFH.historyitem_FormatScheme_SetName:
             {
                 this.name = data.newPr;
                 break;
             }
-            case historyitem_FormatScheme_SetFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetFillStyleLst:
             {
                 this.fillStyleLst.push(data.pr);
                 break;
             }
-            case historyitem_FormatScheme_SetLnStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetLnStyleLst:
             {
                 this.lnStyleLst.push(data.pr);
                 break;
             }
-            case historyitem_FormatScheme_SetEffectStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetEffectStyleLst:
             {
                 this.effectStyleLst.push(data.pr);
                 break;
             }
-            case historyitem_FormatScheme_SetBgFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetBgFillStyleLst:
             {
                 this.bgFillStyleLst.push(data.pr);
                 break;
@@ -8249,15 +8294,15 @@ FmtScheme.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_FormatScheme_SetName:
+            case AscDFH.historyitem_FormatScheme_SetName:
             {
                 writeString(w, data.newPr);
                 break;
             }
-            case historyitem_FormatScheme_SetFillStyleLst:
-            case historyitem_FormatScheme_SetLnStyleLst:
-            case historyitem_FormatScheme_SetEffectStyleLst:
-            case historyitem_FormatScheme_SetBgFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetLnStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetEffectStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetBgFillStyleLst:
             {
                 writeObject(w, data.pr);
                 break;
@@ -8270,12 +8315,12 @@ FmtScheme.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_FormatScheme_SetName:
+            case AscDFH.historyitem_FormatScheme_SetName:
             {
                 this.name = readString(r);
                 break;
             }
-            case historyitem_FormatScheme_SetFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetFillStyleLst:
             {
                 var pr = readObject(r);
                 if(isRealObject(pr))
@@ -8284,7 +8329,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetLnStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetLnStyleLst:
             {
                 var pr = readObject(r);
                 if(isRealObject(pr))
@@ -8293,7 +8338,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetEffectStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetEffectStyleLst:
             {
                 var pr = readObject(r);
                 if(isRealObject(pr))
@@ -8302,7 +8347,7 @@ FmtScheme.prototype =
                 }
                 break;
             }
-            case historyitem_FormatScheme_SetBgFillStyleLst:
+            case AscDFH.historyitem_FormatScheme_SetBgFillStyleLst:
             {
                 var pr = readObject(r);
                 if(isRealObject(pr))
@@ -8376,7 +8421,7 @@ CTheme.prototype =
     {
         if(idx === 0 || idx === 1000)
         {
-            return CreateNoFillUniFill();
+            return AscFormat.CreateNoFillUniFill();
         }
         var ret;
         if (idx >= 1 && idx <= 999)
@@ -8422,19 +8467,19 @@ CTheme.prototype =
 
     changeColorScheme: function(clrScheme)
     {
-        History.Add(this, {Type: historyitem_ThemeSetColorScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
+        History.Add(this, {Type: AscDFH.historyitem_ThemeSetColorScheme, oldPr: this.themeElements.clrScheme, newPr: clrScheme});
         this.themeElements.clrScheme = clrScheme;
     },
 
     setFontScheme: function(fontScheme)
     {
-        History.Add(this, {Type: historyitem_ThemeSetFontScheme, oldPr: this.themeElements.fontScheme, newPr: fontScheme});
+        History.Add(this, {Type: AscDFH.historyitem_ThemeSetFontScheme, oldPr: this.themeElements.fontScheme, newPr: fontScheme});
         this.themeElements.fontScheme = fontScheme;
     },
 
     setFormatScheme: function(fmtScheme)
     {
-        History.Add(this, {Type: historyitem_ThemeSetFmtScheme, oldPr: this.themeElements.fmtScheme, newPr: fmtScheme});
+        History.Add(this, {Type: AscDFH.historyitem_ThemeSetFmtScheme, oldPr: this.themeElements.fmtScheme, newPr: fmtScheme});
         this.themeElements.fmtScheme = fmtScheme;
     },
 
@@ -8446,18 +8491,18 @@ CTheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ThemeSetColorScheme:
+            case AscDFH.historyitem_ThemeSetColorScheme:
             {
                 this.themeElements.clrScheme = data.oldPr;
                 break;
             }
-            case historyitem_ThemeSetFontScheme:
+            case AscDFH.historyitem_ThemeSetFontScheme:
             {
                 this.themeElements.fontScheme = data.oldPr;
                 break;
             }
 
-            case historyitem_ThemeSetFmtScheme:
+            case AscDFH.historyitem_ThemeSetFmtScheme:
             {
                 this.themeElements.fmtScheme = data.oldPr;
                 break;
@@ -8469,18 +8514,18 @@ CTheme.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_ThemeSetColorScheme:
+            case AscDFH.historyitem_ThemeSetColorScheme:
             {
                 this.themeElements.clrScheme = data.newPr;
                 break;
             }
-            case historyitem_ThemeSetFontScheme:
+            case AscDFH.historyitem_ThemeSetFontScheme:
             {
                 this.themeElements.fontScheme = data.newPr;
                 break;
             }
 
-            case historyitem_ThemeSetFmtScheme:
+            case AscDFH.historyitem_ThemeSetFmtScheme:
             {
                 this.themeElements.fmtScheme = data.newPr;
                 break;
@@ -8490,12 +8535,12 @@ CTheme.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Theme;
+        return AscDFH.historyitem_type_Theme;
     },
 
     Write_ToBinary2: function(w)
     {
-        w.WriteLong(historyitem_type_Theme);
+        w.WriteLong(AscDFH.historyitem_type_Theme);
         w.WriteString2(this.Id);
     },
 
@@ -8506,13 +8551,13 @@ CTheme.prototype =
 
     Save_Changes: function(data, w)
     {
-        w.WriteLong(historyitem_type_Theme);
+        w.WriteLong(AscDFH.historyitem_type_Theme);
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_ThemeSetColorScheme:
-            case historyitem_ThemeSetFontScheme:
-            case historyitem_ThemeSetFmtScheme:
+            case AscDFH.historyitem_ThemeSetColorScheme:
+            case AscDFH.historyitem_ThemeSetFontScheme:
+            case AscDFH.historyitem_ThemeSetFmtScheme:
             {
                 data.newPr.Write_ToBinary(w);
                 break;
@@ -8522,24 +8567,24 @@ CTheme.prototype =
 
     Load_Changes: function(r)
     {
-        if(r.GetLong() === historyitem_type_Theme)
+        if(r.GetLong() === AscDFH.historyitem_type_Theme)
         {
             var type = r.GetLong();
             switch(type)
             {
-                case historyitem_ThemeSetColorScheme:
+                case AscDFH.historyitem_ThemeSetColorScheme:
                 {
                     this.themeElements.clrScheme = new ClrScheme();
                     this.themeElements.clrScheme.Read_FromBinary(r);
                     break;
                 }
-                case historyitem_ThemeSetFontScheme:
+                case AscDFH.historyitem_ThemeSetFontScheme:
                 {
                     this.themeElements.fontScheme = new FontScheme();
                     this.themeElements.fontScheme.Read_FromBinary(r);
                     break;
                 }
-                case historyitem_ThemeSetFmtScheme:
+                case AscDFH.historyitem_ThemeSetFmtScheme:
                 {
                     this.themeElements.fmtScheme = new FmtScheme();
                     this.themeElements.fmtScheme.Read_FromBinary(r);
@@ -8577,27 +8622,27 @@ HF.prototype =
     {},
     getObjectType: function()
     {
-        return historyitem_type_HF;
+        return AscDFH.historyitem_type_HF;
     },
 
     setDt: function(pr)
     {
-        History.Add(this, {Type: historyitem_HF_SetDt, oldPr: this.dt, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HF_SetDt, oldPr: this.dt, newPr: pr});
         this.dt = pr;
     },
     setFtr: function(pr)
     {
-        History.Add(this, {Type: historyitem_HF_SetFtr, oldPr: this.ftr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HF_SetFtr, oldPr: this.ftr, newPr: pr});
         this.ftr = pr;
     },
     setHdr: function(pr)
     {
-        History.Add(this, {Type: historyitem_HF_SetHdr, oldPr: this.hdr, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HF_SetHdr, oldPr: this.hdr, newPr: pr});
         this.hdr = pr;
     },
     setSldNum: function(pr)
     {
-        History.Add(this, {Type: historyitem_HF_SetSldNum, oldPr: this.sldNum, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_HF_SetSldNum, oldPr: this.sldNum, newPr: pr});
         this.sldNum = pr;
     },
 
@@ -8605,22 +8650,22 @@ HF.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_HF_SetDt:
+            case AscDFH.historyitem_HF_SetDt:
             {
                 this.dt = data.oldPr;
                 break;
             }
-            case historyitem_HF_SetFtr:
+            case AscDFH.historyitem_HF_SetFtr:
             {
                 this.ftr = data.oldPr;
                 break;
             }
-            case historyitem_HF_SetHdr:
+            case AscDFH.historyitem_HF_SetHdr:
             {
                 this.hdr = data.oldPr;
                 break;
             }
-            case historyitem_HF_SetSldNum:
+            case AscDFH.historyitem_HF_SetSldNum:
             {
                 this.sldNum = data.oldPr;
                 break;
@@ -8633,22 +8678,22 @@ HF.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_HF_SetDt:
+            case AscDFH.historyitem_HF_SetDt:
             {
                 this.dt = data.newPr;
                 break;
             }
-            case historyitem_HF_SetFtr:
+            case AscDFH.historyitem_HF_SetFtr:
             {
                 this.ftr = data.newPr;
                 break;
             }
-            case historyitem_HF_SetHdr:
+            case AscDFH.historyitem_HF_SetHdr:
             {
                 this.hdr = data.newPr;
                 break;
             }
-            case historyitem_HF_SetSldNum:
+            case AscDFH.historyitem_HF_SetSldNum:
             {
                 this.sldNum = data.newPr;
                 break;
@@ -8662,10 +8707,10 @@ HF.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_HF_SetDt:
-            case historyitem_HF_SetFtr:
-            case historyitem_HF_SetHdr:
-            case historyitem_HF_SetSldNum:
+            case AscDFH.historyitem_HF_SetDt:
+            case AscDFH.historyitem_HF_SetFtr:
+            case AscDFH.historyitem_HF_SetHdr:
+            case AscDFH.historyitem_HF_SetSldNum:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -8678,22 +8723,22 @@ HF.prototype =
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_HF_SetDt:
+            case AscDFH.historyitem_HF_SetDt:
             {
                 this.dt = readBool(r);
                 break;
             }
-            case historyitem_HF_SetFtr:
+            case AscDFH.historyitem_HF_SetFtr:
             {
                 this.ftr = readBool(r);
                 break;
             }
-            case historyitem_HF_SetHdr:
+            case AscDFH.historyitem_HF_SetHdr:
             {
                 this.hdr = readBool(r);
                 break;
             }
-            case historyitem_HF_SetSldNum:
+            case AscDFH.historyitem_HF_SetSldNum:
             {
                 this.sldNum = readBool(r);
                 break;
@@ -8756,18 +8801,18 @@ CBgPr.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_BgPr;
+        return AscDFH.historyitem_type_BgPr;
     },
 
     setFill: function(pr)
     {
-        //History.Add(this, {Type: historyitem_BgPr_SetFill, oldPr: this.Fill, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_BgPr_SetFill, oldPr: this.Fill, newPr: pr});
         this.Fill = pr;
     },
 
     setShadeToTitle: function(pr)
     {
-        //History.Add(this, {Type: historyitem_BgPr_SetShadeToTitle, oldPr: this.shadeToTitle, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_BgPr_SetShadeToTitle, oldPr: this.shadeToTitle, newPr: pr});
         this.shadeToTitle = pr;
     },
 
@@ -8795,12 +8840,12 @@ CBgPr.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_BgPr_SetFill:
+            case AscDFH.historyitem_BgPr_SetFill:
             {
                 this.Fill = data.oldPr;
                 break;
             }
-            case historyitem_BgPr_SetShadeToTitle:
+            case AscDFH.historyitem_BgPr_SetShadeToTitle:
             {
                 this.shadeToTitle = data.oldPr;
                 break;
@@ -8812,12 +8857,12 @@ CBgPr.prototype =
     {
         switch (data.Type)
         {
-            case historyitem_BgPr_SetFill:
+            case AscDFH.historyitem_BgPr_SetFill:
             {
                 this.Fill = data.newPr;
                 break;
             }
-            case historyitem_BgPr_SetShadeToTitle:
+            case AscDFH.historyitem_BgPr_SetShadeToTitle:
             {
                 this.shadeToTitle = data.newPr;
                 break;
@@ -8830,12 +8875,12 @@ CBgPr.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_BgPr_SetFill:
+            case AscDFH.historyitem_BgPr_SetFill:
             {
                 writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_BgPr_SetShadeToTitle:
+            case AscDFH.historyitem_BgPr_SetShadeToTitle:
             {
                 writeBool(w, data.newPr);
                 break;
@@ -8848,12 +8893,12 @@ CBgPr.prototype =
         var type = r.GetLong();
         switch (type)
         {
-            case historyitem_BgPr_SetFill:
+            case AscDFH.historyitem_BgPr_SetFill:
             {
                 this.Fill = readObject(r);
                 break;
             }
-            case historyitem_BgPr_SetShadeToTitle:
+            case AscDFH.historyitem_BgPr_SetShadeToTitle:
             {
                 this.shadeToTitle = readBool(r);
                 break;
@@ -8892,17 +8937,17 @@ CBg.prototype =
 
     setBwMode: function(pr)
     {
-        //History.Add(this, {Type: historyitem_BgSetBwMode, oldPr: this.bwMode, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_BgSetBwMode, oldPr: this.bwMode, newPr: pr});
         this.bwMode = pr;
     },
     setBgPr: function(pr)
     {
-        //History.Add(this, {Type: historyitem_BgSetBgPr, oldPr: this.bgPr, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_BgSetBgPr, oldPr: this.bgPr, newPr: pr});
         this.bgPr = pr;
     },
     setBgRef: function(pr)
     {
-        //History.Add(this, {Type: historyitem_BgSetBgRef, oldPr: this.bgRef, newPr: pr});
+        //History.Add(this, {Type: AscDFH.historyitem_BgSetBgRef, oldPr: this.bgRef, newPr: pr});
         this.bgRef = pr;
     },
 
@@ -8965,17 +9010,17 @@ CBg.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_BgSetBwMode:
+            case AscDFH.historyitem_BgSetBwMode:
             {
                 this.bwMode = data.oldPr;
                 break;
             }
-            case historyitem_BgSetBgPr:
+            case AscDFH.historyitem_BgSetBgPr:
             {
                 this.bgPr = data.oldPr;
                 break;
             }
-            case historyitem_BgSetBgRef:
+            case AscDFH.historyitem_BgSetBgRef:
             {
                 this.bgRef = data.oldPr;
                 break;
@@ -8987,17 +9032,17 @@ CBg.prototype =
     {
         switch(data.Type)
         {
-            case historyitem_BgSetBwMode:
+            case AscDFH.historyitem_BgSetBwMode:
             {
                 this.bwMode = data.newPr;
                 break;
             }
-            case historyitem_BgSetBgPr:
+            case AscDFH.historyitem_BgSetBgPr:
             {
                 this.bgPr = data.newPr;
                 break;
             }
-            case historyitem_BgSetBgRef:
+            case AscDFH.historyitem_BgSetBgRef:
             {
                 this.bgRef = data.newPr;
                 break;
@@ -9010,13 +9055,13 @@ CBg.prototype =
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_BgSetBwMode:
+            case AscDFH.historyitem_BgSetBwMode:
             {
                 writeBool(w, data.newPr);
                 break;
             }
-            case historyitem_BgSetBgPr:
-            case historyitem_BgSetBgRef:
+            case AscDFH.historyitem_BgSetBgPr:
+            case AscDFH.historyitem_BgSetBgRef:
             {
                 writeObject(w, data.newPr);
                 break;
@@ -9026,7 +9071,7 @@ CBg.prototype =
 
     getObjectType: function()
     {
-        return historyitem_type_Bg;
+        return AscDFH.historyitem_type_Bg;
     }
 };
 
@@ -9184,9 +9229,7 @@ var nSldLtTVertTitleAndTx          = 33; //Vertical Title and Text)
 var nSldLtTVertTitleAndTxOverChart = 34; //Vertical Title and Text Over Chart)
 var nSldLtTVertTx                  = 35; //Vertical Text)
 
-
-
-
+var _ph_multiplier = 4;
 
 var _weight_body = 9;
 var _weight_chart = 5;
@@ -9199,8 +9242,6 @@ var _weight_pic = 7;
 var _weight_subTitle = 10;
 var _weight_tbl = 6;
 var _weight_title = 11;
-
-var _ph_multiplier = 4;
 
 var _ph_summ_blank = 0;
 var _ph_summ_chart = Math.pow(_ph_multiplier, _weight_title) + Math.pow(_ph_multiplier, _weight_chart);
@@ -9429,15 +9470,6 @@ CTextFit.prototype =
     {}
 };
 
-// ----------------------------------
-
-
-var VERTICAL_ANCHOR_TYPE_BOTTOM = 0;
-var VERTICAL_ANCHOR_TYPE_CENTER = 1;
-var VERTICAL_ANCHOR_TYPE_DISTRIBUTED = 2;
-var VERTICAL_ANCHOR_TYPE_JUSTIFIED = 3;
-var VERTICAL_ANCHOR_TYPE_TOP = 4;
-
 //Overflow Types
 var nOTClip     = 0;
 var nOTEllipsis = 1;
@@ -9450,23 +9482,6 @@ var nTextATCtr = 1;// (Text Anchor Enum ( Center ))
 var nTextATDist = 2;// (Text Anchor Enum ( Distributed ))
 var nTextATJust = 3;// (Text Anchor Enum ( Justified ))
 var nTextATT = 4;// Top
-
-//Vertical Text Types
-var nVertTTeaVert          = 0; //( ( East Asian Vertical ))
-var nVertTThorz            = 1; //( ( Horizontal ))
-var nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
-var nVertTTvert            = 3; //( ( Vertical ))
-var nVertTTvert270         = 4;//( ( Vertical 270 ))
-var nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
-var nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
-//-------------------------------------------------------------------
-//Text Wrapping Types
-var nTWTNone   = 0;
-var nTWTSquare = 1;
-
-var text_fit_No         = 0;
-var text_fit_Auto       = 1;
-var text_fit_NormAuto   = 2;
 
 function CBodyPr()
 {
@@ -9606,7 +9621,7 @@ CBodyPr.prototype =
         ExecuteNoHistory(function(){
             if(r.GetBool())
             {
-                this.prstTxWarp = CreatePrstTxWarpGeometry(readString(r));
+                this.prstTxWarp = AscFormat.CreatePrstTxWarpGeometry(readString(r));
                 var count = r.GetLong();
                 for(var i = 0; i < count; ++i)
                 {
@@ -9942,9 +9957,9 @@ CBodyPr.prototype =
         this.spcFirstLastPara = null;
         this.tIns           = 45720/36000;
         this.upright        = false;
-        this.vert           = nVertTThorz;
+        this.vert           = AscFormat.nVertTThorz;
         this.vertOverflow   = nOTOwerflow;
-        this.wrap           = nTWTSquare;
+        this.wrap           = AscFormat.nTWTSquare;
         this.prstTxWarp     = null;
     },
 
@@ -10613,13 +10628,9 @@ CBullet.prototype =
 
 };
 
-var BULLET_TYPE_COLOR_NONE	= 0;
-var BULLET_TYPE_COLOR_CLRTX	= 1;
-var BULLET_TYPE_COLOR_CLR	= 2;
-
 function CBulletColor()
 {
-    this.type = BULLET_TYPE_COLOR_NONE;
+    this.type = AscFormat.BULLET_TYPE_COLOR_NONE;
     this.UniColor = null;
 
 }
@@ -10683,14 +10694,9 @@ CBulletColor.prototype =
     }
 };
 
-var BULLET_TYPE_SIZE_NONE	= 0;
-var BULLET_TYPE_SIZE_TX		= 1;
-var BULLET_TYPE_SIZE_PCT	= 2;
-var BULLET_TYPE_SIZE_PTS	= 3;
-
 function CBulletSize()
 {
-    this.type = BULLET_TYPE_SIZE_NONE;
+    this.type = AscFormat.BULLET_TYPE_SIZE_NONE;
     this.val = 0;
 
 }
@@ -10742,16 +10748,10 @@ CBulletSize.prototype =
     }
 };
 
-var BULLET_TYPE_TYPEFACE_NONE	= 0;
-var BULLET_TYPE_TYPEFACE_TX		= 1;
-var BULLET_TYPE_TYPEFACE_BUFONT	= 2;
-
 function CBulletTypeface()
 {
-    this.type = BULLET_TYPE_TYPEFACE_NONE;
+    this.type = AscFormat.BULLET_TYPE_TYPEFACE_NONE;
     this.typeface = "";
-
-
 }
 
 CBulletTypeface.prototype =
@@ -10946,13 +10946,6 @@ TextListStyle.prototype =
     }
 };
 
-var PARRUN_TYPE_NONE      = 0;
-var PARRUN_TYPE_RUN		  = 1;
-var PARRUN_TYPE_FLD		  = 2;
-var PARRUN_TYPE_BR		  = 3;
-var PARRUN_TYPE_TEXT_MATH = 4;
-
-
 // DEFAULT OBJECTS
 function GenerateDefaultTheme(presentation)
 {
@@ -11123,15 +11116,13 @@ function CreateDefaultTextRectStyle()
     unicolor.color.setId(g_clr_accent1);
 
     style.setFontRef(new FontRef());
-    style.fontRef.setIdx(fntStyleInd_minor);
+    style.fontRef.setIdx(AscFormat.fntStyleInd_minor);
     unicolor = new CUniColor();
     unicolor.setColor(new CSchemeColor());
     unicolor.color.setId(8);
     style.fontRef.setColor(unicolor);
     return style;
 }
-
-
 
 function GenerateDefaultColorMap()
 {
@@ -11153,8 +11144,6 @@ function GenerateDefaultColorMap()
     return clrMap;
 
 }
-var DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
-
 
 function CreateAscFill(unifill)
 {
@@ -11301,14 +11290,19 @@ function CorrectUniFill(asc_fill, unifill, editorId)
                 ret.fill = new CNoFill();
                 break;
             }
+            case c_oAscFill.FILL_TYPE_GRP:
+            {
+                ret.fill = new CGrpFill();
+                break;
+            }
             case c_oAscFill.FILL_TYPE_BLIP:
             {
 
                 var _url = _fill.url;
                 var _tx_id = _fill.texture_id;
-                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < g_oUserTexturePresets.length))
+                if (null != _tx_id && (0 <= _tx_id) && (_tx_id < AscCommon.g_oUserTexturePresets.length))
                 {
-                    _url = g_oUserTexturePresets[_tx_id];
+                    _url = AscCommon.g_oUserTexturePresets[_tx_id];
                 }
 
 
@@ -11837,7 +11831,7 @@ function CorrectUniColor(asc_color, unicolor, flag)
             {
                 var _map = editor.WordControl.m_oDrawingDocument.GuiControlColorsMap;
                 _flag = isRealNumber(flag) ? flag : 1;
-                __mods = GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
+                __mods = AscCommon.GetDefaultMods(_map[_id].r, _map[_id].g, _map[_id].b, _pos, _flag);
             }
             else
             {
@@ -11855,15 +11849,14 @@ function CorrectUniColor(asc_color, unicolor, flag)
                         var _rgba = {R:0, G:0, B:0, A:255};
                         _schemeClr.Calculate(_theme, _clrMap.color_map, _rgba);
                         _flag = isRealNumber(flag) ? flag : 0;
-                        __mods = GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
+                        __mods = AscCommon.GetDefaultMods(_schemeClr.RGBA.R, _schemeClr.RGBA.G, _schemeClr.RGBA.B, _pos, _flag);
                     }
                 }
             }
 
             if (null != __mods)
             {
-                for (var modInd = 0; modInd < __mods.length; modInd++)
-                    ret.Mods.Mods[modInd] = _create_mod(__mods[modInd]);
+                ret.Mods.Mods = __mods;
             }
 
             break;
@@ -11885,3 +11878,223 @@ function CorrectUniColor(asc_color, unicolor, flag)
     }
     return ret;
 }
+
+    function deleteDrawingBase(aObjects, graphicId)
+    {
+        var position = null;
+        for (var i = 0; i < aObjects.length; i++) {
+            if ( aObjects[i].graphicObject.Get_Id() == graphicId ) {
+                aObjects.splice(i, 1);
+                position = i;
+                break;
+            }
+        }
+        return position;
+    }
+
+    //----------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].CreateFontRef = CreateFontRef;
+    window['AscFormat'].CreatePresetColor = CreatePresetColor;
+    window['AscFormat'].isRealNumber = isRealNumber;
+    window['AscFormat'].isRealBool = isRealBool;
+    window['AscFormat'].writeLong = writeLong;
+    window['AscFormat'].readLong = readLong;
+    window['AscFormat'].writeDouble = writeDouble;
+    window['AscFormat'].readDouble = readDouble;
+    window['AscFormat'].writeBool = writeBool;
+    window['AscFormat'].readBool = readBool;
+    window['AscFormat'].writeString = writeString;
+    window['AscFormat'].readString = readString;
+    window['AscFormat'].writeObject = writeObject;
+    window['AscFormat'].readObject = readObject;
+    window['AscFormat'].checkThemeFonts = checkThemeFonts;
+    window['AscFormat'].ExecuteNoHistory = ExecuteNoHistory;
+    window['AscFormat'].checkTableCellPr = checkTableCellPr;
+    window['AscFormat'].CColorMod = CColorMod;
+    window['AscFormat'].CColorModifiers = CColorModifiers;
+    window['AscFormat'].CSysColor = CSysColor;
+    window['AscFormat'].CPrstColor = CPrstColor;
+    window['AscFormat'].CRGBColor = CRGBColor;
+    window['AscFormat'].CSchemeColor = CSchemeColor;
+    window['AscFormat'].CUniColor = CUniColor;
+    window['AscFormat'].CreateUniColorRGB = CreateUniColorRGB;
+    window['AscFormat'].CreteSolidFillRGB = CreteSolidFillRGB;
+    window['AscFormat'].CreateSolidFillRGBA = CreateSolidFillRGBA;
+    window['AscFormat'].CSrcRect = CSrcRect;
+    window['AscFormat'].CBlipFillTile = CBlipFillTile;
+    window['AscFormat'].CBlipFill = CBlipFill;
+    window['AscFormat'].CSolidFill = CSolidFill;
+    window['AscFormat'].CGs = CGs;
+    window['AscFormat'].GradLin = GradLin;
+    window['AscFormat'].GradPath = GradPath;
+    window['AscFormat'].CGradFill = CGradFill;
+    window['AscFormat'].CPattFill = CPattFill;
+    window['AscFormat'].CNoFill = CNoFill;
+	window['AscFormat'].CGrpFill = CGrpFill;
+    window['AscFormat'].CUniFill = CUniFill;
+    window['AscFormat'].CompareUniFill = CompareUniFill;
+    window['AscFormat'].CompareUnifillBool = CompareUnifillBool;
+    window['AscFormat'].CompareShapeProperties = CompareShapeProperties;
+    window['AscFormat'].EndArrow = EndArrow;
+    window['AscFormat'].ConvertJoinAggType = ConvertJoinAggType;
+    window['AscFormat'].LineJoin = LineJoin;
+    window['AscFormat'].CLn = CLn;
+    window['AscFormat'].DefaultShapeDefinition = DefaultShapeDefinition;
+    window['AscFormat'].CNvPr = CNvPr;
+    window['AscFormat'].NvPr = NvPr;
+    window['AscFormat'].Ph = Ph;
+    window['AscFormat'].UniNvPr = UniNvPr;
+    window['AscFormat'].StyleRef = StyleRef;
+    window['AscFormat'].FontRef = FontRef;
+    window['AscFormat'].CShapeStyle = CShapeStyle;
+    window['AscFormat'].CreateDefaultShapeStyle = CreateDefaultShapeStyle;
+    window['AscFormat'].CXfrm = CXfrm;
+    window['AscFormat'].CSpPr = CSpPr;
+    window['AscFormat'].ClrScheme = ClrScheme;
+    window['AscFormat'].ClrMap = ClrMap;
+    window['AscFormat'].ExtraClrScheme = ExtraClrScheme;
+    window['AscFormat'].FontCollection = FontCollection;
+    window['AscFormat'].FontScheme = FontScheme;
+    window['AscFormat'].FmtScheme = FmtScheme;
+    window['AscFormat'].ThemeElements = ThemeElements;
+    window['AscFormat'].CTheme = CTheme;
+    window['AscFormat'].HF = HF;
+    window['AscFormat'].CBgPr = CBgPr;
+    window['AscFormat'].CBg = CBg;
+    window['AscFormat'].CSld = CSld;
+    window['AscFormat'].CTextStyles = CTextStyles;
+    window['AscFormat'].redrawSlide = redrawSlide;
+    window['AscFormat'].CTextFit = CTextFit;
+    window['AscFormat'].CBodyPr = CBodyPr;
+    window['AscFormat'].CHyperlink = CHyperlink;
+    window['AscFormat'].CTextParagraphPr = CTextParagraphPr;
+    window['AscFormat'].CompareBullets = CompareBullets;
+    window['AscFormat'].CBullet = CBullet;
+    window['AscFormat'].CBulletColor = CBulletColor;
+    window['AscFormat'].CBulletSize = CBulletSize;
+    window['AscFormat'].CBulletTypeface = CBulletTypeface;
+    window['AscFormat'].CBulletType = CBulletType;
+    window['AscFormat'].TextListStyle = TextListStyle;
+    window['AscFormat'].GenerateDefaultTheme = GenerateDefaultTheme;
+    window['AscFormat'].GenerateDefaultMasterSlide = GenerateDefaultMasterSlide;
+    window['AscFormat'].GenerateDefaultSlide = GenerateDefaultSlide;
+    window['AscFormat'].CreateDefaultTextRectStyle = CreateDefaultTextRectStyle;
+    window['AscFormat'].GenerateDefaultColorMap = GenerateDefaultColorMap;
+    window['AscFormat'].CreateAscFill = CreateAscFill;
+    window['AscFormat'].CorrectUniFill = CorrectUniFill;
+    window['AscFormat'].CreateAscStroke = CreateAscStroke;
+    window['AscFormat'].CorrectUniStroke = CorrectUniStroke;
+    window['AscFormat'].CreateAscShapePropFromProp = CreateAscShapePropFromProp;
+    window['AscFormat'].CreateAscTextArtProps = CreateAscTextArtProps;
+    window['AscFormat'].CreateUnifillFromAscColor = CreateUnifillFromAscColor;
+    window['AscFormat'].CorrectUniColor = CorrectUniColor;
+    window['AscFormat'].deleteDrawingBase = deleteDrawingBase;
+
+    window['AscFormat'].Ax_Counter = Ax_Counter;
+    window['AscFormat'].TYPE_TRACK = TYPE_TRACK;
+    window['AscFormat'].TYPE_KIND = TYPE_KIND;
+    window['AscFormat'].ar_arrow = ar_arrow;
+    window['AscFormat'].ar_diamond = ar_diamond;
+    window['AscFormat'].ar_none = ar_none;
+    window['AscFormat'].ar_oval = ar_oval;
+    window['AscFormat'].ar_stealth = ar_stealth;
+    window['AscFormat'].ar_triangle = ar_triangle;
+    window['AscFormat'].LineEndType = LineEndType;
+    window['AscFormat'].LineEndSize = LineEndSize;
+    window['AscFormat'].LineJoinType = LineJoinType;
+
+    //типы плейсхолдеров
+    window['AscFormat'].phType_body     = 0;
+    window['AscFormat'].phType_chart    = 1;
+    window['AscFormat'].phType_clipArt  = 2; //(Clip Art)
+    window['AscFormat'].phType_ctrTitle = 3; //(Centered Title)
+    window['AscFormat'].phType_dgm      = 4; //(Diagram)
+    window['AscFormat'].phType_dt       = 5; //(Date and Time)
+    window['AscFormat'].phType_ftr      = 6; //(Footer)
+    window['AscFormat'].phType_hdr      = 7; //(Header)
+    window['AscFormat'].phType_media    = 8; //(Media)
+    window['AscFormat'].phType_obj      = 9; //(Object)
+    window['AscFormat'].phType_pic      = 10; //(Picture)
+    window['AscFormat'].phType_sldImg   = 11; //(Slide Image)
+    window['AscFormat'].phType_sldNum   = 12; //(Slide Number)
+    window['AscFormat'].phType_subTitle = 13; //(Subtitle)
+    window['AscFormat'].phType_tbl      = 14; //(Table)
+    window['AscFormat'].phType_title    = 15; //(Title)
+
+    window['AscFormat'].fntStyleInd_none = 2;
+    window['AscFormat'].fntStyleInd_major = 0;
+    window['AscFormat'].fntStyleInd_minor = 1;
+
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_BOTTOM = 0;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_CENTER = 1;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_DISTRIBUTED = 2;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_JUSTIFIED = 3;
+    window['AscFormat'].VERTICAL_ANCHOR_TYPE_TOP = 4;
+
+    //Vertical Text Types
+    window['AscFormat'].nVertTTeaVert          = 0; //( ( East Asian Vertical ))
+    window['AscFormat'].nVertTThorz            = 1; //( ( Horizontal ))
+    window['AscFormat'].nVertTTmongolianVert   = 2; //( ( Mongolian Vertical ))
+    window['AscFormat'].nVertTTvert            = 3; //( ( Vertical ))
+    window['AscFormat'].nVertTTvert270         = 4;//( ( Vertical 270 ))
+    window['AscFormat'].nVertTTwordArtVert     = 5;//( ( WordArt Vertical ))
+    window['AscFormat'].nVertTTwordArtVertRtl  = 6;//(Vertical WordArt Right to Left)
+
+    //Text Wrapping Types
+    window['AscFormat'].nTWTNone   = 0;
+    window['AscFormat'].nTWTSquare = 1;
+
+    window['AscFormat'].text_fit_No         = 0;
+    window['AscFormat'].text_fit_Auto       = 1;
+    window['AscFormat'].text_fit_NormAuto   = 2;
+
+    window['AscFormat'].BULLET_TYPE_COLOR_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_COLOR_CLRTX	= 1;
+    window['AscFormat'].BULLET_TYPE_COLOR_CLR	= 2;
+
+    window['AscFormat'].BULLET_TYPE_SIZE_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_SIZE_TX		= 1;
+    window['AscFormat'].BULLET_TYPE_SIZE_PCT	= 2;
+    window['AscFormat'].BULLET_TYPE_SIZE_PTS	= 3;
+
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_NONE	= 0;
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_TX		= 1;
+    window['AscFormat'].BULLET_TYPE_TYPEFACE_BUFONT	= 2;
+
+    window['AscFormat'].PARRUN_TYPE_NONE      = 0;
+    window['AscFormat'].PARRUN_TYPE_RUN		  = 1;
+    window['AscFormat'].PARRUN_TYPE_FLD		  = 2;
+    window['AscFormat'].PARRUN_TYPE_BR		  = 3;
+    window['AscFormat'].PARRUN_TYPE_TEXT_MATH = 4;
+
+    window['AscFormat']._weight_body = _weight_body;
+    window['AscFormat']._weight_chart = _weight_chart;
+    window['AscFormat']._weight_clipArt = _weight_clipArt;
+    window['AscFormat']._weight_ctrTitle = _weight_ctrTitle;
+    window['AscFormat']._weight_dgm = _weight_dgm;
+    window['AscFormat']._weight_media = _weight_media;
+    window['AscFormat']._weight_obj = _weight_obj;
+    window['AscFormat']._weight_pic = _weight_pic;
+    window['AscFormat']._weight_subTitle = _weight_subTitle;
+    window['AscFormat']._weight_tbl = _weight_tbl;
+    window['AscFormat']._weight_title = _weight_title;
+
+    window['AscFormat']._ph_multiplier = _ph_multiplier;
+
+    window['AscFormat'].nSldLtTTitle = nSldLtTTitle;
+    window['AscFormat'].nSldLtTObj = nSldLtTObj;
+    window['AscFormat'].nSldLtTTx = nSldLtTTx;
+
+    window['AscFormat']._arr_lt_types_weight = _arr_lt_types_weight;
+    window['AscFormat']._global_layout_summs_array = _global_layout_summs_array;
+
+    window['AscFormat'].nOTOwerflow = nOTOwerflow;
+
+    window['AscFormat'].BULLET_TYPE_BULLET_NONE = BULLET_TYPE_BULLET_NONE;
+    window['AscFormat'].BULLET_TYPE_BULLET_CHAR = BULLET_TYPE_BULLET_CHAR;
+    window['AscFormat'].BULLET_TYPE_BULLET_AUTONUM = BULLET_TYPE_BULLET_AUTONUM;
+    window['AscFormat'].BULLET_TYPE_BULLET_BLIP = BULLET_TYPE_BULLET_BLIP;
+
+    window['AscFormat'].DEFAULT_COLOR_MAP = GenerateDefaultColorMap();
+})(window);

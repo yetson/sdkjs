@@ -23,6 +23,18 @@
  *
 */
 "use strict";
+
+(
+/**
+* @param {Window} window
+* @param {undefined} undefined
+*/
+function (window, undefined) {
+    // Import
+    var ArcToCurvers = AscFormat.ArcToCurvers;
+
+    var History = AscCommon.History;
+
 var EPSILON_TEXT_AUTOFIT = 0.001;
 var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_PLUS_MINUS = 1,
@@ -41,10 +53,6 @@ var FORMULA_TYPE_MULT_DIV = 0,
     FORMULA_TYPE_TAN = 14,
     FORMULA_TYPE_VALUE = 15,
     FORMULA_TYPE_MIN = 16;
-
-var APPROXIMATE_EPSILON = 1;
-var APPROXIMATE_EPSILON2 = 3;
-var APPROXIMATE_EPSILON3 = 5;
 
 
 var cToRad = Math.PI/(60000*180);
@@ -407,7 +415,7 @@ Geometry.prototype=
 
     getObjectType: function()
     {
-        return historyitem_type_Geometry;
+        return AscDFH.historyitem_type_Geometry;
     },
 
     Write_ToBinary2: function(w)
@@ -481,23 +489,23 @@ Geometry.prototype=
 
     setParent: function(pr)
     {
-        History.Add(this, {Type: historyitem_GeometrySetParent, oldPr: this.parent, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GeometrySetParent, oldPr: this.parent, newPr: pr});
         this.parent = pr;
     },
 
     setPreset: function(preset)
     {
-        History.Add(this, {Type: historyitem_GeometrySetPreset, oldPr: this.preset, newPr: preset});
+        History.Add(this, {Type: AscDFH.historyitem_GeometrySetPreset, oldPr: this.preset, newPr: preset});
         this.preset = preset;
     },
 
     AddAdj: function(name, formula, x, y, z)
     {
-        History.Add(this, {Type: historyitem_GeometryAddAdj, name:name, oldVal:this.gdLst[name], newVal:x, oldAvVal: this.avLst[name]});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddAdj, name:name, oldVal:this.gdLst[name], newVal:x, oldAvVal: this.avLst[name]});
         var dVal = parseInt(x);
         if(isNaN(dVal))
         {
-            if(isRealNumber(oGdLst[x]))
+            if(AscFormat.isRealNumber(oGdLst[x]))
             {
                 dVal = oGdLst[x];
             }
@@ -521,7 +529,7 @@ Geometry.prototype=
 
     AddGuide: function(name, formula, x, y, z)
     {
-        History.Add(this, {Type: historyitem_GeometryAddGuide, name: name, formula: formula, x: x, y: y, z: z});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddGuide, name: name, formula: formula, x: x, y: y, z: z});
         this.gdLstInfo.push(
             {
                 name: name,
@@ -534,7 +542,7 @@ Geometry.prototype=
 
     AddCnx: function(ang, x, y)
     {
-        History.Add(this, {Type: historyitem_GeometryAddCnx, ang: ang, x: x, y: y});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddCnx, ang: ang, x: x, y: y});
         this.cnxLstInfo.push(
             {
                 ang:ang,
@@ -545,7 +553,7 @@ Geometry.prototype=
 
     AddHandleXY: function(gdRefX, minX, maxX, gdRefY, minY, maxY, posX, posY)
     {
-        History.Add(this, {Type: historyitem_GeometryAddHandleXY,
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddHandleXY,
             gdRefX:gdRefX, minX:minX, maxX:maxX, gdRefY:gdRefY, minY:minY, maxY:maxY, posX:posX, posY:posY});
         this.ahXYLstInfo.push(
             {
@@ -564,7 +572,7 @@ Geometry.prototype=
 
     AddHandlePolar: function(gdRefAng, minAng, maxAng, gdRefR, minR, maxR, posX, posY)
     {
-        History.Add(this, {Type: historyitem_GeometryAddHandlePolar,
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddHandlePolar,
             gdRefAng:gdRefAng, minAng:minAng, maxAng:maxAng, gdRefR:gdRefR, minR:minR, maxR:maxR, posX:posX, posY:posY});
         this.ahPolarLstInfo.push(
             {
@@ -583,7 +591,7 @@ Geometry.prototype=
 
     AddPath: function(pr)
     {
-        History.Add(this, {Type: historyitem_GeometryAddPath, newPr: pr});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddPath, newPr: pr});
         this.pathLst.push(pr);
     },
 
@@ -593,7 +601,7 @@ Geometry.prototype=
         {
             case 0:
             {                              /* extrusionOk, fill, stroke, w, h*/
-                var path = new Path();
+                var path = new AscFormat.Path();
                 path.setExtrusionOk(x1 || false);
                 path.setFill(y1 || "norm");
                 path.setStroke(x2 != undefined ? x2 : true);
@@ -637,7 +645,7 @@ Geometry.prototype=
 
     AddRect: function(l, t, r, b)
     {
-        History.Add(this, {Type: historyitem_GeometryAddRect, l: l, t: t, r: r, b: b});
+        History.Add(this, {Type: AscDFH.historyitem_GeometryAddRect, l: l, t: t, r: r, b: b});
         this.rectS = {};
         this.rectS.l = l;
         this.rectS.t = t;
@@ -649,12 +657,12 @@ Geometry.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 this.parent = data.oldPr;
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = data.oldVal;
                 this.avLst[data.name] = data.oldAvVal;
@@ -665,7 +673,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 for(var i = this.gdLstInfo.length - 1; i >-1; --i)
                 {
@@ -681,7 +689,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 for(var i = this.cnxLstInfo.length - 1; i >-1; --i)
                 {
@@ -695,7 +703,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 for(var i = this.ahXYLstInfo.length-1; i > -1; --i)
                 {
@@ -714,7 +722,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 for(var i = this.ahPolarLstInfo.length-1; i > -1; --i)
                 {
@@ -733,7 +741,7 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 for(var i = this.pathLst.length; i > -1; --i)
                 {
@@ -745,12 +753,12 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = null;
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 this.preset = data.oldPr;
                 break;
@@ -762,12 +770,12 @@ Geometry.prototype=
     {
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
                 this.parent = data.newPr;
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
                 this.gdLst[data.name] = parseInt(data.newVal);
                 this.avLst[data.name] = true;
@@ -777,17 +785,17 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
                 this.gdLstInfo.push({name: data.name, formula: data.formula, x: data.x, y: data.y, z: data.z});
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
                 this.cnxLstInfo.push({ang: data.ang, x: data.x, y: data.y});
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
                 this.ahXYLstInfo.push(
                     {gdRefX: data.gdRefX,
@@ -800,7 +808,7 @@ Geometry.prototype=
                     posY: data.posY});
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
                 this.ahPolarLstInfo.push(
                     {
@@ -816,17 +824,17 @@ Geometry.prototype=
                 );
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
                 this.pathLst.push(data.newPr);
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = {l: data.l, t: data.t, r: data.r, b: data.b};
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
                 this.preset = data.newPr;
                 break;
@@ -839,74 +847,74 @@ Geometry.prototype=
         w.WriteLong(data.Type);
         switch(data.Type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
-                writeString(w, data.name);
-                writeString(w, data.newVal);
-                writeBool(w, data.oldAvVal);
+                AscFormat.writeString(w, data.name);
+                AscFormat.writeString(w, data.newVal);
+                AscFormat.writeBool(w, data.oldAvVal);
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
-                writeString(w, data.name);
-                writeLong(w, data.formula);
-                writeString(w, data.x);
-                writeString(w, data.y);
-                writeString(w, data.z);
+                AscFormat.writeString(w, data.name);
+                AscFormat.writeLong(w, data.formula);
+                AscFormat.writeString(w, data.x);
+                AscFormat.writeString(w, data.y);
+                AscFormat.writeString(w, data.z);
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
-                writeString(w, data.ang);
-                writeString(w, data.x);
-                writeString(w, data.y);
+                AscFormat.writeString(w, data.ang);
+                AscFormat.writeString(w, data.x);
+                AscFormat.writeString(w, data.y);
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
-                writeString(w, data.gdRefX);
-                writeString(w, data.minX);
-                writeString(w, data.maxX);
-                writeString(w, data.gdRefY);
-                writeString(w, data.minY);
-                writeString(w, data.maxY);
-                writeString(w, data.posX);
-                writeString(w, data.posY);
+                AscFormat.writeString(w, data.gdRefX);
+                AscFormat.writeString(w, data.minX);
+                AscFormat.writeString(w, data.maxX);
+                AscFormat.writeString(w, data.gdRefY);
+                AscFormat.writeString(w, data.minY);
+                AscFormat.writeString(w, data.maxY);
+                AscFormat.writeString(w, data.posX);
+                AscFormat.writeString(w, data.posY);
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
-                writeString(w, data.gdRefAng);
-                writeString(w, data.minAng);
-                writeString(w, data.maxAng);
-                writeString(w, data.gdRefR);
-                writeString(w, data.minR);
-                writeString(w, data.maxR);
-                writeString(w, data.posX);
-                writeString(w, data.posY);
+                AscFormat.writeString(w, data.gdRefAng);
+                AscFormat.writeString(w, data.minAng);
+                AscFormat.writeString(w, data.maxAng);
+                AscFormat.writeString(w, data.gdRefR);
+                AscFormat.writeString(w, data.minR);
+                AscFormat.writeString(w, data.maxR);
+                AscFormat.writeString(w, data.posX);
+                AscFormat.writeString(w, data.posY);
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
-                writeObject(w, data.newPr);
+                AscFormat.writeObject(w, data.newPr);
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
-                writeString(w, data.l);
-                writeString(w, data.t);
-                writeString(w, data.r);
-                writeString(w, data.b);
+                AscFormat.writeString(w, data.l);
+                AscFormat.writeString(w, data.t);
+                AscFormat.writeString(w, data.r);
+                AscFormat.writeString(w, data.b);
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
-                writeString(w, data.newPr);
+                AscFormat.writeString(w, data.newPr);
                 break;
             }
         }
@@ -917,16 +925,16 @@ Geometry.prototype=
         var type = r.GetLong();
         switch(type)
         {
-            case historyitem_GeometrySetParent:
+            case AscDFH.historyitem_GeometrySetParent:
             {
-                this.parent = readObject(r);
+                this.parent = AscFormat.readObject(r);
                 break;
             }
-            case historyitem_GeometryAddAdj:
+            case AscDFH.historyitem_GeometryAddAdj:
             {
-                var name = readString(r);
-                var val = readString(r);
-                var oldAvVal = readBool(r);
+                var name = AscFormat.readString(r);
+                var val = AscFormat.readString(r);
+                var oldAvVal = AscFormat.readBool(r);
                 if(typeof name === "string" && typeof val === "string")
                 {
                     this.gdLst[name] = parseInt(val);
@@ -941,47 +949,47 @@ Geometry.prototype=
                 }
                 break;
             }
-            case historyitem_GeometryAddGuide:
+            case AscDFH.historyitem_GeometryAddGuide:
             {
-                var name = readString(r);
-                var formula = readLong(r);
-                var x = readString(r);
-                var y = readString(r);
-                var z = readString(r);
+                var name = AscFormat.readString(r);
+                var formula = AscFormat.readLong(r);
+                var x = AscFormat.readString(r);
+                var y = AscFormat.readString(r);
+                var z = AscFormat.readString(r);
                 this.gdLstInfo.push({name: name, formula:formula, x: x, y: y, z: z});
                 break;
             }
-            case historyitem_GeometryAddCnx:
+            case AscDFH.historyitem_GeometryAddCnx:
             {
-                var ang = readString(r);
-                var x = readString(r);
-                var y = readString(r);
+                var ang = AscFormat.readString(r);
+                var x = AscFormat.readString(r);
+                var y = AscFormat.readString(r);
                 this.cnxLstInfo.push({ang: ang, x: x, y: y});
                 break;
             }
-            case historyitem_GeometryAddHandleXY:
+            case AscDFH.historyitem_GeometryAddHandleXY:
             {
-                var gdRefX = readString(r);
-                var minX = readString(r);
-                var maxX = readString(r);
-                var gdRefY = readString(r);
-                var minY = readString(r);
-                var maxY = readString(r);
-                var posX = readString(r);
-                var posY = readString(r);
+                var gdRefX = AscFormat.readString(r);
+                var minX = AscFormat.readString(r);
+                var maxX = AscFormat.readString(r);
+                var gdRefY = AscFormat.readString(r);
+                var minY = AscFormat.readString(r);
+                var maxY = AscFormat.readString(r);
+                var posX = AscFormat.readString(r);
+                var posY = AscFormat.readString(r);
                 this.ahXYLstInfo.push({gdRefX: gdRefX, minX: minX, maxX: maxX, gdRefY: gdRefY, minY: minY, maxY: maxY, posX:posX,posY: posY});
                 break;
             }
-            case historyitem_GeometryAddHandlePolar:
+            case AscDFH.historyitem_GeometryAddHandlePolar:
             {
-                var gdRefAng = readString(r);
-                var minAng = readString(r);
-                var maxAng = readString(r);
-                var gdRefR = readString(r);
-                var minR = readString(r);
-                var maxR = readString(r);
-                var posX = readString(r);
-                var posY = readString(r);
+                var gdRefAng = AscFormat.readString(r);
+                var minAng = AscFormat.readString(r);
+                var maxAng = AscFormat.readString(r);
+                var gdRefR = AscFormat.readString(r);
+                var minR = AscFormat.readString(r);
+                var maxR = AscFormat.readString(r);
+                var posX = AscFormat.readString(r);
+                var posY = AscFormat.readString(r);
                 this.ahPolarLstInfo.push(
                     {
                         gdRefAng: gdRefAng,
@@ -995,23 +1003,23 @@ Geometry.prototype=
                     });
                 break;
             }
-            case historyitem_GeometryAddPath:
+            case AscDFH.historyitem_GeometryAddPath:
             {
-                this.pathLst.push(readObject(r));
+                this.pathLst.push(AscFormat.readObject(r));
                 break;
             }
-            case historyitem_GeometryAddRect:
+            case AscDFH.historyitem_GeometryAddRect:
             {
                 this.rectS = {};
-                this.rectS.l = readString(r);
-                this.rectS.t = readString(r);
-                this.rectS.r = readString(r);
-                this.rectS.b = readString(r);
+                this.rectS.l = AscFormat.readString(r);
+                this.rectS.t = AscFormat.readString(r);
+                this.rectS.r = AscFormat.readString(r);
+                this.rectS.b = AscFormat.readString(r);
                 break;
             }
-            case historyitem_GeometrySetPreset:
+            case AscDFH.historyitem_GeometrySetPreset:
             {
-                this.preset = readString(r);
+                this.preset = AscFormat.readString(r);
                 break;
             }
         }
@@ -1100,12 +1108,12 @@ Geometry.prototype=
 
     getMaxPathPolygonLength: function()
     {
-        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+        var aByPaths = this.getArrayPolygonsByPaths(AscFormat.PATH_DIV_EPSILON);
 
         var dLength = 0;
         for(var i = 0; i < aByPaths.length; ++i)
         {
-            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            var oWarpPathPolygon = new AscFormat.PolygonWrapper(aByPaths[i]);
             if(dLength < oWarpPathPolygon.dLen)
             {
                 dLength = oWarpPathPolygon.dLen;
@@ -1115,12 +1123,12 @@ Geometry.prototype=
     },
     getMinPathPolygonLength: function()
     {
-        var aByPaths = this.getArrayPolygonsByPaths(PATH_DIV_EPSILON);
+        var aByPaths = this.getArrayPolygonsByPaths(AscFormat.PATH_DIV_EPSILON);
 
         var dLength = 10000000;
         for(var i = 0; i < aByPaths.length; ++i)
         {
-            var oWarpPathPolygon = new PolygonWrapper(aByPaths[i]);
+            var oWarpPathPolygon = new AscFormat.PolygonWrapper(aByPaths[i]);
             if(dLength > oWarpPathPolygon.dLen)
             {
                 dLength = oWarpPathPolygon.dLen;
@@ -1241,7 +1249,7 @@ Geometry.prototype=
     {
         var used_epsilon;
         if(typeof epsilon !== "number" || isNaN(epsilon))
-            used_epsilon = APPROXIMATE_EPSILON;
+            used_epsilon = AscFormat.APPROXIMATE_EPSILON;
         else
             used_epsilon = epsilon;
         var arr_polygons = [];
@@ -1257,9 +1265,9 @@ Geometry.prototype=
                 var cur_command = arr_cur_path_commands[command_index];
                 switch(cur_command.id)
                 {
-                    case moveTo:
+                    case AscFormat.moveTo:
                     {
-                        if(last_command === null || last_command.id === close)
+                        if(last_command === null || last_command.id === AscFormat.close)
                         {
                             cur_polygon.push({x: cur_command.X, y: cur_command.Y});
                             last_command = cur_command;
@@ -1270,7 +1278,7 @@ Geometry.prototype=
                         }
                         break;
                     }
-                    case lineTo:
+                    case AscFormat.lineTo:
                     {
                         cur_polygon.push({x: cur_command.X, y: cur_command.Y});
                         last_command = cur_command;
@@ -1278,9 +1286,9 @@ Geometry.prototype=
                         last_point_y = cur_command.Y;
                         break;
                     }
-                    case bezier3:
+                    case AscFormat.bezier3:
                     {
-                        bezier_polygon = partition_bezier3(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, used_epsilon);
+                        bezier_polygon = AscFormat.partition_bezier3(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, used_epsilon);
                         for(var point_index = 1; point_index < bezier_polygon.length; ++point_index)
                         {
                             cur_polygon.push(bezier_polygon[point_index]);
@@ -1290,9 +1298,9 @@ Geometry.prototype=
                         last_point_y = cur_command.Y1;
                         break;
                     }
-                    case bezier4:
+                    case AscFormat.bezier4:
                     {
-                        bezier_polygon = partition_bezier4(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, used_epsilon);
+                        bezier_polygon = AscFormat.partition_bezier4(last_point_x, last_point_y, cur_command.X0, cur_command.Y0, cur_command.X1, cur_command.Y1, cur_command.X2, cur_command.Y2, used_epsilon);
                         for(point_index = 1; point_index < bezier_polygon.length; ++point_index)
                         {
                             cur_polygon.push(bezier_polygon[point_index]);
@@ -1303,7 +1311,7 @@ Geometry.prototype=
                         break;
                     }
 
-                    case arcTo:
+                    case AscFormat.arcTo:
                     {
                         var path_accumulator = new PathAccumulator();
                         ArcToCurvers(path_accumulator, cur_command.stX, cur_command.stY, cur_command.wR, cur_command.hR, cur_command.stAng, cur_command.swAng);
@@ -1313,7 +1321,7 @@ Geometry.prototype=
                             var cur_arc_to_command = arc_to_path_commands[arc_to_path_index];
                             switch (cur_arc_to_command.id)
                             {
-                                case moveTo:
+                                case AscFormat.moveTo:
                                 {
                                     cur_polygon.push({x: cur_arc_to_command.X, y: cur_arc_to_command.Y});
                                     last_command = cur_arc_to_command;
@@ -1321,9 +1329,9 @@ Geometry.prototype=
                                     last_point_y = cur_arc_to_command.Y;
                                     break;
                                 }
-                                case bezier4:
+                                case AscFormat.bezier4:
                                 {
-                                    bezier_polygon = partition_bezier4(last_point_x, last_point_y, cur_arc_to_command.X0, cur_arc_to_command.Y0, cur_arc_to_command.X1, cur_arc_to_command.Y1, cur_arc_to_command.X2, cur_arc_to_command.Y2, used_epsilon);
+                                    bezier_polygon = AscFormat.partition_bezier4(last_point_x, last_point_y, cur_arc_to_command.X0, cur_arc_to_command.Y0, cur_arc_to_command.X1, cur_arc_to_command.Y1, cur_arc_to_command.X2, cur_arc_to_command.Y2, used_epsilon);
                                     for(point_index = 0; point_index < bezier_polygon.length; ++point_index)
                                     {
                                         cur_polygon.push(bezier_polygon[point_index]);
@@ -1338,10 +1346,10 @@ Geometry.prototype=
                         break;
                     }
 
-                    case close:
+                    case AscFormat.close:
                     {
 
-                        if(last_command.id !== moveTo)
+                        if(last_command.id !== AscFormat.moveTo)
                         {
                             if(cur_polygon.length >= 2)
                             {
@@ -1385,9 +1393,9 @@ Geometry.prototype=
     {
         var dDelta = 0;
         var dWi = dTextWidth, dHi = dTextHeight, dWNext, dHNext;
-        var oGeometry = ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
+        var oGeometry = AscFormat.ExecuteNoHistory(function(){return this.createDuplicate()}, this, []);
         var iter_Count = 0;
-        if(!isRealNumber(dGeometryWidth) && !isRealNumber(dGeometryHeight))
+        if(!AscFormat.isRealNumber(dGeometryWidth) && !AscFormat.isRealNumber(dGeometryHeight))
         {
             do
             {
@@ -1402,7 +1410,7 @@ Geometry.prototype=
             while(dDelta > EPSILON_TEXT_AUTOFIT && iter_Count < MAX_ITER_COUNT);
             return {W: dWi, H: dHi, bError: dDelta > EPSILON_TEXT_AUTOFIT};
         }
-        else if(isRealNumber(dGeometryWidth))
+        else if(AscFormat.isRealNumber(dGeometryWidth))
         {
             do
             {
@@ -1442,12 +1450,12 @@ PathAccumulator.prototype =
 {
     _m: function(x, y)
     {
-        this.pathCommand.push({id: moveTo, X: x, Y: y});
+        this.pathCommand.push({id: AscFormat.moveTo, X: x, Y: y});
     },
 
     _c: function(x0, y0, x1, y1, x2, y2)
     {
-        this.pathCommand.push({id: bezier4, X0: x0, Y0: y0, X1: x1, Y1: y1, X2: x2, Y2: y2});
+        this.pathCommand.push({id: AscFormat.bezier4, X0: x0, Y0: y0, X1: x1, Y1: y1, X2: x2, Y2: y2});
     }
 };
 
@@ -1529,3 +1537,16 @@ function ComparisonEdgeByTopPoint(graphEdge1, graphEdge2)
 {
     return Math.min(graphEdge1.point1.y, graphEdge1.point2.y) - Math.min(graphEdge2.point1.y, graphEdge2.point2.y);
 }
+
+    //--------------------------------------------------------export----------------------------------------------------
+    window['AscFormat'] = window['AscFormat'] || {};
+    window['AscFormat'].Geometry = Geometry;
+    window['AscFormat'].GraphEdge = GraphEdge;
+
+    window['AscFormat'].EPSILON_TEXT_AUTOFIT = EPSILON_TEXT_AUTOFIT;
+    window['AscFormat'].APPROXIMATE_EPSILON = 1;
+    window['AscFormat'].APPROXIMATE_EPSILON2 = 3;
+    window['AscFormat'].APPROXIMATE_EPSILON3 = 5;
+    window['AscFormat'].cToRad = cToRad;
+    window['AscFormat'].cToDeg = cToDeg;
+})(window);

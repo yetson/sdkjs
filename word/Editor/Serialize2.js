@@ -25,21 +25,30 @@
 "use strict";
 
 // Import
+var g_memory = AscFonts.g_memory;
+var FontStyle = AscFonts.FontStyle;
+var DecodeBase64Char = AscFonts.DecodeBase64Char;
+var b64_decode = AscFonts.b64_decode;
+var g_fontApplication = AscFonts.g_fontApplication;
+
 var align_Right = AscCommon.align_Right;
 var align_Left = AscCommon.align_Left;
 var align_Center = AscCommon.align_Center;
 var align_Justify = AscCommon.align_Justify;
 var c_oAscWrapStyle = AscCommon.c_oAscWrapStyle;
-var c_oAscLimLoc = AscCommon.c_oAscLimLoc;
+var Binary_CommonReader = AscCommon.Binary_CommonReader;
+var BinaryCommonWriter = AscCommon.BinaryCommonWriter;
+var c_oSerPaddingType = AscCommon.c_oSerPaddingType;
+var c_oSerBordersType = AscCommon.c_oSerBordersType;
+var c_oSerBorderType = AscCommon.c_oSerBorderType;
+var c_oSerPropLenType = AscCommon.c_oSerPropLenType;
+var c_oSerConstants = AscCommon.c_oSerConstants;
+var pptx_content_loader = AscCommon.pptx_content_loader;
+var pptx_content_writer = AscCommon.pptx_content_writer;
 
 var c_oAscXAlign = Asc.c_oAscXAlign;
 var c_oAscYAlign = Asc.c_oAscYAlign;
 
-var c_oSerFormat = {
-    Version		: 5, //1.0.0.5
-    Signature	: "DOCY"
-};
-var g_nCurFileVersion = c_oSerFormat.Version;
 //dif:
 //Version:2 добавлены свойства стилей qFormat, uiPriority, hidden, semiHidden, unhideWhenUsed, для более ранних бинарников считаем qFormat = true
 //Version:3 все рисованные обьекты открываются через презентации
@@ -486,10 +495,6 @@ var c_oSer_pgMarType = {
     Header:4,
     Footer:5
 };
-var c_oSer_ColorType = {
-    None: 0,
-    Auto: 1
-};
 var c_oSer_CommentsType = {
 	Comment: 0,
 	Id: 1,
@@ -708,12 +713,6 @@ var c_oSer_FldSimpleType = {
 	Content: 0,
 	Instr: 1
 };
-var c_oSer_ColorThemeType = {
-	Auto: 0,
-	Color: 1,
-	Tint: 2,
-	Shade: 3
-};
 var c_oSerProp_RevisionType = {
     Author: 0,
     Date: 1,
@@ -881,22 +880,22 @@ function CreateThemeUnifill(color, tint, shade){
 			case EThemeColor.themecolorText1: id = 15;break;
 			case EThemeColor.themecolorText2: id = 16;break;
 		}
-		ret = new CUniFill();
-		ret.setFill(new CSolidFill());
-		ret.fill.setColor(new CUniColor());
-		ret.fill.color.setColor(new CSchemeColor());
+		ret = new AscFormat.CUniFill();
+		ret.setFill(new AscFormat.CSolidFill());
+		ret.fill.setColor(new AscFormat.CUniColor());
+		ret.fill.color.setColor(new AscFormat.CSchemeColor());
 		ret.fill.color.color.setId(id);
 		if(null != tint || null != shade){
-			ret.fill.color.setMods(new CColorModifiers());
+			ret.fill.color.setMods(new AscFormat.CColorModifiers());
 			var mod;
 			if(null != tint){
-				mod = new CColorMod();
+				mod = new AscFormat.CColorMod();
 				mod.setName("wordTint");
 				mod.setVal(tint /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
 			}
 			if(null != shade){
-				mod = new CColorMod();
+				mod = new AscFormat.CColorMod();
 				mod.setName("wordShade");
 				mod.setVal(shade /** 100000.0 / 0xff*/);
 				ret.fill.color.Mods.addMod(mod);
@@ -983,7 +982,7 @@ function initMathRevisions(elem ,props) {
 
 function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 {
-    this.memory = new CMemory();
+    this.memory = new AscCommon.CMemory();
     this.Document = doc;
     this.nLastFilePos = 0;
     this.nRealTableCount = 0;
@@ -1004,16 +1003,16 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 	};
     this.Write = function()
     {
-        window.global_pptx_content_writer._Start();
+        pptx_content_writer._Start();
         this.WriteMainTable();
-        window.global_pptx_content_writer._End();
+        pptx_content_writer._End();
         return this.GetResult();
     }
     this.Write2 = function()
     {
-        window.global_pptx_content_writer._Start();
+        pptx_content_writer._Start();
         this.WriteMainTable();
-        window.global_pptx_content_writer._End();
+        pptx_content_writer._End();
     }
 	this.GetResult = function()
 	{
@@ -1021,7 +1020,7 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 	}
     this.WriteFileHeader = function(nDataSize)
     {
-        return c_oSerFormat.Signature + ";v" + c_oSerFormat.Version + ";" + nDataSize  + ";";
+        return AscCommon.c_oSerFormat.Signature + ";v" + AscCommon.c_oSerFormat.Version + ";" + nDataSize  + ";";
     }
     this.WriteMainTable = function()
     {
@@ -1077,12 +1076,12 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
 	this.CopyStart = function()
     {
 		var api = this.Document.DrawingDocument.m_oWordControl.m_oApi;
-		window.global_pptx_content_writer.Start_UseFullUrl();
+		pptx_content_writer.Start_UseFullUrl();
         if (api.ThemeLoader) {
-            window.global_pptx_content_writer.Start_UseDocumentOrigin(api.ThemeLoader.ThemesUrlAbs);
+            pptx_content_writer.Start_UseDocumentOrigin(api.ThemeLoader.ThemesUrlAbs);
         }
 
-        window.global_pptx_content_writer._Start();
+        pptx_content_writer._Start();
 		this.copyParams.bLockCopyElems = 0;
 		this.copyParams.itemCount = 0;
 		this.copyParams.oUsedNumIdMap = {};
@@ -1128,8 +1127,8 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml)
         this.WriteTable(c_oSerTableTypes.Style, new BinaryStyleTableWriter(this.memory, this.Document, this.copyParams.oUsedNumIdMap, this.copyParams, this.saveParams));
 		
 		this.WriteMainTableEnd();
-		window.global_pptx_content_writer._End();
-		window.global_pptx_content_writer.End_UseFullUrl();
+		pptx_content_writer._End();
+		pptx_content_writer.End_UseFullUrl();
 	}
     this.WriteTable = function(type, oTableSer)
     {
@@ -1170,7 +1169,7 @@ function BinarySigTableWriter(memory)
         //Write stVersion
         this.memory.WriteByte(c_oSerSigTypes.Version);
         this.memory.WriteByte(c_oSerPropLenType.Long);
-        this.memory.WriteLong(c_oSerFormat.Version);
+        this.memory.WriteLong(AscCommon.c_oSerFormat.Version);
     }
 };
 function BinaryStyleTableWriter(memory, doc, oNumIdMap, copyParams, saveParams)
@@ -1588,10 +1587,10 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
         this.memory.WriteByte(c_oSerPropLenType.Byte);
 		switch(TabItem.Value)
 		{
-			case tab_Right: this.memory.WriteByte(g_tabtype_right);break;
-			case tab_Center: this.memory.WriteByte(g_tabtype_center);break;
-			case tab_Clear: this.memory.WriteByte(g_tabtype_clear);break;
-			default:this.memory.WriteByte(g_tabtype_left);
+			case tab_Right: this.memory.WriteByte(AscCommon.g_tabtype_right);break;
+			case tab_Center: this.memory.WriteByte(AscCommon.g_tabtype_center);break;
+			case tab_Clear: this.memory.WriteByte(AscCommon.g_tabtype_clear);break;
+			default:this.memory.WriteByte(AscCommon.g_tabtype_left);
 		}
         
         //pos
@@ -1797,11 +1796,11 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 		var nFormatType = null;
 		switch(sectPr.Get_Type())
 		{
-			case section_type_Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
-			case section_type_EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
-			case section_type_Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
-			case section_type_NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
-			case section_type_OddPage: nFormatType = ESectionMark.sectionmarkOddPage;break;
+			case c_oAscSectionBreakType.Continuous: nFormatType = ESectionMark.sectionmarkContinious;break;
+			case c_oAscSectionBreakType.EvenPage: nFormatType = ESectionMark.sectionmarkEvenPage;break;
+			case c_oAscSectionBreakType.Column: nFormatType = ESectionMark.sectionmarkNextColumn;break;
+			case c_oAscSectionBreakType.NextPage: nFormatType = ESectionMark.sectionmarkNextPage;break;
+			case c_oAscSectionBreakType.OddPage: nFormatType = ESectionMark.sectionmarkOddPage;break;
 		}
 		if(null != nFormatType)
 		{
@@ -2002,7 +2001,7 @@ function Binary_rPrWriter(memory, saveParams)
             {
                 this.memory.WriteByte(c_oSerProp_rPrType.HighLightTyped);
                 this.memory.WriteByte(c_oSerPropLenType.Byte);
-                this.memory.WriteByte(c_oSer_ColorType.None);
+                this.memory.WriteByte(AscCommon.c_oSer_ColorType.Auto);
             }
             else
             {
@@ -2129,7 +2128,7 @@ function Binary_rPrWriter(memory, saveParams)
 		{
 			this.memory.WriteByte(c_oSerProp_rPrType.TextOutline);
             this.memory.WriteByte(c_oSerPropLenType.Variable);
-			this.bs.WriteItemWithLength(function () { window.global_pptx_content_writer.WriteSpPr(_this.memory, rPr.TextOutline, 0); });
+			this.bs.WriteItemWithLength(function () { pptx_content_writer.WriteSpPr(_this.memory, rPr.TextOutline, 0); });
 		}
 		if(null != rPr.TextFill)
 		{
@@ -2139,7 +2138,7 @@ function Binary_rPrWriter(memory, saveParams)
             {
                 rPr.TextFill.transparent = 255 - rPr.TextFill.transparent;
             }
-			this.bs.WriteItemWithLength(function () { window.global_pptx_content_writer.WriteSpPr(_this.memory, rPr.TextFill, 1); });
+			this.bs.WriteItemWithLength(function () { pptx_content_writer.WriteSpPr(_this.memory, rPr.TextFill, 1); });
             if(null != rPr.TextFill.transparent)
             {
                 rPr.TextFill.transparent = 255 - rPr.TextFill.transparent;
@@ -4240,8 +4239,8 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
                     //}
                     if(this.copyParams)
                     {
-                        ExecuteNoHistory(function(){
-                            CheckSpPrXfrm2(item.GraphicObj);
+                        AscFormat.ExecuteNoHistory(function(){
+                          AscFormat.CheckSpPrXfrm2(item.GraphicObj);
                         }, this, []);
                     }
 					
@@ -4270,20 +4269,19 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			this.memory.WriteByte(c_oSerImageType2.Extent);
 			this.memory.WriteByte(c_oSerPropLenType.Variable);
 			this.bs.WriteItemWithLength(function(){oThis.WriteExtent(img.Extent);});
-			
 			if(null != img.GraphicObj.chart)
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
 				
-				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
 			}
 		}
 		else
@@ -4340,12 +4338,11 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 				this.memory.WriteByte(c_oSerPropLenType.Byte);
 				this.memory.WriteBool(img.SimplePos.Use);
 			}
-			if(false)
+			if(img.EffectExtent)
 			{
-				var EffectExtent = null;
 				this.memory.WriteByte(c_oSerImageType2.EffectExtent);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(EffectExtent);});
+				this.bs.WriteItemWithLength(function(){oThis.WriteEffectExtent(img.EffectExtent);});
 			}
 			if(null != img.Extent)
 			{
@@ -4413,14 +4410,14 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
 			{
 				this.memory.WriteByte(c_oSerImageType2.Chart2);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				var oBinaryChartWriter = new BinaryChartWriter(this.memory);
+				var oBinaryChartWriter = new AscCommon.BinaryChartWriter(this.memory);
 				this.bs.WriteItemWithLength(function () { oBinaryChartWriter.WriteCT_ChartSpace(img.GraphicObj); });
 			}
 			else
 			{
 				this.memory.WriteByte(c_oSerImageType2.PptxData);
 				this.memory.WriteByte(c_oSerPropLenType.Variable);
-				this.bs.WriteItemWithLength(function(){window.global_pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
+				this.bs.WriteItemWithLength(function(){pptx_content_writer.WriteDrawing(oThis.memory, img.GraphicObj, oThis.Document, oThis.oMapCommentId, oThis.oNumIdMap, oThis.copyParams, oThis.saveParams);});
 			}
 		}
 		if(this.saveParams && this.saveParams.bMailMergeHtml)
@@ -4432,29 +4429,29 @@ function BinaryDocumentTableWriter(memory, doc, oMapCommentId, oNumIdMap, copyPa
     };
 	this.WriteEffectExtent = function(EffectExtent)
 	{
-		if(null != EffectExtent.Left)
+		if(null != EffectExtent.L)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Left);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Left);
+			this.memory.WriteDouble(EffectExtent.L);
 		}
-		if(null != EffectExtent.Top)
+		if(null != EffectExtent.T)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Top);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Top);
+			this.memory.WriteDouble(EffectExtent.T);
 		}
-		if(null != EffectExtent.Right)
+		if(null != EffectExtent.R)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Right);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Right);
+			this.memory.WriteDouble(EffectExtent.R);
 		}
-		if(null != EffectExtent.Bottom)
+		if(null != EffectExtent.B)
 		{
 			this.memory.WriteByte(c_oSerEffectExtent.Bottom);
 			this.memory.WriteByte(c_oSerPropLenType.Double);
-			this.memory.WriteDouble(EffectExtent.Bottom);
+			this.memory.WriteDouble(EffectExtent.B);
 		}
 	}
 	this.WriteExtent = function(Extent)
@@ -4737,7 +4734,7 @@ function BinaryOtherTableWriter(memory, doc)
         //delete ImageMap
         //todo EmbeddedFonts
 		//DocxTheme
-		this.bs.WriteItem(c_oSerOtherTableTypes.DocxTheme, function(){window.global_pptx_content_writer.WriteTheme(oThis.memory, oThis.Document.theme);});
+		this.bs.WriteItem(c_oSerOtherTableTypes.DocxTheme, function(){pptx_content_writer.WriteTheme(oThis.memory, oThis.Document.theme);});
     };
 };
 function BinaryCommentsTableWriter(memory, doc, oMapCommentId)
@@ -5070,7 +5067,7 @@ function BinaryFileReader(doc, openParams)
         var nWritten = 0;
 
         var nType = 0;
-        var index = c_oSerFormat.Signature.length;
+        var index = AscCommon.c_oSerFormat.Signature.length;
         var version = "";
         var dst_len = "";
         while (true)
@@ -5100,7 +5097,7 @@ function BinaryFileReader(doc, openParams)
         var dstLen = parseInt(dst_len);
 
         var pointer = g_memory.Alloc(dstLen);
-        var stream = new FT_Stream2(pointer.data, dstLen);
+        var stream = new AscCommon.FT_Stream2(pointer.data, dstLen);
         stream.obj = pointer.obj;
 
         var dstPx = stream.data;
@@ -5170,7 +5167,7 @@ function BinaryFileReader(doc, openParams)
         {
             var nTempVersion = version.substring(1) - 0;
             if(nTempVersion)
-                g_nCurFileVersion = nTempVersion;
+              AscCommon.CurFileVersion = nTempVersion;
         }
         return stream;
     };
@@ -5194,7 +5191,7 @@ function BinaryFileReader(doc, openParams)
     this.ReadData = function(data)
     {
         //try{
-        this.stream = new FT_Stream2(data, data.length);        
+        this.stream = new AscCommon.FT_Stream2(data, data.length);        
         this.PreLoadPrepare();
         this.ReadMainTable();
         this.PostLoadPrepare();
@@ -5218,7 +5215,7 @@ function BinaryFileReader(doc, openParams)
 		stDefault.Table = null;
 
         //надо сбросить то, что остался после открытия документа(повторное открытие в Version History)
-        window.global_pptx_content_loader.Clear();
+        pptx_content_loader.Clear();
 	}
     this.ReadMainTable = function()
     {
@@ -5395,7 +5392,7 @@ function BinaryFileReader(doc, openParams)
 		var oDocStyle = this.Document.Styles;
 		var styles = this.Document.Styles.Style;
         var stDefault = this.Document.Styles.Default;
-		if(g_nCurFileVersion < 2){
+		if(AscCommon.CurFileVersion < 2){
 			for(var i in this.oReadResult.styles)
 				this.oReadResult.styles[i].style.qFormat = true;
 		}		
@@ -5690,12 +5687,12 @@ function BinaryFileReader(doc, openParams)
 
         this.Document.On_EndLoad();
 		//чтобы удалялся stream с бинарником
-		window.global_pptx_content_loader.Clear(true);
+		pptx_content_loader.Clear(true);
     };
     this.ReadFromString = function (sBase64, isCopyPaste) {
         //надо сбросить то, что остался после открытия документа
-        window.global_pptx_content_loader.Clear();
-        window.global_pptx_content_loader.Start_UseFullUrl();
+        pptx_content_loader.Clear();
+        pptx_content_loader.Start_UseFullUrl();
         this.stream = this.getbase64DecodedData(sBase64);
         this.ReadMainTable();
         var oReadResult = this.oReadResult;
@@ -5859,14 +5856,14 @@ function BinaryFileReader(doc, openParams)
 			fontScheme = m_oLogicDocument.slideMasters[0].Theme.themeElements.fontScheme;
 		else
 			fontScheme = oDocument.theme.themeElements.fontScheme;
-		
-		checkThemeFonts(AllFonts, fontScheme);
+
+      AscFormat.checkThemeFonts(AllFonts, fontScheme);
 		
         for (var i in AllFonts)
-            aPrepeareFonts.push(new CFont(i, 0, "", 0));
+            aPrepeareFonts.push(new AscFonts.CFont(i, 0, "", 0));
         //создаем список используемых картинок
         var oPastedImagesUnique = {};
-        var aPastedImages = window.global_pptx_content_loader.End_UseFullUrl();
+        var aPastedImages = pptx_content_loader.End_UseFullUrl();
         for (var i = 0, length = aPastedImages.length; i < length; ++i) {
             var elem = aPastedImages[i];
             oPastedImagesUnique[elem.Url] = 1;
@@ -5915,7 +5912,7 @@ function BinaryFileReader(doc, openParams)
 		
 		var oCommentsNewId = {};
 		//меняем CDocumentContent на Document для возможности вставки комментариев в колонтитул и таблицу
-		var isIntoShape = this.Document && this.Document.Parent && this.Document.Parent instanceof CShape ? true : false;
+		var isIntoShape = this.Document && this.Document.Parent && this.Document.Parent instanceof AscFormat.CShape ? true : false;
 		var isIntoDocumentContent = this.Document instanceof CDocumentContent ? true : false;
 		var document = this.Document && isIntoDocumentContent && !isIntoShape ? this.Document.LogicDocument : this.Document;
 		for(var i in this.oReadResult.oComments)
@@ -5980,7 +5977,7 @@ function BinaryFileReader(doc, openParams)
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
 		}
 		//чтобы удалялся stream с бинарником
-		window.global_pptx_content_loader.Clear(true);
+		pptx_content_loader.Clear(true);
         return { content: aContent, fonts: aPrepeareFonts, images: aPrepeareImages, bAddNewStyles: addNewStyles, aPastedImages: aPastedImages, bInBlock: bInBlock };
     }
 }
@@ -6288,7 +6285,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				if(null != unifill)
 					pPr.Shd.Unifill = unifill;
 				else if (null != pPr.Shd.Color && !pPr.Shd.Color.Auto)
-				    pPr.Shd.Unifill = CreteSolidFillRGB(pPr.Shd.Color.r, pPr.Shd.Color.g, pPr.Shd.Color.b);
+				    pPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(pPr.Shd.Color.r, pPr.Shd.Color.g, pPr.Shd.Color.b);
                 break;
             case c_oSerProp_pPrType.WidowControl:
 				pPr.WidowControl = this.stream.GetBool();
@@ -6414,7 +6411,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			if(null != unifill)
 				Border.Unifill = unifill;
 			else if (null != Border.Color && !Border.Color.Auto)
-			    Border.Unifill = CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
+			    Border.Unifill = AscFormat.CreteSolidFillRGB(Border.Color.r, Border.Color.g, Border.Color.b);
         }
         else
             res = c_oSerConstants.ReadUnknown;
@@ -6558,9 +6555,9 @@ function Binary_pPrReader(doc, oReadResult, stream)
 		{
 			switch(this.stream.GetUChar())
 			{
-				case g_tabtype_right : tab.Value = tab_Right;break;
-				case g_tabtype_center : tab.Value = tab_Center;break;
-				case g_tabtype_clear : tab.Value = tab_Clear;break;
+				case AscCommon.g_tabtype_right : tab.Value = tab_Right;break;
+				case AscCommon.g_tabtype_center : tab.Value = tab_Center;break;
+				case AscCommon.g_tabtype_clear : tab.Value = tab_Clear;break;
 				default : tab.Value = tab_Left;
 			}
 		}
@@ -6705,11 +6702,11 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			var nEditorType = null;
 			switch(this.stream.GetByte())
 			{
-				case ESectionMark.sectionmarkContinious: nEditorType = section_type_Continuous;break;
-				case ESectionMark.sectionmarkEvenPage: nEditorType = section_type_EvenPage;break;
-				case ESectionMark.sectionmarkNextColumn: nEditorType = section_type_Column;break;
-				case ESectionMark.sectionmarkNextPage: nEditorType = section_type_NextPage;break;
-				case ESectionMark.sectionmarkOddPage: nEditorType = section_type_OddPage;break;
+				case ESectionMark.sectionmarkContinious: nEditorType = c_oAscSectionBreakType.Continuous;break;
+				case ESectionMark.sectionmarkEvenPage: nEditorType = c_oAscSectionBreakType.EvenPage;break;
+				case ESectionMark.sectionmarkNextColumn: nEditorType = c_oAscSectionBreakType.Column;break;
+				case ESectionMark.sectionmarkNextPage: nEditorType = c_oAscSectionBreakType.NextPage;break;
+				case ESectionMark.sectionmarkOddPage: nEditorType = c_oAscSectionBreakType.OddPage;break;
 			}
 			if(null != nEditorType)
 				oSectPr.Set_Type(nEditorType);
@@ -6921,7 +6918,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 break;
             case c_oSerProp_rPrType.HighLightTyped:
                 var nHighLightTyped = this.stream.GetUChar();
-                if(nHighLightTyped == c_oSer_ColorType.None)
+                if(nHighLightTyped == AscCommon.c_oSer_ColorType.Auto)
                     rPr.HighLight = highlight_None;
                 break;
 			case c_oSerProp_rPrType.RStyle:
@@ -7003,7 +7000,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
 				if(null != unifill)
 					rPr.Unifill = unifill;
 				else if (null != rPr.Color && !rPr.Color.Auto)
-				    rPr.Unifill = CreteSolidFillRGB(rPr.Color.r, rPr.Color.g, rPr.Color.b);
+				    rPr.Unifill = AscFormat.CreteSolidFillRGB(rPr.Color.r, rPr.Color.g, rPr.Color.b);
 				break;
             case c_oSerProp_rPrType.Shd:
                 rPr.Shd = new CDocumentShd();
@@ -7017,14 +7014,14 @@ function Binary_rPrReader(doc, oReadResult, stream)
                 if (null != unifill)
                     rPr.Shd.Unifill = unifill;
                 else if (null != rPr.Shd.Color && !rPr.Shd.Color.Auto)
-                    rPr.Shd.Unifill = CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
+                    rPr.Shd.Unifill = AscFormat.CreteSolidFillRGB(rPr.Shd.Color.r, rPr.Shd.Color.g, rPr.Shd.Color.b);
                 break;
 			case c_oSerProp_rPrType.Vanish:
                 rPr.Vanish = this.stream.GetBool();
                 break;
 			case c_oSerProp_rPrType.TextOutline:
 				if(length > 0){
-					var TextOutline = window.global_pptx_content_loader.ReadShapeProperty(this.stream, 0);
+					var TextOutline = pptx_content_loader.ReadShapeProperty(this.stream, 0);
 					if(null != TextOutline)
 						rPr.TextOutline = TextOutline;
 				}
@@ -7033,7 +7030,7 @@ function Binary_rPrReader(doc, oReadResult, stream)
 				break;
 			case c_oSerProp_rPrType.TextFill:
 				if(length > 0){
-					var TextFill = window.global_pptx_content_loader.ReadShapeProperty(this.stream, 1);
+					var TextFill = pptx_content_loader.ReadShapeProperty(this.stream, 1);
 					if(null != TextFill)
 						rPr.TextFill = TextFill;
 				}
@@ -7140,7 +7137,7 @@ Binary_tblPrReader.prototype =
 			if(null != unifill)
 				Pr.Shd.Unifill = unifill;
 			else if (null != Pr.Shd.Color && !Pr.Shd.Color.Auto)
-			    Pr.Shd.Unifill = CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
+			    Pr.Shd.Unifill = AscFormat.CreteSolidFillRGB(Pr.Shd.Color.r, Pr.Shd.Color.g, Pr.Shd.Color.b);
         }
 		else if( c_oSerProp_tblPrType.Layout === type )
 		{
@@ -7501,7 +7498,7 @@ Binary_tblPrReader.prototype =
 			if(null != unifill)
 				oNewShd.Unifill = unifill;
 			else if (null != oNewShd.Color && !oNewShd.Color.Auto)
-			    oNewShd.Unifill = CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
+			    oNewShd.Unifill = AscFormat.CreteSolidFillRGB(oNewShd.Color.r, oNewShd.Color.g, oNewShd.Color.b);
             //если есть themeColor или Color, то Value по умолчанию ShdClear(Тарифы_на_комплексное_обслуживание_клиен.docx)
             if (undefined == oNewShd.Value && oNewShd.Unifill) {
                 oNewShd.Value = Asc.c_oAscShdClear;
@@ -7995,7 +7992,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             if (oNewTable.Content.length > 0) {
               oNewTable.ReIndexing(0);
               oNewTable.Correct_BadTable();
-              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              if(2 == AscCommon.CurFileVersion && false == oNewTable.Inline)
               {
                   //делаем смещение левой границы
                   if(false == oNewTable.PositionH.Align)
@@ -8022,7 +8019,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             });
 			if(null != oAdditional.EvenAndOddHeaders)
 				this.Document.Set_DocumentEvenAndOddHeaders(oAdditional.EvenAndOddHeaders);
-			if(g_nCurFileVersion < 5)
+			if(AscCommon.CurFileVersion < 5)
 			{
 				for(var i = 0; i < this.oReadResult.headers.length; ++i)
 				{
@@ -8414,7 +8411,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
                 }
                 if(null != drawing.GraphicObj)
                 {
-                    window.global_pptx_content_loader.ImageMapChecker[src] = true;
+                    pptx_content_loader.ImageMapChecker[src] = true;
                     oNewElem = drawing;
                 }
             }
@@ -8436,7 +8433,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             if (oNewTable.Content.length > 0) {
               oNewTable.ReIndexing(0);
               oNewTable.Correct_BadTable();
-              if(2 == g_nCurFileVersion && false == oNewTable.Inline)
+              if(2 == AscCommon.CurFileVersion && false == oNewTable.Inline)
               {
                   //делаем смещение левой границы
                   if(false == oNewTable.PositionH.Align)
@@ -8524,7 +8521,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 
         if(oParaDrawing.GraphicObj)
         {
-            if(oParaDrawing.GraphicObj.getObjectType() !== historyitem_type_ChartSpace)//диаграммы могут быть без spPr
+            if(oParaDrawing.GraphicObj.getObjectType() !== AscDFH.historyitem_type_ChartSpace)//диаграммы могут быть без spPr
             {
                 if(!oParaDrawing.GraphicObj.spPr)
                 {
@@ -8533,8 +8530,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
             }
             if(oParaDrawing.GraphicObj)
             {
-                if(drawing_Anchor == oParaDrawing.DrawingType && typeof History.RecalcData_Add === "function")//TODO некорректная проверка typeof
-                    History.RecalcData_Add( { Type : historyrecalctype_Flow, Data : oParaDrawing});
+                if(drawing_Anchor == oParaDrawing.DrawingType && typeof AscCommon.History.RecalcData_Add === "function")//TODO некорректная проверка typeof
+                  AscCommon.History.RecalcData_Add( { Type : AscDFH.historyitem_recalctype_Flow, Data : oParaDrawing});
             }
         }
 		oDrawing.content = oParaDrawing;
@@ -8718,7 +8715,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.PptxData === type )
         {
 			if(length > 0){
-				var grObject = window.global_pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
+				var grObject = pptx_content_loader.ReadDrawing(this, this.stream, this.Document, oParaDrawing);
 				if(null != grObject)
 					oParaDrawing.Set_GraphicObject(grObject);
 			}
@@ -8728,8 +8725,8 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		else if( c_oSerImageType2.Chart2 === type )
         {
 			res = c_oSerConstants.ReadUnknown;
-			var oNewChartSpace = new CChartSpace();
-            var oBinaryChartReader = new BinaryChartReader(this.stream);
+			var oNewChartSpace = new AscFormat.CChartSpace();
+            var oBinaryChartReader = new AscCommon.BinaryChartReader(this.stream);
             res = oBinaryChartReader.ExternalReadCT_ChartSpace(length, oNewChartSpace, this.Document);
             oNewChartSpace.setBDeleted(false);
             oParaDrawing.Set_GraphicObject(oNewChartSpace);
@@ -8775,6 +8772,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadEffectExtent(t, l, oReadEffectExtent);
                 });
+            oParaDrawing.setEffectExtent(oReadEffectExtent.L, oReadEffectExtent.T, oReadEffectExtent.R, oReadEffectExtent.B);
 		}
 		else if( c_oSerImageType2.Extent === type )
 		{
@@ -8878,13 +8876,13 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 		var res = c_oSerConstants.ReadOk;
         var oThis = this;
         if( c_oSerEffectExtent.Left === type )
-			oEffectExtent.Left = this.bcr.ReadDouble();
+			oEffectExtent.L = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Top === type )
-			oEffectExtent.Top = this.bcr.ReadDouble();
+			oEffectExtent.T = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Right === type )
-			oEffectExtent.Right = this.bcr.ReadDouble();
+			oEffectExtent.R = this.bcr.ReadDouble();
 		else if( c_oSerEffectExtent.Bottom === type )
-			oEffectExtent.Bottom = this.bcr.ReadDouble();
+			oEffectExtent.B = this.bcr.ReadDouble();
 		else
             res = c_oSerConstants.ReadUnknown;
         return res;
@@ -9012,7 +9010,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, bAllow
 			var DistB = this.bcr.ReadDouble();
 		else if( c_oSerWrapTopBottom.EffectExtent === type )
 		{
-			var EffectExtent = {Left: null, Top: null, Right: null, Bottom: null};
+			var EffectExtent = {L: null, T: null, R: null, B: null};
 			res = this.bcr.Read2(length, function(t, l){
                     return oThis.ReadEffectExtent(t, l, EffectExtent);
                 });
@@ -11735,7 +11733,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
             for (var i = 0; i < _count; i++)
             {
                 var _at = this.stream.GetUChar();
-                if (_at != g_nodeAttributeStart)
+                if (_at != AscCommon.g_nodeAttributeStart)
                     break;
 
                 var _f_i = {};
@@ -11743,7 +11741,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
                 while (true)
                 {
                     _at = this.stream.GetUChar();
-                    if (_at == g_nodeAttributeEnd)
+                    if (_at == AscCommon.g_nodeAttributeEnd)
                         break;
 
                     switch (_at)
@@ -11786,7 +11784,7 @@ function Binary_OtherTableReader(doc, oReadResult, stream)
 		}
 		else if ( c_oSerOtherTableTypes.DocxTheme === type )
         {
-		    this.Document.theme = window.global_pptx_content_loader.ReadTheme(this, this.stream);
+		    this.Document.theme = pptx_content_loader.ReadTheme(this, this.stream);
 		    res = c_oSerConstants.ReadUnknown;
 		}
         else
@@ -12376,7 +12374,7 @@ CFontsCharMap.prototype =
 
     EndWork : function()
     {
-        var mem = new CMemory();
+        var mem = new AscCommon.CMemory();
         mem.Init();
 
         for (var i in this.map_fonts)
@@ -12431,7 +12429,7 @@ CFontsCharMap.prototype =
         else if ( bItalic && bBold )
             oFontStyle = FontStyle.FontStyleBoldItalic;
 
-        var _id = font_info.GetFontID(window.g_font_loader, oFontStyle);
+        var _id = font_info.GetFontID(AscCommon.g_font_loader, oFontStyle);
 
         var _find_index = _id.id + "_teamlab_" + _id.faceIndex;
         if (this.CurrentFontName != _find_index)
@@ -12447,7 +12445,7 @@ CFontsCharMap.prototype =
                 _find.Name = family;
                 _find.Id = _id.id;
                 _find.FaceIndex = _id.faceIndex;
-                _find.IsEmbedded = (font_info.type == FONT_TYPE_EMBEDDED);
+                _find.IsEmbedded = (font_info.type == AscFonts.FONT_TYPE_EMBEDDED);
 
                 this.CurrentFontInfo = _find;
                 this.map_fonts[_find_index] = _find;
@@ -12565,3 +12563,9 @@ OpenParStruct.prototype = {
         return this.cur.pos;
     }
 }
+
+//---------------------------------------------------------export---------------------------------------------------
+window['AscCommonWord'] = window['AscCommonWord'] || {};
+window["AscCommonWord"].BinaryFileReader = BinaryFileReader;
+window["AscCommonWord"].BinaryFileWriter = BinaryFileWriter;
+window["AscCommonWord"].EThemeColor = EThemeColor;

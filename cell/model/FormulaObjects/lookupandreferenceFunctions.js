@@ -36,6 +36,10 @@ function (window, undefined) {
 
     var g_cCharDelimiter = AscCommon.g_cCharDelimiter;
     var parserHelp = AscCommon.parserHelp;
+    var gc_nMaxRow0 = AscCommon.gc_nMaxRow0;
+    var gc_nMaxCol0 = AscCommon.gc_nMaxCol0;
+    var g_oCellAddressUtils = AscCommon.g_oCellAddressUtils;
+    var CellAddress = AscCommon.CellAddress;
     
     var cElementType = AscCommonExcel.cElementType;
     var cErrorType = AscCommonExcel.cErrorType;
@@ -179,7 +183,7 @@ cADDRESS.prototype.Calculate = function ( arg ) {
     refType = refType.getValue();
     A1RefType = A1RefType.getValue();
 
-    if ( refType > 4 || refType < 1 || rowNumber < 1 || rowNumber > gc_nMaxRow || colNumber < 1 || colNumber > gc_nMaxCol ) {
+    if ( refType > 4 || refType < 1 || rowNumber < 1 || rowNumber > AscCommon.gc_nMaxRow || colNumber < 1 || colNumber > AscCommon.gc_nMaxCol ) {
         return this.value = new cError( cErrorType.wrong_value_type );
     }
     var strRef;
@@ -1369,7 +1373,7 @@ VHLOOKUPCache.prototype.get = function ( range, valueForSearching, isValueString
         this.cacheId[sRangeName] = cacheElem;
         var cacheRange = this.cacheRanges[wsId];
         if ( null == cacheRange ) {
-            cacheRange = new RangeDataManager( null );
+            cacheRange = new AscCommonExcel.RangeDataManager( null );
             this.cacheRanges[wsId] = cacheRange;
         }
         cacheRange.add( range.getBBox0(), cacheElem );

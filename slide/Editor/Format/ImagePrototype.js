@@ -24,6 +24,10 @@
 */
 "use strict";
 
+// Import
+var CShape = AscFormat.CShape;
+var CImageShape = AscFormat.CImageShape;
+
 CImageShape.prototype.addToDrawingObjects =  CShape.prototype.addToDrawingObjects;
 CImageShape.prototype.setDrawingObjects = CShape.prototype.setDrawingObjects;
 CImageShape.prototype.setDrawingBase = CShape.prototype.setDrawingBase;
@@ -153,7 +157,7 @@ CImageShape.prototype.recalculate = function ()
 {
     if(this.bDeleted || !this.parent)
         return;
-    ExecuteNoHistory(function(){
+    AscFormat.ExecuteNoHistory(function(){
         if (this.recalcInfo.recalculateBrush) {
             this.recalculateBrush();
             this.recalcInfo.recalculateBrush = false;
@@ -165,7 +169,7 @@ CImageShape.prototype.recalculate = function ()
         }
         if (this.recalcInfo.recalculateTransform) {
             this.recalculateTransform();
-            this.calculateSnapArrays();
+            this.recalculateSnapArrays();
             this.recalcInfo.recalculateTransform = false;
         }
 
@@ -189,4 +193,3 @@ CImageShape.prototype.getNumByCardDirection = CShape.prototype.getNumByCardDirec
 CImageShape.prototype.getCardDirectionByNum = CShape.prototype.getCardDirectionByNum;
 CImageShape.prototype.getResizeCoefficients = CShape.prototype.getResizeCoefficients;
 CImageShape.prototype.check_bounds = CShape.prototype.check_bounds;
-CImageShape.prototype.normalize = CShape.prototype.normalize;
