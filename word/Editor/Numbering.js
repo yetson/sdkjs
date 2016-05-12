@@ -2503,3 +2503,4 @@ function getNumInfoLvl(Lvl) {
 window['AscCommonWord'] = window['AscCommonWord'] || {};
 window['AscCommonWord'].CAbstractNum = CAbstractNum;
 window['AscCommonWord'].getNumInfoLvl = getNumInfoLvl;
+window['AscCommonWord'].g_NumberingArr = g_NumberingArr;
