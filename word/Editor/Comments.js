@@ -1474,5 +1474,6 @@ ParaComment.prototype.Reject_RevisionChanges = function(Type, bAll){};
 
 //--------------------------------------------------------export----------------------------------------------------
 window['AscCommon'] = window['AscCommon'] || {};
+window['AscCommon'].CCommentData = CCommentData;
 window['AscCommon'].CComment = CComment;
 window['AscCommon'].ParaComment = ParaComment;
