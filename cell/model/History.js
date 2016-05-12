@@ -226,7 +226,7 @@ CHistory.prototype.UndoRedoPrepare = function (oRedoObjectParam, bUndo) {
 		this.TurnOff();
 	}
 	/* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-	AscCommonExcel.lockDraw(this.workbook);
+	this.workbook.lockDraw();
 
 	if (bUndo)
 		this.workbook.bUndoChanges = true;
@@ -440,8 +440,8 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
     }
 
 	/* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-	AscCommonExcel.buildRecalc(this.workbook);
-	AscCommonExcel.unLockDraw(this.workbook);
+	this.workbook.unLockDraw();
+	this.workbook.buildRecalc();
 	if (oRedoObjectParam.bIsOn)
 		this.TurnOn();
 };
