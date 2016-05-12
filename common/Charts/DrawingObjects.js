@@ -2372,13 +2372,6 @@ function DrawingObjects() {
         }
     };
 
-    _this.clearSparklineGroups = function(oSparklineGroups, range) {
-        for(var i = 0; i < oSparklineGroups.arrSparklineGroup.length; ++i) {
-            var oSparklineGroup = oSparklineGroups.arrSparklineGroup[i];
-            oSparklineGroup.updateCache(range);
-        }
-    };
-
     _this.checkSparklineGroupMinMaxVal = function(oSparklineGroup)
     {
         var maxVal = null, minVal = null, i, j;

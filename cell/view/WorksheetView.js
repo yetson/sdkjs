@@ -11746,6 +11746,8 @@
             this._updateSelectionNameAndInfo();
         }
 
+        this.model.onUpdateRanges(arrChanged);
+
         this.objectRender.rebuildChartGraphicObjects( new AscFormat.CChangeTableData( null, null, null, null, arrChanged ) );
         this.cellCommentator.updateCommentPosition();
         this.handlers.trigger( "onDocumentPlaceChanged" );
