@@ -1279,7 +1279,7 @@
 			asc_setShowGridLines: function (val) { this.showGridLines = val; },
 			asc_setShowRowColHeaders: function (val) { this.showRowColHeaders = val; },
 			getType : function () {
-				return UndoRedoDataTypes.SheetViewSettings;
+				return AscCommonExcel.UndoRedoDataTypes.SheetViewSettings;
 			},
 			getProperties : function () {
 				return this.Properties;
