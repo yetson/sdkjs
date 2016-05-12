@@ -1521,7 +1521,7 @@
 					//изменяем содержимое фильтра
 					if(!curFilter.SortState)
 					{
-						curFilter.SortState = new SortState();
+						curFilter.SortState = new AscCommonExcel.SortState();
 						curFilter.SortState.Ref = new Asc.Range(startCol, curFilter.Ref.r1, startCol, maxFilterRow);
 						curFilter.SortState.SortConditions = [];
 						curFilter.SortState.SortConditions[0] = new AscCommonExcel.SortCondition();
