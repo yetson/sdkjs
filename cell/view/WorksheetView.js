@@ -9083,7 +9083,7 @@
                         t.handlers.trigger( "slowOperation", true );
                     }
                     /* отключаем отрисовку на случай необходимости пересчета ячеек, заносим ячейку, при необходимости в список перерисовываемых */
-                    AscCommonExcel.lockDraw( t.model.workbook );
+                    t.model.workbook.lockDraw();
 
                     // Если нужно удалить автофильтры - удаляем
                     if ( val === c_oAscCleanOptions.All || val === c_oAscCleanOptions.Text ) {
@@ -9115,8 +9115,8 @@
                     t.model.autoFilters.renameTableColumn( arn );
 
                     /* возвращаем отрисовку. и перерисовываем ячейки с предварительным пересчетом */
-                    AscCommonExcel.buildRecalc( t.model.workbook );
-                    AscCommonExcel.unLockDraw( t.model.workbook );
+                    t.model.workbook.unLockDraw();
+                    t.model.workbook.buildRecalc();
                     break;
 
                 case "changeDigNum":
@@ -9221,7 +9221,7 @@
             t.handlers.trigger( "slowOperation", true );
         }
 
-        AscCommonExcel.lockDraw( t.model.workbook );
+        t.model.workbook.lockDraw();
         var selectData;
         if ( isLocal === 'binary' ) {
             selectData = t._pasteFromBinary( val );
@@ -9234,8 +9234,8 @@
 
         if ( !selectData ) {
             bIsUpdate = false;
-            AscCommonExcel.buildRecalc( t.model.workbook );
-            AscCommonExcel.unLockDraw( t.model.workbook );
+            t.model.workbook.unLockDraw();
+            t.model.workbook.buildRecalc();
 			if ( callTrigger ) {
                 t.handlers.trigger( "slowOperation", false );
             }
@@ -9257,8 +9257,8 @@
             }
         }
 
-        AscCommonExcel.buildRecalc( t.model.workbook );
-        AscCommonExcel.unLockDraw( t.model.workbook );
+        t.model.workbook.unLockDraw();
+        t.model.workbook.buildRecalc();
         var arn = selectData[0];
         var selectionRange = arn.clone( true );
 
