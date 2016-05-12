@@ -4792,6 +4792,11 @@ ParaDrawing.prototype =
         {
             c.setExtent(this.Extent.W, this.Extent.H);
         }
+        var EE = this.EffectExtent;
+        if(EE.L > 0 || EE.T > 0 || EE.R || EE.B)
+        {
+            c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
+        }
         if (this.ParaMath)
             c.Set_ParaMath(this.ParaMath.Copy());
         return c;
@@ -7077,6 +7082,8 @@ ParaDrawing.prototype =
         c.Set_AllowOverlap(this.AllowOverlap);
         c.Set_WrappingType(this.wrappingType);
         c.Set_BehindDoc(this.behindDoc);
+        var EE = this.EffectExtent;
+        c.setEffectExtent(EE.L, EE.T, EE.R, EE.B);
         return c;
     },
 

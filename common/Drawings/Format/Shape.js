@@ -520,7 +520,7 @@ function CheckExcelDrawingXfrm(xfrm)
 function SetXfrmFromMetrics(oDrawing, metrics)
 {
     AscFormat.CheckSpPrXfrm(oDrawing);
-    var rot = AscFormat.isRealNumber(oDrawing.spPr.xfrm.rot) ? normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
+    var rot = AscFormat.isRealNumber(oDrawing.spPr.xfrm.rot) ? AscFormat.normalizeRotate(oDrawing.spPr.xfrm.rot) : 0;
 
     var metricExtX, metricExtY;
     if(!(oDrawing instanceof AscFormat.CGroupShape))
@@ -2473,7 +2473,7 @@ CShape.prototype.recalculateLocalTransform = function(transform)
             this.y = metrics.y;
             extX = metrics.extX;
             extY = metrics.extY;
-            var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? normalizeRotate(this.spPr.xfrm.rot) : 0;
+            var rot = this.spPr && this.spPr.xfrm && AscFormat.isRealNumber(this.spPr.xfrm.rot) ? AscFormat.normalizeRotate(this.spPr.xfrm.rot) : 0;
             this.rot = rot;
             var metricExtX, metricExtY;
             if(!(this instanceof AscFormat.CGroupShape))
@@ -5377,11 +5377,6 @@ CShape.prototype.recalculateBounds = function()
 {
     var boundsChecker = new  AscFormat.CSlideBoundsChecker();
     this.draw(boundsChecker, this.localTransform, this.localTransformText);
-    if(!this.group)
-    {
-
-        boundsChecker.CorrectBounds();
-    }
     this.bounds.l = boundsChecker.Bounds.min_x;
     this.bounds.t = boundsChecker.Bounds.min_y;
     this.bounds.r = boundsChecker.Bounds.max_x;

@@ -43,16 +43,6 @@ module.exports = function(grunt) {
         else
             grunt.log.error().writeln('Could not load config file'.red);
     });
-
-	grunt.registerTask('build_nativeword_init', 'Initialize build NativeWord SDK.', function(){
-        defaultConfig = path + '/nativeword.json';
-        packageFile = require(defaultConfig);
-
-        if (packageFile)
-            grunt.log.ok('nativeword config loaded successfully'.green);
-        else
-            grunt.log.error().writeln('Could not load config file'.red);
-    });
 	
     grunt.registerTask('build_webexcel_init', 'Initialize build WebExcel SDK.', function(){
         defaultConfig = path + '/webexcel.json';
@@ -86,7 +76,6 @@ module.exports = function(grunt) {
     });
 	
 	grunt.registerTask('build_webword',     ['build_webword_init', 'build_sdk']);
-	grunt.registerTask('build_nativeword', ['build_nativeword_init', 'build_sdk']);
 	grunt.registerTask('build_webexcel',  ['build_webexcel_init', 'build_sdk']);
 	grunt.registerTask('build_webpowerpoint', ['build_webpowerpoint_init', 'build_sdk']);
 
@@ -96,17 +85,23 @@ module.exports = function(grunt) {
 		var sdkTmp = 'sdk-tmp.js', sdkAllTmp = 'sdk-all-tmp.js', sdkAllMinTmp = 'sdk-all-min-tmp.js';
 		var srcFilesMin = packageFile['compile']['sdk']['min'];
 		var srcFilesAll = packageFile['compile']['sdk']['common'];
-		var sdkOpt = {
-			compilation_level: 'WHITESPACE_ONLY',
-			warning_level: 'QUIET',
-			externs: packageFile['compile']['sdk']['externs']
-		};
+		var sdkOpt = {};
+		
+		if (!grunt.option('noclosure')) {
+			sdkOpt = {
+				banner: '(function(window, undefined) {',
+				footer: '})(window);'
+			};
+		}
 		
 		if (grunt.option('mobile')) {
-			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile']
+			srcFilesMin = packageFile['compile']['sdk']['mobile_banners']['min'].concat(srcFilesMin);
+			srcFilesAll = packageFile['compile']['sdk']['mobile_banners']['common'].concat(srcFilesAll);
+			
+			var excludeFiles = packageFile['compile']['sdk']['exclude_mobile'];
 			srcFilesAll = srcFilesAll.filter(function(item) {
 				return -1 === excludeFiles.indexOf(item);
-			});		
+			});
 			var mobileFiles = packageFile['compile']['sdk']['mobile'];
 			if(mobileFiles){
 				srcFilesAll = srcFilesAll.concat(mobileFiles);
@@ -137,10 +132,7 @@ module.exports = function(grunt) {
 					dest: sdkAllMinTmp
 				},
 				sdk: {
-					options: {
-						banner: '(function(window, undefined) {',
-						footer: '})(window);'
-					},
+					options: sdkOpt,
 					src: srcFilesAll,
 					dest: sdkAllTmp
 				},
