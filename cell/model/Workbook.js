@@ -3374,7 +3374,7 @@ Woorksheet.prototype.clone=function(sNewId, sName){
 		oNewWs.sheetViews.push(this.sheetViews[i].clone());
 	}
 	for (i = 0; i < this.aConditionalFormatting.length; ++i) {
-		oNewWs.aConditionalFormatting.push(this.aConditionalFormatting[i].clone(oNewWs));
+		oNewWs.aConditionalFormatting.push(this.aConditionalFormatting[i].clone());
 	}
 	if (this.sheetPr)
 		oNewWs.sheetPr = this.sheetPr.clone();
@@ -3504,20 +3504,21 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
   var min = Number.MAX_VALUE;
   var max = -Number.MAX_VALUE;
   var arrayCells = [];
-  var tmp, i, j, cell;
+  var tmp, i, j, cell, sqref;
   for (i = 0; i < aCFs.length; ++i) {
-    // ToDo убрать null === aCFs[i].SqRefRange когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
-    if (null === aCFs[i].SqRefRange) {
+    sqref = aCFs[i].sqref;
+    // ToDo убрать null === sqref когда научимся мультиселект обрабатывать (\\192.168.5.2\source\DOCUMENTS\XLSX\Matematika Quantum Sedekah.xlsx)
+    if (null === sqref) {
       continue;
     }
-    if (!range || range.intersection(aCFs[i].SqRefRange)) {
+    if (!range || range.isIntersect(sqref)) {
       aRules = aCFs[i].aRules;
       for (j = 0; j < aRules.length; ++j) {
         oRule = aRules[j];
         // ToDo aboveAverage, beginsWith, cellIs, containsBlanks, containsErrors,
         // ToDo containsText, dataBar, duplicateValues, endsWith, expression, iconSet, notContainsBlanks,
         // ToDo notContainsErrors, notContainsText, timePeriod, top10, uniqueValues (page 2679)
-        switch (oRule.Type) {
+        switch (oRule.type) {
           case Asc.ECfType.colorScale:
             if (1 !== oRule.aRuleElements.length) {
               break;
@@ -3527,7 +3528,7 @@ Woorksheet.prototype._updateConditionalFormatting = function(range) {
               break;
             }
 
-            aCFs[i].SqRefRange._setPropertyNoEmpty(null, null, function(c) {
+            this.getRange3(sqref.r1, sqref.c1, sqref.r2, sqref.c2)._setPropertyNoEmpty(null, null, function(c) {
               if (CellValueType.Number === c.getType() && false === c.isEmptyTextString()) {
                 tmp = parseFloat(c.getValueWithoutFormat());
                 if (isNaN(tmp)) {
@@ -5393,6 +5394,7 @@ Woorksheet.prototype.createTablePart = function(){
 };
 Woorksheet.prototype.onUpdateRanges = function(ranges) {
   this.workbook.updateSparklineCache(this.sName, ranges);
+  this._updateConditionalFormatting(new AscCommonExcel.MultiplyRange(ranges));
 };
 Woorksheet.prototype.updateSparklineCache = function(sheet, ranges) {
   for (var i = 0; i < this.sparklineGroups.arrSparklineGroup.length; ++i) {
