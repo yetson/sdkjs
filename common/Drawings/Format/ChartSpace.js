@@ -489,6 +489,13 @@ function checkPointInMap(map, worksheet, row, col)
             oCopyTextPr.FontSize = FontSize_IncreaseDecreaseValue( bIncrease, AscFormat.isRealNumber(oCopyTextPr.FontSize) ? oCopyTextPr.FontSize : nDefaultSize);
             oParaPr.DefaultRunPr = oCopyTextPr;
             oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+            if(oElement.tx && oElement.tx.rich)
+            {
+                oElement.tx.rich.content.Set_ApplyToAll(true);
+                oElement.tx.rich.content.Paragraph_IncDecFontSize(bIncrease);
+                oElement.tx.rich.content.Set_ApplyToAll(false);
+
+            }
         }
     }
 
@@ -12635,4 +12642,5 @@ function checkBlipFillRasterImages(sp)
     window['AscFormat'].initStyleManager = initStyleManager;
     window['AscFormat'].CHART_STYLE_MANAGER = CHART_STYLE_MANAGER;
     window['AscFormat'].CheckParagraphTextPr = CheckParagraphTextPr;
+    window['AscFormat'].CheckObjectTextPr = CheckObjectTextPr;
 })(window);
