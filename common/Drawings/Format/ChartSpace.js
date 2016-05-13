@@ -539,11 +539,11 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
             drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.getTransformMatrix(), 0, 0, this.extX, this.extY, false, this.canRotate());
             if(this.selection.textSelection)
             {
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.TEXT, this.selection.textSelection.transform, 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, false, false);
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.selection.textSelection.transform, 0, 0, this.selection.textSelection.extX, this.selection.textSelection.extY, false, false, false);
             }
             else if(this.selection.title)
             {
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.title.transform, 0, 0, this.selection.title.extX, this.selection.title.extY, false, false, false);
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.selection.title.transform, 0, 0, this.selection.title.extX, this.selection.title.extY, false, false, false);
             }
             else if(AscFormat.isRealNumber(this.selection.dataLbls))
             {
@@ -558,7 +558,7 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
                         {
                             if(pts[i] && pts[i].compiledDlb)
                             {
-                                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, pts[i].compiledDlb.transform, 0, 0, pts[i].compiledDlb.extX, pts[i].compiledDlb.extY, false, false);
+                                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, pts[i].compiledDlb.transform, 0, 0, pts[i].compiledDlb.extX, pts[i].compiledDlb.extY, false, false);
                             }
                         }
                     }
@@ -566,7 +566,7 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
                     {
                         if(pts[this.selection.dataLbl] && pts[this.selection.dataLbl].compiledDlb)
                         {
-                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, pts[this.selection.dataLbl].compiledDlb.transform, 0, 0, pts[this.selection.dataLbl].compiledDlb.extX, pts[this.selection.dataLbl].compiledDlb.extY, false, false);
+                            drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, pts[this.selection.dataLbl].compiledDlb.transform, 0, 0, pts[this.selection.dataLbl].compiledDlb.extX, pts[this.selection.dataLbl].compiledDlb.extY, false, false);
                         }
                     }
                 }
@@ -574,24 +574,24 @@ CChartSpace.prototype.drawSelect = function(drawingDocument, nPageIndex)
             }
             else if(this.selection.dataLbl)
             {
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.dataLbl.transform, 0, 0, this.selection.dataLbl.extX, this.selection.dataLbl.extY, false, false);
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.selection.dataLbl.transform, 0, 0, this.selection.dataLbl.extX, this.selection.dataLbl.extY, false, false);
             }
             else if(this.selection.legend)
             {
                 if(AscFormat.isRealNumber(this.selection.legendEntry) && this.chart.legend.calcEntryes[this.selection.legendEntry])
                 {
                     var oEntry = this.chart.legend.calcEntryes[this.selection.legendEntry];
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, oEntry.transformText, 0, 0, oEntry.contentWidth, oEntry.contentHeight, false, false);
                 }
                 else
                 {
-                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.selection.legend.transform, 0, 0, this.selection.legend.extX, this.selection.legend.extY, false, false);
+                    drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.selection.legend.transform, 0, 0, this.selection.legend.extX, this.selection.legend.extY, false, false);
                 }
             }
             else if(this.selection.axisLbls)
             {
                 var oLabels = this.selection.axisLbls.labels;
-                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.SHAPE, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
+                drawingDocument.DrawTrack(AscFormat.TYPE_TRACK.CHART_TEXT, this.transform, oLabels.x, oLabels.y, oLabels.extX, oLabels.extY, false, false);
             }
         }
     };
