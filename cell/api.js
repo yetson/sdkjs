@@ -3211,6 +3211,9 @@ var editor;
   spreadsheet_api.prototype._onEndLoadSdk = function() {
     History = AscCommon.History;
 
+    if (this.isMobileVersion)
+        this.asc_setMobileVersion(true);
+
     spreadsheet_api.superclass._onEndLoadSdk.call(this);
 
     this.controller = new AscCommonExcel.asc_CEventsController();
