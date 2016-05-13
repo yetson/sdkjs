@@ -410,6 +410,40 @@ function checkPointInMap(map, worksheet, row, col)
 }*/
 
 
+
+    function CheckParagraphTextPr(oParagraph, oTextPr)
+    {
+        var oParaPr = oParagraph.Pr.Copy();
+        var oParaPr2 = new CParaPr();
+        var oCopyTextPr = oTextPr.Copy();
+        if(oCopyTextPr.FontFamily)
+        {
+            oCopyTextPr.RFonts.Set_FromObject(
+                {
+                    Ascii: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    EastAsia: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    HAnsi: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    },
+                    CS: {
+                        Name: oCopyTextPr.FontFamily.Name,
+                        Index: -1
+                    }
+                }
+            );
+        }
+        oParaPr2.DefaultRunPr = oCopyTextPr;
+        oParaPr.Merge(oParaPr2);
+        oParagraph.Set_Pr(oParaPr);
+    }
+
     function CheckObjectTextPr(oElement, oTextPr, oDrawingDocument)
     {
         if(oElement)
@@ -418,37 +452,18 @@ function checkPointInMap(map, worksheet, row, col)
             {
                 oElement.setTxPr(AscFormat.CreateTextBodyFromString("", oDrawingDocument, oElement));
             }
-
-            var oParaPr = oElement.txPr.content.Content[0].Pr.Copy();
             oElement.txPr.content.Content[0].Set_DocumentIndex(0);
-            var oParaPr2 = new CParaPr();
-            var oCopyTextPr = oTextPr.Copy();
-            if(oCopyTextPr.FontFamily)
+
+            CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
+            if(oElement.tx && oElement.tx.rich)
             {
-                oCopyTextPr.RFonts.Set_FromObject(
-                    {
-                        Ascii: {
-                            Name: oCopyTextPr.FontFamily.Name,
-                            Index: -1
-                        },
-                        EastAsia: {
-                            Name: oCopyTextPr.FontFamily.Name,
-                            Index: -1
-                        },
-                        HAnsi: {
-                            Name: oCopyTextPr.FontFamily.Name,
-                            Index: -1
-                        },
-                        CS: {
-                            Name: oCopyTextPr.FontFamily.Name,
-                            Index: -1
-                        }
-                    }
-                );
+                var aContent = oElement.tx.rich.content.Content;
+                for(var i = 0; i < aContent.length; ++i)
+                {
+                    CheckParagraphTextPr(aContent[i], oTextPr);
+                }
             }
-            oParaPr2.DefaultRunPr = oCopyTextPr;
-            oParaPr.Merge(oParaPr2);
-            oElement.txPr.content.Content[0].Set_Pr(oParaPr);
+            CheckParagraphTextPr(oElement.txPr.content.Content[0], oTextPr);
         }
     }
 
@@ -828,7 +843,12 @@ CChartSpace.prototype.applyLabelsFunction = function(fCallback, value)
 {
     if(this.selection.title)
     {
-        fCallback(this.selection.title, value, this.getDrawingDocument(), 18);
+        var DefaultFontSize = 18;
+        if(this.selection.title !== this.chart.title)
+        {
+            DefaultFontSize = 10;
+        }
+        fCallback(this.selection.title, value, this.getDrawingDocument(), DefaultFontSize);
     }
     else if(this.selection.legend)
     {
@@ -954,7 +974,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
             this.selection.textSelection.paragraphAdd(paraItem, bRecalculate);
             return;
         }
-        if(this.selection.title)
+        /*if(this.selection.title)
         {
             this.selection.title.checkDocContent();
             CheckObjectTextPr(this.selection.title, _paraItem.Value, this.getDrawingDocument(), 18);
@@ -965,7 +985,7 @@ CChartSpace.prototype.paragraphAdd = function(paraItem, bRecalculate)
                 this.selection.title.tx.rich.content.Set_ApplyToAll(false);
             }
             return;
-        }
+        }*/
         this.applyLabelsFunction(CheckObjectTextPr, _paraItem.Value);
     }
 };
@@ -12614,4 +12634,5 @@ function checkBlipFillRasterImages(sp)
 
     window['AscFormat'].initStyleManager = initStyleManager;
     window['AscFormat'].CHART_STYLE_MANAGER = CHART_STYLE_MANAGER;
+    window['AscFormat'].CheckParagraphTextPr = CheckParagraphTextPr;
 })(window);
