@@ -8112,6 +8112,7 @@
     window["Asc"].EFontScheme = EFontScheme;
     window["Asc"].EIconSetType = EIconSetType;
 	window["Asc"].ECfType = ECfType;
+    window["AscCommonExcel"].ECfvoType = ECfvoType;
       window["Asc"].ESparklineType = ESparklineType;
       window["Asc"].EDispBlanksAs = EDispBlanksAs;
       window["Asc"].SparklineAxisMinMax = SparklineAxisMinMax;
