@@ -2271,6 +2271,8 @@
 				this._cleanStyleTable(tablePart.Ref);
 				this._setColorStyleTable(tablePart.Ref, tablePart, null, isSetValue);
 				History.EndTransaction();
+				
+				return tablePart.Ref.clone();
 			},
 			
 			changeTableRange: function(tableName, range)
