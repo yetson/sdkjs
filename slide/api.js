@@ -1672,6 +1672,13 @@ background-repeat: no-repeat;\
 
         ParaPr.StyleName   = "";
         var TextPr         = editor.WordControl.m_oLogicDocument.Get_Paragraph_TextPr();
+        var oDrawingProps  = editor.WordControl.m_oLogicDocument.Get_GraphicObjectsProps();
+        if(oDrawingProps.shapeProps && oDrawingProps.shapeProps.locked
+            || oDrawingProps.chartProps && oDrawingProps.chartProps.locked
+            || oDrawingProps.tableProps && oDrawingProps.tableProps.Locked)
+        {
+            ParaPr.Locked = true;
+        }
         ParaPr.Subscript   = ( TextPr.VertAlign === AscCommon.vertalign_SubScript ? true : false );
         ParaPr.Superscript = ( TextPr.VertAlign === AscCommon.vertalign_SuperScript ? true : false );
         ParaPr.Strikeout   = TextPr.Strikeout;
