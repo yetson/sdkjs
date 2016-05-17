@@ -6618,6 +6618,7 @@ background-repeat: no-repeat;\
                 if (this.bInit_word_control === false)
                 {
                     this.bInit_word_control = true;
+                    this.pluginsManager = Asc.createPluginsManager(this);
                     this.asc_fireCallback("asc_onDocumentContentReady");
                 }
             }
@@ -8791,6 +8792,9 @@ background-repeat: no-repeat;\
     asc_docs_api.prototype['asc_isOffline']                             = asc_docs_api.prototype.asc_isOffline;
     asc_docs_api.prototype['asc_getUrlType']                            = asc_docs_api.prototype.asc_getUrlType;
     asc_docs_api.prototype["asc_setInterfaceDrawImagePlaceShape"]       = asc_docs_api.prototype.asc_setInterfaceDrawImagePlaceShape;
+    asc_docs_api.prototype["asc_pluginsRegister"]                       = asc_docs_api.prototype.asc_pluginsRegister;
+    asc_docs_api.prototype["asc_pluginRun"]                             = asc_docs_api.prototype.asc_pluginRun;
+    asc_docs_api.prototype["asc_pluginResize"]                          = asc_docs_api.prototype.asc_pluginResize;
 
     CParagraphPropEx.prototype['get_ContextualSpacing'] = CParagraphPropEx.prototype.get_ContextualSpacing;
     CParagraphPropEx.prototype['get_Ind']               = CParagraphPropEx.prototype.get_Ind;
