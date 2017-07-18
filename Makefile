@@ -23,7 +23,11 @@ SDKJS_FILES += slide/sdk-all.js
 
 .PHONY: all
 
-all: $(WEBAPPS)
+all: $(NODE_MODULES)
+
+$(NODE_MODULES):
+	cd $(@D) && \
+		npm install
 
 $(WEBAPPS): $(WEBAPPS_FILES)
 	mkdir -p $(OUTPUT)/$(WEBAPPS_DIR) && \
@@ -32,10 +36,6 @@ $(WEBAPPS): $(WEBAPPS_FILES)
 $(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
 	cd ../$(WEBAPPS_DIR)/build  && \
 		$(GRUNT_ENV) $(GRUNT) deploy-$(filter %editor documents,$(subst /, ,$(@D)))-component $(GRUNT_FLAGS)
-
-$(NODE_MODULES):
-	cd $(@D) && \
-		npm install
 
 $(SDKJS_FILES): $(NODE_MODULES)
 	cd build && \
