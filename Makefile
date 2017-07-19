@@ -25,11 +25,11 @@ SDKJS_FILES += slide/sdk-all.js
 
 all: $(WEBAPPS)
 
-$(WEBAPPS): $(WEBAPPS_FILES)
+$(WEBAPPS): $(NODE_MODULES) $(WEBAPPS_FILES)
 	mkdir -p $(OUTPUT)/$(WEBAPPS_DIR) && \
 		cp -r -t $(OUTPUT)/$(WEBAPPS_DIR) ../$(WEBAPPS_DIR)/deploy/** 
 
-$(WEBAPPS_FILES): $(NODE_MODULES) $(SDKJS_FILES)
+$(WEBAPPS_FILES): $(SDKJS_FILES)
 	cd ../$(WEBAPPS_DIR)/build  && \
 		$(GRUNT_ENV) $(GRUNT) deploy-$(filter %editor documents,$(subst /, ,$(@D)))-component $(GRUNT_FLAGS)
 
