@@ -760,6 +760,7 @@
 
 		this.isImageChangeUrl      = false;
 		this.isShapeImageChangeUrl = false;
+		this.textureType           = null;
 
 		this.tmpFontRenderingMode = null;
 		this.FontAsyncLoadType    = 0;
@@ -2357,6 +2358,9 @@ background-repeat: no-repeat;\
 	};
 	asc_docs_api.prototype.asc_Save           = function(isAutoSave, isUndoRequest, isIdle)
 	{
+		if (this.WordControl.m_oLogicDocument.IsViewModeInReview())
+			return false;
+
 		var res = false;
 		this.IsUserSave = !isAutoSave;
 		if (this.saveCheck())
@@ -4476,9 +4480,10 @@ background-repeat: no-repeat;\
 		this.isImageChangeUrl = true;
 		this.asc_addImage();
 	};
-	asc_docs_api.prototype.ChangeShapeImageFromFile = function()
+	asc_docs_api.prototype.ChangeShapeImageFromFile = function(type)
 	{
 		this.isShapeImageChangeUrl = true;
+		this.textureType = type;
 		this.asc_addImage();
 	};
 
@@ -4584,8 +4589,12 @@ background-repeat: no-repeat;\
 				AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 				AscShapeProp.fill.fill = new asc_CFillBlip();
 				AscShapeProp.fill.fill.asc_putUrl(src);
+				if(this.textureType !== null && this.textureType !== undefined){
+                    AscShapeProp.fill.fill.asc_putType(this.textureType);
+				}
 				this.ImgApply(new asc_CImgProperty({ShapeProperties : AscShapeProp}));
 				this.isShapeImageChangeUrl = false;
+				this.textureType = null;
 			}
 			else if (this.isImageChangeUrl)
 			{
@@ -4637,6 +4646,11 @@ background-repeat: no-repeat;\
 					AscShapeProp.fill.type = c_oAscFill.FILL_TYPE_BLIP;
 					AscShapeProp.fill.fill = new asc_CFillBlip();
 					AscShapeProp.fill.fill.asc_putUrl(src);
+
+                    if(this.textureType !== null && this.textureType !== undefined){
+                        AscShapeProp.fill.fill.asc_putType(this.textureType);
+                    }
+                    this.textureType = null;
 					this.ImgApply(new asc_CImgProperty({ShapeProperties : AscShapeProp}));
 					this.isShapeImageChangeUrl = false;
 				}
@@ -8252,6 +8266,26 @@ background-repeat: no-repeat;\
 	window["asc_docs_api"].prototype["pluginMethod_GetCurrentContentControl"] = function()
 	{
 		return this.asc_GetCurrentContentControl();
+	};
+	/**
+	 * Find and replace text.
+	 * @param {Object} oProperties The properties for find and replace.
+	 * @param {string} oProperties.searchString Search string.
+	 * @param {string} oProperties.replaceString Replacement string.
+	 * @param {string} [oProperties.matchCase=true]
+	 *
+	 */
+	window["asc_docs_api"].prototype["pluginMethod_SearchAndReplace"] = function(oProperties)
+	{
+		var sSearch     = oProperties["searchString"];
+		var sReplace    = oProperties["replaceString"];
+		var isMatchCase = undefined !== oProperties["matchCase"] ? oProperties.matchCase : true;
+
+		var oSearchEngine = this.WordControl.m_oLogicDocument.Search(sSearch, {MatchCase : isMatchCase});
+		if (!oSearchEngine)
+			return;
+
+		this.WordControl.m_oLogicDocument.Search_Replace(sReplace, true, null, false);
 	};
 
 	/********************************************************************/
