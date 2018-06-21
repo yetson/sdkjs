@@ -510,15 +510,22 @@
 		return dstStr.join("");
 	}
 
-	function CMemory(bIsNoInit)
+	function CMemory(bIsNoInit, useUint)
 	{
 		this.Init = function()
 		{
 			var _canvas = document.createElement('canvas');
 			var _ctx    = _canvas.getContext('2d');
 			this.len    = 1024 * 1024 * 5;
-			this.ImData = _ctx.createImageData(this.len / 4, 1);
-			this.data   = this.ImData.data;
+			if (!this.useUint)
+			{
+				this.ImData = _ctx.createImageData(this.len / 4, 1);
+				this.data   = this.ImData.data;
+			}
+			else
+			{
+				this.data = new Uint8Array(this.len);
+			}
 			this.pos    = 0;
 		}
 
@@ -526,6 +533,7 @@
 		this.data   = null;
 		this.len    = 0;
 		this.pos    = 0;
+		this.useUint = useUint;
 
 		if (true !== bIsNoInit)
 			this.Init();
@@ -543,17 +551,23 @@
 		{
 			if (this.pos + count >= this.len)
 			{
-				var _canvas = document.createElement('canvas');
-				var _ctx    = _canvas.getContext('2d');
-
-				var oldImData = this.ImData;
 				var oldData   = this.data;
 				var oldPos    = this.pos;
 
 				this.len = Math.max(this.len * 2, this.pos + ((3 * count / 2) >> 0));
 
-				this.ImData = _ctx.createImageData(this.len / 4, 1);
-				this.data   = this.ImData.data;
+				if (!this.useUint)
+				{
+					var _canvas = document.createElement('canvas');
+					var _ctx    = _canvas.getContext('2d');
+					this.ImData = _ctx.createImageData(Math.max(this.len / 4, 1), 1);
+					this.data   = this.ImData.data;
+				}
+				else
+				{
+					this.data = new Uint8Array(this.len);
+				}
+
 				var newData = this.data;
 
 				for (var i = 0; i < this.pos; i++)
@@ -575,9 +589,17 @@
 
 			var len = this.GetCurPosition();
 
-			//todo ImData.data.length multiple of 4
-			var ImData = _ctx.createImageData(Math.ceil(len / 4), 1);
-			var res = ImData.data;
+			var res;
+			if (!this.useUint)
+			{
+				//todo ImData.data.length multiple of 4
+				var ImData = _ctx.createImageData(Math.ceil(len / 4), 1);
+				var res = ImData.data;
+			}
+			else
+			{
+				res = new Uint8Array(len);
+			}
 
 			for (var i = 0; i < len; i++)
 				res[i] = this.data[i];
