@@ -549,7 +549,7 @@
 
 		this.CheckSize          = function(count)
 		{
-			if (this.pos + count >= this.len)
+			if (this.pos + count > this.len)
 			{
 				var oldData   = this.data;
 				var oldPos    = this.pos;
@@ -581,6 +581,11 @@
 		this.GetBase64Memory2   = function(nPos, nLen)
 		{
 			return Base64Encode(this.data, nLen, nPos);
+		}
+		this.SetData   = function(data)
+		{
+			this.data   = data;
+			this.len    = data.length;
 		}
 		this.GetData   = function(nPos, nLen)
 		{

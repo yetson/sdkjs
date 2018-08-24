@@ -1788,6 +1788,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return this.ws ? this.ws.workbook.getDefinesNames(this.value, this.ws.getId()) : null;
 	};
 	cName.prototype.changeDefName = function (from, to) {
+		var res = false;
 		var sheetId = this.ws ? this.ws.getId() : null;
 		if (AscCommonExcel.getDefNameIndex(this.value) == AscCommonExcel.getDefNameIndex(from.name)) {
 			if (null == from.sheetId) {
@@ -1796,10 +1797,13 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				if (!(defName && null != defName.sheetId)) {
 					this.value = to.name;
 				}
+				res = true;
 			} else if (sheetId == from.sheetId) {
 				this.value = to.name;
+				res = true;
 			}
 		}
+		return res;
 	};
 	cName.prototype.getWS = function () {
 		return this.ws;
@@ -2083,9 +2087,11 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		return parserHelp.getColumnNameByType(reservedColumn, local);
 	};
 	cStrucTable.prototype.changeDefName = function (from, to) {
-		if (this.tableName == from.name) {
+		var res = this.tableName === from.name;
+		if (res) {
 			this.tableName = to.name;
 		}
+		return res;
 	};
 	cStrucTable.prototype.removeTableColumn = function (deleted) {
 		if (this.oneColumnIndex) {
@@ -5509,14 +5515,18 @@ parserFormula.prototype.setFormula = function(formula) {
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
 	parserFormula.prototype.changeOffset = function (offset, canResize) {//offset = AscCommon.CellBase
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			this._changeOffsetElem(outStack[i], outStack, i, offset, canResize);
+		var type, elem, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (cElementType.cell === type || cElementType.cell3D === type ||
+				cElementType.cellsRange === type ||	cElementType.cellsRange3D === type) {
+				elem = this._changeOffsetElem(it.readElem(), offset, canResize);
+				it = g_formulaBinaryStack.writeElem(this, it, elem);
+			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		return this;
 	};
-	parserFormula.prototype._changeOffsetElem = function(elem, container, index, offset, canResize) {//offset =
+	parserFormula.prototype._changeOffsetElem = function(elem, offset, canResize) {
 		// AscCommon.CellBase
 		var range, bbox = null, ws, isErr = false;
 		if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
@@ -5539,7 +5549,7 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		}
 		if (isErr) {
-			container[index] = new cError(cErrorType.bad_reference);
+			elem = new cError(cErrorType.bad_reference);
 		}
 		return elem;
 	};
@@ -5581,98 +5591,107 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 	};
 	parserFormula.prototype.changeDefName = function(from, to) {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		var i, elem;
-		for (i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
-			if (elem.type == cElementType.name || elem.type == cElementType.name3D || elem.type == cElementType.table) {
-				elem.changeDefName(from, to);
+		var i, elem, type, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (type == cElementType.name || type == cElementType.name3D || type == cElementType.table) {
+				elem = it.readElem();
+				if (elem.changeDefName(from, to)) {
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
+				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.removeTableName = function(defName, bConvertTableFormulaToRef) {
-		var i, elem;
+		var i, elem, type;
 		var bbox;
 		if (this.parent && this.parent.onFormulaEvent) {
 			bbox= this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.GetRangeCell);
 		}
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
-			if (elem.type == cElementType.table && elem.tableName == defName.name) {
-				if(bConvertTableFormulaToRef)
-				{
-					outStack[i] = outStack[i].toRef(bbox, bConvertTableFormulaToRef);
-				}
-				else
-				{
-					outStack[i] = new cError(cErrorType.bad_reference);
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (type == cElementType.table) {
+				elem = it.readElem();
+				if (elem.tableName == defName.name) {
+					if (bConvertTableFormulaToRef) {
+						elem = elem.toRef(bbox, bConvertTableFormulaToRef);
+					} else {
+						elem = new cError(cErrorType.bad_reference);
+					}
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.removeTableColumn = function(tableName, deleted) {
-		var i, elem;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
-			if (elem.type == cElementType.table && elem.tableName == tableName) {
-				if (elem.removeTableColumn(deleted)) {
-					outStack[i] = new cError(cErrorType.bad_reference);
+		var i, elem, type, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (type == cElementType.table) {
+				elem = it.readElem();
+				if (elem.tableName == tableName && elem.removeTableColumn(deleted)) {
+					elem = new cError(cErrorType.bad_reference);
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.renameTableColumn = function(tableName) {
-		var i, elem;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
-			if (elem.type == cElementType.table && elem.tableName == tableName) {
-				if (!elem.renameTableColumn()) {
-					outStack[i] = new cError(cErrorType.bad_reference);
+		var i, elem, type;
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (type == cElementType.table) {
+				elem = it.readElem();
+				if (elem.tableName == tableName) {
+					if (!elem.renameTableColumn()) {
+						elem = new cError(cErrorType.bad_reference);
+					}
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.changeTableRef = function(tableName) {
-		var i, elem;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
-			if (elem.type == cElementType.table && elem.tableName == tableName) {
-				elem.changeTableRef();
+		var i, elem, type;
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (type == cElementType.table) {
+				elem = it.readElem();
+				if (elem.tableName == tableName) {
+					elem.changeTableRef();
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
+				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.shiftCells = function(notifyType, sheetId, bbox, offset) {
 		var res = false;
-		var elem;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
+		var i, elem, type, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
 			var _cellsRange = null;
 			var _cellsBbox = null;
-			if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange) {
+			if (type === cElementType.cell || type === cElementType.cellsRange) {
+				elem = it.readElem();
 				if (sheetId === elem.getWsId() && elem.isValid()) {
 					_cellsRange = elem.getRange();
 					if (_cellsRange) {
 						_cellsBbox = _cellsRange.getBBox0();
 					}
 				}
-			} else if (elem.type === cElementType.cell3D) {
+			} else if (type === cElementType.cell3D) {
+				elem = it.readElem();
 				if (sheetId === elem.getWsId() && elem.isValid()) {
 					_cellsRange = elem.getRange();
 					if (_cellsRange) {
 						_cellsBbox = _cellsRange.getBBox0();
 					}
 				}
-			} else if (elem.type === cElementType.cellsRange3D) {
+			} else if (type === cElementType.cellsRange3D) {
+				elem = it.readElem();
 				if (elem.isSingleSheet() && sheetId === elem.wsFrom.getId() && elem.isValid()) {
 					_cellsBbox = elem.getBBox0();
 				}
@@ -5716,36 +5735,38 @@ parserFormula.prototype.setFormula = function(formula) {
 						}
 					}
 					if (isNoDelete) {
-						if (elem.type === cElementType.cellsRange3D) {
+						if (type === cElementType.cellsRange3D) {
 							elem.bbox = _cellsBbox;
 						} else {
 							elem.range = _cellsRange.createFromBBox(_cellsRange.getWorksheet(), _cellsBbox);
 						}
 						elem.value = _cellsBbox.getName();
 					} else {
-						outStack[i] = new cError(cErrorType.bad_reference);
+						elem = new cError(cErrorType.bad_reference);
 					}
+					it = g_formulaBinaryStack.writeElem(this, it, elem);
 					res = true;
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		return res;
 	};
 	parserFormula.prototype.getSharedIntersect = function(sheetId, bbox) {
-		var ref;
+		var ref, type;
 		var elem;
 		var bboxElem;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			elem = outStack[i];
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); i++) {
+			type = it.readType();
 			bboxElem = undefined;
-			if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange ||
-				elem.type === cElementType.cell3D) {
+			if (type === cElementType.cell || type === cElementType.cellsRange ||
+				type === cElementType.cell3D) {
+				elem = it.readElem();
 				if (sheetId === elem.getWsId() && elem.isValid()) {
 					bboxElem = elem.getRange().getBBox0();
 				}
-			} else if (elem.type === cElementType.cellsRange3D) {
+			} else if (type === cElementType.cellsRange3D) {
+				elem = it.readElem();
 				if (elem.isSingleSheet() && sheetId === elem.wsFrom.getId() && elem.isValid()) {
 					bboxElem = elem.getBBox0();
 				}
@@ -5759,24 +5780,25 @@ parserFormula.prototype.setFormula = function(formula) {
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		return ref;
 	};
 	parserFormula.prototype.canShiftShared = function(bHor) {
 		if (this.shared && this.shared.isOneDimension() && !(bHor ^ this.shared.isHor())) {
 			//cut off formulas with absolute reference. it is shifted unexpectedly
 			var elem;
-			var bboxElem;
-			var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-			for (var i = 0; i < outStack.length; i++) {
-				elem = outStack[i];
+			var bboxElem, type;
+			var it = new FormulaBinaryIterator(this.ws, this.memory);
+			for (var i = 0; i < it.getCount(); i++) {
+				type = it.readType();
 				bboxElem = undefined;
-				if (elem.type === cElementType.cell || elem.type === cElementType.cellsRange ||
-					elem.type === cElementType.cell3D) {
+				if (type === cElementType.cell || type === cElementType.cellsRange ||
+					type === cElementType.cell3D) {
+					elem = it.readElem();
 					if (elem.isValid()) {
 						bboxElem = elem.getRange().getBBox0();
 					}
-				} else if (elem.type === cElementType.cellsRange3D) {
+				} else if (type === cElementType.cellsRange3D) {
+					elem = it.readElem();
 					if (elem.isValid()) {
 						bboxElem = elem.getBBox0();
 					}
@@ -5793,7 +5815,6 @@ parserFormula.prototype.setFormula = function(formula) {
 					}
 				}
 			}
-			this.memory = g_formulaBinaryStack.fromStack(outStack)
 			return true;
 		}
 		return false;
@@ -5806,42 +5827,49 @@ parserFormula.prototype.setFormula = function(formula) {
 			//before change outStack necessary to removeDependencies
 			this.removeDependencies();
 		}
-
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			var elem = outStack[i];
-			if (cElementType.cell3D === elem.type) {
+		var i, type, elem, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			elem = null;
+			if (cElementType.cell3D === type) {
+				elem = it.readElem();
 				if (params.offset) {
-					elem = this._changeOffsetElem(elem, outStack, i, params.offset);
+					elem = this._changeOffsetElem(elem, params.offset);
 				}
 				if (wsLast && wsNew) {
 					elem.changeSheet(wsLast, wsNew);
 				}
-			} else if (cElementType.cellsRange3D === elem.type) {
+			} else if (cElementType.cellsRange3D === type) {
+				elem = it.readElem();
 				if (params.offset) {
-					elem = this._changeOffsetElem(elem, outStack, i, params.offset);
+					elem = this._changeOffsetElem(elem, params.offset);
 				}
 				if (wsLast && wsNew) {
 					if (elem.isSingleSheet()) {
 						elem.changeSheet(wsLast, wsNew);
 					} else {
 						if (elem.wsFrom === wsLast || elem.wsTo === wsLast) {
-							outStack[i] = new cError(cErrorType.bad_reference);
+							elem = new cError(cErrorType.bad_reference);
 						}
 					}
 				}
-			} else if (params.offset && (cElementType.cellsRange === elem.type || cElementType.cell === elem.type)) {
-				elem = this._changeOffsetElem(elem, outStack, i, params.offset);
-			} else if (wsLast && wsNew && cElementType.name3D === elem.type) {
+			} else if (params.offset && (cElementType.cellsRange === type || cElementType.cell === type)) {
+				elem = it.readElem();
+				elem = this._changeOffsetElem(elem, params.offset);
+			} else if (wsLast && wsNew && cElementType.name3D === type) {
+				elem = it.readElem();
 				elem.changeSheet(wsLast, wsNew);
-			} else if (params.tableNameMap && cElementType.table === elem.type) {
+			} else if (params.tableNameMap && cElementType.table === type) {
+				elem = it.readElem();
 				var newTableName = params.tableNameMap[elem.tableName];
 				if (newTableName) {
 					elem.tableName = newTableName;
 				}
 			}
+			if (elem) {
+				it = g_formulaBinaryStack.writeElem(this, it, elem);
+			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		if (isInDependencies) {
 			this.buildDependencies();
 		}
@@ -5854,47 +5882,54 @@ parserFormula.prototype.setFormula = function(formula) {
 			var wsIndex = ws.getIndex();
 			var wsPrev = this.wb.getWorksheet(wsIndex - 1);
 			var wsNext = this.wb.getWorksheet(wsIndex + 1);
-			var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-			for (var i = 0; i < outStack.length; i++) {
-				var elem = outStack[i];
-				if (cElementType.cellsRange3D === elem.type) {
+			var type, elem, it = new FormulaBinaryIterator(this.ws, this.memory);
+			for (var i = 0; i < it.getCount(); i++) {
+				type = it.readType();
+				if (cElementType.cellsRange3D === type) {
+					elem = it.readElem();
 					if (elem.wsFrom === ws) {
 						if (!elem.isSingleSheet() && null !== wsNext) {
 							elem.changeSheet(ws, wsNext);
 						} else {
-							outStack[i] = new cError(cErrorType.bad_reference);
+							elem = new cError(cErrorType.bad_reference);
 						}
+						it = g_formulaBinaryStack.writeElem(this, it, elem);
 						bRes = true;
 					} else if (elem.wsTo === ws) {
 						if (null !== wsPrev) {
 							elem.changeSheet(ws, wsPrev);
 						} else {
-							outStack[i] = new cError(cErrorType.bad_reference);
+							elem = new cError(cErrorType.bad_reference);
 						}
+						it = g_formulaBinaryStack.writeElem(this, it, elem);
 						bRes = true;
 					}
-				} else if (cElementType.cell3D === elem.type || cElementType.name3D === elem.type) {
+				} else if (cElementType.cell3D === type || cElementType.name3D === type) {
+					elem = it.readElem();
 					if (elem.getWS() === ws) {
-						outStack[i] = new cError(cErrorType.bad_reference);
+						elem = new cError(cErrorType.bad_reference);
+						it = g_formulaBinaryStack.writeElem(this, it, elem);
 						bRes = true;
 					}
-				} else if (cElementType.table === elem.type) {
+				} else if (cElementType.table === type) {
+					elem = it.readElem();
 					if (tableNamesMap[elem.tableName]) {
-						outStack[i] = new cError(cErrorType.bad_reference);
+						elem = new cError(cErrorType.bad_reference);
+						it = g_formulaBinaryStack.writeElem(this, it, elem);
 						bRes = true;
 					}
 				}
 			}
-			this.memory = g_formulaBinaryStack.fromStack(outStack)
 		}
 		return bRes;
 	};
 	parserFormula.prototype.moveSheet = function(tempW) {
 		var bRes = false;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			var elem = outStack[i];
-			if (cElementType.cellsRange3D === elem.type) {
+		var type, elem, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); i++) {
+			type = it.readType();
+			if (cElementType.cellsRange3D === type) {
+				elem = it.readElem();
 				var wsToIndex = elem.wsTo.getIndex();
 				var wsFromIndex = elem.wsFrom.getIndex();
 				if (!elem.isSingleSheet()) {
@@ -5905,8 +5940,9 @@ parserFormula.prototype.setFormula = function(formula) {
 							if (wsNext) {
 								elem.changeSheet(tempW.wF, wsNext);
 							} else {
-								outStack[i] = new cError(cErrorType.bad_reference);
+								elem = new cError(cErrorType.bad_reference);
 							}
+							it = g_formulaBinaryStack.writeElem(this, it, elem);
 						}
 					} else if (elem.wsTo === tempW.wF) {
 						if (tempW.wTI <= wsFromIndex) {
@@ -5915,20 +5951,20 @@ parserFormula.prototype.setFormula = function(formula) {
 							if (wsPrev) {
 								elem.changeSheet(tempW.wF, wsPrev);
 							} else {
-								outStack[i] = new cError(cErrorType.bad_reference);
+								elem = new cError(cErrorType.bad_reference);
 							}
+							it = g_formulaBinaryStack.writeElem(this, it, elem);
 						}
 					}
 				}
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		return bRes;
 	};
 	/* Сборка функции в инфиксную форму */
 	parserFormula.prototype.assemble = function (rFormula) {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		if (!rFormula && outStack.length == 1 && outStack[outStack.length - 1] instanceof cError) {
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		if (!rFormula && 1 === it.getCount() && cElementType.error === it.readType()) {
 			return this.Formula;
 		}
 
@@ -5937,8 +5973,8 @@ parserFormula.prototype.setFormula = function(formula) {
 
 	/* Сборка функции в инфиксную форму */
 	parserFormula.prototype.assembleLocale = function (locale, digitDelim) {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		if (outStack.length == 1 && outStack[outStack.length - 1] instanceof cError) {
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		if (1 === it.getCount() && cElementType.error === it.readType()) {
 			return this.Formula;
 		}
 
@@ -6006,9 +6042,9 @@ parserFormula.prototype.setFormula = function(formula) {
 		if (this.isInDependencies) {
 			return;
 		}
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
 		this.isInDependencies = true;
-		var ref, wsR;
+		var elem, type, wsR;
 		if (this.ca) {
 			this.wb.dependencyFormulas.startListeningVolatile(this);
 		}
@@ -6018,36 +6054,44 @@ parserFormula.prototype.setFormula = function(formula) {
 			isDefName = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.IsDefName);
 		}
 
-		for (var i = 0; i < outStack.length; i++) {
-			ref = outStack[i];
-
-			if (ref.type === cElementType.table) {
-				this.wb.dependencyFormulas.startListeningDefName(ref.tableName, this);
-			} else if (ref.type === cElementType.name) {
-				this.wb.dependencyFormulas.startListeningDefName(ref.value, this);
-			} else if (ref.type === cElementType.name3D) {
-				this.wb.dependencyFormulas.startListeningDefName(ref.value, this, ref.ws.getId());
-			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
-				cElementType.cellsRange === ref.type) && ref.isValid()) {
-				this._buildDependenciesRef(ref.getWsId(), ref.getRange().getBBox0(), isDefName, true);
-			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
-				wsR = ref.range(ref.wsRange());
-				for (var j = 0; j < wsR.length; j++) {
-					var range = wsR[j];
-					if (range) {
-						this._buildDependenciesRef(range.getWorksheet().getId(), range.getBBox0(), isDefName, true);
-						}
-							}
+		for (var i = 0; i < it.getCount(); i++) {
+			var type = it.readType();
+			if (type === cElementType.table) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.startListeningDefName(elem.tableName, this);
+			} else if (type === cElementType.name) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.startListeningDefName(elem.value, this);
+			} else if (type === cElementType.name3D) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.startListeningDefName(elem.value, this, elem.ws.getId());
+			} else if ((cElementType.cell === type || cElementType.cell3D === type ||
+				cElementType.cellsRange === type)) {
+				elem = it.readElem();
+				if (elem.isValid()) {
+					this._buildDependenciesRef(elem.getWsId(), elem.getRange().getBBox0(), isDefName, true);
+				}
+			} else if (cElementType.cellsRange3D === type) {
+				elem = it.readElem();
+				if (elem.isValid()) {
+					wsR = elem.range(elem.wsRange());
+					for (var j = 0; j < wsR.length; j++) {
+						var range = wsR[j];
+						if (range) {
+							this._buildDependenciesRef(range.getWorksheet().getId(), range.getBBox0(), isDefName, true);
 						}
 					}
+				}
+			}
+		}
 	};
 	parserFormula.prototype.removeDependencies = function() {
 		if (!this.isInDependencies) {
 			return;
 		}
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
 		this.isInDependencies = false;
-		var ref;
+		var elem;
 		var wsR;
 		if (this.ca) {
 			this.wb.dependencyFormulas.endListeningVolatile(this);
@@ -6058,27 +6102,35 @@ parserFormula.prototype.setFormula = function(formula) {
 			isDefName = this.parent.onFormulaEvent(AscCommon.c_oNotifyParentType.IsDefName);
 		}
 
-		for (var i = 0; i < outStack.length; i++) {
-			ref = outStack[i];
-
-			if (ref.type === cElementType.table) {
-				this.wb.dependencyFormulas.endListeningDefName(ref.tableName, this);
-			} else if (ref.type === cElementType.name) {
-				this.wb.dependencyFormulas.endListeningDefName(ref.value, this);
-			} else if (ref.type === cElementType.name3D) {
-				this.wb.dependencyFormulas.endListeningDefName(ref.value, this, ref.ws.getId());
-			} else if ((cElementType.cell === ref.type || cElementType.cell3D === ref.type ||
-				cElementType.cellsRange === ref.type) && ref.isValid()) {
-				this._buildDependenciesRef(ref.getWsId(), ref.getRange().getBBox0(), isDefName, false);
-			} else if (cElementType.cellsRange3D === ref.type && ref.isValid()) {
-				wsR = ref.range(ref.wsRange());
-				for (var j = 0; j < wsR.length; j++) {
-					var range = wsR[j];
-					if (range) {
-						this._buildDependenciesRef(range.getWorksheet().getId(), range.getBBox0(), isDefName, false);
+		for (var i = 0; i < it.getCount(); i++) {
+			var type = it.readType();
+			if (type === cElementType.table) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.endListeningDefName(elem.tableName, this);
+			} else if (type === cElementType.name) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.endListeningDefName(elem.value, this);
+			} else if (type === cElementType.name3D) {
+				elem = it.readElem();
+				this.wb.dependencyFormulas.endListeningDefName(elem.value, this, elem.ws.getId());
+			} else if ((cElementType.cell === type || cElementType.cell3D === type ||
+				cElementType.cellsRange === type)) {
+				elem = it.readElem();
+				if (elem.isValid()) {
+					this._buildDependenciesRef(elem.getWsId(), elem.getRange().getBBox0(), isDefName, false);
 				}
+			} else if (cElementType.cellsRange3D === type) {
+				elem = it.readElem();
+				if (elem.isValid()) {
+					wsR = elem.range(elem.wsRange());
+					for (var j = 0; j < wsR.length; j++) {
+						var range = wsR[j];
+						if (range) {
+							this._buildDependenciesRef(range.getWorksheet().getId(), range.getBBox0(), isDefName, false);
+						}
 					}
 				}
+			}
 		}
 	};
 	parserFormula.prototype._buildDependenciesRef = function(wsId, bbox, isDefName, isStart) {
@@ -6159,16 +6211,16 @@ parserFormula.prototype.setFormula = function(formula) {
 
 	parserFormula.prototype.getFirstRange = function() {
 		var res;
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			var elem = outStack[i];
-			if (cElementType.cell === elem.type || cElementType.cell3D === elem.type ||
-				cElementType.cellsRange === elem.type || cElementType.cellsRange3D === elem.type) {
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); i++) {
+			var type = it.readType();
+			if (cElementType.cell === type || cElementType.cell3D === type ||
+				cElementType.cellsRange === type || cElementType.cellsRange3D === type) {
+				var elem = it.readElem();
 				res = elem.getRange();
 				break;
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 		return res;
 	};
 	parserFormula.prototype.getIndexNumber = function() {
@@ -6178,26 +6230,27 @@ parserFormula.prototype.setFormula = function(formula) {
 		this._index = val;
 	};
 	parserFormula.prototype.canSaveShared = function() {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			var elem = outStack[i];
-			if (cElementType.cell3D === elem.type || cElementType.cellsRange3D === elem.type ||
-				cElementType.table === elem.type || cElementType.name3D === elem.type ||
-				cElementType.error === elem.type || cElementType.array === elem.type) {
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); i++) {
+			var type = it.readType();
+			if (cElementType.cell3D === type || cElementType.cellsRange3D === type ||
+				cElementType.table === type || cElementType.name3D === type ||
+				cElementType.error === type || cElementType.array === type) {
 				return false;
 			}
 		}
 		return true;
 	};
 	parserFormula.prototype.transpose = function(bounds) {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
+		var i, type, elem, range, it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (i = 0; i < it.getCount(); i++) {
 			//TODO пересмотреть случаи, когда возвращается ошибка
-			var elem = outStack[i];
-			var range;
-			if (cElementType.cellsRange === elem.type || cElementType.cell === elem.type || cElementType.cell3D === elem.type) {
+			type = it.getType();
+			if (cElementType.cellsRange === type || cElementType.cell === type || cElementType.cell3D === type) {
+				elem = it.readElem();
 				range = elem.range && elem.range.bbox ? elem.range.bbox : null;
-			} else if (cElementType.cellsRange3D === elem.type) {
+			} else if (cElementType.cellsRange3D === type) {
+				elem = it.readElem();
 				range = elem.bbox ? elem.bbox : null;
 			}
 			if (range) {
@@ -6210,15 +6263,18 @@ parserFormula.prototype.setFormula = function(formula) {
 				range.r1 = bounds.r1 + diffCol1;
 				range.c2 = bounds.c1 + diffRow2;
 				range.r2 = bounds.r1 + diffCol2;
+				it = g_formulaBinaryStack.writeElem(this, it, elem);
 			}
 		}
-		this.memory = g_formulaBinaryStack.fromStack(outStack)
 	};
 	parserFormula.prototype.isFoundNestedStAg = function() {
-		var outStack = g_formulaBinaryStack.toStack(this.ws, this.memory);
-		for (var i = 0; i < outStack.length; i++) {
-			if (outStack[i] && (outStack[i].name === "AGGREGATE" || outStack[i].name === "SUBTOTAL")) {
-				return true;
+		var it = new FormulaBinaryIterator(this.ws, this.memory);
+		for (var i = 0; i < it.getCount(); ++i) {
+			if (cElementType.func === it.readType()) {
+				var elem = it.readElem();
+				if (elem.name === "AGGREGATE" || elem.name === "SUBTOTAL") {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -6285,93 +6341,96 @@ parserFormula.prototype.setFormula = function(formula) {
 
 	function FormulaBinaryStack(cFormulaFunctionGroup, cFormulaOperators) {
 		var i, elem;
-		this.memory = new AscCommon.CMemory(true, true);
+		this.memoryWriter = new AscCommon.CMemory(true, true);
 		this.sharedStrings = new AscCommonExcel.CSharedStrings();
 		this.functions = [];
 		this.operators = [];
 
 		for (var type in cFormulaFunctionGroup) {
-			for (i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
-				elem = cFormulaFunctionGroup[type][i];
-				elem.prototype.funcIndex = this.functions.length;
-				this.functions.push(elem);
+			if (cFormulaFunctionGroup.hasOwnProperty(type)) {
+				for (i = 0; i < cFormulaFunctionGroup[type].length; ++i) {
+					elem = cFormulaFunctionGroup[type][i];
+					elem.prototype.funcIndex = this.functions.length;
+					this.functions.push(elem);
+				}
 			}
 		}
 		for (i in cFormulaOperators) {
-			elem = cFormulaOperators[i];
-			elem.prototype.operIndex = this.operators.length;
-			this.operators.push(elem);
+			if (cFormulaOperators.hasOwnProperty(i)) {
+				elem = cFormulaOperators[i];
+				elem.prototype.operIndex = this.operators.length;
+				this.operators.push(elem);
+			}
 		}
 	}
 
 	FormulaBinaryStack.prototype.fromStack = function(outStack) {
-		this.memory.pos = 0;
-		this.memory.WriteLong(outStack.length);
+		this.memoryWriter.Seek(0);
+		this.memoryWriter.WriteLong(outStack.length);
 		for (var i = 0; i < outStack.length; ++i) {
-			this._fromOutputStackElem(outStack[i]);
+			this._fromOutputStackElem(this.memoryWriter, outStack[i]);
 		}
-		return this.memory.data.slice(0, this.memory.pos);
+		return this.memoryWriter.data.slice(0, this.memoryWriter.GetCurPosition());
 	};
-	FormulaBinaryStack.prototype._fromOutputStackElem = function(elem) {
-		var cols, bbox, abs;
+	FormulaBinaryStack.prototype._fromOutputStackElem = function(memory, elem) {
 		if (undefined !== elem.type) {
-			this.memory.WriteByte(elem.type);
+			memory.WriteByte(elem.type);
 			switch (elem.type) {
 				case cElementType.number:
-					this.memory.WriteDouble2(elem.value);
+					memory.WriteDouble2(elem.value);
 					break;
 				case cElementType.string:
-					this.memory.WriteLong(this.sharedStrings.addText(elem.value));
+					memory.WriteLong(this.sharedStrings.addText(elem.value));
 					break;
 				case cElementType.bool:
-					this.memory.WriteBool(elem.value);
+					memory.WriteBool(elem.value);
 					break;
 				case cElementType.error:
-					this.memory.WriteByte(elem.errorType);
+					memory.WriteByte(elem.errorType);
 					break;
 				case cElementType.empty:
 					break;
 				case cElementType.cellsRange:
-					this._fromOutputStackArea(elem.range.bbox);
+					this._fromOutputStackArea(memory, elem.range.bbox);
 					break;
 				case cElementType.cell:
-					this._fromOutputStackCell(elem.range.bbox);
+					this._fromOutputStackCell(memory, elem.range.bbox);
 					break;
 				case cElementType.func:
-					this.memory.WriteLong(elem.funcIndex);
+					memory.WriteLong(elem.funcIndex);
 					break;
 				case cElementType.operator:
-					this.memory.WriteByte(elem.operIndex);
+					memory.WriteByte(elem.operIndex);
 					break;
 				case cElementType.name:
-					this.memory.WriteLong(this.sharedStrings.addText(elem.value));
+					memory.WriteLong(this.sharedStrings.addText(elem.value));
 					break;
 				case cElementType.array:
 					var matrix = elem.getMatrix();
-					this.memory.WriteLong(matrix.length);
+					memory.WriteLong(matrix.length);
 					for (var ir = 0; ir < matrix.length; ir++) {
 						var row = matrix[ir];
-						this.memory.WriteLong(row.length);
+						memory.WriteLong(row.length);
 						for (var ic = 0; ic < row.length; ic++) {
-							this._fromOutputStackElem(row[ic]);
+							this._fromOutputStackElem(memory, row[ic]);
 						}
 					}
 					break;
 				case cElementType.cell3D:
-					this.memory.WriteLong(this.sharedStrings.addText(elem.ws.getId()));
-					this._fromOutputStackCell(elem.range.bbox);
+					memory.WriteLong(this.sharedStrings.addText(elem.ws.getId()));
+					this._fromOutputStackCell(memory, elem.range.bbox);
 					break;
 				case cElementType.cellsRange3D:
-					this.memory.WriteLong(this.sharedStrings.addText(elem.wsFrom.getId()));
-					this.memory.WriteLong(this.sharedStrings.addText(elem.wsTo.getId()));
-					this._fromOutputStackArea(elem.bbox);
+					memory.WriteLong(this.sharedStrings.addText(elem.wsFrom.getId()));
+					memory.WriteLong(this.sharedStrings.addText(elem.wsTo.getId()));
+					this._fromOutputStackArea(memory, elem.bbox);
 					break;
 				case cElementType.table:
-					this._fromOutputStackTable(elem);
+					this._fromOutputStackTable(memory, elem);
 					break;
 				case cElementType.name3D:
-					this.memory.WriteLong(this.sharedStrings.addText(elem.ws.getId()));
-					this.memory.WriteLong(this.sharedStrings.addText(elem.value));
+					memory.WriteLong(this.sharedStrings.addText(elem.ws.getId()));
+					memory.WriteLong(this.sharedStrings.addText(elem.value));
 					break;
 				case cElementType.specialFunctionStart:
 					break;
@@ -6379,84 +6438,108 @@ parserFormula.prototype.setFormula = function(formula) {
 					break;
 			}
 		} else {
-			this.memory.WriteByte(cElementType.argCount);
-			this.memory.WriteLong(elem);
+			memory.WriteByte(cElementType.argCount);
+			memory.WriteLong(elem);
 		}
 	};
-	FormulaBinaryStack.prototype._fromOutputStackCell = function(bbox) {
+	FormulaBinaryStack.prototype._fromOutputStackCell = function(memory, bbox) {
 		var abs = bbox.isAbsR1() | (bbox.isAbsC1() << 1);
-		this.memory.WriteLong(bbox.r1);
-		this.memory.WriteLong(bbox.c1);
-		this.memory.WriteByte(abs);
+		memory.WriteLong(bbox.r1);
+		memory.WriteLong(bbox.c1);
+		memory.WriteByte(abs);
 	};
-	FormulaBinaryStack.prototype._fromOutputStackArea = function(bbox) {
+	FormulaBinaryStack.prototype._fromOutputStackArea = function(memory, bbox) {
 		var cols = bbox.c1 | bbox.c2 << 16;
 		var abs = bbox.isAbsR1() | (bbox.isAbsC1() << 1) | (bbox.isAbsR2() << 2) | (bbox.isAbsC2() << 3);
-		this.memory.WriteLong(bbox.r1);
-		this.memory.WriteLong(bbox.r2);
-		this.memory.WriteLong(cols);
-		this.memory.WriteByte(abs);
+		memory.WriteLong(bbox.r1);
+		memory.WriteLong(bbox.r2);
+		memory.WriteLong(cols);
+		memory.WriteByte(abs);
 	};
-	FormulaBinaryStack.prototype._fromOutputStackTableIndex = function(tableIndex) {
-		this.memory.WriteLong(this.sharedStrings.addText(tableIndex.wsID));
-		this.memory.WriteLong(tableIndex.index);
-		this.memory.WriteLong(this.sharedStrings.addText(tableIndex.name));
+	FormulaBinaryStack.prototype._fromOutputStackTableIndex = function(memory, tableIndex) {
+		memory.WriteLong(this.sharedStrings.addText(tableIndex.wsID));
+		memory.WriteLong(tableIndex.index);
+		memory.WriteLong(this.sharedStrings.addText(tableIndex.name));
 	};
-	FormulaBinaryStack.prototype._fromOutputStackTable = function(table) {
-		this.memory.WriteLong(this.sharedStrings.addText(table.tableName));
-		this.memory.WriteBool(!!table.oneColumnIndex);
+	FormulaBinaryStack.prototype._fromOutputStackTable = function(memory, table) {
+		memory.WriteLong(this.sharedStrings.addText(table.tableName));
+		memory.WriteBool(!!table.oneColumnIndex);
 		if (table.oneColumnIndex) {
-			this._fromOutputStackTableIndex(table.oneColumnIndex);
+			this._fromOutputStackTableIndex(memory, table.oneColumnIndex);
 		}
-		this.memory.WriteBool(!!table.colStartIndex);
+		memory.WriteBool(!!table.colStartIndex);
 		if (table.colStartIndex) {
-			this._fromOutputStackTableIndex(table.colStartIndex);
+			this._fromOutputStackTableIndex(memory, table.colStartIndex);
 		}
-		this.memory.WriteBool(!!table.colEndIndex);
+		memory.WriteBool(!!table.colEndIndex);
 		if (table.colEndIndex) {
-			this._fromOutputStackTableIndex(table.colEndIndex);
+			this._fromOutputStackTableIndex(memory, table.colEndIndex);
 		}
-		this.memory.WriteBool(null !== table.reservedColumnIndex);
+		memory.WriteBool(null !== table.reservedColumnIndex);
 		if (null !== table.reservedColumnIndex) {
-			this.memory.WriteByte(table.reservedColumnIndex);
+			memory.WriteByte(table.reservedColumnIndex);
 		}
-		this.memory.WriteBool(!!table.hdtIndexes);
+		memory.WriteBool(!!table.hdtIndexes);
 		if (table.hdtIndexes) {
-			this.memory.WriteLong(table.hdtIndexes.length);
+			memory.WriteLong(table.hdtIndexes.length);
 			for (var i = 0; i < table.hdtIndexes.length; ++i) {
-				this.memory.WriteByte(table.hdtIndexes[i]);
+				memory.WriteByte(table.hdtIndexes[i]);
 			}
 		}
-		this.memory.WriteBool(!!table.hdtcstartIndex);
+		memory.WriteBool(!!table.hdtcstartIndex);
 		if (table.hdtcstartIndex) {
-			this._fromOutputStackTableIndex(table.hdtcstartIndex);
+			this._fromOutputStackTableIndex(memory, table.hdtcstartIndex);
 		}
-		this.memory.WriteBool(!!table.hdtcendIndex);
+		memory.WriteBool(!!table.hdtcendIndex);
 		if (table.hdtcendIndex) {
-			this._fromOutputStackTableIndex(table.hdtcendIndex);
+			this._fromOutputStackTableIndex(memory, table.hdtcendIndex);
 		}
-		this.memory.WriteBool(table.isDynamic);
-		this.memory.WriteBool(!!table.area);
+		memory.WriteBool(table.isDynamic);
+		memory.WriteBool(!!table.area);
 		if (table.area) {
-			this._fromOutputStackElem(table.area);
+			this._fromOutputStackElem(memory, table.area);
 		}
 	};
 	FormulaBinaryStack.prototype.toStack = function(ws, memory) {
 		if (memory) {
-			var reader = new AscCommon.FT_Stream2(memory, memory.length);
-			var len = reader.GetLong();
+			var it = new FormulaBinaryIterator(ws, memory);
+			var len = it.getCount();
 			var outStack = new Array(len);
-			for (var i = 0; i < len; ++i) {
-				outStack[i] = this._toOutputStackElem(ws, reader);
+			for(var i = 0; i < len; ++i){
+				it.readType();
+				outStack[i] = it.readElem();
 			}
 			return outStack;
 		} else {
 			return [];
 		}
 	};
-	FormulaBinaryStack.prototype._toOutputStackElem = function(ws, reader) {
-		var res, r1, r2, cols, abs;
-		switch (reader.GetByte()) {
+	FormulaBinaryStack.prototype.writeElem = function(parsed, it, elem) {
+		var oldPos = it.GetCurPos();
+		it.SetCurPos(it.posBeforeReadCurType);
+		var type = it.reader.GetByte();
+		if (type === elem.type && !(type === cElementType.array || type === cElementType.table)) {
+			var memoryWriter = new AscCommon.CMemory(true, true);
+			memoryWriter.SetData(it.memory);
+			memoryWriter.Seek(it.posBeforeReadCurType);
+			this._fromOutputStackElem(memoryWriter, elem);
+			it.SetCurPos(oldPos);
+		} else {
+			this.memoryWriter.Seek(0);
+			this.memoryWriter.WriteBuffer(it.memory, 0, it.posBeforeReadCurType);
+			this._fromOutputStackElem(this.memoryWriter, elem);
+			var newPos = this.memoryWriter.GetCurPosition();
+			this.memoryWriter.WriteBuffer(it.memory, oldPos, it.memory.length - oldPos);
+
+			parsed.memory = this.memoryWriter.data.slice(0, this.memoryWriter.GetCurPosition());
+			it = it.clone(it.ws, parsed.memory);
+			it.SetCurPos(newPos);
+		}
+		return it;
+	};
+	FormulaBinaryStack.prototype._readElem = function(type, ws, reader) {
+		var res;
+		switch (type) {
 			case cElementType.number:
 				res = new cNumber(reader.GetDoubleLE());
 				break;
@@ -6474,11 +6557,11 @@ parserFormula.prototype.setFormula = function(formula) {
 				break;
 			case cElementType.cellsRange:
 				res = new cArea(null, ws);
-				res.range = this._toOutputStackArea(ws, reader, true);
+				res.range = this._readArea(ws, reader, true);
 				break;
 			case cElementType.cell:
 				res = new cRef(null, ws);
-				res.range = this._toOutputStackCell(ws, reader);
+				res.range = this._readCell(ws, reader);
 				break;
 			case cElementType.func:
 				res = this.functions[reader.GetLong()].prototype;
@@ -6496,23 +6579,23 @@ parserFormula.prototype.setFormula = function(formula) {
 					res.addRow();
 					var lenCol = reader.GetLong();
 					for (var ic = 0; ic < lenCol; ic++) {
-						res.addElement(this._toOutputStackElem(ws, reader));
+						res.addElement(this._readElem(reader.GetByte(), ws, reader));
 					}
 				}
 				break;
 			case cElementType.cell3D:
 				ws = ws.workbook.getWorksheetById(this.sharedStrings.get(reader.GetLong()));
 				res = new cRef3D(null, ws);
-				res.range = this._toOutputStackCell(ws, reader);
+				res.range = this._readCell(ws, reader);
 				break;
 			case cElementType.cellsRange3D:
 				var wsFrom = ws.workbook.getWorksheetById(this.sharedStrings.get(reader.GetLong()));
 				var wsTo = ws.workbook.getWorksheetById(this.sharedStrings.get(reader.GetLong()));
 				res = new cArea3D(null, wsFrom, wsTo);
-				res.bbox = this._toOutputStackArea(ws, reader, false);
+				res.bbox = this._readArea(ws, reader, false);
 				break;
 			case cElementType.table:
-				res = this._toOutputStackTable(ws, reader);
+				res = this._readTable(ws, reader);
 				break;
 			case cElementType.name3D:
 				ws = ws.workbook.getWorksheetById(this.sharedStrings.get(reader.GetLong()));
@@ -6530,7 +6613,72 @@ parserFormula.prototype.setFormula = function(formula) {
 		}
 		return res;
 	};
-	FormulaBinaryStack.prototype._toOutputStackCell = function(ws, reader) {
+	FormulaBinaryStack.prototype._skipElem = function(type, ws, reader) {
+		switch (type) {
+			case cElementType.number:
+				reader.GetDoubleLE();
+				break;
+			case cElementType.string:
+				reader.GetLong();
+				break;
+			case cElementType.bool:
+				reader.GetBool();
+				break;
+			case cElementType.error:
+				reader.GetByte();
+				break;
+			case cElementType.empty:
+				break;
+			case cElementType.cellsRange:
+				this._skipArea(reader, true);
+				break;
+			case cElementType.cell:
+				this._skipCell(reader);
+				break;
+			case cElementType.func:
+				reader.GetLong();
+				break;
+			case cElementType.operator:
+				reader.GetByte();
+				break;
+			case cElementType.name:
+				reader.GetLong();
+				break;
+			case cElementType.array:
+				var len = reader.GetLong();
+				for (var ir = 0; ir < len; ir++) {
+					var lenCol = reader.GetLong();
+					for (var ic = 0; ic < lenCol; ic++) {
+						this._skipElem(reader.GetByte(), ws, reader);
+					}
+				}
+				break;
+			case cElementType.cell3D:
+				reader.GetLong();
+				this._skipCell(reader);
+				break;
+			case cElementType.cellsRange3D:
+				reader.GetLong();
+				reader.GetLong();
+				this._skipArea(reader, false);
+				break;
+			case cElementType.table:
+				this._skipTable(ws, reader);
+				break;
+			case cElementType.name3D:
+				reader.GetLong();
+				reader.GetLong();
+				break;
+			case cElementType.specialFunctionStart:
+				break;
+			case cElementType.specialFunctionEnd:
+				break;
+			case cElementType.argCount:
+				reader.GetLong();
+				break;
+		}
+	};
+	FormulaBinaryStack.prototype._readCell = function(ws, reader) {
 		var r1 = reader.GetLong();
 		var c1 = reader.GetLong();
 		var abs = reader.GetByte();
@@ -6538,7 +6686,12 @@ parserFormula.prototype.setFormula = function(formula) {
 		res.bbox.setAbs(abs & 0x1, (abs >> 1) & 0x1, abs & 0x1, (abs >> 1) & 0x1);
 		return res;
 	};
-	FormulaBinaryStack.prototype._toOutputStackArea = function(ws, reader, returnRange) {
+	FormulaBinaryStack.prototype._skipCell = function(reader) {
+		reader.GetLong();
+		reader.GetLong();
+		reader.GetByte();
+	};
+	FormulaBinaryStack.prototype._readArea = function(ws, reader, returnRange) {
 		var r1 = reader.GetLong();
 		var r2 = reader.GetLong();
 		var cols = reader.GetLong();
@@ -6554,23 +6707,34 @@ parserFormula.prototype.setFormula = function(formula) {
 		bbox.setAbs(abs & 0x1, (abs >> 1) & 0x1, (abs >> 2) & 0x1, (abs >> 3) & 0x1);
 		return res;
 	};
-	FormulaBinaryStack.prototype._toOutputStackTableIndex = function(reader) {
+	FormulaBinaryStack.prototype._skipArea = function(reader) {
+		reader.GetLong();
+		reader.GetLong();
+		reader.GetLong();
+		reader.GetByte();
+	};
+	FormulaBinaryStack.prototype._readTableIndex = function(reader) {
 		return {
 			wsID: this.sharedStrings.get(reader.GetLong()), index: reader.GetLong(),
 			name: this.sharedStrings.get(reader.GetLong())
 		};
 	};
-	FormulaBinaryStack.prototype._toOutputStackTable = function(ws, reader) {
+	FormulaBinaryStack.prototype._skipTableIndex = function(reader) {
+		reader.GetLong();
+		reader.GetLong();
+		reader.GetLong();
+	};
+	FormulaBinaryStack.prototype._readTable = function(ws, reader) {
 		var res = new cStrucTable(null, ws.workbook, ws);
 		res.tableName = this.sharedStrings.get(reader.GetLong());
 		if (reader.GetBool()) {
-			res.oneColumnIndex = this._toOutputStackTableIndex(reader);
+			res.oneColumnIndex = this._readTableIndex(reader);
 		}
 		if (reader.GetBool()) {
-			res.colStartIndex = this._toOutputStackTableIndex(reader);
+			res.colStartIndex = this._readTableIndex(reader);
 		}
 		if (reader.GetBool()) {
-			res.colEndIndex = this._toOutputStackTableIndex(reader);
+			res.colEndIndex = this._readTableIndex(reader);
 		}
 		if (reader.GetBool()) {
 			res.reservedColumnIndex = reader.GetByte();
@@ -6583,18 +6747,92 @@ parserFormula.prototype.setFormula = function(formula) {
 			}
 		}
 		if (reader.GetBool()) {
-			res.hdtcstartIndex = this._toOutputStackTableIndex(reader);
+			res.hdtcstartIndex = this._readTableIndex(reader);
 		}
 		if (reader.GetBool()) {
-			res.hdtcendIndex = this._toOutputStackTableIndex(reader);
+			res.hdtcendIndex = this._readTableIndex(reader);
 		}
 		res.isDynamic = reader.GetBool();
 		if (reader.GetBool()) {
-			res.area = this._toOutputStackElem(ws, reader);
+			res.area = this._readElem(reader.GetByte(), ws, reader);
 		}
 		return res;
 	};
+	FormulaBinaryStack.prototype._skipTable = function(ws, reader) {
+		reader.GetLong();
+		if (reader.GetBool()) {
+			this._skipTableIndex(reader);
+		}
+		if (reader.GetBool()) {
+			this._skipTableIndex(reader);
+		}
+		if (reader.GetBool()) {
+			this._skipTableIndex(reader);
+		}
+		if (reader.GetBool()) {
+			reader.GetByte();
+		}
+		if (reader.GetBool()) {
+			var len = reader.GetLong();
+			for (var i = 0; i < len; ++i) {
+				reader.GetByte();
+			}
+		}
+		if (reader.GetBool()) {
+			this._skipTableIndex(reader);
+		}
+		if (reader.GetBool()) {
+			this._skipTableIndex(reader);
+		}
+		reader.GetBool();
+		if (reader.GetBool()) {
+			this._skipElem(reader.GetByte(), ws, reader);
+		}
+	};
+
 	var g_formulaBinaryStack;
+
+	function FormulaBinaryIterator(ws, memory) {
+		this.ws = ws;
+		this.memory = memory;
+		this.curType = null;
+		this.posBeforeReadCurType = null;
+		if (memory) {
+			this.reader = new AscCommon.FT_Stream2(memory, memory.length);
+			this.count = this.reader.GetLong();
+		} else {
+			this.reader = null;
+			this.count = 0;
+		}
+	}
+	FormulaBinaryIterator.prototype.clone = function(ws, memory) {
+		var res = new FormulaBinaryIterator(ws, memory);
+		res.curType = this.curType;
+		res.posBeforeReadCurType = this.posBeforeReadCurType;
+		return res;
+	};
+	FormulaBinaryIterator.prototype.getCount = function() {
+		return this.count;
+	};
+	FormulaBinaryIterator.prototype.GetCurPos = function() {
+		return this.reader.GetCurPos();
+	};
+	FormulaBinaryIterator.prototype.SetCurPos = function(pos) {
+		return this.reader.Seek2(pos);
+	};
+	FormulaBinaryIterator.prototype.readType = function() {
+		if (null !== this.curType) {
+			g_formulaBinaryStack._skipElem(this.curType, this.ws, this.reader);
+		}
+		this.posBeforeReadCurType = this.reader.GetCurPos();
+		this.curType = this.reader.GetByte();
+		return this.curType;
+	};
+	FormulaBinaryIterator.prototype.readElem = function() {
+		var res = g_formulaBinaryStack._readElem(this.curType, this.ws, this.reader);
+		this.curType = null;
+		return res;
+	};
 
 function parseNum( str ) {
     if ( str.indexOf( "x" ) > -1 || str == "" || str.match( /\s+/ ) )//исключаем запись числа в 16-ричной форме из числа.
