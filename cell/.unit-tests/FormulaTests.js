@@ -602,7 +602,7 @@ $( function () {
 		//console.log(val);
 	}
 
-	var newFormulaParser = false;
+	var newFormulaParser = window['AscCommonExcel'].c_bIsNewFormulaParser;
 
     var c_msPerDay = AscCommonExcel.c_msPerDay;
     var parserFormula = AscCommonExcel.parserFormula;

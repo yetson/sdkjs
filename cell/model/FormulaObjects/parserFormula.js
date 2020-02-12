@@ -52,6 +52,8 @@ function (window, undefined) {
 
   var c_oAscError = Asc.c_oAscError;
 
+  var c_bIsNewFormulaParser = true;
+
 	var TOK_TYPE_OPERAND = 1;
 	var TOK_TYPE_FUNCTION = 2;
 	var TOK_TYPE_SUBEXPR = 3;
@@ -5324,7 +5326,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 		 При разборе формулы важен порядок проверки очередной части выражения на принадлежность тому или иному типу.
 		 */
 
-		if (false) {
+		if (c_bIsNewFormulaParser) {
 
 			var getPrevElem = function(aTokens, pos){
 				for(var n = pos - 1; n >=0; n--){
@@ -5517,6 +5519,10 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 								this.ca = elem.ca;
 							}
 							stack.push(elem);
+							parseResult.addElem(elem);
+							if('ARRAY' !== val && 'ARRAYROW' !== val) {
+								parseResult.addElem(cFormulaOperators["("].prototype);
+							}
 							args[++indentCount] = 1;
 						} else {
 							if (arr) {
@@ -5536,6 +5542,11 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 								}
 								break;
 							}
+
+							if('ARRAY' !== val && 'ARRAYROW' !== val) {
+								parseResult.addElem(cFormulaOperators[")"].prototype);
+							}
+
 							len = stack.length;
 							while (0 !== len) {
 								tmp = stack[len - 1];
@@ -7911,5 +7922,6 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 	window['AscCommonExcel'].convertRefToRowCol = convertRefToRowCol;
 	window['AscCommonExcel'].convertAreaToArray = convertAreaToArray;
 	window['AscCommonExcel'].convertAreaToArrayRefs = convertAreaToArrayRefs;
+	window['AscCommonExcel'].c_bIsNewFormulaParser = c_bIsNewFormulaParser;
 
 })(window);
