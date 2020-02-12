@@ -601,30 +601,25 @@ RotateState.prototype =
 
     onMouseUp: function(e, x, y, pageIndex)
     {
-        if(this.drawingObjects.canEdit())
+        if(this.drawingObjects.canEdit() && this.bSamePos !== true)
         {
             var tracks = [].concat(this.drawingObjects.arrTrackObjects);
             var group = this.group;
             var drawingObjects = this.drawingObjects;
             var oThis = this;
 
-            if(e.CtrlKey && this instanceof MoveState && !(Asc["editor"] && Asc["editor"].isChartEditor === true))
+            if(e.CtrlKey && this instanceof MoveState && !(Asc["editor"] && Asc["editor"].isChartEditor === true) && !(tracks.length > 0 && (tracks[0] instanceof AscFormat.MoveChartObjectTrack)))
             {
                 var i, copy;
                 this.drawingObjects.resetSelection();
                 var oIdMap = {};
+                var oCopyPr = new AscFormat.CCopyObjectProperties();
+                oCopyPr.idMap = oIdMap;
                 var aCopies = [];
                 History.Create_NewPoint(AscDFH.historydescription_CommonDrawings_CopyCtrl);
                 for(i = 0; i < tracks.length; ++i)
                 {
-                    if(tracks[i].originalObject.getObjectType() === AscDFH.historyitem_type_GroupShape){
-
-                        copy = tracks[i].originalObject.copy(oIdMap);
-                    }
-                    else{
-
-                        copy = tracks[i].originalObject.copy();
-                    }
+                    copy = tracks[i].originalObject.copy(oCopyPr);
                     oIdMap[tracks[i].originalObject.Id] = copy.Id;
                     this.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(this.drawingObjects.drawingObjects.getWorksheetModel());
                     if(this.drawingObjects.drawingObjects && this.drawingObjects.drawingObjects.cSld)
@@ -668,17 +663,12 @@ RotateState.prototype =
                     this.drawingObjects.checkSelectedObjectsAndCallback(function(){
                         var oIdMap = {};
                         var aCopies = [];
+                        var oCopyPr = new AscFormat.CCopyObjectProperties();
+                        oCopyPr.idMap = oIdMap;
                         group.resetSelection();
                         for(i = 0; i < tracks.length; ++i)
                         {
-                            if(tracks[i].originalObject.getObjectType() === AscDFH.historyitem_type_GroupShape){
-
-                                copy = tracks[i].originalObject.copy(oIdMap);
-                            }
-                            else{
-
-                                copy = tracks[i].originalObject.copy();
-                            }
+                            copy = tracks[i].originalObject.copy(oCopyPr);
                             aCopies.push(copy);
                             oThis.drawingObjects.drawingObjects.getWorksheetModel && copy.setWorksheet(oThis.drawingObjects.drawingObjects.getWorksheetModel());
                             if(oThis.drawingObjects.drawingObjects && oThis.drawingObjects.drawingObjects.cSld)
@@ -752,24 +742,25 @@ RotateState.prototype =
                     var oMapAdditionalForCheck = {};
                     for(i = 0; i < tracks.length; ++i)
                     {
+                        var oOrigObject = tracks[i].originalObject && tracks[i].chartSpace ? tracks[i].chartSpace : tracks[i].originalObject;
                         if(tracks[i].originalObject && !tracks[i].processor3D){
-                            oOriginalObjects.push(tracks[i].originalObject);
-                            oMapOriginalsId[tracks[i].originalObject.Get_Id()] = true;
-                            var oGroup = tracks[i].originalObject.getMainGroup();
+                            oOriginalObjects.push(oOrigObject);
+                            oMapOriginalsId[oOrigObject.Get_Id()] = true;
+                            var oGroup = oOrigObject.getMainGroup && oOrigObject.getMainGroup();
                             if(oGroup){
                                 if(!oGroup.selected){
                                     oMapAdditionalForCheck[oGroup.Get_Id()] = oGroup;
                                 }
                             }
                             else{
-                                if(!tracks[i].originalObject.selected){
-                                    oMapAdditionalForCheck[tracks[i].originalObject.Get_Id()] = tracks[i].originalObject;
+                                if(!oOrigObject.selected){
+                                    oMapAdditionalForCheck[oOrigObject.Get_Id()] = oOrigObject;
                                 }
                             }
 
-                            if(Array.isArray(tracks[i].originalObject.arrGraphicObjects)){
-                                for(j = 0; j < tracks[i].originalObject.arrGraphicObjects.length; ++j){
-                                    oMapOriginalsId[tracks[i].originalObject.arrGraphicObjects[j].Get_Id()] = true;
+                            if(Array.isArray(oOrigObject.arrGraphicObjects)){
+                                for(j = 0; j < oOrigObject.arrGraphicObjects.length; ++j){
+                                    oMapOriginalsId[oOrigObject.arrGraphicObjects[j].Get_Id()] = true;
                                 }
                             }
                         }
@@ -782,7 +773,7 @@ RotateState.prototype =
                         var stSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getStCxnId());
                         var endSp = AscCommon.g_oTableId.Get_ById(aAllConnectors[i].getEndCxnId());
                         if((stSp && !oMapOriginalsId[stSp.Get_Id()]) || (endSp && !oMapOriginalsId[endSp.Get_Id()]) || !oMapOriginalsId[aAllConnectors[i].Get_Id()]){
-                            var oGroup = aAllConnectors[i].getMainGroup();
+                            var oGroup = aAllConnectors[i].getMainGroup && aAllConnectors[i].getMainGroup();
                             aConnectors.push(aAllConnectors[i]);
                             if(oGroup){
                                 oMapAdditionalForCheck[oGroup.Id] = oGroup;
@@ -809,7 +800,7 @@ RotateState.prototype =
                             var oGroupMaps = {};
                             for(i = 0; i < aConnectors.length; ++i){
                                 aConnectors[i].calculateTransform(bFlag);
-                                var oGroup = aConnectors[i].getMainGroup();
+                                var oGroup = aConnectors[i].getMainGroup && aConnectors[i].getMainGroup();
                                 if(oGroup){
                                     oGroupMaps[oGroup.Id] = oGroup;
                                 }
@@ -857,8 +848,8 @@ RotateState.prototype =
                                     {
                                         drawing.spPr.xfrm.setOffY(drawing.spPr.xfrm.offY - min_y);
                                     }
-                                    drawing.checkDrawingBaseCoords();
-                                    drawing.recalculateTransform();
+                                    drawing.checkDrawingBaseCoords && drawing.checkDrawingBaseCoords();
+                                    drawing.recalculateTransform && drawing.recalculateTransform();
                                     oTransform = drawing.transform;
                                     arr_x2.push(oTransform.TransformPointX(0, 0));
                                     arr_y2.push(oTransform.TransformPointY(0, 0));
@@ -1034,7 +1025,7 @@ function MoveState(drawingObjects, majorObject, startX, startY)
     this.rectY = Math.min.apply(Math, arr_y);
     this.rectW = Math.max.apply(Math, arr_x) - this.rectX;
     this.rectH = Math.max.apply(Math, arr_y) - this.rectY;
-
+    this.bSamePos = true;
 }
 
 MoveState.prototype =
@@ -1095,6 +1086,10 @@ MoveState.prototype =
         {
             var cur_track_original_shape = _arr_track_objects[track_index].originalObject;
             var trackSnapArrayX = cur_track_original_shape.snapArrayX;
+            if(!trackSnapArrayX)
+            {
+                continue;
+            }
             var curDX =  result_x - startPos.x;
 
 
@@ -1169,6 +1164,10 @@ MoveState.prototype =
         {
             cur_track_original_shape = _arr_track_objects[track_index].originalObject;
             var trackSnapArrayY = cur_track_original_shape.snapArrayY;
+            if(!trackSnapArrayY)
+            {
+                continue;
+            }
             var curDY =  result_y - startPos.y;
 
 
@@ -1267,6 +1266,7 @@ MoveState.prototype =
         var check_position = this.drawingObjects.drawingObjects.checkGraphicObjectPosition(this.rectX + tx, this.rectY + ty, this.rectW, this.rectH);
         for(_object_index = 0; _object_index < _objects_count; ++_object_index)
             _arr_track_objects[_object_index].track(tx + check_position.x, ty + check_position.y, pageIndex);
+        this.bSamePos = (AscFormat.fApproxEqual(tx + check_position.x, 0) && AscFormat.fApproxEqual(ty + check_position.y, 0));
         this.drawingObjects.updateOverlay();
     },
 
@@ -1332,7 +1332,7 @@ function MoveInGroupState(drawingObjects, majorObject, group, startX, startY)
     this.group = group;
     this.startX = startX;
     this.startY = startY;
-
+    this.bSamePos = true;
 
     var arr_x = [], arr_y = [];
     for(var i = 0; i < this.drawingObjects.arrTrackObjects.length; ++i)

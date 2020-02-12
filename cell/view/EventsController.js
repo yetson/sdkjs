@@ -553,7 +553,7 @@
 		 * @param event {MouseEvent}
 		 * @param callback {Function}
 		 */
-		asc_CEventsController.prototype._changeFillHandle = function (event, callback) {
+		asc_CEventsController.prototype._changeFillHandle = function (event, callback, tableIndex) {
 			var t = this;
 			// Обновляемся в режиме автозаполнения
 			var coord = this._getCoordinates(event);
@@ -562,7 +562,7 @@
 					if (!d) return;
 					t.scroll(d);
 					asc_applyFunction(callback);
-				});
+				}, tableIndex);
 		};
 
 		/** @param event {MouseEvent} */
@@ -751,7 +751,17 @@
 					return true;
 
 				case 120: // F9
-					t.handlers.trigger("calcAll", ctrlKey, event.altKey, shiftKey);
+					var type;
+					if (ctrlKey && altKey && shiftKey) {
+						type = Asc.c_oAscCalculateType.All;
+					} else if (ctrlKey && altKey) {
+						type = Asc.c_oAscCalculateType.Workbook;
+					} else if (shiftKey) {
+						type = Asc.c_oAscCalculateType.ActiveSheet;
+					} else {
+						type = Asc.c_oAscCalculateType.WorkbookOnlyChanged;
+					}
+					t.handlers.trigger("calculate", type);
 					return result;
 
 				case 113: // F2
@@ -788,7 +798,7 @@
 					return result;
 
 				case 9: // tab
-					if (t.getCellEditMode()) {
+					if (t.getCellEditMode() || t.isSelectionDialogMode) {
 						return true;
 					}
 					// Отключим стандартную обработку браузера нажатия tab
@@ -805,7 +815,7 @@
 					break;
 
 				case 13:  // "enter"
-					if (t.getCellEditMode()) {
+					if (t.getCellEditMode() || t.isSelectionDialogMode) {
 						return true;
 					}
 					// Особый случай (возможно движение в выделенной области)
@@ -1107,7 +1117,7 @@
 							}
 
 							t.scroll(d);
-						});
+						}, t.mouseX, t.mouseY);
 				}
 			}
 
@@ -1407,7 +1417,7 @@
 					} else if (t.targetInfo.target === c_oTargetType.FillHandle && this.canEdit()) {
 						// В режиме автозаполнения
 						this.isFillHandleMode = true;
-						t._changeFillHandle(event);
+						t._changeFillHandle(event, null, t.targetInfo.tableIndex);
 						return;
 					} else if (t.targetInfo.target === c_oTargetType.MoveRange && this.canEdit()) {
 						// В режиме перемещения диапазона
@@ -1420,7 +1430,7 @@
 					} else if (t.targetInfo.target === c_oTargetType.FilterObject && 2 === button) {
 						this.handlers.trigger('onContextMenu', null);
 						return;
-					} else if (t.targetInfo.commentIndexes && this.canEdit()) {
+					} else if (t.targetInfo.commentIndexes) {
 						t._commentCellClick(event);
 					} else if (t.targetInfo.target === c_oTargetType.MoveResizeRange && this.canEdit()) {
 						this.isMoveResizeRange = true;
@@ -1498,7 +1508,7 @@
 				if (this.targetInfo && this.targetInfo.target === c_oTargetType.FillHandle && this.canEdit()) {
 					// В режиме автозаполнения
 					this.isFillHandleMode = true;
-					this._changeFillHandle(event);
+					this._changeFillHandle(event, null, t.targetInfo.tableIndex);
 				} else {
 					this.isSelectMode = true;
 					this.handlers.trigger("changeSelection", /*isStartPoint*/true, coord.x, coord.y, /*isCoord*/true,
@@ -1643,10 +1653,11 @@
     	/** @param event {MouseEvent} */
 		asc_CEventsController.prototype._onMouseLeave = function (event) {
 			var t = this;
+			var coord = t._getCoordinates(event);
 			this.hasCursor = false;
 			if (!this.isSelectMode && !this.isResizeMode && !this.isMoveResizeRange) {
 				this.targetInfo = undefined;
-				this.handlers.trigger("updateWorksheet");
+				this.handlers.trigger("updateWorksheet", coord.x, coord.y);
 			}
 			if (this.isMoveRangeMode) {
 				t.moveRangeTimerId = window.setTimeout(function(){t._moveRangeHandle2(event)},0);

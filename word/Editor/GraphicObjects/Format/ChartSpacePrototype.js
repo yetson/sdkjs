@@ -177,7 +177,7 @@ CChartSpace.prototype.handleUpdatePosition = function()
     this.recalcBounds();
     for(var i = 0; i < this.userShapes.length; ++i)
     {
-        if(this.userShapes[i].object && this.userShapes[i].object.handleUpdateExtents)
+        if(this.userShapes[i].object)
         {
             this.userShapes[i].object.handleUpdateExtents();
         }
@@ -475,6 +475,7 @@ CChartSpace.prototype.checkShapeChildTransform = function(transform_text)
             {
                 if(this.chart.plotArea)
                 {
+                    this.chart.plotArea.checkShapeChildTransform(transform_text);
                     if(this.chart.plotArea.charts[0] && this.chart.plotArea.charts[0].series)
                     {
                         var series = this.chart.plotArea.charts[0].series;
@@ -579,17 +580,7 @@ CChartSpace.prototype.IsHdrFtr = function(bool)
 
 CChartSpace.prototype.Refresh_RecalcData2 = function(pageIndex, object)
 {
-    if(object && object.getObjectType && object.getObjectType() === AscDFH.historyitem_type_Title && this.selection.title === object)
-    {
-        this.recalcInfo.recalcTitle = object;
-    }
-    else
-    {
-        var bOldRecalculateRef = this.recalcInfo.recalculateReferences;
-        this.setRecalculateInfo();
-        this.recalcInfo.recalculateReferences = bOldRecalculateRef;
-    }
-    this.addToRecalculate();
+    this.refreshRecalcData2(pageIndex, object);
     var HdrFtr = this.IsHdrFtr(true);
     if (HdrFtr)
         HdrFtr.Refresh_RecalcData2();

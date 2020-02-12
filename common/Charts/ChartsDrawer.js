@@ -888,35 +888,34 @@ CChartsDrawer.prototype =
 
 		//исключение - когда среди диаграмм есть груговая
 		var pieChart = null;
-		if(!this._isSwitchCurrent3DChart(chartSpace)) {
-			var charts = plotArea.charts;
-			for(var i = 0; i < charts.length; i++) {
-				var chartType = this._getChartType(charts[i]);
-				if(c_oChartTypes.Pie === chartType || c_oChartTypes.DoughnutChart === chartType) {
-					pieChart = charts[i];
-					break;
-				}
-			}
-			if(null !== pieChart) {
-				//вычисляем истинную(первоначальную) ширину и высоту диаграммы
-				left = this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
-				bottom = this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
-				top = this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
-				right = this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
-
-				var width = chartSpace.extX - left - right;
-				var height = chartSpace.extY - top - bottom;
-				var pieSize = width > height ? height : width;
-
-				//размещаем по центру относительно width/height
-				left += (width - pieSize)/2;
-				right += (width - pieSize)/2;
-				top += (height - pieSize)/2;
-				bottom += (height - pieSize)/2;
+		var charts = plotArea.charts;
+		for(i = 0; i < charts.length; i++) {
+			var chartType = this._getChartType(charts[i]);
+			if(c_oChartTypes.Pie === chartType || c_oChartTypes.DoughnutChart === chartType) {
+				pieChart = charts[i];
+				break;
 			}
 		}
+		var is3dChart = this._isSwitchCurrent3DChart(chartSpace);
+		if(!is3dChart && null !== pieChart) {
+			//вычисляем истинную(первоначальную) ширину и высоту диаграммы
+			left = this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
+			bottom = this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
+			top = this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;
+			right = this._getStandartMargin(right, rightKey, rightTextLabels, 0) + rightKey + rightTextLabels;
 
-		if(null === pieChart) {
+			var width = chartSpace.extX - left - right;
+			var height = chartSpace.extY - top - bottom;
+			var pieSize = width > height ? height : width;
+
+			//размещаем по центру относительно width/height
+			left += (width - pieSize)/2;
+			right += (width - pieSize)/2;
+			top += (height - pieSize)/2;
+			bottom += (height - pieSize)/2;
+		}
+
+		if(null === pieChart || is3dChart) {
 			left += this._getStandartMargin(left, leftKey, leftTextLabels, 0) + leftKey + leftTextLabels;
 			bottom += this._getStandartMargin(bottom, bottomKey, bottomTextLabels, 0) + bottomKey + bottomTextLabels;
 			top += this._getStandartMargin(top, topKey, topTextLabels, topMainTitle) + topKey + topTextLabels + topMainTitle;

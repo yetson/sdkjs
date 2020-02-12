@@ -1312,7 +1312,7 @@ function CDrawingDocument(drawingObjects)
     this.drawingObjects = drawingObjects;
     this.IsLockObjectsEnable = false;
 
-    AscCommon.g_oHtmlCursor.register("de-markerformat", "marker_format", ["marker_format", 14, 8], "pointer");
+    AscCommon.g_oHtmlCursor.register("de-markerformat", "marker_format", "14 8", "pointer");
 
     this.m_oWordControl     = null;
     this.m_oLogicDocument   = null;
@@ -3328,12 +3328,8 @@ function CDrawingDocument(drawingObjects)
 
         for (var i = 0; i < _len; i++)
         {
-            if (__tabs[i].Value == tab_Left)
-                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_left);
-            else if (__tabs[i].Value == tab_Center)
-                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_center);
-            else if (__tabs[i].Value == tab_Right)
-                _ar[i] = new CTab(__tabs[i].Pos, AscCommon.g_tabtype_right);
+            if (__tabs[i].Value == tab_Left || __tabs[i].Value == tab_Center || __tabs[i].Value == tab_Right)
+                _ar[i] = new CTab(__tabs[i].Pos, __tabs[i].Value);
         }
 
         hor_ruler.CorrectTabs();
