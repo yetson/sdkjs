@@ -5399,10 +5399,41 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 											parseResult.addRefPos(aTokens[i].pos - aTokens[i].length, aTokens[i].pos, this.outStack.length, elem);
 										} else if(TOK_SUBTYPE_ERROR === aTokens[i].subtype) {
 											elem = new cError(val);
+										} else if(_tableTMP = parserHelp.isTable.call(ph, valUp, 0, local)) {//todo while use regular
+											elem = cStrucTable.prototype.createFromVal(_tableTMP, this.wb, this.ws);
+
+											if (elem.type === cElementType.error && !ignoreErrors) {
+												/*используется неверный именованный диапазон или таблица*/
+												parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
+												t.outStack = [];
+												return false;
+											}
+											if (elem.type !== cElementType.error) {
+												parseResult.addRefPos(aTokens[i].pos - aTokens[i].length, aTokens[i].pos, this.outStack.length, elem, true);
+											}
 										} else {
-											elem = new cName(aTokens[i].value, this.ws);
-											parseResult.addRefPos(aTokens[i].pos - aTokens[i].length,
-												aTokens[i].pos,	this.outStack.length, elem);
+											//проверяем вдруг это область печати
+											var defName;
+											var sDefNameOperand = aTokens[i].value.replace(rx_sDefNamePref, "");
+											var tryTranslate = AscCommonExcel.tryTranslateToPrintArea(sDefNameOperand);
+											if(tryTranslate) {
+												elem = new cName(tryTranslate, this.ws);
+												defName = elem.getDefName();
+											}
+											//TODO возможно здесь нужно else ставить
+											if(!defName) {
+												elem = new cName(sDefNameOperand, this.ws);
+												defName = elem.getDefName();
+											}
+
+											var table_tmp;
+											if (defName && defName.isTable && (table_tmp = parserHelp.isTable(sDefNameOperand + "[]", 0))) {
+												elem = cStrucTable.prototype.createFromVal(table_tmp, this.wb, this.ws);
+												//need assemble becase source formula wrong
+												needAssemble = true;
+											}
+
+											parseResult.addRefPos(aTokens[i].pos - aTokens[i].length, aTokens[i].pos, this.outStack.length, elem);
 										}
 									}
 								}
@@ -5657,6 +5688,9 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 			}
 
 			if (this.outStack.length !== 0) {
+				if (needAssemble) {
+					this.Formula = this.assemble();
+				}
 				return this.isParsed = true;
 			} else {
 				return this.isParsed = false;
