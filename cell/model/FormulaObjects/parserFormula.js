@@ -5338,9 +5338,8 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 			};
 
 			//console.log(this.Formula);
-			cFormulaList =
-				(local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized :
-					cFormulaFunction;
+			cFormulaList = (local && AscCommonExcel.cFormulaFunctionLocalized) ? AscCommonExcel.cFormulaFunctionLocalized : cFormulaFunction;
+
 			var aTokens = getTokens(this.Formula);
 			if (null === aTokens) {
 				this.outStack = [];
@@ -5349,6 +5348,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 			}
 
 			var notEndedFuncCount = 0;
+			var operandExpected = false;
 			var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null,
 				bArrElemSign = false, wsF, wsT, arg_count;
 			for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
@@ -5372,6 +5372,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 				val = aTokens[i].value;
 				switch (aTokens[i].type) {
 					case TOK_TYPE_OPERAND: {
+						operandExpected = false;
 						if (TOK_SUBTYPE_TEXT === aTokens[i].subtype) {
 							elem = new cString(val);
 						} else {
@@ -5483,6 +5484,8 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 							return false;
 						}
 
+						operandExpected = true;
+
 						prev = getPrevElem(aTokens, i);
 						if ('-' === val && (0 === i ||
 							(TOK_TYPE_OPERAND !== prev.type && TOK_TYPE_OP_POST !== prev.type &&
@@ -5523,6 +5526,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 					}
 					case TOK_TYPE_FUNCTION: {
 						if (TOK_SUBTYPE_START === aTokens[i].subtype) {
+							parseResult.operand_expected = false;
 							val = val.toUpperCase();
 							if ('ARRAY' === val) {
 								if (arr) {
@@ -5691,7 +5695,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 				this.outStack.push(stack.pop());
 			}
 
-			if(notEndedFuncCount) {
+			if(notEndedFuncCount || operandExpected) {
 				this.outStack = [];
 				parseResult.setError(c_oAscError.ID.FrmlOperandExpected);
 				return false;
