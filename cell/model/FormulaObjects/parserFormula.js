@@ -5527,7 +5527,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 					case TOK_TYPE_FUNCTION: {
 						if (TOK_SUBTYPE_START === aTokens[i].subtype) {
 							parseResult.operand_expected = false;
-							val = val.toUpperCase();
+							val = val.replace(rx_sFuncPref, "").toUpperCase();
 							if ('ARRAY' === val) {
 								if (arr) {
 									this.outStack = [];
