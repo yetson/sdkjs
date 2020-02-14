@@ -5330,7 +5330,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 
 			var getPrevElem = function(aTokens, pos){
 				for(var n = pos - 1; n >=0; n--){
-					if("" !== aTokens[n].value){
+					if(aTokens[n] && "" !== aTokens[n].value){
 						return aTokens[n];
 					}
 				}
@@ -5352,6 +5352,16 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 			var stack = [], val, valUp, tmp, elem, len, indentCount = -1, args = [], prev, next, arr = null,
 				bArrElemSign = false, wsF, wsT, arg_count;
 			for (var i = 0, nLength = aTokens.length; i < nLength; ++i) {
+				if(!aTokens[i]) {
+					//данный элемент можеть быть не определен в случае ввода, допустим, неверной формулы =sin(1)}
+					if(!ignoreErrors) {
+						parseResult.setError(c_oAscError.ID.FrmlAnotherParsingError);
+						this.outStack = [];
+						return false;
+					} else {
+						continue;
+					}
+				}
 				if(TOK_SUBTYPE_START === aTokens[i].subtype) {
 					notEndedFuncCount++;
 				} else if(TOK_SUBTYPE_STOP === aTokens[i].subtype) {
