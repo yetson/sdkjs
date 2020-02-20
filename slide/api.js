@@ -1924,6 +1924,10 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.addToMultipleClipboard = function(data, type) {
+		AscCommon.g_clipboardBase.addToMultipleClipboard(data, type);
+	};
+
 	asc_docs_api.prototype.asc_IsFocus = function(bIsNaturalFocus)
 	{
 		var _ret = false;

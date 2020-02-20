@@ -505,6 +505,10 @@ var editor;
     return result;
   };
 
+  spreadsheet_api.prototype.addToMultipleClipboard = function(data, type) {
+	  AscCommon.g_clipboardBase.addToMultipleClipboard(data, type);
+  };
+
   spreadsheet_api.prototype.asc_Undo = function() {
     this.wb.undo();
     this.wb.restoreFocus();

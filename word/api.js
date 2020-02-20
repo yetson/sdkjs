@@ -2224,6 +2224,10 @@ background-repeat: no-repeat;\
 		}
 	};
 
+	asc_docs_api.prototype.addToMultipleClipboard = function(data, type) {
+		AscCommon.g_clipboardBase.addToMultipleClipboard(data, type);
+	};
+
 	asc_docs_api.prototype._finalizeAction = function()
 	{
 		var _logicDoc = this.WordControl.m_oLogicDocument;

@@ -95,6 +95,10 @@
 		this.inputContext = null;
 		this.LastCopyBinary = null; // для вставки по кнопке, когда браузер не позволяет
 
+		//для хранения множественных скопированных фрагментов
+		this.LastCopy = null;
+		this.LastCopyArr = null;
+
 		// images counter
 		this.PasteImagesCount = 0;
 		this.PasteImagesCounter = 0;
@@ -1024,6 +1028,15 @@
 			if (this.Api && this.Api.isCopyOutEnabled)
 				return this.Api.isCopyOutEnabled();
 			return true;
+		},
+
+		addToMultipleClipboard : function(data, type)
+		{
+			if(!this.LastCopyArr) {
+				this.LastCopyArr = [];
+			}
+
+			this.LastCopyArr.push(new asc_CMultipleCopyData(data, type));
 		}
 	};
 
@@ -1294,12 +1307,36 @@
 		}
 	};
 
+	function asc_CMultipleCopyData(data, type) {
+		this.data = data;
+		this.type = type;
+	}
+
+	asc_CMultipleCopyData.prototype = {
+		Init : function() {
+
+		},
+
+		asc_getData: function() {
+			return this.data;
+		},
+
+		asc_getType: function() {
+			return this.type;
+		}
+	};
+
 	var g_clipboardBase = new CClipboardBase();
 	window['AscCommon'] = window['AscCommon'] || {};
 	window['AscCommon'].g_clipboardBase = g_clipboardBase;
 
 	var g_specialPasteHelper = new CSpecialPasteHelper();
 	window['AscCommon'].g_specialPasteHelper = g_specialPasteHelper;
+
+	window['AscCommon'].asc_CMultipleCopyData = asc_CMultipleCopyData;
+	prot = asc_CMultipleCopyData.prototype;
+	prot["asc_getData"] = prot.asc_getData;
+	prot["asc_getType"] = prot.asc_getType;
 })(window);
 
 // copy/paste focus error!!!
