@@ -4582,9 +4582,9 @@
 	SUMIFSCache.prototype._get = function (range, arg, valueForSearching, parent) {
 		var res, _this = this, wsId = range.getWorksheet().getId();
 		var sRangeName;
-		AscCommonExcel.executeInR1C1Mode(false, function () {
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
 			sRangeName = wsId + AscCommon.g_cCharDelimiter + range.getName();
-		});
+		//});
 		var sInputKey = valueForSearching.getValue() + AscCommon.g_cCharDelimiter + sRangeName /*+ g_cCharDelimiter + valueForSearching.type*/;
 		var cacheElem;
 		if(parent) {

@@ -478,9 +478,9 @@
 						//history
 						//FOR R1C1 - add into history only A1B1 format
 						if (addFormatTableOptionsObj && addFormatTableOptionsObj.range && rangeWithoutDiff) {
-							AscCommonExcel.executeInR1C1Mode(false, function () {
+							//AscCommonExcel.executeInR1C1Mode(false, function () {
 								addFormatTableOptionsObj.range = rangeWithoutDiff.getName();
-							});
+							//});
 						}
 
 						t._addHistoryObj({Ref: filterRange}, AscCH.historyitem_AutoFilter_Add, {
@@ -2676,9 +2676,9 @@
 
 				if (cellId !== undefined) {
 					var curCellId = cellId.split('af')[0];
-					AscCommonExcel.executeInR1C1Mode(false, function () {
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
 						activeRange = AscCommonExcel.g_oRangeCache.getAscRange(curCellId).clone();
-					});
+					//});
 				}
 
 				var ColId = null;
@@ -3900,9 +3900,9 @@
 				var filterDefName = ws.workbook.getDefinesNames("_xlnm._filterdatabase", ws.getId());
 				if(filterDefName) {
 					var filterDefNameRef = false;
-					AscCommonExcel.executeInR1C1Mode(false, function () {
-						filterDefNameRef = AscCommonExcel.getRangeByRef(filterDefName.ref, ws, true, true)
-					});
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
+						filterDefNameRef = AscCommonExcel.getRangeByRef(filterDefName.ref, ws, true, true);
+					//});
 					if(filterDefNameRef && filterDefNameRef.length) {
 						filterDefNameRef = filterDefNameRef[0];
 						if(filterDefNameRef && filterDefNameRef.bbox) {

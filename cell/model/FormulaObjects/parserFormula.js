@@ -1012,9 +1012,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.ws = ws;
 		this.range = null;
 		if (val) {
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				val = ws.getRange2(val);
-			});
+			//});
 			this.range = val;
 		}
 	}
@@ -1258,9 +1258,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 
 		this.bbox = null;
 		if (val) {
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				val = AscCommonExcel.g_oRangeCache.getAscRange(val);
-			});
+			//});
 			if (val) {
 				this.bbox = val.clone();
 			}
@@ -1584,9 +1584,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.ws = ws;
 		this.range = null;
 		if (val) {
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				val = ws.getRange2(val.replace(AscCommon.rx_space_g, ""));
-			});
+			//});
 			this.range = val;
 		}
 	}
@@ -1690,9 +1690,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		this.ws = ws;
 		this.range = null;
 		if (val && this.ws) {
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				val = ws.getRange2(val);
-			});
+			//});
 			this.range = val;
 		}
 	}
@@ -2176,9 +2176,9 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		if (tableData.range) {
 			//всегда получаем диапазон в виде A1B1
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				refName = tableData.range.getName();
-			});
+			//});
 
 			var wsFrom = this.wb.getWorksheetById(tableData.wsID);
 			if (tableData.range.isOneCell()) {

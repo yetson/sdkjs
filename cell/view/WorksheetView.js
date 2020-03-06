@@ -1743,9 +1743,9 @@
 		//var titleWidth = 0, titleHeight = 0;
 		if(printTitles) {
 			var printTitleRefs;
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				printTitleRefs = AscCommonExcel.getRangeByRef(printTitles.ref, t.model, true, true)
-			});
+			//});
 			if(printTitleRefs && printTitleRefs.length) {
 				for(var i = 0; i < printTitleRefs.length; i++) {
 					var bbox = printTitleRefs[i].bbox;
@@ -2007,9 +2007,9 @@
 
 		var getPrintAreaRanges = function() {
 			var res = false;
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				res = AscCommonExcel.getRangeByRef(printArea.ref, t.model, true, true, true)
-			});
+			//});
 			return res && res.length ? res : null;
 		};
 
@@ -2680,9 +2680,9 @@
 			var printArea = !ignorePrintArea && this.model.workbook.getDefinesNames("Print_Area", this.model.getId());
 			var getPrintAreaRanges = function() {
 				var res = false;
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					res = AscCommonExcel.getRangeByRef(printArea.ref, t.model, true, true)
-				});
+				//});
 				return res && res.length ? res : null;
 			};
 
@@ -11405,9 +11405,9 @@
 			var fromBinaryExcel = val.fromBinary;
 			//paste from excel binary
 			if(fromBinaryExcel) {
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					selectData = t._pasteData(isLargeRange, fromBinaryExcel, pasteContent, bIsUpdate, pasteToRange);
-				});
+				//});
 
 				History.EndTransaction();
 			} else {
@@ -13953,7 +13953,7 @@
 
 			//проверяем на совпадение с именем диапазона в другом формате
 			var changeModeRanges;
-			AscCommonExcel.executeInR1C1Mode(!AscCommonExcel.g_R1C1Mode, function () {
+			AscCommonExcel.executeInR1C1Mode(AscCommonExcel.g_R1C1Mode, function () {
 				changeModeRanges = AscCommonExcel.getRangeByRef(reference, t.model, true, true);
 			});
 			if(changeModeRanges && changeModeRanges.length){
@@ -13972,10 +13972,10 @@
 				mc = selectionLast.isOneCell() ? this.model.getMergedByCell(selectionLast.r1, selectionLast.c1) : null;
 
 				var defName;
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					defName = t.model.workbook.editDefinesNames(null, new Asc.asc_CDefName(reference,
 						parserHelp.get3DRef(t.model.getName(), (mc || selectionLast).getAbsName())));
-				});
+				//});
 
 				if (defName) {
 					this._isLockedDefNames(null, defName.getNodeId());
@@ -17322,9 +17322,9 @@
 					if(i === 0 && str !== "") {
 						str += ",";
 					}
-					AscCommonExcel.executeInR1C1Mode(false, function () {
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
 						str += parserHelp.get3DRef(t.model.getName(), (mc || ranges[i]).getAbsName());
-					});
+					//});
 					if(i !== ranges.length - 1) {
 						str += ",";
 					}
@@ -17385,9 +17385,9 @@
             var selection = this.model.selectionRange.ranges;
 
             var areaRefsArr;
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				areaRefsArr = AscCommonExcel.getRangeByRef(printArea.ref, t.model, true, true, true)
-			});
+			//});
             if(areaRefsArr && areaRefsArr.length) {
 				res = true;
             	for(var i = 0; i < areaRefsArr.length; i++) {

@@ -424,9 +424,9 @@ CHistory.prototype.UndoRedoEnd = function (Point, oRedoObjectParam, bUndo) {
         }
 	}
 
-	AscCommonExcel.executeInR1C1Mode(false, function () {
+	//AscCommonExcel.executeInR1C1Mode(false, function () {
 		t.workbook.dependencyFormulas.unlockRecal();
-	});
+	//});
 
 	if (null != Point) {
 		if (oRedoObjectParam.bChangeColorScheme) {

@@ -509,7 +509,7 @@ function (window, undefined) {
 			return new cError(cErrorType.wrong_value_type);
 		}
 
-		AscCommonExcel.executeInR1C1Mode(false, function () {
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
 			if (cElementType.array === arg0.type) {
 				if(undefined === arg[2] && 1 === arg0.rowCount) {//если последний аргумент опущен, и выделенa 1 строка
 					res = arg0.getValue2(0, (0 === arg1) ? 0 : arg1 - 1);
@@ -571,7 +571,7 @@ function (window, undefined) {
 			} else {
 				res = new cError(cErrorType.wrong_value_type);
 			}
-		});
+		//});
 
 		return res ? res : new cError(cErrorType.bad_reference);
 	};
@@ -904,7 +904,7 @@ function (window, undefined) {
 				return new cError(cErrorType.bad_reference);
 			}
 
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				var b = arg2.getBBox0();
 				if (2 === arg.length) {
 					if (bVertical) {
@@ -919,7 +919,7 @@ function (window, undefined) {
 						res = new cRef(ws.getCell3(b.r1 + index, b.c1 + 0).getName(), ws);
 					}
 				}
-			});
+			//});
 			return res;
 		}
 	};
@@ -1504,9 +1504,9 @@ function (window, undefined) {
 				}
 
 				var name;
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					name = box.getName();
-				});
+				//});
 				var ws = arg0.getWS();
 				var wsCell = arguments[3];
 				if (box.isOneCell()) {
@@ -1797,9 +1797,9 @@ function (window, undefined) {
 	VHLOOKUPCache.prototype._get = function (range, valueForSearching, arg3Value) {
 		var res, _this = this, wsId = range.getWorksheet().getId();
 		var sRangeName;
-		AscCommonExcel.executeInR1C1Mode(false, function () {
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
 			sRangeName = wsId + g_cCharDelimiter + range.getName();
-		});
+		//});
 		var cacheElem = this.cacheId[sRangeName];
 		if (!cacheElem) {
 			cacheElem = {elements: [], results: {}};

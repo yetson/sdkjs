@@ -3616,7 +3616,7 @@ Hyperlink.prototype = {
 		return this.Location;
 	},
 	getLocationRange : function () {
-		return this.LocationRangeBbox && this.LocationRangeBbox.getName(AscCommonExcel.g_R1C1Mode ?
+		return this.LocationRangeBbox && this.LocationRangeBbox.getName(AscCommonExcel.g_R1C1ModeCalculate ?
 			AscCommonExcel.referenceType.A : AscCommonExcel.referenceType.R);
 	},
 	_updateLocation : function () {
@@ -3632,9 +3632,9 @@ Hyperlink.prototype = {
 				});
 			}
 			if (this.LocationRangeBbox) {
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					t.LocationRange = t.LocationRangeBbox.getName(AscCommonExcel.referenceType.R);
-				});
+				//});
 				this.Location = parserHelp.get3DRef(this.LocationSheet, this.LocationRange);
 			}
 		}
@@ -4741,7 +4741,7 @@ function RangeDataManagerElem(bbox, data)
 			var initData = this.initData;
 			this.initData = null;
 			var t = this;
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				History.TurnOff();
 				for (var i = 0; i < initData.length; ++i) {
 					var range = t.worksheet.getRange2(initData[i]);
@@ -4750,7 +4750,7 @@ function RangeDataManagerElem(bbox, data)
 					}
 				}
 				History.TurnOn();
-			});
+			//});
 		}
 	};
 	RangeDataManager.prototype.add = function (bbox, data, oChangeParam) {
@@ -5574,9 +5574,9 @@ function RangeDataManagerElem(bbox, data)
 		var t = this;
 		if (this._f && oldSheet === this._f.sheet && (null === this._f.sheet2 || oldSheet === this._f.sheet2)) {
 			this._f.setSheet(sheet);
-			AscCommonExcel.executeInR1C1Mode(false,function (){
+			//AscCommonExcel.executeInR1C1Mode(false,function (){
 				t.f = t._f.getName();
-			});
+			//});
 		}
 	};
 	sparkline.prototype.checkInRange = function (range) {

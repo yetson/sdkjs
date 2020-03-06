@@ -260,9 +260,9 @@
 			var t = this;
 			if (opt_forceBuild) {
 				if(opt_open) {
-					AscCommonExcel.executeInR1C1Mode(false, function () {
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
 						t.parsedRef.parse();
-					});
+					//});
 				} else {
 					this.parsedRef.parse();
 				}
@@ -279,9 +279,9 @@
 			//R1C1 - отдаём в зависимости от флага bLocale(для меню в виде R1C1)
 			var res, t = this;
 			if(!this.parsedRef.isParsed) {
-				AscCommonExcel.executeInR1C1Mode(false, function () {
+				//AscCommonExcel.executeInR1C1Mode(false, function () {
 					t.parsedRef.parse();
-				});
+				//});
 			}
 			if(bLocale) {
 				res = this.parsedRef.assembleLocale(AscCommonExcel.cFormulaFunctionToLocale, true);
@@ -349,9 +349,9 @@
 		//значения в areaMap хранятся в виде A1B1
 		//данная функция используется только для получения данных из areaMap
 		var res;
-		AscCommonExcel.executeInR1C1Mode(false, function () {
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
 			res = bbox.getName(AscCommonExcel.referenceType.R);
-		});
+		//});
 		return res;
 	}
 
@@ -784,7 +784,7 @@
 				AscCommonExcel.g_oRangeCache.getAscRange(name);
 			if(!range) {
 				//проверяем на совпадение с именем диапазона в другом формате
-				AscCommonExcel.executeInR1C1Mode(!AscCommonExcel.g_R1C1Mode, function () {
+				AscCommonExcel.executeInR1C1Mode(/*AscCommonExcel.g_R1C1Mode*/true, function () {
 					range = AscCommonExcel.g_oRangeCache.getRange3D(name) ||
 						AscCommonExcel.g_oRangeCache.getAscRange(name);
 				});
@@ -2816,9 +2816,9 @@
 					}
 					// TODO if(g_oUndoRedoGraphicObjects == item.oClass && item.oData.drawingData)
 					//     item.oData.drawingData.bCollaborativeChanges = true;
-					AscCommonExcel.executeInR1C1Mode(false, function () {
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
 						history.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
-					});
+					//});
 				}
 			}
 			AscFonts.IsCheckSymbols = false;
@@ -2904,9 +2904,9 @@
 				var item = new UndoRedoItemSerializable();
 				item.Deserialize(stream);
 				if ((null != item.oClass || (item.oData && typeof item.oData.sChangedObjectId === "string")) && null != item.nActionType){
-					AscCommonExcel.executeInR1C1Mode(false, function () {
+					//AscCommonExcel.executeInR1C1Mode(false, function () {
 						History.RedoAdd(oRedoObjectParam, item.oClass, item.nActionType, item.nSheetId, item.oRange, item.oData);
-					});
+					//});
 				}
 
 				_pos += _len;
@@ -7582,9 +7582,9 @@
 		this.processFormula(function(parsed) {
 			//todo without parse
 			var newFormula = new parserFormula(parsed.getFormula(), oNewCell, t.ws);
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				newFormula.parse();
-			});
+			//});
 			var arrayFormulaRef = parsed.getArrayFormulaRef();
 			if(arrayFormulaRef) {
 				newFormula.setArrayFormulaRef(arrayFormulaRef);

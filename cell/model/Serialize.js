@@ -4890,9 +4890,9 @@
 			if (noBase64) {
 				this.Memory.WriteXmlString(this.WriteFileHeader(0, Asc.c_nVersionNoBase64));
 			}
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				t.WriteMainTable();
-			});
+			//});
             pptx_content_writer._End();
 			if (noBase64) {
 			    if (onlySaveBase64)
@@ -9279,9 +9279,9 @@
 			if(!pasteBinaryFromExcel)
 				History.TurnOff();
 
-			AscCommonExcel.executeInR1C1Mode(false, function () {
+			//AscCommonExcel.executeInR1C1Mode(false, function () {
 				t.ReadMainTable(wb);
-			});
+			//});
 
             if(!this.copyPasteObj.isCopyPaste)
             {

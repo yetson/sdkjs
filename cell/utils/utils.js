@@ -806,7 +806,7 @@
 		};
 
 		Range.prototype._getName = function (val, isCol, abs) {
-			var isR1C1Mode = AscCommonExcel.g_R1C1Mode;
+			var isR1C1Mode = AscCommonExcel.g_R1C1ModeCalculate;
 			val += 1;
 			if (isCol && !isR1C1Mode) {
 				val = g_oCellAddressUtils.colnumToColstr(val);
@@ -816,7 +816,7 @@
 					AscCommonExcel.g_ActiveCell.r1) - 1))) ? '[' + val + ']' : '') : val));
 		};
 		Range.prototype.getName = function (refType) {
-			var isR1C1Mode = AscCommonExcel.g_R1C1Mode;
+			var isR1C1Mode = AscCommonExcel.g_R1C1ModeCalculate;
 			var c, r, type = this.getType();
 			var sRes = "";
 			var c1Abs, c2Abs, r1Abs, r2Abs;
@@ -1563,7 +1563,7 @@
 			return this._getRange(sRange, 3);
 		};
 		RangeCache.prototype._getRange = function (sRange, type) {
-			if (AscCommonExcel.g_R1C1Mode) {
+			if (AscCommonExcel.g_R1C1ModeCalculate) {
 				var o = {
 					Formula: sRange, pCurrPos: 0
 				};
@@ -1788,10 +1788,10 @@
 		}
 
 		function executeInR1C1Mode(mode, runFunction) {
-			var oldMode = AscCommonExcel.g_R1C1Mode;
-			AscCommonExcel.g_R1C1Mode = mode;
+			var oldMode = AscCommonExcel.g_R1C1ModeCalculate;
+			AscCommonExcel.g_R1C1ModeCalculate = mode;
 			runFunction();
-			AscCommonExcel.g_R1C1Mode = oldMode;
+			AscCommonExcel.g_R1C1ModeCalculate = oldMode;
 		}
 
 		function checkFilteringMode(f, oThis, args) {
@@ -2740,6 +2740,7 @@
 		window['AscCommonExcel'] = window['AscCommonExcel'] || {};
 		window['AscCommonExcel'].g_ActiveCell = null; // Active Cell for calculate (in R1C1 mode for relative cell)
 		window['AscCommonExcel'].g_R1C1Mode = false; // No calculate in R1C1 mode
+		window['AscCommonExcel'].g_R1C1ModeCalculate = false; // No calculate in R1C1 mode
 		window['AscCommonExcel'].kCurCells = "se-cells";
 		window["AscCommonExcel"].c_oAscShiftType = c_oAscShiftType;
 		window["AscCommonExcel"].recalcType = recalcType;

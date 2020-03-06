@@ -4103,9 +4103,9 @@ CChartSpace.prototype.parseChartFormula = function(sFormula)
 {
     if(this.worksheet && typeof sFormula === "string" && sFormula.length > 0){
         var res, ws = this.worksheet;
-		AscCommonExcel.executeInR1C1Mode(false, function () {
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
 			res = AscCommonExcel.getRangeByRef(sFormula, ws);
-		});
+		//});
         return res;
     }
     return [];
