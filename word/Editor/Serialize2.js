@@ -1719,8 +1719,9 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml, isCompatible)
 		
 		//Write Comments
 		var oMapCommentId = {};
-		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, false));
-		this.WriteTable(c_oSerTableTypes.DocumentComments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, true));
+		var commentUniqueGuids = {};
+		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, commentUniqueGuids, false));
+		this.WriteTable(c_oSerTableTypes.DocumentComments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, commentUniqueGuids, true));
         //Write Numbering
 		var oNumIdMap = {};
         this.WriteTable(c_oSerTableTypes.Numbering, new BinaryNumberingTableWriter(this.memory, this.Document, oNumIdMap, null, this.saveParams));
@@ -1769,8 +1770,9 @@ function BinaryFileWriter(doc, bMailMergeDocx, bMailMergeHtml, isCompatible)
 		this.WriteMainTableStart();
 		
 		var oMapCommentId = {};
-		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, false));
-		this.WriteTable(c_oSerTableTypes.DocumentComments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, true));
+		var commentUniqueGuids = {};
+		this.WriteTable(c_oSerTableTypes.Comments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, commentUniqueGuids, false));
+		this.WriteTable(c_oSerTableTypes.DocumentComments, new BinaryCommentsTableWriter(this.memory, this.Document, oMapCommentId, commentUniqueGuids, true));
 		this.copyParams.bdtw.oMapCommentId = oMapCommentId;
 		
 		this.copyParams.nDocumentWriterTablePos = this.WriteTableStart(c_oSerTableTypes.Document);
@@ -2480,6 +2482,9 @@ function Binary_pPrWriter(memory, oNumIdMap, oBinaryHeaderFooterTableWriter, sav
 			case Asc.c_oAscNumberingFormat.UpperLetter: val = 60; break;
 			case Asc.c_oAscNumberingFormat.DecimalZero: val = 21; break;
 			case Asc.c_oAscNumberingFormat.DecimalEnclosedCircle: val = 14; break;
+			case Asc.c_oAscNumberingFormat.ChineseCounting: val = 8; break;
+			case Asc.c_oAscNumberingFormat.ChineseCountingThousand: val = 9; break;
+			case Asc.c_oAscNumberingFormat.ChineseLegalSimplified: val = 10; break;
 
 			default: val = 13; break;
 		}
@@ -4197,6 +4202,7 @@ Binary_tblPrWriter.prototype =
     Write_tblpPr2: function(table)
     {
         var oThis = this;
+		var twips;
         if(null != table.PositionH)
         {
 			var PositionH = table.PositionH;
@@ -4214,9 +4220,14 @@ Binary_tblPrWriter.prototype =
 			}
 			else
 			{
+				twips = this.bs.mmToTwips(PositionH.Value);
+				//0 is a special value(left align)
+				if (0 === twips) {
+					twips = 1;
+				}
 				this.memory.WriteByte(c_oSer_tblpPrType2.TblpXTwips);
 				this.memory.WriteByte(c_oSerPropLenType.Long);
-				this.bs.writeMmToTwips(PositionH.Value);
+				this.memory.WriteLong(twips);
 			}
         }
 		if(null != table.PositionV)
@@ -4236,9 +4247,14 @@ Binary_tblPrWriter.prototype =
 			}
 			else
 			{
+				twips = this.bs.mmToTwips(PositionV.Value);
+				//0 is a special value(c_oAscVAnchor.Text)
+				if (0 === twips && Asc.c_oAscVAnchor.Text !== PositionV.RelativeFrom) {
+					twips = 1;
+				}
 				this.memory.WriteByte(c_oSer_tblpPrType2.TblpYTwips);
 				this.memory.WriteByte(c_oSerPropLenType.Long);
-				this.bs.writeMmToTwips(PositionV.Value);
+				this.memory.WriteLong(twips);
 			}
         }
 		if(null != table.Distance)
@@ -6287,11 +6303,12 @@ function BinaryOtherTableWriter(memory, doc)
 		this.bs.WriteItem(c_oSerOtherTableTypes.DocxTheme, function(){pptx_content_writer.WriteTheme(oThis.memory, oThis.Document.theme);});
     };
 };
-function BinaryCommentsTableWriter(memory, doc, oMapCommentId, isDocument)
+function BinaryCommentsTableWriter(memory, doc, oMapCommentId, commentUniqueGuids, isDocument)
 {
     this.memory = memory;
     this.Document = doc;
     this.oMapCommentId = oMapCommentId;
+	this.commentUniqueGuids = commentUniqueGuids;
 	this.isDocument = isDocument;
     this.bs = new BinaryCommonWriter(this.memory);
     this.Write = function()
@@ -6350,6 +6367,10 @@ function BinaryCommentsTableWriter(memory, doc, oMapCommentId, isDocument)
 		}
 		if(null != comment.m_nDurableId)
 		{
+			while (this.commentUniqueGuids[comment.m_nDurableId]) {
+				comment.m_nDurableId = AscCommon.CreateDurableId();
+			}
+			this.commentUniqueGuids[comment.m_nDurableId] = 1;
 			this.bs.WriteItem(c_oSer_CommentsType.DurableId, function(){oThis.memory.WriteULong(comment.m_nDurableId);});
 		}
 		if(null != comment.m_sText && "" != comment.m_sText)
@@ -6437,6 +6458,11 @@ function BinarySettingsTableWriter(memory, doc, saveParams)
 		this.bs.WriteItem(c_oSerCompat.CompatSetting, function() {oThis.WriteCompatSetting("overrideTableStyleFontSizeAndJustification", "http://schemas.microsoft.com/office/word", "1");});
 		this.bs.WriteItem(c_oSerCompat.CompatSetting, function() {oThis.WriteCompatSetting("enableOpenTypeFeatures", "http://schemas.microsoft.com/office/word", "1");});
 		this.bs.WriteItem(c_oSerCompat.CompatSetting, function() {oThis.WriteCompatSetting("doNotFlipMirrorIndents", "http://schemas.microsoft.com/office/word", "1");});
+		var flags1 = 0;
+		if (this.saveParams.isCompatible) {
+			flags1 |= (oThis.Document.IsDoNotExpandShiftReturn() ? 1 : 0) << 10;
+		}
+		this.bs.WriteItem(c_oSerCompat.Flags1, function() {oThis.memory.WriteULong(flags1);});
 		var flags2 = 0;
 		if (this.saveParams.isCompatible) {
 			flags2 |= (oThis.Document.IsSplitPageBreakAndParaMark() ? 1 : 0) << 27;
@@ -6867,6 +6893,7 @@ function BinaryFileReader(doc, openParams)
 			else
 				throw e;
 		}
+
 		return true;
     };
 	this.PreLoadPrepare = function()
@@ -7486,6 +7513,7 @@ function BinaryFileReader(doc, openParams)
 		for(var i in oCommentsNewId)
 		{
 			var oNewComment = oCommentsNewId[i];
+			oNewComment.CreateNewCommentsGuid();
 			this.Document.DrawingDocument.m_oWordControl.m_oApi.sync_AddComment( oNewComment.Id, oNewComment.Data );
 		}
 		//remove bookmarks without end
@@ -7524,6 +7552,9 @@ function BinaryFileReader(doc, openParams)
 		}
 		if (this.oReadResult.SplitPageBreakAndParaMark) {
 			this.Document.Settings.SplitPageBreakAndParaMark = this.oReadResult.SplitPageBreakAndParaMark;
+		}
+		if (this.oReadResult.DoNotExpandShiftReturn) {
+			this.Document.Settings.DoNotExpandShiftReturn = this.oReadResult.DoNotExpandShiftReturn;
 		}
 
         this.Document.On_EndLoad();
@@ -7845,6 +7876,7 @@ function BinaryFileReader(doc, openParams)
 			for(var i in oCommentsNewId)
 			{
 				var oNewComment = oCommentsNewId[i];
+				oNewComment.CreateNewCommentsGuid();
 				api.sync_AddComment( oNewComment.Id, oNewComment.Data );
 			}
 		}
@@ -8290,7 +8322,7 @@ function Binary_pPrReader(doc, oReadResult, stream)
 			case c_oSerProp_pPrType.SectPr:
 				if(null != this.paragraph && (!this.oReadResult.bCopyPaste || this.oReadResult.isDocumentPasting()))
 				{
-					var oNewSectionPr = new CSectionPr(this.Document);
+					var oNewSectionPr = new CSectionPr(this.oReadResult.logicDocument);
 					var oAdditional = {EvenAndOddHeaders: null};
 					res = this.bcr.Read1(length, function(t, l){
 							return oThis.Read_SecPr(t, l, oNewSectionPr, oAdditional);
@@ -8722,6 +8754,9 @@ function Binary_pPrReader(doc, oReadResult, stream)
 				case 21: props.Format = Asc.c_oAscNumberingFormat.DecimalZero; break;
 				case 14: props.Format = Asc.c_oAscNumberingFormat.DecimalEnclosedCircle; break;
 				case 15: props.Format = Asc.c_oAscNumberingFormat.DecimalEnclosedCircle; break;
+				case 8: props.Format = Asc.c_oAscNumberingFormat.ChineseCounting; break;
+				case 9: props.Format = Asc.c_oAscNumberingFormat.ChineseCountingThousand; break;
+				case 10: props.Format = Asc.c_oAscNumberingFormat.ChineseLegalSimplified; break;
 				default: props.Format = Asc.c_oAscNumberingFormat.Decimal; break;
 			}
 		} else {
@@ -12088,7 +12123,7 @@ function Binary_DocumentTableReader(doc, oReadResult, openParams, stream, curFoo
 	this.ReadSdt = function(type, length, oSdt, typeContainer, container) {
 		var res = c_oSerConstants.ReadOk;
 		var oThis = this;
-		if (c_oSerSdt.Pr === type) {
+		if (c_oSerSdt.Pr === type && (!this.oReadResult.bCopyPaste || this.oReadResult.isDocumentPasting())) {
 			if (oSdt) {
 				var sdtPr = new AscCommonWord.CSdtPr();
 				res = this.bcr.Read1(length, function(t, l) {
@@ -15216,7 +15251,7 @@ function Binary_CommentsTableReader(doc, oReadResult, stream, oComments)
 		}
 		else if ( c_oSer_CommentsType.DurableId === type )
 		{
-			oNewImage.DurableId = AscFonts.FT_Common.IntToUInt(this.stream.GetULong());
+			oNewImage.DurableId = AscCommon.FixDurableId(this.stream.GetULong());
 		}
         else
             res = c_oSerConstants.ReadUnknown;
@@ -15790,6 +15825,9 @@ function Binary_SettingsTableReader(doc, oReadResult, stream)
 			if ("compatibilityMode" === compat.name && "http://schemas.microsoft.com/office/word" === compat.url) {
 				this.oReadResult.compatibilityMode = parseInt(compat.value);
 			}
+		} else if (c_oSerCompat.Flags1 === type) {
+			var flags1 = this.stream.GetULong(length);
+			this.oReadResult.DoNotExpandShiftReturn = 0 != ((flags1 >> 10) & 1);
 		} else if (c_oSerCompat.Flags2 === type) {
 			var flags2 = this.stream.GetULong(length);
 			this.oReadResult.SplitPageBreakAndParaMark = 0 != ((flags2 >> 27) & 1);
@@ -15852,7 +15890,7 @@ function Binary_NotesTableReader(doc, oReadResult, openParams, stream)
 		} else if (c_oSerNotes.NoteId === type) {
 			note.id = this.stream.GetULongLE();
 		} else if (c_oSerNotes.NoteContent === type) {
-			var footnote = new CFootEndnote(this.Document.Footnotes);
+			var footnote = new CFootEndnote(this.oReadResult.logicDocument.Footnotes);
 			var footnoteContent = [];
 			var bdtr = new Binary_DocumentTableReader(footnote, this.oReadResult, this.openParams, this.stream, footnote, this.oReadResult.oCommentsPlaces);
 			bdtr.Read(length, footnoteContent);
@@ -16184,6 +16222,7 @@ function DocReadResult(doc) {
 	this.AppVersion;
 	this.compatibilityMode = null;
 	this.SplitPageBreakAndParaMark = false;
+	this.DoNotExpandShiftReturn = false;
 	this.bdtr = null;
 	this.runsToSplit = [];
 	this.bCopyPaste = false;

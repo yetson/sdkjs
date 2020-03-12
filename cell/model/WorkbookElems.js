@@ -1612,7 +1612,7 @@ var g_oFontProperties = {
 		return ((this.patternFill && c_oAscPatternType.None !== this.patternFill.patternType) || this.gradientFill);
 	};
 	Fill.prototype.getSolidFill = function () {
-		return (this.patternFill && c_oAscPatternType.Solid === this.patternFill.patternType) ? this.patternFill.fgColor : null;
+		return (this.patternFill && c_oAscPatternType.Solid === this.patternFill.patternType) ? (this.patternFill.fgColor || createRgbColor(255, 255, 255)) : null;
 	};
 	Fill.prototype.bg = function () {
 		var res = null;
@@ -3108,6 +3108,10 @@ StyleManager.prototype =
 	},
 	setNum : function(oItemWithXfs, val)
 	{
+		if (val && val.f) {
+			var numFormat = AscCommon.oNumFormatCache.get(val.f);
+			numFormat.checkCultureInfoFontPicker();
+		}
 		return this._setProperty(oItemWithXfs, val, "num", CellXfs.prototype.getNum, CellXfs.prototype.setNum, g_StyleCache.addNum);
 	},
 	setFont : function(oItemWithXfs, val)
@@ -3592,16 +3596,21 @@ Hyperlink.prototype = {
 		this.LocationSheet = this.LocationRange = this.LocationRangeBbox = null;
 
 		if (null !== Location) {
-			var result = parserHelp.parse3DRef(Location);
-			if (!result) {
-				// Can be in all mods. Excel bug...
-				AscCommonExcel.executeInR1C1Mode(!AscCommonExcel.g_R1C1Mode, function () {
-					result = parserHelp.parse3DRef(Location);
-				});
-			}
-			if (null !== result) {
-				this.LocationSheet = result.sheet;
-				this.LocationRange = result.range;
+			var result = parserHelp.isName(Location, 0);
+			if (result[0]) {
+				this.LocationRange = result[1];
+			} else {
+				result = parserHelp.parse3DRef(Location);
+				if (!result) {
+					// Can be in all mods. Excel bug...
+					AscCommonExcel.executeInR1C1Mode(!AscCommonExcel.g_R1C1Mode, function () {
+						result = parserHelp.parse3DRef(Location);
+					});
+				}
+				if (null !== result) {
+					this.LocationSheet = result.sheet;
+					this.LocationRange = result.range;
+				}
 			}
 		}
 		this._updateLocation();
@@ -3633,6 +3642,8 @@ Hyperlink.prototype = {
 				});
 				this.Location = parserHelp.get3DRef(this.LocationSheet, this.LocationRange);
 			}
+		} else if (null !== this.LocationRange) {
+			this.Location = this.LocationRange;
 		}
 	},
 	setVisited : function (bVisited) {
@@ -3652,10 +3663,10 @@ Hyperlink.prototype = {
 	},
 	getProperty : function (nType) {
 		switch (nType) {
-			case this.Properties.Ref: return parserHelp.get3DRef(this.Ref.worksheet.getName(), this.Ref.getName()); break;
-			case this.Properties.Location: return this.getLocation();break;
-			case this.Properties.Hyperlink: return this.Hyperlink;break;
-			case this.Properties.Tooltip: return this.Tooltip;break;
+			case this.Properties.Ref: return parserHelp.get3DRef(this.Ref.worksheet.getName(), this.Ref.getName());
+			case this.Properties.Location: return this.getLocation();
+			case this.Properties.Hyperlink: return this.Hyperlink;
+			case this.Properties.Tooltip: return this.Tooltip;
 		}
 	},
 	setProperty : function (nType, value) {
@@ -6642,6 +6653,11 @@ function RangeDataManagerElem(bbox, data)
 					nTemp2 = range.c2 - range.c1 + 1;
 					to.setOffsetLast(new AscCommon.CellBase(0, -Math.min(nTemp1, nTemp2)));
 				}
+			} else if(range.c1 <= from.c1 && range.c2 >= from.c1 && range.c2 <= from.c2 && range.r1 <= from.r1 && from.r2 <= range.r2 && !bAdd) {
+				to = from.clone();
+				nTemp1 = range.c2 - from.c1 + 1;
+				nTemp2 = range.c2 - range.c1 + 1;
+				to.setOffsetFirst(new AscCommon.CellBase(0, Math.min(nTemp1, nTemp2)));
 			}
 		} else {
 			if (from.r1 < range.r1 && range.c1 <= from.c1 && from.c2 <= range.c2) {
@@ -6654,6 +6670,11 @@ function RangeDataManagerElem(bbox, data)
 					nTemp2 = range.r2 - range.r1 + 1;
 					to.setOffsetLast(new AscCommon.CellBase(-Math.min(nTemp1, nTemp2), 0));
 				}
+			} else if(range.r1 <= from.r1 && range.r2 >= from.r1 && range.r2 <= from.r2 && range.c1 <= from.c1 && from.c2 <= range.c2 && !bAdd) {
+				to = from.clone();
+				nTemp1 = range.r2 - from.r1 + 1;
+				nTemp2 = range.r2 - range.r1 + 1;
+				to.setOffsetFirst(new AscCommon.CellBase(Math.min(nTemp1, nTemp2), 0));
 			}
 		}
 
@@ -7482,12 +7503,14 @@ CustomFilter.prototype.isHideValue = function (val) {
 		var trimFilterVal = "string" === typeof(filterVal) ? window["Asc"].trim(filterVal) : filterVal;
 
 
-		var matchingValues = function (val1, val2, op) {
-			var matchingInfo = AscCommonExcel.matchingValue(new AscCommonExcel.cString(val1));
+		var matchingValues = function (_val1, _val2, op) {
+			_val1 = _val1 + "";
+			_val2 = _val2 + "";
+			var matchingInfo = AscCommonExcel.matchingValue(new AscCommonExcel.cString(_val1));
 			if (op) {
 				matchingInfo.op = op;
 			}
-			return AscCommonExcel.matching(new AscCommonExcel.cString(val2), matchingInfo);
+			return AscCommonExcel.matching(new AscCommonExcel.cString(_val2), matchingInfo);
 		};
 
 		switch (this.Operator) {
@@ -8738,8 +8761,8 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	asc_CPageOptions.prototype.clone = function (ws) {
 		var res = new asc_CPageOptions(ws);
 
-		res.pageMargins = this.pageMargins.clone();
-		res.pageSetup = this.pageSetup.clone();
+		res.pageMargins = this.pageMargins.clone(ws);
+		res.pageSetup = this.pageSetup.clone(ws);
 		res.gridLines = this.gridLines;
 		res.headings = this.headings;
 
@@ -9089,7 +9112,7 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	};
 
 	function CSortProperties(ws) {
-		this._oldSelect = null;
+		this.selection = null;
 		this._newSelection = null;
 		this.hasHeaders = null;
 		this.columnSort = null;
@@ -9262,6 +9285,14 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 
 	CSortProperties.prototype.asc_getRangeStr = function () {
 		return this._newSelection.getAbsName();
+	};
+
+	CSortProperties.prototype.asc_getSelection = function () {
+		return this.selection;
+	};
+
+	CSortProperties.prototype.asc_setSelection = function (val) {
+		this.selection = val;
 	};
 
 	function CSortPropertiesLevel() {
@@ -9594,6 +9625,8 @@ AutoFilterDateElem.prototype.convertDateGroupItemToRange = function(oDateGroupIt
 	prot["asc_setCaseSensitive"] = prot.asc_setCaseSensitive;
 	prot["asc_addBySortList"] = prot.asc_addBySortList;
 	prot["asc_getRangeStr"] = prot.asc_getRangeStr;
+	prot["asc_getSelection"] = prot.asc_getSelection;
+	prot["asc_setSelection"] = prot.asc_setSelection;
 
 	window["Asc"]["CSortPropertiesLevel"] = window["Asc"].CSortPropertiesLevel = CSortPropertiesLevel;
 	prot = CSortPropertiesLevel.prototype;

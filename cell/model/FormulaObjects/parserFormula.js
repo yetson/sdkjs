@@ -2303,6 +2303,32 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		}
 		return bRes;
 	};
+	cStrucTable.prototype.geColumnHeadings = function() {
+		var res = [];
+		var table = this.wb.getTableByName(this.tableName);
+		if (!table) {
+			return res;
+		}
+		var from = 0;
+		var to = table.TableColumns.length - 1;
+		if (this.oneColumnIndex) {
+			from = to = this.oneColumnIndex.index;
+		} else if (this.colStartIndex && this.colEndIndex) {
+			from = this.colStartIndex.index;
+			to = this.colEndIndex.index;
+		}
+		if (this.hdtcstartIndex && this.hdtcendIndex) {
+			from = this.hdtcstartIndex.index;
+			to = this.hdtcendIndex.index;
+		}
+		for (var i = from; i <= to; ++i) {
+			res.push(table.TableColumns[i].Name);
+		}
+		return res;
+	};
+	cStrucTable.prototype.getWS = function () {
+		return this.ws;
+	};
 	cStrucTable.prototype.changeSheet = function(wsLast, wsNew) {
 		if (this.ws === wsLast) {
 			this.ws = wsNew;
@@ -2315,7 +2341,7 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var t = this;
 
 		var tryDiffHdtcIndex = function(oIndex) {
-			var table = t.wb.getTableByName(t.tableName, oIndex.wsID);
+			var table = t.wb.getTableByNameAndSheet(t.tableName, oIndex.wsID);
 			if(table) {
 				var tableColumnsCount = table.TableColumns.length;
 				var index = oIndex.index + offset.col;
@@ -2744,7 +2770,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 	};
 	cBaseFunction.prototype.toLocaleString = function (/*locale*/) {
 		var name = this.toString();
-		return AscCommonExcel.cFormulaFunctionToLocale ? AscCommonExcel.cFormulaFunctionToLocale[name] : name;
+		//для cUnknownFunction делаем проверку
+		if(AscCommonExcel.cFormulaFunctionToLocale && undefined !== AscCommonExcel.cFormulaFunctionToLocale[name]) {
+			return AscCommonExcel.cFormulaFunctionToLocale[name];
+		} else {
+			return name;
+		}
 	};
 	cBaseFunction.prototype.setCalcValue = function (arg, numFormat) {
 		if (numFormat !== null && numFormat !== undefined) {
@@ -2873,10 +2904,12 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 		var res = [];
 
 		var getValue = function(curArg){
-			if(undefined === type || cElementType.string === type){
+			if (undefined === type || cElementType.string === type){
 				return curArg.tocString().getValue();
-			}else if( cElementType.number === type){
+			} else if( cElementType.number === type){
 				return curArg.tocNumber().getValue();
+			} else if( cElementType.bool === type){
+				return curArg.toLocaleString();
 			}
 		};
 
@@ -2892,15 +2925,15 @@ parserHelp.setDigitSeparator(AscCommon.g_oDefaultCultureInfo.NumberDecimalSepara
 				for (var j = 0; j < arg[i].length; j++) {
 					if(cElementType.error === arg[i][j].type){
 						return arg[i][j];
-					}else{
+					} else{
 						res.push(getValue(arg[i][j]));
 					}
 				}
 			}
 		}else{
-			if(cElementType.error === arg.type){
+			if (cElementType.error === arg.type){
 				return arg;
-			}else{
+			} else{
 				res.push(getValue(arg));
 			}
 		}
@@ -5253,31 +5286,36 @@ function parserFormula( formula, parent, _ws ) {
 			}
 		return needAssemble;
 	};
-parserFormula.prototype.clone = function(formula, parent, ws) {
-    if (null == formula) {
-    formula = this.Formula;
-    }
-    if (null == parent) {
-		parent = this.parent;
-    }
-    if (null == ws) {
-    ws = this.ws;
-    }
-  var oRes = new parserFormula(formula, parent, ws);
-  oRes.is3D = this.is3D;
-  oRes.value = this.value;
-  for (var i = 0, length = this.outStack.length; i < length; i++) {
-    var oCurElem = this.outStack[i];
-      if (oCurElem.clone) {
-      oRes.outStack.push(oCurElem.clone());
-      } else {
-      oRes.outStack.push(oCurElem);
-    }
-    }
-  oRes.isParsed = this.isParsed;
-  oRes.ref = this.ref;
-  return oRes;
-};
+	parserFormula.prototype.clone = function (formula, parent, ws) {
+		var opt_ws = null;
+		if (Asc["editor"] && Asc["editor"].wb && Asc["editor"].wb.model && Asc["editor"].wb.model.addingWorksheet) {
+			opt_ws = Asc["editor"].wb.model.addingWorksheet;
+			ws = opt_ws;
+		}
+		if (null == formula) {
+			formula = this.Formula;
+		}
+		if (null == parent) {
+			parent = this.parent;
+		}
+		if (null == ws) {
+			ws = this.ws;
+		}
+		var oRes = new parserFormula(formula, parent, ws);
+		oRes.is3D = this.is3D;
+		oRes.value = this.value;
+		for (var i = 0, length = this.outStack.length; i < length; i++) {
+			var oCurElem = this.outStack[i];
+			if (oCurElem.clone) {
+				oRes.outStack.push(oCurElem.clone(opt_ws));
+			} else {
+				oRes.outStack.push(oCurElem);
+			}
+		}
+		oRes.isParsed = this.isParsed;
+		oRes.ref = this.ref;
+		return oRes;
+	};
 	parserFormula.prototype.getParent = function() {
 		return this.parent;
 	};
@@ -5305,7 +5343,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 		this.isInDependencies = false;
 	};
 
-	parserFormula.prototype.parse = function (local, digitDelim, parseResult, ignoreErrors) {
+	parserFormula.prototype.parse = function (local, digitDelim, parseResult, ignoreErrors, renameSheetMap) {
 		var elemArr = [];
 		var ph = {operand_str: null, pCurrPos: 0};
 		var needAssemble = false;
@@ -6061,6 +6099,19 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 					parserHelp.is3DRef.call(ph, t.Formula, ph.pCurrPos))[0]) {
 
 				t.is3D = true;
+
+				//renameSheetMap
+				if (renameSheetMap) {
+					if (renameSheetMap[_3DRefTmp[1]]) {
+						_3DRefTmp[1] = renameSheetMap[_3DRefTmp[1]];
+						needAssemble = true;
+					}
+					if (_3DRefTmp[2] && renameSheetMap[_3DRefTmp[2]]) {
+						_3DRefTmp[2] = renameSheetMap[_3DRefTmp[2]];
+						needAssemble = true;
+					}
+				}
+
 				var wsF = t.wb.getWorksheetByName(_3DRefTmp[1]);
 				var wsT = (null !== _3DRefTmp[2]) ? t.wb.getWorksheetByName(_3DRefTmp[2]) : wsF;
 
@@ -6121,7 +6172,7 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 				}
 			}
 
-			/* Referens to DefinedNames */ else if (parserHelp.isName.call(ph, t.Formula, ph.pCurrPos, t.wb, t.ws)[0]) {
+			/* Referens to DefinedNames */ else if (parserHelp.isName.call(ph, t.Formula, ph.pCurrPos)[0]) {
 
 				if (ph.operand_str.length > g_nFormulaStringMaxLength && !ignoreErrors) {
 					//TODO стоит добавить новую ошибку
@@ -6445,9 +6496,15 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 
 	/* Для обратной сборки функции иногда необходимо поменять ссылки на ячейки */
 	parserFormula.prototype.changeOffset = function (offset, canResize, nChangeTable) {//offset = AscCommon.CellBase
-		for (var i = 0; i < this.outStack.length; i++) {
-			this._changeOffsetElem(this.outStack[i], this.outStack, i, offset, canResize, nChangeTable);
-		}
+		var t = this;
+		//временно комментирую из-за проблемы: при сборке формулы после обработки данной функцией в режиме R1c1
+		///мы получаем вид A1. необходимо пересмотреть все функции toString/toLocaleString где возвращается value
+		//+ парсинг на endTransaction запускается в режиме r1c1
+		//AscCommonExcel.executeInR1C1Mode(false, function () {
+			for (var i = 0; i < t.outStack.length; i++) {
+				t._changeOffsetElem(t.outStack[i], t.outStack, i, offset, canResize, nChangeTable);
+			}
+		//});
 		return this;
 	};
 	parserFormula.prototype._changeOffsetElem = function(elem, container, index, offset, canResize, nChangeTable) {//offset =
@@ -7169,6 +7226,12 @@ parserFormula.prototype.clone = function(formula, parent, ws) {
 			}
 		}
 		return res;
+	};
+	parserFormula.prototype.getOutStackSize = function() {
+		return this.outStack.length;
+	};
+	parserFormula.prototype.getOutStackElem = function(index) {
+		return this.outStack[index];
 	};
 	parserFormula.prototype.getIndexNumber = function() {
 		return this._index;

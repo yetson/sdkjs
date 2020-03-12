@@ -520,8 +520,8 @@
       };
       this.Api.Begin_CompositeInput = function () {
         var oWSView = self.getWorksheet();
-        if(oWSView && oWSView.isSelectOnShape){
-          if(oWSView.objectRender){
+        if (oWSView && oWSView.isSelectOnShape) {
+          if (oWSView.objectRender) {
             oWSView.objectRender.Begin_CompositeInput();
           }
           return;
@@ -596,6 +596,26 @@
         }
         return res;
       };
+      this.Api.AddTextWithPr = function (familyName, arrCharCodes) {
+      	var ws = self.getWorksheet();
+      	if (ws && ws.isSelectOnShape) {
+      		var textPr = new CTextPr();
+			textPr.RFonts = new CRFonts();
+			textPr.RFonts.Set_All(familyName, -1);
+      		ws.objectRender.controller.addTextWithPr(new AscCommon.CUnicodeStringEmulator(arrCharCodes), textPr, true);
+      		return;
+      	}
+
+      	if (!self.isCellEditMode) {
+      		self._onEditCell(undefined, undefined, undefined, false, function () {
+				self.cellEditor.setTextStyle('fn', familyName);
+				self.cellEditor._addCharCodes(arrCharCodes);
+			});
+		} else {
+			self.cellEditor.setTextStyle('fn', familyName);
+			self.cellEditor._addCharCodes(arrCharCodes);
+		}
+	  };
       this.Api.beginInlineDropTarget = function (event) {
       	if (!self.controller.isMoveRangeMode) {
       		self.controller.isMoveRangeMode = true;
@@ -1041,7 +1061,7 @@
     }
   };
 
-  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isCtrl, callback, x, y) {
+  WorkbookView.prototype._onChangeSelection = function (isStartPoint, dc, dr, isCoord, isCtrl, callback) {
     var ws = this.getWorksheet();
     var t = this;
     var d = isStartPoint ? ws.changeSelectionStartPoint(dc, dr, isCoord, isCtrl) :
@@ -1061,12 +1081,11 @@
     		t.timerEnd = true;
     		},1000);
     }
-    t._onUpdateWorksheet(x, y, isCtrl);
     asc_applyFunction(callback, d);
   };
 
   // Окончание выделения
-  WorkbookView.prototype._onChangeSelectionDone = function(x, y) {
+  WorkbookView.prototype._onChangeSelectionDone = function(x, y, event) {
   	if (this.timerId !== null) {
 		clearTimeout(this.timerId);
 		this.timerId = null;
@@ -1094,9 +1113,19 @@
     if (c_oTargetType.Hyperlink === ct.target && !this.controller.isFormulaEditMode) {
       // Проверим замерженность
       var isHyperlinkClick = false;
-      if (ar.isOneCell() || isSelectOnShape) {
-        isHyperlinkClick = true;
-      } else {
+     if(isSelectOnShape) {
+          var button = 0;
+          if(event) {
+              button = AscCommon.getMouseButton(event);
+          }
+          if(button === 0) {
+              isHyperlinkClick = true;
+          }
+     }
+     else if(ar.isOneCell()) {
+         isHyperlinkClick = true;
+     }
+     else {
         var mergedRange = ws.model.getMergedByCell(ar.r1, ar.c1);
         if (mergedRange && ar.isEqual(mergedRange)) {
           isHyperlinkClick = true;
@@ -1155,10 +1184,8 @@
 		}
     } else {
       ct = ws.getCursorTypeFromXY(x, y);
-      if (t.controller) {
-        t.controller.mouseX = x;
-        t.controller.mouseY = y;
-      }
+      ct.coordX = x;
+      ct.coordY = y;
       if (this.timerId !== null) {
       	clearTimeout(this.timerId);
       	this.timerId = null;
@@ -1428,20 +1455,21 @@
     var ct = ws.getCursorTypeFromXY(x, y);
 
     if (ct.target === c_oTargetType.ColumnResize || ct.target === c_oTargetType.RowResize) {
-      ct.target === c_oTargetType.ColumnResize ? ws.autoFitColumnsWidth(ct.col) : ws.autoFitRowHeight(ct.row, ct.row);
+      if (ct.target === c_oTargetType.ColumnResize) {
+      	ws.autoFitColumnsWidth(ct.col);
+      } else {
+      	ws.autoFitRowHeight(ct.row, ct.row);
+      }
       asc_applyFunction(callback);
     } else {
       if (ct.col >= 0 && ct.row >= 0) {
         this.controller.setStrictClose(!ws._isCellNullText(ct.col, ct.row));
       }
 
-      // Для нажатия на колонку/строку/all/frozenMove обрабатывать dblClick не нужно
-      if (c_oTargetType.ColumnHeader === ct.target || c_oTargetType.RowHeader === ct.target || c_oTargetType.Corner === ct.target || c_oTargetType.FrozenAnchorH === ct.target || c_oTargetType.FrozenAnchorV === ct.target) {
-        asc_applyFunction(callback);
-        return;
-      }
-
-      if (ws.objectRender.checkCursorDrawingObject(x, y)) {
+      // In view mode or click on column | row | all | frozenMove | drawing object do not process
+      if (!this.Api.canEdit() || c_oTargetType.ColumnHeader === ct.target || c_oTargetType.RowHeader === ct.target ||
+		  c_oTargetType.Corner === ct.target || c_oTargetType.FrozenAnchorH === ct.target ||
+		  c_oTargetType.FrozenAnchorV === ct.target || ws.objectRender.checkCursorDrawingObject(x, y)) {
         asc_applyFunction(callback);
         return;
       }
@@ -1551,9 +1579,9 @@
     }
 
     // Обновляем состояние Undo/Redo
-	  if(!(this.cellEditor.options && this.cellEditor.options.menuEditor)) {
-		  History._sendCanUndoRedo();
-	  }
+    if (!this.cellEditor.getMenuEditorMode()) {
+    	History._sendCanUndoRedo();
+    }
 
     // Обновляем состояние информации
     this._onWSSelectionChanged();
@@ -1758,7 +1786,7 @@
     if (ws.updateResize && ws.updateZoom) {
       ws.changeZoomResize();
     } else if (ws.updateResize) {
-      ws.resize(true);
+      ws.resize(true, this.cellEditor);
     } else if (ws.updateZoom) {
       ws.changeZoom(true);
     }
@@ -1902,7 +1930,7 @@
       for (var i in this.wsViews) {
         item = this.wsViews[i];
         // Делаем resize (для не активных сменим как только сделаем его активным)
-        item.resize(/*isDraw*/i == activeIndex);
+        item.resize(/*isDraw*/i == activeIndex, this.cellEditor);
       }
       this.drawWorksheet();
     } else {
@@ -2362,10 +2390,9 @@
 
     var result = this.model.findCellText(options);
     if (result) {
-		ws = this.getWorksheet();
-    	var ac = ws.model.selectionRange.activeCell;
-    	var dc = result.col - ac.col, dr = result.row - ac.row;
-    	return options.findInSelection ? ws.changeSelectionActivePoint(dc, dr, options) : ws.changeSelectionStartPoint(dc, dr, undefined, undefined, options);
+      var range = new Asc.Range(result.col, result.row, result.col, result.row);
+      options.findInSelection ? ws.setActiveCell(result) : ws.setSelection(range);
+      return true;
     }
     return null;
   };
@@ -2409,6 +2436,7 @@
 				ws.replaceCellText(options, true, this.fReplaceCallback);
 				return;
 			}
+      options.sheetIndex = -1;
 		}
 
 		this.handlers.trigger("asc_onRenameCellTextEnd", options.countFindAll, options.countReplaceAll);
@@ -3243,6 +3271,38 @@
 	WorkbookView.prototype.updateGroupData = function () {
 		this.getWorksheet()._updateGroups(true);
 		this.getWorksheet()._updateGroups(null);
+	};
+	WorkbookView.prototype.pasteSheet = function (base64, insertBefore, name, callback) {
+
+		var t = this;
+		var tempWorkbook = new AscCommonExcel.Workbook();
+		tempWorkbook.setCommonIndexObjectsFrom(this.model);
+		var pasteProcessor = AscCommonExcel.g_clipboardExcel.pasteProcessor;
+		var aPastedImages = pasteProcessor._readExcelBinary(base64.split('xslData;')[1], tempWorkbook, true);
+		var pastedWs = tempWorkbook.aWorksheets[0];
+		var newFonts = {};
+		newFonts = tempWorkbook.generateFontMap2();
+		newFonts = pasteProcessor._convertFonts(newFonts);
+		for (var i = 0; i < pastedWs.Drawings.length; i++) {
+			pastedWs.Drawings[i].graphicObject.getAllFonts(newFonts);
+		}
+
+		var doCopy = function() {
+			History.Create_NewPoint();
+			var renameParams = t.model.copyWorksheet(0, insertBefore, name, undefined, undefined, undefined, pastedWs);
+			callback(renameParams);
+		};
+
+		var api = window["Asc"]["editor"];
+		api._loadFonts(newFonts, function () {
+			if (aPastedImages && aPastedImages.length) {
+				pasteProcessor._loadImagesOnServer(aPastedImages, function () {
+					doCopy();
+				});
+			} else {
+				doCopy();
+			}
+		});
 	};
 
   //------------------------------------------------------------export---------------------------------------------------

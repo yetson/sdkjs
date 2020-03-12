@@ -399,6 +399,7 @@ Paragraph.prototype.Recalculate_Page = function(CurPage)
     this.FontMap.NeedRecalc = true;
 
     this.Internal_CheckSpelling();
+    this.RecalculateEndInfo();
 
     var RecalcResult = this.private_RecalculatePage( CurPage );
 
@@ -906,11 +907,12 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 			while (PrevElement && (PrevElement instanceof CBlockLevelSdt))
 				PrevElement = PrevElement.GetLastElement();
 
-            if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
+			var oFootnotes = this.LogicDocument ? this.LogicDocument.Footnotes : null;
+			if (null !== PrevElement && type_Paragraph === PrevElement.Get_Type() && true === PrevElement.Is_Empty() && undefined !== PrevElement.Get_SectionPr())
 			{
 				var PrevSectPr = PrevElement.Get_SectionPr();
 				var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-				if (c_oAscSectionBreakType.Continuous === CurSectPr.Get_Type() && true === CurSectPr.Compare_PageSize(PrevSectPr))
+				if (c_oAscSectionBreakType.Continuous === CurSectPr.Get_Type() && true === CurSectPr.Compare_PageSize(PrevSectPr) && oFootnotes && oFootnotes.IsEmptyPage(PrevElement.GetAbsolutePage(PrevElement.GetPagesCount() - 1)))
 					PrevElement = PrevElement.Get_DocumentPrev();
 			}
 
@@ -927,7 +929,7 @@ Paragraph.prototype.private_RecalculatePageBreak       = function(CurLine, CurPa
 				{
 					var PrevSectPr = PrevElement.Get_SectionPr();
 					var CurSectPr  = this.LogicDocument.SectionsInfo.Get_SectPr(this.Index).SectPr;
-					if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr))
+					if (c_oAscSectionBreakType.Continuous !== CurSectPr.Get_Type() || true !== CurSectPr.Compare_PageSize(PrevSectPr) || (oFootnotes && !oFootnotes.IsEmptyPage(PrevElement.GetAbsolutePage(PrevElement.GetPagesCount() - 1))))
 						bNeedPageBreak = false;
 				}
 
@@ -1468,14 +1470,28 @@ Paragraph.prototype.private_RecalculateLinePosition    = function(CurLine, CurPa
 			Bottom = this.YLimit;
 	}
 
-    // Верхнюю границу мы сохраняем только для первой строки данной страницы
+	this.Lines[CurLine].Top    = Top    - this.Pages[CurPage].Y;
+	this.Lines[CurLine].Bottom = Bottom - this.Pages[CurPage].Y;
+
+	// В MSWord версиях 14 и ниже пустая строка с переносом колонки не имеет высоты
+	// Заметим, что границы строки мы оставляем корректными
+	if (this.LogicDocument
+		&& this.LogicDocument.GetCompatibilityMode
+		&& this.LogicDocument.GetCompatibilityMode() <= document_compatibility_mode_Word14
+		&& this.Lines[CurLine].Info & paralineinfo_BreakPage
+		&& this.Lines[CurLine].Info & paralineinfo_Empty
+		&& !(this.Lines[CurLine].Info & paralineinfo_BreakRealPage))
+	{
+		Bottom  = Top;
+		Top2    = Top;
+		Bottom2 = Top;
+	}
+
+	// Верхнюю границу мы сохраняем только для первой строки данной страницы
     if (CurLine === this.Pages[CurPage].FirstLine && !(this.Lines[CurLine].Info & paralineinfo_RangeY))
         this.Pages[CurPage].Bounds.Top = Top;
 
     this.Pages[CurPage].Bounds.Bottom = Bottom;
-
-    this.Lines[CurLine].Top    = Top    - this.Pages[CurPage].Y;
-    this.Lines[CurLine].Bottom = Bottom - this.Pages[CurPage].Y;
 
     PRS.LineTop        = AscCommon.CorrectMMToTwips(Top);
     PRS.LineBottom     = AscCommon.CorrectMMToTwips(Bottom);
@@ -1531,7 +1547,7 @@ Paragraph.prototype.private_RecalculateLineBottomBound = function(CurLine, CurPa
 		&& (Top > YLimit || Bottom2 > YLimit)
 		&& (CurLine != this.Pages[CurPage].FirstLine
 		|| false === bNoFootnotes
-		|| (0 === RealCurPage && (null != this.Get_DocumentPrev()
+		|| (0 === RealCurPage && ((null != this.Get_DocumentPrev() && !this.Parent.IsElementStartOnNewPage(this.GetIndex()))
 		|| (true === this.Parent.IsTableCellContent() && true !== this.Parent.IsTableFirstRowOnNewPage())
 		|| (true === this.Parent.IsBlockLevelSdtContent() && true !== this.Parent.IsBlockLevelSdtFirstOnNewPage()))))
 		&& false === BreakPageLineEmpty)
@@ -3325,16 +3341,16 @@ CParagraphRecalculateStateWrap.prototype =
             var FirstTextPr = Para.Get_FirstTextPr2();
 
 
-            if(BulletNum > 32767)
-            {
-                BulletNum = (BulletNum % 32767);
-            }
             if (Bullet.Get_Type() >= numbering_presentationnumfrmt_AlphaLcParenR)
             {
                 if(BulletNum > 780)
                 {
                     BulletNum = (BulletNum % 780);
                 }
+            }
+            if(BulletNum > 32767)
+            {
+                BulletNum = (BulletNum % 32767);
             }
 
 
@@ -3568,8 +3584,16 @@ CParagraphRecalculateStateInfo.prototype.Reset = function(PrevInfo)
 {
 	if (null !== PrevInfo && undefined !== PrevInfo)
 	{
-		this.Comments      = PrevInfo.Comments;
+		this.Comments      = [];
 		this.ComplexFields = [];
+
+		if (PrevInfo.Comments)
+		{
+			for (var nIndex = 0, nCount = PrevInfo.Comments.length; nIndex < nCount; ++nIndex)
+			{
+				this.Comments[nIndex] = PrevInfo.Comments[nIndex];
+			}
+		}
 
 		if (PrevInfo.ComplexFields)
 		{

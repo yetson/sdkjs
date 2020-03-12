@@ -522,6 +522,8 @@
 	{
 		var content;
 		var ext = GetFileExtension(name);
+		if ("svg" === ext)
+			ext += "+xml";
 		if (null !== ext && oZipImages && (content = oZipImages[name]))
 		{
 			return 'data:image/' + ext + ';base64,' + AscCommon.Base64Encode(content, content.length, 0);
@@ -929,6 +931,45 @@
 
 		return sUnicode;
 	}
+
+	function CUnicodeStringEmulator(array)
+	{
+        this.arr = array;
+        this.len = this.arr.length;
+        this.pos = 0;
+    }
+
+    CUnicodeStringEmulator.prototype =
+	{
+		getUnicodeIterator : function()
+		{
+			return this;
+		},
+
+        isOutside : function()
+        {
+            return (this.pos >= this.len);
+        },
+        isInside : function()
+        {
+            return (this.pos < this.len);
+        },
+        value : function()
+        {
+            if (this.pos >= this.len)
+                return 0;
+            return this.arr[this.pos];
+        },
+        next : function()
+        {
+            this.pos++;
+        },
+        position : function()
+        {
+            return this.pos;
+        }
+	};
+    CUnicodeStringEmulator.prototype.check = CUnicodeStringEmulator.prototype.isInside;
 
     function CUnicodeIterator(str)
     {
@@ -2625,7 +2666,7 @@
 		}
 		return false;
 	};
-	parserHelper.prototype.isName = function (formula, start_pos, wb, ws)
+	parserHelper.prototype.isName = function (formula, start_pos)
 	{
 		if (this instanceof parserHelper)
 		{
@@ -2638,7 +2679,7 @@
 		if (match != null)
 		{
 			var name = match["name"];
-			if (name && 0 !== name.length && name.toUpperCase() !== cBoolLocal.t && name.toUpperCase() !== cBoolLocal.f/*&& wb.DefinedNames && wb.isDefinedNamesExists( name, ws ? ws.getId() : null )*/)
+			if (name && 0 !== name.length && name.toUpperCase() !== cBoolLocal.t && name.toUpperCase() !== cBoolLocal.f)
 			{
 				this.pCurrPos += name.length;
 				this.operand_str = name;
@@ -2813,6 +2854,21 @@
 		var result, range, sheetModel, checkChangeRange;
 		if (Asc.c_oAscSelectionDialogType.Chart === dialogType)
 		{
+			if(dataRange)
+			{
+				result = parserHelp.parse3DRef(dataRange);
+			}
+			if (result)
+			{
+				sheetModel = model.getWorksheetByName(result.sheet);
+				if (sheetModel)
+				{
+					range = AscCommonExcel.g_oRangeCache.getAscRange(result.range);
+				}
+			}
+		}
+		else if(Asc.c_oAscSelectionDialogType.PivotTableData === dialogType || Asc.c_oAscSelectionDialogType.PivotTableReport === dialogType)
+		{
 			result = parserHelp.parse3DRef(dataRange);
 			if (result)
 			{
@@ -2821,6 +2877,12 @@
 				{
 					range = AscCommonExcel.g_oRangeCache.getAscRange(result.range);
 				}
+			}
+			if (!range) {
+				range = AscCommon.rx_defName.test(dataRange);
+			}
+			if (!range) {
+				range = parserHelp.isTable(dataRange, 0, true);
 			}
 		}
 		else
@@ -2888,6 +2950,22 @@
 				checkChangeRange = wb.getWorksheet().checkCustomSortRange(range, isRows);
 				if (null !== checkChangeRange)
 					return checkChangeRange;
+			}
+			else if (Asc.c_oAscSelectionDialogType.PivotTableData === dialogType)
+			{
+				if (!Asc.CT_pivotTableDefinition.prototype.isValidDataRef(dataRange)) {
+					return c_oAscError.ID.PivotLabledColumns;
+				}
+			}
+			else if (Asc.c_oAscSelectionDialogType.PivotTableReport === dialogType)
+			{
+				var location = Asc.CT_pivotTableDefinition.prototype.parseDataRef(dataRange);
+				if (location) {
+					var newRange = new Asc.Range(location.bbox.c1, location.bbox.r1, location.bbox.c1 + AscCommonExcel.NEW_PIVOT_LAST_COL_OFFSET, location.bbox.r1 + AscCommonExcel.NEW_PIVOT_LAST_ROW_OFFSET);
+					return location.ws.checkPivotReportLocationForError([newRange]);
+				} else {
+					return Asc.c_oAscError.ID.DataRangeError
+				}
 			}
 		}
 		return Asc.c_oAscError.ID.No;
@@ -3612,6 +3690,295 @@
 				}
 				break;
 			}
+
+			case Asc.c_oAscNumberingFormat.ChineseCounting:
+			{
+				var arrChinese = [
+					String.fromCharCode(0x25CB),
+					String.fromCharCode(0x4E00),
+					String.fromCharCode(0x4E8C),
+					String.fromCharCode(0x4E09),
+					String.fromCharCode(0x56DB),
+					String.fromCharCode(0x4E94),
+					String.fromCharCode(0x516D),
+					String.fromCharCode(0x4E03),
+					String.fromCharCode(0x516B),
+					String.fromCharCode(0x4E5D),
+					String.fromCharCode(0x5341)
+				];
+
+				var nQuotient  = (nValue / 10) | 0;
+				var nRemainder = nValue - nQuotient * 10;
+
+				if (nQuotient < 10 && nQuotient > 0)
+				{
+					if (0 !== nRemainder)
+						sResult = arrChinese[nRemainder] + sResult;
+
+					sResult = arrChinese[10] + sResult;
+
+					if (1 === nQuotient)
+						nQuotient = 0;
+				}
+				else
+				{
+					sResult = arrChinese[nRemainder] + sResult;
+				}
+
+
+				var nRemValue = nQuotient;
+				while (nQuotient > 0)
+				{
+					nQuotient  = (nRemValue / 10) | 0;
+					nRemainder = nRemValue - nQuotient * 10;
+
+					sResult = arrChinese[nRemainder] + sResult;
+
+					nRemValue = nQuotient;
+				}
+
+				break;
+			}
+			case Asc.c_oAscNumberingFormat.ChineseCountingThousand:
+			{
+				var arrChinese = {
+					0     : String.fromCharCode(0x25CB),
+					1     : String.fromCharCode(0x4E00),
+					2     : String.fromCharCode(0x4E8C),
+					3     : String.fromCharCode(0x4E09),
+					4     : String.fromCharCode(0x56DB),
+					5     : String.fromCharCode(0x4E94),
+					6     : String.fromCharCode(0x516D),
+					7     : String.fromCharCode(0x4E03),
+					8     : String.fromCharCode(0x516B),
+					9     : String.fromCharCode(0x4E5D),
+					10    : String.fromCharCode(0x5341),
+					100   : String.fromCharCode(0x767E),
+					1000  : String.fromCharCode(0x5343),
+					10000 : String.fromCharCode(0x4E07)
+				};
+
+				var nRemValue = nValue;
+
+				while (true)
+				{
+					var nTTQuotient  = (nRemValue / 10000) | 0;
+					var nTTRemainder = nRemValue - nTTQuotient * 10000;
+
+					nRemValue = nTTQuotient;
+
+					var sGroup = "", isPrevZero = false;
+
+					if (nTTQuotient > 0)
+						sGroup += arrChinese[10000];
+					else
+						isPrevZero = true;
+
+					if (nTTRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					var nQuotient  = (nTTRemainder / 1000) | 0;
+					var nRemainder = nTTRemainder - nQuotient * 1000;
+
+					if (0 !== nQuotient)
+					{
+						sGroup += arrChinese[nQuotient] + arrChinese[1000];
+						isPrevZero = false;
+					}
+					else if (nTTQuotient > 0)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (nRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					nQuotient  = (nRemainder / 100) | 0;
+					nRemainder = nRemainder - nQuotient * 100;
+
+					if (0 !== nQuotient)
+					{
+						sGroup += arrChinese[nQuotient] + arrChinese[100];
+						isPrevZero = false;
+					}
+					else if (!isPrevZero)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (nRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					nQuotient  = (nRemainder / 10) | 0;
+					nRemainder = nRemainder - nQuotient * 10;
+
+					if (0 !== nQuotient)
+					{
+						if (nValue < 20)
+							sGroup += arrChinese[10];
+						else
+							sGroup += arrChinese[nQuotient] + arrChinese[10];
+
+						isPrevZero = false;
+					}
+					else if (!isPrevZero)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (0 !== nRemainder)
+						sGroup += arrChinese[nRemainder];
+
+					sResult = sGroup + sResult;
+
+					if (nRemValue <= 0)
+						break;
+				}
+
+				break;
+			}
+			case Asc.c_oAscNumberingFormat.ChineseLegalSimplified:
+			{
+				var arrChinese = {
+					0     : String.fromCharCode(0x96F6),
+					1     : String.fromCharCode(0x58F9),
+					2     : String.fromCharCode(0x8D30),
+					3     : String.fromCharCode(0x53C1),
+					4     : String.fromCharCode(0x8086),
+					5     : String.fromCharCode(0x4F0D),
+					6     : String.fromCharCode(0x9646),
+					7     : String.fromCharCode(0x67D2),
+					8     : String.fromCharCode(0x634C),
+					9     : String.fromCharCode(0x7396),
+					10    : String.fromCharCode(0x62FE),
+					100   : String.fromCharCode(0x4F70),
+					1000  : String.fromCharCode(0x4EDF),
+					10000 : String.fromCharCode(0x842C)
+				};
+
+				var nRemValue = nValue;
+
+				while (true)
+				{
+					var nTTQuotient  = (nRemValue / 10000) | 0;
+					var nTTRemainder = nRemValue - nTTQuotient * 10000;
+
+					nRemValue = nTTQuotient;
+
+					var sGroup = "", isPrevZero = false;
+
+					if (nTTQuotient > 0)
+						sGroup += arrChinese[10000];
+					else
+						isPrevZero = true;
+
+					if (nTTRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					var nQuotient  = (nTTRemainder / 1000) | 0;
+					var nRemainder = nTTRemainder - nQuotient * 1000;
+
+					if (0 !== nQuotient)
+					{
+						sGroup += arrChinese[nQuotient] + arrChinese[1000];
+						isPrevZero = false;
+					}
+					else if (nTTQuotient > 0)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (nRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					nQuotient  = (nRemainder / 100) | 0;
+					nRemainder = nRemainder - nQuotient * 100;
+
+					if (0 !== nQuotient)
+					{
+						sGroup += arrChinese[nQuotient] + arrChinese[100];
+						isPrevZero = false;
+					}
+					else if (!isPrevZero)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (nRemainder <= 0)
+					{
+						sResult = sGroup + sResult;
+
+						if (nRemValue <= 0)
+							break;
+
+						continue;
+					}
+
+					nQuotient  = (nRemainder / 10) | 0;
+					nRemainder = nRemainder - nQuotient * 10;
+
+					if (0 !== nQuotient)
+					{
+						sGroup += arrChinese[nQuotient] + arrChinese[10];
+						isPrevZero = false;
+					}
+					else if (!isPrevZero)
+					{
+						sGroup += arrChinese[0];
+						isPrevZero = true;
+					}
+
+					if (0 !== nRemainder)
+						sGroup += arrChinese[nRemainder];
+
+					sResult = sGroup + sResult;
+
+					if (nRemValue <= 0)
+						break;
+				}
+
+				break;
+			}
 		}
 
 		return sResult;
@@ -3740,11 +4107,20 @@
 				return;
 		}
 
+		var backoff = new AscCommon.Backoff(AscCommon.g_oBackoffDefaults);
+		loadScriptWithBackoff(backoff, url, onSuccess, onError);
+	}
+
+	function loadScriptWithBackoff(backoff, url, onSuccess, onError){
 		var script = document.createElement('script');
 		script.type = 'text/javascript';
 		script.src = url;
 		script.onload = onSuccess;
-		script.onerror = onError;
+		script.onerror = function() {
+			backoff.attempt(onError, function() {
+				loadScriptWithBackoff(backoff, url, onSuccess, onError);
+			});
+		};
 
 		// Fire the loading
 		document.head.appendChild(script);
@@ -4762,6 +5138,30 @@
 		return this.mapTranslate.hasOwnProperty(key) ? this.mapTranslate[key] : key;
 	};
 	//------------------------------------------------------------fill polyfill--------------------------------------------
+	if (!Array.prototype.findIndex) {
+		Object.defineProperty(Array.prototype, 'findIndex', {
+			value: function(predicate) {
+				if (this == null) {
+					throw new TypeError('Array.prototype.findIndex called on null or undefined');
+				}
+				if (typeof predicate !== 'function') {
+					throw new TypeError('predicate must be a function');
+				}
+				var list = Object(this);
+				var length = list.length >>> 0;
+				var thisArg = arguments[1];
+				var value;
+
+				for (var i = 0; i < length; i++) {
+					value = list[i];
+					if (predicate.call(thisArg, value, i, list)) {
+						return i;
+					}
+				}
+				return -1;
+			}
+		});
+	}
 	if (!Array.prototype.fill) {
 		Object.defineProperty(Array.prototype, 'fill', {
 			value: function(value) {
@@ -4932,6 +5332,75 @@
 		return null;
 	}
 
+	var g_oBackoffDefaults = {
+		retries: 2,
+		factor: 2,
+		minTimeout: 100,
+		maxTimeout: 2000,
+		randomize: true
+	};
+
+	function Backoff(opts) {
+		this.attempts = 0;
+		this.opts = opts;
+	}
+
+	Backoff.prototype.attempt = function(fError, fRetry) {
+		var timeout = this.nextTimeout();
+		if (timeout > 0) {
+			setTimeout(function() {
+				fRetry();
+			}, timeout);
+		} else {
+			fError();
+		}
+	};
+	Backoff.prototype.nextTimeout = function() {
+		var timeout = -1;
+		if (this.attempts < this.opts.retries) {
+			timeout = this.createTimeout(this.attempts, this.opts);
+			this.attempts++;
+		}
+		return timeout;
+	};
+	Backoff.prototype.createTimeout = function(attempt, opts) {
+		//like npm retry
+		var random = (opts.randomize)
+			? (Math.random() + 1)
+			: 1;
+
+		var timeout = Math.round(random * opts.minTimeout * Math.pow(opts.factor, attempt));
+		timeout = Math.min(timeout, opts.maxTimeout);
+
+		return timeout;
+	};
+	function backoffOnError(obj, onError, onRetry) {
+		if (!onRetry) {
+			return onError;
+		}
+		var backoff = new Backoff(g_oBackoffDefaults);
+		return function() {
+			var timeout = backoff.nextTimeout();
+			if (timeout > 0) {
+				setTimeout(function() {
+					onRetry.call(obj, obj);
+				}, timeout);
+			} else if (onError) {
+				onError.apply(obj, arguments);
+			}
+		};
+	}
+	function backoffOnErrorImg(img, onRetry) {
+		//$self.attr("src", $self.attr("src"));
+		//https://github.com/doomhz/jQuery-Image-Reloader/blob/dd1f626b25628ede498ae2489a0c2963f1c3cf61/jquery.imageReloader.js#L56
+		if (!onRetry) {
+			onRetry = function(img) {
+				img.setAttribute('src', img.getAttribute('src'));
+			};
+		}
+		img.onerror = backoffOnError(img, img.onerror, onRetry);
+	}
+
 	//------------------------------------------------------------export---------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
 	window["AscCommon"].getSockJs = getSockJs;
@@ -5020,6 +5489,10 @@
 
 	window["AscCommon"].g_oHtmlCursor = g_oHtmlCursor;
 
+	window["AscCommon"].g_oBackoffDefaults = g_oBackoffDefaults;
+	window["AscCommon"].Backoff = Backoff;
+	window["AscCommon"].backoffOnErrorImg = backoffOnErrorImg;
+
 	window["AscCommon"].CSignatureDrawer = window["AscCommon"]["CSignatureDrawer"] = CSignatureDrawer;
 	var prot = CSignatureDrawer.prototype;
 	prot["getImages"] 	= prot.getImages;
@@ -5035,6 +5508,8 @@
 
 	window["AscCommon"].valueToMm = valueToMm;
 	window["AscCommon"].valueToMmType = valueToMmType;
+
+	window["AscCommon"].CUnicodeStringEmulator = CUnicodeStringEmulator;
 })(window);
 
 window["asc_initAdvancedOptions"] = function(_code, _file_hash, _docInfo)

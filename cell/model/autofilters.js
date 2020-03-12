@@ -886,7 +886,7 @@
 				return result;
 			},
 
-			getAddFormatTableOptions: function (activeCells, userRange) {
+			getAddFormatTableOptions: function (activeCells, userRange, isPivot) {
 				var res;
 
 				if (userRange) {
@@ -904,28 +904,45 @@
 					bIsInFilter = null;
 				}
 
-				if (null === bIsInFilter) {
-					if (activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2 && !userRange)//если ячейка выделенная одна
-					{
-						addRange = this.expandRange(activeCells);
-					} else {
-						addRange = activeCells;
-					}
-				} else//range внутри а/ф или ф/т
-				{
-					if (bIsInFilter.isAutoFilter()) {
-						addRange = bIsInFilter.Ref;
-					} else {
-						res = false;
-					}
-				}
-
-				if (false !== res) {
+				if (isPivot) {
 					res = new AddFormatTableOptions();
+					res.asc_setIsTitle(false);
+					if (bIsInFilter && !bIsInFilter.isAutoFilter() && bIsInFilter.Ref.containsRange(activeCells)) {
+						res.asc_setRange(bIsInFilter.DisplayName);
+					} else {
+						if (activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2 && !userRange)//если ячейка выделенная одна
+						{
+							addRange = this.expandRange(activeCells);
+						} else {
+							addRange = activeCells;
+						}
+						CT_pivotTableDefinition.prototype.prepareDataRange(this.worksheet, addRange);
+						res.asc_setRange(AscCommon.parserHelp.get3DRef(this.worksheet.getName(), addRange.getAbsName()));
+					}
+				} else {
+					if (null === bIsInFilter || isPivot) {
+						if (activeCells.r1 == activeCells.r2 && activeCells.c1 == activeCells.c2 && !userRange)//если ячейка выделенная одна
+						{
+							addRange = this.expandRange(activeCells);
+						} else {
+							addRange = activeCells;
+						}
+					} else//range внутри а/ф или ф/т
+					{
+						if (bIsInFilter.isAutoFilter()) {
+							addRange = bIsInFilter.Ref;
+						} else {
+							res = false;
+						}
+					}
 
-					var bIsTitle = this._isAddNameColumn(addRange);
-					res.asc_setIsTitle(bIsTitle);
-					res.asc_setRange(addRange.getAbsName());
+					if (false !== res) {
+						res = new AddFormatTableOptions();
+
+						var bIsTitle = this._isAddNameColumn(addRange);
+						res.asc_setIsTitle(bIsTitle);
+						res.asc_setRange(addRange.getAbsName());
+					}
 				}
 
 				return res;
@@ -2676,7 +2693,9 @@
 
 				if (cellId !== undefined) {
 					var curCellId = cellId.split('af')[0];
-					activeRange = AscCommonExcel.g_oRangeCache.getAscRange(curCellId).clone();
+					AscCommonExcel.executeInR1C1Mode(false, function () {
+						activeRange = AscCommonExcel.g_oRangeCache.getAscRange(curCellId).clone();
+					});
 				}
 
 				var ColId = null;
@@ -2838,15 +2857,20 @@
 								cell = worksheet.getCell3(ref.r1, j);
 								val = props ? props.val : cell.getValueWithFormat();
 
-								//проверка на повторение уже существующих заголовков
-								if (checkRepeateColumnName(val, filter.TableColumns, j - tableRange.c1)) {
-									val = "";
-								}
-
 								//если не пустая изменяем TableColumns
 								var oldVal = filter.TableColumns[j - tableRange.c1].Name;
 								var newVal = null;
-								if (val != "" && intersection.c1 <= j && intersection.c2 >= j) {
+								//проверка на повторение уже существующих заголовков
+								if (val !== "" && checkRepeateColumnName(val, filter.TableColumns, j - tableRange.c1)) {
+									filter.TableColumns[j - tableRange.c1].Name = "";
+									generateName = this._generateNextColumnName(filter.TableColumns, val);
+									if (!bUndo) {
+										cell.setValue(generateName);
+										cell.setType(CellValueType.String);
+									}
+									filter.TableColumns[j - tableRange.c1].Name = generateName;
+									newVal = generateName;
+								} else if (val != "" && intersection.c1 <= j && intersection.c2 >= j) {
 									filter.TableColumns[j - tableRange.c1].Name = val;
 									if (!bUndo) {
 										//если пытаемся вбить формулу в заголовок - оставляем только результат
@@ -3891,13 +3915,41 @@
 				return range;
 			},
 
+			checkExpandRangeForSort: function(range) {
+				//пока добавляю только исколючение для именованного диапазона
+				//TODO так же необходимо рассмотреть все возможные ситуации при расширении именованного диапазона в случае сортировки
+				var ws = this.worksheet;
+				var filterDefName = ws.workbook.getDefinesNames("_xlnm._filterdatabase", ws.getId());
+				if(filterDefName) {
+					var filterDefNameRef = false;
+					AscCommonExcel.executeInR1C1Mode(false, function () {
+						filterDefNameRef = AscCommonExcel.getRangeByRef(filterDefName.ref, ws, true, true)
+					});
+					if(filterDefNameRef && filterDefNameRef.length) {
+						filterDefNameRef = filterDefNameRef[0];
+						if(filterDefNameRef && filterDefNameRef.bbox) {
+							filterDefNameRef = filterDefNameRef.bbox;
+							if(range.intersection(filterDefNameRef)) {
+								if(range.containsRange(filterDefNameRef)) {
+									//обрезаем диапазон по первой строке именованного диапазона
+									range = new Asc.Range(range.c1, filterDefNameRef.r1, range.c2, range.r2);
+								} else {
+									range = range.union(filterDefNameRef);
+									range = new Asc.Range(range.c1, filterDefNameRef.r1, range.c2, range.r2);
+								}
+							}
+						}
+					}
+				}
+				return range;
+			},
+
 			cutRangeByDefinedCells: function(range) {
-				var worksheet = this.worksheet;
 				if(!range) {
 					return range;
 				}
 
-				range = range.clone();
+				var res = range.clone();
 
 				var minRow, maxRow, minCol, maxCol;
 				this.worksheet.getRange3(0, 0, AscCommon.gc_nMaxRow0, AscCommon.gc_nMaxCol0)._foreachNoEmptyByCol(function (cell, row, col) {
@@ -3922,20 +3974,20 @@
 
 				});
 
-				if(range.r1 < minRow) {
-					range.r1 = minRow;
+				if(res.r1 < minRow && minRow <= res.r2) {
+					res.r1 = minRow;
 				}
-				if(range.r2 > maxRow && maxRow >= range.r1) {
-					range.r2 = maxRow;
+				if(res.r2 > maxRow && maxRow >= res.r1) {
+					res.r2 = maxRow;
 				}
-				if(range.c1 < minCol) {
-					range.c1 = minCol;
+				if(res.c1 < minCol && minCol <= res.c2) {
+					res.c1 = minCol;
 				}
-				if(range.c2 > maxCol && maxCol >= range.c1) {
-					range.c2 = maxCol;
+				if(res.c2 > maxCol && maxCol >= res.c1) {
+					res.c2 = maxCol;
 				}
 
-				return range;
+				return res;
 			},
 
 			_addNewFilter: function(ref, style, bWithoutFilter, tablePartDisplayName, tablePart, offset)
@@ -4425,10 +4477,10 @@
 						isSequence = true;
 				}
 
-				var name;
+				var name, i;
 				if(indexInsertColumn == undefined || !isSequence)
 				{
-					for(var i = 0; i < tableColumns.length; i++)
+					for(i = 0; i < tableColumns.length; i++)
 					{
 						if(tableColumns[i].Name)
 							name = tableColumns[i].Name.split("Column");
@@ -4447,18 +4499,37 @@
 					if(name && name[1] && !isNaN(parseFloat(name[1])))
 						index = parseFloat(name[1]) + 1;
 					
-					for(var i = 0; i < tableColumns.length; i++)
+					for(i = 0; i < tableColumns.length; i++)
 					{
 						if(tableColumns[i].Name)
 							name = tableColumns[i].Name.split("Column");
 						if(name && name[1] && !isNaN(parseFloat(name[1])) && index == parseFloat(name[1]))
 						{
-							index = parseInt((index - 1) + "2"); 
+							index = parseInt((index - 1) + "2");
 							i = -1;
 						}
 					}
 					return "Column" + index;
 				}
+			},
+
+			_generateNextColumnName: function(tableColumns, val)
+			{
+				var tableColumnMap = [];
+				for(var i = 0 ; i < tableColumns.length; i++) {
+					tableColumnMap[tableColumns[i].Name] = 1;
+				}
+				var res = val;
+				var index = 2;
+				while(true) {
+					if(tableColumnMap[res]) {
+						res = val + index;
+					} else {
+						break;
+					}
+					index++;
+				}
+				return res;
 			},
 			
 			//TODO убрать начеркивание

@@ -1599,14 +1599,16 @@ CGraphicObjects.prototype =
         }
     },
 
-    addInlineTable: function( Cols, Rows )
-    {
-        var content = this.getTargetDocContent();
-        if(content)
-        {
-            content.AddInlineTable(Cols, Rows);
-        }
-    },
+	addInlineTable : function(nCols, nRows, nMode)
+	{
+		var content = this.getTargetDocContent();
+		if (content)
+		{
+			return content.AddInlineTable(nCols, nRows, nMode);
+		}
+
+		return null;
+	},
 
     addImages: function( aImages )
     {
@@ -1712,7 +1714,7 @@ CGraphicObjects.prototype =
                         drawing.setExtent(selectedObjects[i].parent.Extent.W, selectedObjects[i].parent.Extent.H)
                     }
                     drawing.GraphicObj.setParent(drawing);
-                    drawing.CheckWH();
+                    //drawing.CheckWH();
 					drawing.Set_ParaMath(selectedObjects[i].parent.ParaMath);
                     drawing.docPr.setFromOther(selectedObjects[i].parent.docPr);
                     if(selectedObjects[i].parent.DrawingType === drawing_Anchor)
@@ -4191,7 +4193,8 @@ CGraphicObjects.prototype =
                 break;
             }
         }
-    }
+    },
+    endTrackNewShape: DrawingObjectsController.prototype.endTrackNewShape
 };
 CGraphicObjects.prototype.Document_Is_SelectionLocked = function(CheckType)
 {

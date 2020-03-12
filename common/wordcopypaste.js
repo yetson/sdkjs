@@ -1976,7 +1976,10 @@ function sendImgUrls(api, images, callback, bExcel, bNotShowError, token) {
     for (var i = 0; i < images.length; i++)
     {
       var _url = window["native"]["getImageUrl"](images[i]);
-      _data[i] = { url: images[i], path : AscCommon.g_oDocumentUrls.getImageUrl(_url) };
+      var _full_path = window["native"]["getImagesDirectory"]() + "/" + _url;
+      var _local_url = "media/" + _url;
+      AscCommon.g_oDocumentUrls.addUrls({_local_url:_full_path});
+      _data[i] = {url:_full_path, path:_local_url};
     }
     callback(_data);
     return;
@@ -5138,7 +5141,10 @@ PasteProcessor.prototype =
 					
 					tempParaRun = new ParaRun();
 					tempParaRun.Paragraph = null;
-					tempParaRun.Add_ToContent( 0, new ParaDrawing(), false );
+
+					var newParaDrawing = new ParaDrawing();
+					//newParaDrawing.Set_DrawingType(drawing_Anchor);
+					tempParaRun.Add_ToContent( 0, newParaDrawing, false );
 					
 					tempParaRun.Content[0].Set_GraphicObject(graphicObj);
 					tempParaRun.Content[0].GraphicObj.setParent(tempParaRun.Content[0]);
@@ -5168,7 +5174,7 @@ PasteProcessor.prototype =
 		    if(!this.oDocument.bPresentation)
             {
                 fonts = this._convertTableFromExcel(aContentExcel);
-				if(this.aContent && this.aContent.length === 1 && 1 === this.aContent[0].Rows && this.aContent[0].Content[0]) {
+				if(PasteElementsId.g_bIsDocumentCopyPaste && this.aContent && this.aContent.length === 1 && 1 === this.aContent[0].Rows && this.aContent[0].Content[0]) {
 					var _content = this.aContent[0].Content[0];
 					if (_content && _content.Content && 1 === _content.Content.length && _content.Content[0].Content &&
 						_content.Content[0].Content.Content[0]) {
@@ -5766,9 +5772,9 @@ PasteProcessor.prototype =
 				allDrawingObj[allDrawingObj.length] = drawingObj[n];
 			}
 		}
-		
-		if(allDrawingObj && allDrawingObj.length)
-            this.oLogicDocument.Select_Drawings(allDrawingObj, oDoc);
+
+		if (allDrawingObj && allDrawingObj.length)
+			this.oLogicDocument.SelectDrawings(allDrawingObj, oDoc);
 	},
 	
 	_readFromBinaryExcel: function(base64)
@@ -9423,7 +9429,7 @@ PasteProcessor.prototype =
 		};
 		var fInitCommentData = function (comment) {
 			var oCommentObj = new AscCommon.CCommentData();
-			oCommentObj.m_nDurableId = AscCommon.CreateUInt32();
+			oCommentObj.m_nDurableId = AscCommon.CreateDurableId();
 			if (null != comment.UserName) {
 				oCommentObj.m_sUserName = comment.UserName;
 			}
@@ -9686,6 +9692,11 @@ function SpecialPasteShowOptions()
 	this.shapeId = null;
 	this.fixPosition = null;
 	this.position = null;
+
+	//для электронных таблиц
+	//показывать или нет дополнительный пункт специальной вставки
+	this.showPasteSpecial = null;
+	this.containTables = null;
 }
 
 SpecialPasteShowOptions.prototype = {
@@ -9707,6 +9718,9 @@ SpecialPasteShowOptions.prototype = {
 		this.shapeId = null;
 		this.fixPosition = null;
 		this.position = null;
+
+		this.showPasteSpecial = null;
+		this.containTables = null;
 	},
 
 	setRange: function(val) {
@@ -9735,8 +9749,20 @@ SpecialPasteShowOptions.prototype = {
 	asc_getCellCoord: function () {
 		return this.cellCoord;
 	},
-	asc_getOptions: function (val) {
+	asc_getOptions: function () {
 		return this.options;
+	},
+	asc_getShowPasteSpecial: function () {
+		return this.showPasteSpecial;
+	},
+	asc_setShowPasteSpecial: function (val) {
+		this.showPasteSpecial = val;
+	},
+	asc_getContainTables: function () {
+		return this.containTables;
+	},
+	asc_setContainTables: function (val) {
+		this.containTables = val;
 	}
 };
 
@@ -9761,6 +9787,9 @@ SpecialPasteShowOptions.prototype = {
   
   window["Asc"]["SpecialPasteShowOptions"] = window["Asc"].SpecialPasteShowOptions = SpecialPasteShowOptions;
   prot									 = SpecialPasteShowOptions.prototype;
-  prot["asc_getCellCoord"]				 	= prot.asc_getCellCoord;
+  prot["asc_getCellCoord"]					= prot.asc_getCellCoord;
   prot["asc_getOptions"]					= prot.asc_getOptions;
+  prot["asc_getShowPasteSpecial"]			= prot.asc_getShowPasteSpecial;
+  prot["asc_getContainTables"]			    = prot.asc_getContainTables;
+
 })(window);

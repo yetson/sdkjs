@@ -687,6 +687,7 @@
 
 	asc_docs_api.prototype.sendEvent = function()
 	{
+        this.sendInternalEvent.apply(this, arguments);
 		var name = arguments[0];
 		if (_callbacks.hasOwnProperty(name))
 		{
@@ -1646,7 +1647,7 @@ background-repeat: no-repeat;\
 	{
 		var opt = {};
         if (options && options.advancedOptions && options.advancedOptions && (Asc.c_oAscPrintType.Selection === options.advancedOptions.asc_getPrintType()))
-            opt["selection"] = 1;
+			opt["printOptions"] = { "selection" : 1 };
 
 		window["AscDesktopEditor"]["Print"](JSON.stringify(opt));
 		return true;
@@ -2913,7 +2914,7 @@ background-repeat: no-repeat;\
 
                 AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
 
-                    if (data && data[0])
+                    if (data && data[0] && data[0].url !== "error")
                     {
                         image_url = data[0].url;
                         fApplyCallback();
@@ -3100,7 +3101,7 @@ background-repeat: no-repeat;\
 
                     AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
 
-                        if (data && data[0])
+                        if (data && data[0] && data[0].url !== "error")
                         {
                             image_url = data[0].url;
                             fApplyCallback();
@@ -4165,7 +4166,7 @@ background-repeat: no-repeat;\
             var t = this;
             AscCommon.sendImgUrls(this, [url], function(data) {
 
-                if (data && data[0])
+                if (data && data[0] && data[0].url !== "error")
                     t.AddImageUrlAction(data[0].url, obj);
 
             }, false, undefined, token);
@@ -4358,7 +4359,7 @@ background-repeat: no-repeat;\
 
                 AscCommon.sendImgUrls(this, [sImageUrl], function(data) {
 
-                    if (data && data[0])
+                    if (data && data[0] && data[0].url !== "error")
                     {
                         ImagePr.ImageUrl = data[0].url;
                         fApplyCallback();
@@ -5311,7 +5312,7 @@ background-repeat: no-repeat;\
 	};
 
 
-	asc_docs_api.prototype.asc_AddVideo = function(sImageUrlLocal, sVideoUrl)
+	asc_docs_api.prototype.asc_AddVideoCallback = function(sImageUrlLocal, sVideoUrl, obj)
 	{
 		var oApi = this;
 		var sImageUrl = AscCommon.g_oDocumentUrls.getImageUrl(sImageUrlLocal);
@@ -5326,10 +5327,10 @@ background-repeat: no-repeat;\
 			oImageObject.Image.width = _image.Image.width;
 			oImageObject.Image.height = _image.Image.height;
 			oImageObject.videoUrl = sVideoUrl;
-			oApi.WordControl.m_oLogicDocument.addImages([oImageObject]);
+			oApi.WordControl.m_oLogicDocument.addImages([oImageObject], obj);
 		});
 	};
-	asc_docs_api.prototype.asc_AddAudio = function(sImageUrlLocal, sAudioUrl)
+	asc_docs_api.prototype.asc_AddAudioCallback = function(sImageUrlLocal, sAudioUrl, obj)
 	{
 		var oApi = this;
         var sImageUrl = AscCommon.g_oDocumentUrls.getImageUrl(sImageUrlLocal);
@@ -5344,7 +5345,7 @@ background-repeat: no-repeat;\
 			oImageObject.Image.width = 50;
 			oImageObject.Image.height = 50;
 			oImageObject.audioUrl = sAudioUrl;
-			oApi.WordControl.m_oLogicDocument.addImages([oImageObject]);
+			oApi.WordControl.m_oLogicDocument.addImages([oImageObject], obj);
 		});
 	};
 
@@ -5759,7 +5760,7 @@ background-repeat: no-repeat;\
 		//if ( true === CollaborativeEditing.Get_GlobalLock() )
 		//    return false;
 
-		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink();
+		var bCanAdd = this.WordControl.m_oLogicDocument.CanAddHyperlink(true);
 		if (true === bCanAdd)
 			return this.WordControl.m_oLogicDocument.GetSelectedText(true);
 
@@ -8053,9 +8054,6 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype["asc_getCurrentFocusObject"]           = asc_docs_api.prototype.asc_getCurrentFocusObject;
 	asc_docs_api.prototype["asc_AddMath"]           			  = asc_docs_api.prototype.asc_AddMath;
 	asc_docs_api.prototype["asc_SetMathProps"]           		  = asc_docs_api.prototype.asc_SetMathProps;
-
-	asc_docs_api.prototype["asc_AddVideo"]           		  = asc_docs_api.prototype.asc_AddVideo;
-	asc_docs_api.prototype["asc_AddAudio"]           		  = asc_docs_api.prototype.asc_AddAudio;
 
     asc_docs_api.prototype['sendEvent']								= asc_docs_api.prototype.sendEvent;
 

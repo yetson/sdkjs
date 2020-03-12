@@ -1142,6 +1142,21 @@
 			case AscDFH.historydescription_Document_AddTextWithProperties:
 				sString = "Document_AddTextWithProperties";
 				break;
+			case AscDFH.historydescription_Document_AddCaption:
+				sString = "Document_AddCaption";
+				break;
+			case AscDFH.historydescription_Document_CompareDocuments:
+				sString = "Document_CompareDocuments";
+				break;
+			case AscDFH.historydescription_Document_DrawNewTable:
+				sString = "Document_DrawNewTable";
+				break;
+			case AscDFH.historydescription_Document_DrawTable:
+				sString = "Document_DrawTable";
+				break;
+			case AscDFH.historydescription_Document_AddDateTimeField:
+				sString = "Document_AddDateTimeField";
+				break;
 		}
 		return sString;
 	}
@@ -2759,8 +2774,6 @@
     window['AscDFH'].historyitem_Sparkline_RemoveData = window['AscDFH'].historyitem_type_Sparkline | 28;
     window['AscDFH'].historyitem_Sparkline_RemoveSparkline = window['AscDFH'].historyitem_type_Sparkline | 29;
 
-	window['AscDFH'].historyitem_PivotTableDefinitionDelete = window['AscDFH'].historyitem_type_PivotTableDefinition | 1;
-
 
     window['AscDFH'].historyitem_NotesMasterSetHF          = window['AscDFH'].historyitem_type_NotesMaster | 1;
     window['AscDFH'].historyitem_NotesMasterSetNotesStyle  = window['AscDFH'].historyitem_type_NotesMaster | 2;
@@ -3194,7 +3207,10 @@
 	window['AscDFH'].historydescription_Presentation_FitImagesToSlide               = 0x0170;
 	window['AscDFH'].historydescription_Document_AddTextWithProperties              = 0x0171;
 	window['AscDFH'].historydescription_Document_AddCaption                         = 0x0172;
-	window['AscDFH'].historydescription_Document_CompareDocuments                   = 0x0172;
+	window['AscDFH'].historydescription_Document_CompareDocuments                   = 0x0173;
+	window['AscDFH'].historydescription_Document_DrawNewTable                       = 0x0174;
+	window['AscDFH'].historydescription_Document_DrawTable                          = 0x0175;
+	window['AscDFH'].historydescription_Document_AddDateTimeField                   = 0x0176;
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
