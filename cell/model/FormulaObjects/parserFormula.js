@@ -5343,7 +5343,7 @@ function parserFormula( formula, parent, _ws ) {
 		this.isInDependencies = false;
 	};
 
-	parserFormula.prototype.parse = function (local, digitDelim, parseResult, ignoreErrors, renameSheetMap) {
+	parserFormula.prototype.parse2 = function (local, digitDelim, parseResult, ignoreErrors, renameSheetMap) {
 		var elemArr = [];
 		var ph = {operand_str: null, pCurrPos: 0};
 		var needAssemble = false;
@@ -6360,13 +6360,20 @@ function parserFormula( formula, parent, _ws ) {
 		ocArrayColSep       = 8,
 		ocColRowName        = 9,
 		ocColRowNameAuto    = 10;
-	parserFormula.prototype.parse2 = function ( rFormula ) {
+
+	var nSrcPos = 0;
+
+	//global
+	var eLastOp = ocOpen;
+
+	parserFormula.prototype.parse = function ( rFormula ) {
 		/*var ScTokenArray aArr;
 		 var pArr = &aArr;*/
 		rFormula = this.Formula;
 		var aFormula = rFormula/*comphelper::string::strip(rFormula, ' ')*/;
 
-		var nSrcPos = 0;
+		this.generateParseSymbols();
+
 		var bCorrected = false;
 		/*if ( bAutoCorrect )
 		 {
@@ -6407,8 +6414,7 @@ function parserFormula( formula, parent, _ws ) {
 		var nFunction = 0;
 		var nBrackets = 0;
 		var bInArray = false;
-		//global
-		var eLastOp = ocOpen;
+
 
 
 		while (this.NextNewToken(bInArray)) {
@@ -6645,7 +6651,7 @@ function parserFormula( formula, parent, _ws ) {
 	parserFormula.prototype.NextNewToken = function( bInArray )
 	{
 		var bAllowBooleans = bInArray;
-		var nSpaces = NextSymbol(bInArray);
+		var nSpaces = this.NextSymbol(bInArray);
 
 		if (!cSymbol[0])
 			return false;
@@ -6921,15 +6927,17 @@ function parserFormula( formula, parent, _ws ) {
 			CharErrConst    = 0x01000000;  // start character of an error constant ('#')
 
 
-	function NextSymbol(bInArray)
+	parserFormula.prototype.NextSymbol = function( bInArray )
 	{
 		/*cSymbol[MAXSTRLEN-1] = 0;       // end*/
 
-		var pSym = cSymbol;
-		var pStart = aFormula.getStr();
-		var pSrc = pStart + nSrcPos;
+		var pSym = "";
+
+		var pStart = this.Formula;
+		var str = pStart.substring(nSrcPos, this.Formula.length);
+		var pSrc = 0;
 		var bi18n = false;
-		var c = pSrc;
+		var c = str[nSrcPos];
 		var cLast = 0;
 		var bQuote = false;
 		//mnRangeOpPosInSymbol = -1;
@@ -6955,11 +6963,11 @@ function parserFormula( formula, parent, _ws ) {
 		while ((c != 0) && (eState != ssStop) )
 		{
 			pSrc++;
-			var nMask = GetCharTableFlags( c, cLast );
+			var nMask = this.getCharTableFlags( c, cLast );
 
 			// The parameter separator and the array column and row separators end
 			// things unconditionally if not in string or reference.
-			if (c == cSep/*,*/ || (bInArray && (c == cArrayColSep || c == cArrayRowSep)))
+			if (c == /*cSep*/"," || (bInArray && (c == "," /*cArrayColSep*/ || c == ";"/*cArrayRowSep*/)))
 			{
 				switch (eState)
 				{
@@ -6992,7 +7000,7 @@ function parserFormula( formula, parent, _ws ) {
 						else if( nMask & OdfLabelOp )
 						{
 							// '!!' automatic intersection
-							if (GetCharTableFlags( pSrc[0], 0 ) & OdfLabelOp)
+							if (this.getCharTableFlags( pSrc[0], 0 ) & OdfLabelOp)
 							{
 								/* TODO: For now the UI "space operator" is used, this
 								 * could be enhanced using a specialized OpCode to get
@@ -7023,7 +7031,7 @@ function parserFormula( formula, parent, _ws ) {
 						else if( nMask & OdfNameMarker )
 						{
 							// '$$' defined name marker
-							if (GetCharTableFlags( pSrc[0], 0 ) & OdfNameMarker)
+							if (this.getCharTableFlags( pSrc[0], 0 ) & OdfNameMarker)
 							{
 								// both eaten, not added to pSym
 								++pSrc;
@@ -7047,7 +7055,7 @@ function parserFormula( formula, parent, _ws ) {
 							}
 							else
 							{
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 								eState = ssStop;
 							}
 						}
@@ -7059,22 +7067,22 @@ function parserFormula( formula, parent, _ws ) {
 						}
 						else if( nMask & CharBool )
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							eState = ssGetBool;
 						}
 						else if( nMask & CharValue )
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							eState = ssGetValue;
 						}
 						else if( nMask & CharString )
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							eState = ssGetString;
 						}
 						else if( nMask & CharErrConst )
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							if (!maTableRefs.empty() && maTableRefs.back().mnLevel == 2)
 								eState = ssGetTableRefItem;
 							else
@@ -7087,7 +7095,7 @@ function parserFormula( formula, parent, _ws ) {
 						else if( nMask & CharIdent )
 						{   // try to get a simple ASCII identifier before calling
 							// i18n, to gain performance during import
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							eState = ssGetIdent;
 						}
 						else
@@ -7101,13 +7109,13 @@ function parserFormula( formula, parent, _ws ) {
 					{
 						if ( nMask & Ident )
 						{   // This catches also $Sheet1.A$1, for example.
-							if( pSym == cSymbol[ MAXSTRLEN-1 ] )
+							/*if( pSym == cSymbol[ MAXSTRLEN-1 ] )
 							{
 								//SetError(FormulaError::StringOverflow);
 								eState = ssStop;
 							}
-							else
-								pSym = c;//*pSym++ = c;
+							else*/
+								pSym += c;//*pSym++ = c;
 						}
 						else if (c == '#' && lcl_isUnicodeIgnoreAscii( pSrc, "REF!", 4))
 						{
@@ -7147,7 +7155,7 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssStop;
 							}
 							else
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 						}
 						else if ( 128 <= c || '\'' == c )
 						{   // High values need reparsing with i18n,
@@ -7167,7 +7175,7 @@ function parserFormula( formula, parent, _ws ) {
 					{
 						if( nMask & Bool )
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 							eState = ssStop;
 						}
 						else
@@ -7193,10 +7201,10 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssStop;
 							}
 							else
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 						}
 						else if( nMask & Value )
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 					else if( nMask & ValueSep )
 					{
 						pSrc--;
@@ -7204,8 +7212,8 @@ function parserFormula( formula, parent, _ws ) {
 					}
 					else if (c == 'E' || c == 'e')
 					{
-						if (GetCharTableFlags( pSrc[0], 0 ) & ValueExp)
-							pSym = c;//*pSym++ = c;
+						if (this.getCharTableFlags( pSrc[0], 0 ) & ValueExp)
+							pSym += c;//*pSym++ = c;
 					else
 						{
 							// reparse with i18n
@@ -7216,9 +7224,9 @@ function parserFormula( formula, parent, _ws ) {
 					else if( nMask & ValueSign )
 					{
 						if (((cLast == 'E') || (cLast == 'e')) &&
-							(GetCharTableFlags( pSrc[0], 0 ) & ValueValue))
+							(this.getCharTableFlags( pSrc[0], 0 ) & ValueValue))
 						{
-							pSym = c;//*pSym++ = c;
+							pSym += c;//*pSym++ = c;
 						}
 						else
 						{
@@ -7256,7 +7264,7 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssSkipString;
 							}
 							else
-								pSym = c;/**pSym++ = c;*/
+								pSym += c;/**pSym++ = c;*/
 						}
 					}
 						break;
@@ -7283,7 +7291,7 @@ function parserFormula( formula, parent, _ws ) {
 							// Check if this is #REF! that starts an invalid reference.
 							// Note we have an implicit '!' here at the end.
 							if (pSym - cSymbol[0] == 4 && lcl_isUnicodeIgnoreAscii( cSymbol, "#REF", 4) &&
-								(GetCharTableFlags( pSrc, c) & Ident))
+								(this.getCharTableFlags( pSrc, c) & Ident))
 							eState = ssGetIdent;
 						else
 							eState = ssStop;
@@ -7313,7 +7321,7 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssStop;
 							}
 							else
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 						}
 					}
 						break;
@@ -7328,7 +7336,7 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssStop;
 							}
 							else
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 						}
 						else
 						{
@@ -7348,7 +7356,7 @@ function parserFormula( formula, parent, _ws ) {
 								eState = ssStop;
 							}
 							else
-								pSym = c;//*pSym++ = c;
+								pSym += c;//*pSym++ = c;
 						}
 						else
 						{
@@ -7526,7 +7534,7 @@ function parserFormula( formula, parent, _ws ) {
 							++mnPredetectedReference;
 						}
 						if (bAddToSymbol && eState != ssSkipReference)
-							pSym = c; /**pSym++ = c;*/    // everything is part of reference
+							pSym += c; /**pSym++ = c;*/    // everything is part of reference
 					}
 						break;
 					case ssStop:
@@ -7534,7 +7542,7 @@ function parserFormula( formula, parent, _ws ) {
 						break;
 				}
 			cLast = c;
-			c = pSrc;
+			c = str[pSrc];
 		}
 		if ( bi18n )
 		{
@@ -7618,7 +7626,77 @@ function parserFormula( formula, parent, _ws ) {
 		if (bAutoIntersection && nSpaces > 1)
 			--nSpaces;  // replace '!!' with only one space
 		return nSpaces;
-	}
+	};
+
+	var mpCharTable;
+	parserFormula.prototype.generateParseSymbols = function() {
+		mpCharTable = [];
+
+		for (var i = 0; i < 128; i++)
+			mpCharTable[i] = Illegal;
+
+		/* tab */   mpCharTable[ 9] = CharDontCare | WordSep | ValueSep;
+		/* lf  */   mpCharTable[10] = CharDontCare | WordSep | ValueSep;
+		/* cr  */   mpCharTable[13] = CharDontCare | WordSep | ValueSep;
+
+		/*   */     mpCharTable[32] = CharDontCare | WordSep | ValueSep;
+		/* ! */     mpCharTable[33] = Char | WordSep | ValueSep;
+
+		/* " */     mpCharTable[34] = CharString | StringSep;
+		/* # */     mpCharTable[35] = WordSep | CharErrConst;
+		/* $ */     mpCharTable[36] = CharWord | Word | CharIdent | Ident;
+
+		/* % */     mpCharTable[37] = Value;
+		/* & */     mpCharTable[38] = Char | WordSep | ValueSep;
+		/* ' */     mpCharTable[39] = NameSep;
+		/* ( */     mpCharTable[40] = Char | WordSep | ValueSep;
+		/* ) */     mpCharTable[41] = Char | WordSep | ValueSep;
+		/* * */     mpCharTable[42] = Char | WordSep | ValueSep;
+		/* + */     mpCharTable[43] = Char | WordSep | ValueExp | ValueSign;
+		/* , */     mpCharTable[44] = CharValue | Value;
+		/* - */     mpCharTable[45] = Char | WordSep | ValueExp | ValueSign;
+		/* . */     mpCharTable[46] = Word | CharValue | Value | Ident | Name;
+		/* / */     mpCharTable[47] = Char | WordSep | ValueSep;
+
+		for (i = 48; i < 58; i++)
+			/* 0-9 */       mpCharTable[i] = CharValue | Word | Value | ValueExp | ValueValue | Ident | Name;
+
+		/* : */     mpCharTable[58] = Char | Word;
+		/* ; */     mpCharTable[59] = Char | WordSep | ValueSep;
+		/* < */     mpCharTable[60] = CharBool | WordSep | ValueSep;
+		/* = */     mpCharTable[61] = Char | Bool | WordSep | ValueSep;
+		/* > */     mpCharTable[62] = CharBool | Bool | WordSep | ValueSep;
+		/* ? */     mpCharTable[63] = CharWord | Word | Name;
+		/* @ */     // FREE
+
+		for (i = 65; i < 91; i++)
+			/* A-Z */   mpCharTable[i] = CharWord | Word | CharIdent | Ident | CharName | Name;
+
+
+
+		/* ^ */     mpCharTable[94] = Char | WordSep | ValueSep;
+		/* _ */     mpCharTable[95] = CharWord | Word | CharIdent | Ident | CharName | Name;
+		/* ` */     // FREE
+
+		for (i = 97; i < 123; i++)
+			/* a-z */       mpCharTable[i] = CharWord | Word | CharIdent | Ident | CharName | Name;
+
+		/* { */     mpCharTable[123] = Char | WordSep | ValueSep; // array open
+		/* | */     mpCharTable[124] = Char | WordSep | ValueSep; // array row sep (Should be OOo specific)
+		/* } */     mpCharTable[125] = Char | WordSep | ValueSep; // array close
+		/* ~ */     mpCharTable[126] = Char;        // OOo specific
+		/* 127 */   // FREE
+
+
+	};
+
+	parserFormula.prototype.getCharTableFlags = function(c, cLast)
+	{
+		var nFlags = mpCharTable[c.charCodeAt()];
+		if (c == '-' && cLast == '[')
+			nFlags |= Ident;
+		return nFlags;
+	};
 
 
 
