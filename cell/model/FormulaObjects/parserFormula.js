@@ -6960,17 +6960,15 @@ function parserFormula( formula, parent, _ws ) {
 		mnPredetectedReference = 0;
 
 		// try to parse simple tokens before calling i18n parser
-		while ((c != 0) && (eState != ssStop) )
-		{
+		while ((c !== 0) && (eState !== ssStop) ) {
 			pSrc++;
+
 			var nMask = this.getCharTableFlags( c, cLast );
 
 			// The parameter separator and the array column and row separators end
 			// things unconditionally if not in string or reference.
-			if (c == /*cSep*/"," || (bInArray && (c == "," /*cArrayColSep*/ || c == ";"/*cArrayRowSep*/)))
-			{
-				switch (eState)
-				{
+			if (c === /*cSep*/"," || (bInArray && (c === "," /*cArrayColSep*/ || c === ";"/*cArrayRowSep*/))) {
+				switch (eState) {
 					// these are to be continued
 					case ssGetString:
 					case ssSkipString:
@@ -6978,572 +6976,450 @@ function parserFormula( formula, parent, _ws ) {
 					case ssSkipReference:
 						break;
 					default:
-						if (eState == ssGetChar)
-							pSym = c;//pSym++ = c;
-					else
-						pSrc--;
+						if (eState === ssGetChar) {
+							pSym += c;//pSym++ = c;
+						}
+						else {
+							pSrc--;
+						}
 						eState = ssStop;
 				}
 			}
 
 			//Label_MaskStateMachine:
-				switch (eState)
-				{
-					case ssGetChar :
-					{
-						// Order is important!
-						if (eLastOp == ocTableRefOpen && c != '[' && c != '#' && c != ']')
-						{
-							pSym = c;//pSym++ = c;
-							eState = ssGetTableRefColumn;
-						}
-						else if( nMask & OdfLabelOp )
-						{
-							// '!!' automatic intersection
-							if (this.getCharTableFlags( pSrc[0], 0 ) & OdfLabelOp)
-							{
-								/* TODO: For now the UI "space operator" is used, this
-								 * could be enhanced using a specialized OpCode to get
-								 * rid of the space ambiguity, which would need some
-								 * places to be adapted though. And we would still need
-								 * to support the ambiguous space operator for UI
-								 * purposes anyway. However, we then could check for
-								 * invalid usage of '!!', which currently isn't
-								 * possible. */
-								if (!bAutoIntersection)
-								{
-									++pSrc;
-									nSpaces += 2;   // must match the character count
-									bAutoIntersection = true;
-								}
-								else
-								{
-									pSrc--;
-									eState = ssStop;
-								}
-							}
-							else
-							{
-								nMask &= OdfLabelOp;
-								//goto Label_MaskStateMachine;
-							}
-						}
-						else if( nMask & OdfNameMarker )
-						{
-							// '$$' defined name marker
-							if (this.getCharTableFlags( pSrc[0], 0 ) & OdfNameMarker)
-							{
-								// both eaten, not added to pSym
+			switch (eState) {
+				case ssGetChar : {
+					// Order is important!
+					if (eLastOp === ocTableRefOpen && c !== '[' && c !== '#' && c !== ']') {
+						pSym += c;//pSym++ = c;
+						eState = ssGetTableRefColumn;
+					} else if (nMask & OdfLabelOp) {
+						// '!!' automatic intersection
+						if (this.getCharTableFlags(pSrc[0], 0) & OdfLabelOp) {
+							/* TODO: For now the UI "space operator" is used, this
+                             * could be enhanced using a specialized OpCode to get
+                             * rid of the space ambiguity, which would need some
+                             * places to be adapted though. And we would still need
+                             * to support the ambiguous space operator for UI
+                             * purposes anyway. However, we then could check for
+                             * invalid usage of '!!', which currently isn't
+                             * possible. */
+							if (!bAutoIntersection) {
 								++pSrc;
-							}
-							else
-							{
-								nMask &= OdfNameMarker;
-								//goto Label_MaskStateMachine;
-							}
-						}
-						else if( nMask & Char )
-						{
-							// '[' is a special case in OOXML, it can start an external
-							// reference ID like [1]Sheet1!A1 that needs to be scanned
-							// entirely, or can be ocTableRefOpen, of which the first
-							// transforms an ocDBArea into an ocTableRef.
-							if (c == '[' /*&& FormulaGrammar::isOOXML( meGrammar) && eLastOp != ocDBArea && maTableRefs.empty()*/)
-							{
-								nMask &= Char;
-								//goto Label_MaskStateMachine;
-							}
-							else
-							{
-								pSym += c;//*pSym++ = c;
+								nSpaces += 2;   // must match the character count
+								bAutoIntersection = true;
+							} else {
+								pSrc--;
 								eState = ssStop;
 							}
+						} else {
+							nMask &= OdfLabelOp;
+							//goto Label_MaskStateMachine;
 						}
-						else if( nMask & OdfLBracket )
-						{
-							// eaten, not added to pSym
-							eState = ssGetReference;
-							mnPredetectedReference = 1;
+					} else if (nMask & OdfNameMarker) {
+						// '$$' defined name marker
+						if (this.getCharTableFlags(pSrc[0], 0) & OdfNameMarker) {
+							// both eaten, not added to pSym
+							++pSrc;
+						} else {
+							nMask &= OdfNameMarker;
+							//goto Label_MaskStateMachine;
 						}
-						else if( nMask & CharBool )
-						{
+					} else if (nMask & Char) {
+						// '[' is a special case in OOXML, it can start an external
+						// reference ID like [1]Sheet1!A1 that needs to be scanned
+						// entirely, or can be ocTableRefOpen, of which the first
+						// transforms an ocDBArea into an ocTableRef.
+						if (c === '[' /*&& FormulaGrammar::isOOXML( meGrammar) && eLastOp != ocDBArea && maTableRefs.empty()*/) {
+							nMask &= Char;
+							//goto Label_MaskStateMachine;
+						} else {
 							pSym += c;//*pSym++ = c;
-							eState = ssGetBool;
-						}
-						else if( nMask & CharValue )
-						{
-							pSym += c;//*pSym++ = c;
-							eState = ssGetValue;
-						}
-						else if( nMask & CharString )
-						{
-							pSym += c;//*pSym++ = c;
-							eState = ssGetString;
-						}
-						else if( nMask & CharErrConst )
-						{
-							pSym += c;//*pSym++ = c;
-							if (!maTableRefs.empty() && maTableRefs.back().mnLevel == 2)
-								eState = ssGetTableRefItem;
-							else
-								eState = ssGetErrorConstant;
-						}
-						else if( nMask & CharDontCare )
-						{
-							nSpaces++;
-						}
-						else if( nMask & CharIdent )
-						{   // try to get a simple ASCII identifier before calling
-							// i18n, to gain performance during import
-							pSym += c;//*pSym++ = c;
-							eState = ssGetIdent;
-						}
-						else
-						{
-							bi18n = true;
 							eState = ssStop;
 						}
+					} else if (nMask & OdfLBracket) {
+						// eaten, not added to pSym
+						eState = ssGetReference;
+						mnPredetectedReference = 1;
+					} else if (nMask & CharBool) {
+						pSym += c;//*pSym++ = c;
+						eState = ssGetBool;
+					} else if (nMask & CharValue) {
+						pSym += c;//*pSym++ = c;
+						eState = ssGetValue;
+					} else if (nMask & CharString) {
+						pSym += c;//*pSym++ = c;
+						eState = ssGetString;
+					} else if (nMask & CharErrConst) {
+						pSym += c;//*pSym++ = c;
+						if (!maTableRefs.empty() && maTableRefs.back().mnLevel == 2)
+							eState = ssGetTableRefItem;
+						else
+							eState = ssGetErrorConstant;
+					} else if (nMask & CharDontCare) {
+						nSpaces++;
+					} else if (nMask & CharIdent) {   // try to get a simple ASCII identifier before calling
+						// i18n, to gain performance during import
+						pSym += c;//*pSym++ = c;
+						eState = ssGetIdent;
+					} else {
+						bi18n = true;
+						eState = ssStop;
 					}
-						break;
-					case ssGetIdent:
-					{
-						if ( nMask & Ident )
-						{   // This catches also $Sheet1.A$1, for example.
-							/*if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-							{
+				}
+					break;
+				case ssGetIdent: {
+					if (nMask & Ident) {   // This catches also $Sheet1.A$1, for example.
+						/*if( pSym == cSymbol[ MAXSTRLEN-1 ] )
+                        {
+                            //SetError(FormulaError::StringOverflow);
+                            eState = ssStop;
+                        }
+                        else*/
+						pSym += c;//*pSym++ = c;
+					} else if (c == '#' && lcl_isUnicodeIgnoreAscii(pSrc, "REF!", 4)) {
+						// Completely ugly means to catch broken
+						// [$]#REF!.[$]#REF![$]#REF! (one or multiple parts)
+						// references that were written in ODF named ranges
+						// (without embracing [] hence no predetected reference)
+						// and to OOXML and handle them as one symbol.
+						// Also catches these in UI, so we can process them
+						// further.
+						var i = 0;
+						for (; i < 5; ++i) {
+							if (pSym === cSymbol[MAXSTRLEN - 1]) {
 								//SetError(FormulaError::StringOverflow);
 								eState = ssStop;
+								break;  // for
+							} else {
+								pSym += c;
+								pSrc++;//c = *pSrc++;
 							}
-							else*/
-								pSym += c;//*pSym++ = c;
 						}
-						else if (c == '#' && lcl_isUnicodeIgnoreAscii( pSrc, "REF!", 4))
-						{
-							// Completely ugly means to catch broken
-							// [$]#REF!.[$]#REF![$]#REF! (one or multiple parts)
-							// references that were written in ODF named ranges
-							// (without embracing [] hence no predetected reference)
-							// and to OOXML and handle them as one symbol.
-							// Also catches these in UI, so we can process them
-							// further.
-							var i = 0;
-							for ( ; i<5; ++i)
-							{
-								if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-								{
-									//SetError(FormulaError::StringOverflow);
-									eState = ssStop;
-									break;  // for
-								}
-								else
-								{/*pSym++ = c;
-									c = *pSrc++;*/
-								}
-							}
-							if (i == 5)
-								c = ((--pSrc)-1);  // position last/next character correctly
+						if (i === 5) {
+							//TODO ?
+							c = ((--pSrc) - 1);  // position last/next character correctly
 						}
-						else if (c == ':' /*&& mnRangeOpPosInSymbol < 0*/)
-						{
-							// One range operator may form Sheet1.A:A, which we need to
-							// pass as one entity to IsReference().
+					} else if (c === ':' /*&& mnRangeOpPosInSymbol < 0*/) {
+						// One range operator may form Sheet1.A:A, which we need to
+						// pass as one entity to IsReference().
 
-							//mnRangeOpPosInSymbol = pSym - cSymbol[0];
-							if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-							{
-								//SetError(FormulaError::StringOverflow);
-								eState = ssStop;
-							}
-							else
-								pSym += c;//*pSym++ = c;
-						}
-						else if ( 128 <= c || '\'' == c )
-						{   // High values need reparsing with i18n,
-							// single quoted $'sheet' names too (otherwise we'd had to
-							// implement everything twice).
-							bi18n = true;
-							eState = ssStop;
-						}
-						else
-						{
-							pSrc--;
-							eState = ssStop;
-						}
-					}
-						break;
-					case ssGetBool :
-					{
-						if( nMask & Bool )
-						{
-							pSym += c;//*pSym++ = c;
-							eState = ssStop;
-						}
-						else
-						{
-							pSrc--;
-							eState = ssStop;
-						}
-					}
-						break;
-					case ssGetValue :
-					{
-						if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-						{
+						//mnRangeOpPosInSymbol = pSym - cSymbol[0];
+						if (pSym === cSymbol[MAXSTRLEN - 1]) {
 							//SetError(FormulaError::StringOverflow);
 							eState = ssStop;
-						}
-						else if (c == cDecSep)
-						{
-							if (++nDecSeps > 1)
-							{
-								// reparse with i18n, may be numeric sheet name as well
-								bi18n = true;
-								eState = ssStop;
-							}
-							else
-								pSym += c;//*pSym++ = c;
-						}
-						else if( nMask & Value )
+						} else {
 							pSym += c;//*pSym++ = c;
-					else if( nMask & ValueSep )
-					{
+						}
+					} else if (128 <= c || '\'' === c) {   // High values need reparsing with i18n,
+						// single quoted $'sheet' names too (otherwise we'd had to
+						// implement everything twice).
+						bi18n = true;
+						eState = ssStop;
+					} else {
 						pSrc--;
 						eState = ssStop;
 					}
-					else if (c == 'E' || c == 'e')
-					{
-						if (this.getCharTableFlags( pSrc[0], 0 ) & ValueExp)
+				}
+					break;
+				case ssGetBool : {
+					if (nMask & Bool) {
+						pSym += c;//*pSym++ = c;
+						eState = ssStop;
+					} else {
+						pSrc--;
+						eState = ssStop;
+					}
+				}
+					break;
+				case ssGetValue : {
+					if (pSym == cSymbol[MAXSTRLEN - 1]) {
+						//SetError(FormulaError::StringOverflow);
+						eState = ssStop;
+					} else if (c == cDecSep) {
+						if (++nDecSeps > 1) {
+							// reparse with i18n, may be numeric sheet name as well
+							bi18n = true;
+							eState = ssStop;
+						} else
 							pSym += c;//*pSym++ = c;
-					else
-						{
+					} else if (nMask & Value)
+						pSym += c;//*pSym++ = c;
+					else if (nMask & ValueSep) {
+						pSrc--;
+						eState = ssStop;
+					} else if (c === 'E' || c === 'e') {
+						if (this.getCharTableFlags(pSrc[0], 0) & ValueExp)
+							pSym += c;//*pSym++ = c;
+						else {
 							// reparse with i18n
 							bi18n = true;
 							eState = ssStop;
 						}
-					}
-					else if( nMask & ValueSign )
-					{
-						if (((cLast == 'E') || (cLast == 'e')) &&
-							(this.getCharTableFlags( pSrc[0], 0 ) & ValueValue))
-						{
+					} else if (nMask & ValueSign) {
+						if (((cLast === 'E') || (cLast === 'e')) && (this.getCharTableFlags(pSrc[0], 0) & ValueValue)) {
 							pSym += c;//*pSym++ = c;
-						}
-						else
-						{
+						} else {
 							pSrc--;
 							eState = ssStop;
 						}
-					}
-					else
-					{
+					} else {
 						// reparse with i18n
 						bi18n = true;
 						eState = ssStop;
 					}
-					}
-						break;
-					case ssGetString :
-					{
-						if( nMask & StringSep )
-						{
-							if ( !bQuote )
-							{
-								if ( pSrc == '"' )
+				}
+					break;
+				case ssGetString : {
+					if (nMask & StringSep) {
+						if (!bQuote) {
+							if (pSrc === '"') {
 								bQuote = true;      // "" => literal "
-							else
+							} else {
 								eState = ssStop;
 							}
-							else
-								bQuote = false;
-						}
-						if ( !bQuote )
-						{
-							if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-							{
-								//SetError(FormulaError::StringOverflow);
-								eState = ssSkipString;
-							}
-							else
-								pSym += c;/**pSym++ = c;*/
-						}
+						} else
+							bQuote = false;
 					}
-						break;
-					case ssSkipString:
-						if( nMask & StringSep )
-							eState = ssStop;
-						break;
-					case ssGetErrorConstant:
-					{
-						// ODFF Error ::= '#' [A-Z0-9]+ ([!?] | ('/' ([A-Z] | ([0-9] [!?]))))
-						// BUT, in UI these may have been translated! So don't
-						// check for ASCII alnum. Note that this construct can't be
-						// parsed with i18n.
-						/* TODO: be strict when reading ODFF, check for ASCII alnum
-						 * and proper continuation after '/'. However, even with
-						 * the lax parsing only the error constants we have defined
-						 * as opcode symbols will be recognized and others result
-						 * in ocBad, so the result is actually conformant. */
-						var bAdd = true;
-						if ('?' == c)
-							eState = ssStop;
-						else if ('!' == c)
-						{
-							// Check if this is #REF! that starts an invalid reference.
-							// Note we have an implicit '!' here at the end.
-							if (pSym - cSymbol[0] == 4 && lcl_isUnicodeIgnoreAscii( cSymbol, "#REF", 4) &&
-								(this.getCharTableFlags( pSrc, c) & Ident))
+					if (!bQuote) {
+						if (pSym === cSymbol[MAXSTRLEN - 1]) {
+							//SetError(FormulaError::StringOverflow);
+							eState = ssSkipString;
+						} else
+							pSym += c;/**pSym++ = c;*/
+					}
+				}
+					break;
+				case ssSkipString:
+					if (nMask & StringSep)
+						eState = ssStop;
+					break;
+				case ssGetErrorConstant: {
+					// ODFF Error ::= '#' [A-Z0-9]+ ([!?] | ('/' ([A-Z] | ([0-9] [!?]))))
+					// BUT, in UI these may have been translated! So don't
+					// check for ASCII alnum. Note that this construct can't be
+					// parsed with i18n.
+					/* TODO: be strict when reading ODFF, check for ASCII alnum
+                     * and proper continuation after '/'. However, even with
+                     * the lax parsing only the error constants we have defined
+                     * as opcode symbols will be recognized and others result
+                     * in ocBad, so the result is actually conformant. */
+					var bAdd = true;
+					if ('?' === c) {
+						eState = ssStop;
+					} else if ('!' === c) {
+						// Check if this is #REF! that starts an invalid reference.
+						// Note we have an implicit '!' here at the end.
+						//TODO ?
+						if (pSym - cSymbol[0] === 4 && lcl_isUnicodeIgnoreAscii(cSymbol, "#REF", 4) && (this.getCharTableFlags(pSrc, c) & Ident)) {
 							eState = ssGetIdent;
-						else
+						} else {
 							eState = ssStop;
 						}
-						else if ('/' == c)
-						{
-							if (!bErrorConstantHadSlash)
-								bErrorConstantHadSlash = true;
-							else
-							{
-								bAdd = false;
-								eState = ssStop;
-							}
-						}
-						else if ((nMask & WordSep) || (c < 128 /*&& !rtl::isAsciiAlphanumeric( c))*/))
-						{
+					} else if ('/' === c) {
+						if (!bErrorConstantHadSlash)
+							bErrorConstantHadSlash = true;
+						else {
 							bAdd = false;
 							eState = ssStop;
 						}
-						if (!bAdd)
-							--pSrc;
-						else
-						{
-							if (pSym == cSymbol[ MAXSTRLEN-1 ])
-							{
-								//SetError( FormulaError::StringOverflow);
-								eState = ssStop;
-							}
-							else
-								pSym += c;//*pSym++ = c;
-						}
+					} else if ((nMask & WordSep) || (c < 128 /*&& !rtl::isAsciiAlphanumeric( c))*/)) {
+						bAdd = false;
+						eState = ssStop;
 					}
-						break;
-					case ssGetTableRefItem:
-					{
-						// Scan whatever up to the next ']' closer.
-						if (c != ']')
-						{
-							if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-							{
-								//SetError( FormulaError::StringOverflow);
-								eState = ssStop;
-							}
-							else
-								pSym += c;//*pSym++ = c;
-						}
-						else
-						{
-							--pSrc;
-							eState = ssStop;
-						}
-					}
-						break;
-					case ssGetTableRefColumn:
-					{
-						// Scan whatever up to the next unescaped ']' closer.
-						if (c != ']' || cLast == '\'')
-						{
-							if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-							{
-								//SetError( FormulaError::StringOverflow);
-								eState = ssStop;
-							}
-							else
-								pSym += c;//*pSym++ = c;
-						}
-						else
-						{
-							--pSrc;
-							eState = ssStop;
-						}
-					}
-						break;
-					case ssGetReference:
-						if( pSym == cSymbol[ MAXSTRLEN-1 ] )
-						{
+					if (!bAdd) {
+						--pSrc;
+					} else {
+						if (pSym === cSymbol[MAXSTRLEN - 1]) {
 							//SetError( FormulaError::StringOverflow);
-							eState = ssSkipReference;
-						}
-						SAL_FALLTHROUGH;
-					case ssSkipReference:
-						// ODF reference: ['External'#$'Sheet'.A1:.B2] with dots being
-						// mandatory also if no sheet name. 'External'# is optional,
-						// sheet name is optional, quotes around sheet name are
-						// optional if no quote contained. [#REF!] is valid.
-						// 2nd usage: ['Sheet'.$$'DefinedName']
-						// 3rd usage: ['External'#$$'DefinedName']
-						// 4th usage: ['External'#$'Sheet'.$$'DefinedName']
-						// Also for all these names quotes are optional if no quote
-						// contained.
-					{
-
-						// nRefInName: 0 := not in sheet name yet. 'External'
-						// is parsed as if it was a sheet name and nRefInName
-						// is reset when # is encountered immediately after closing
-						// quote. Same with 'DefinedName', nRefInName is cleared
-						// when : is encountered.
-
-						// Encountered leading $ before sheet name.
-						var kDollar    = (1 << 1);
-						// Encountered ' opening quote, which may be after $ or
-						// not.
-						var kOpen      = (1 << 2);
-						// Somewhere in name.
-						var kName      = (1 << 3);
-						// Encountered ' in name, will be cleared if double or
-						// transformed to kClose if not, in which case kOpen is
-						// cleared.
-						var kQuote     = (1 << 4);
-						// Past ' closing quote.
-						var kClose     = (1 << 5);
-						// Encountered # file/sheet separator.
-						var kFileSep   = (1 << 6);
-						// Past . sheet name separator.
-						var kPast      = (1 << 7);
-						// Marked name $$ follows sheet name separator, detected
-						// while we're still on the separator. Will be cleared when
-						// entering the name.
-						var kMarkAhead = (1 << 8);
-						// In marked defined name.
-						var kDefName   = (1 << 9);
-						// Encountered # of #REF!
-						var kRefErr    = (1 << 10);
-
-						var bAddToSymbol = true;
-						if ((nMask & OdfRBracket) && !(nRefInName & kOpen))
-						{
-							/*OSL_ENSURE( nRefInName & (kPast | kDefName | kRefErr),
-								"ScCompiler::NextSymbol: reference: "
-							"closing bracket ']' without prior sheet name separator '.' violates ODF spec");*/
-							// eaten, not added to pSym
-							bAddToSymbol = false;
 							eState = ssStop;
-						}
-						else if (cSheetSep == c && nRefInName == 0)
-						{
-							// eat it, no sheet name [.A1]
-							bAddToSymbol = false;
-							nRefInName |= kPast;
-							if ('$' == pSrc[0] && '$' == pSrc[1])
-								nRefInName |= kMarkAhead;
-						}
-						else if (!(nRefInName & kPast) || (nRefInName & (kMarkAhead | kDefName)))
-						{
-							// Not in col/row yet.
+						} else
+							pSym += c;//*pSym++ = c;
+					}
+				}
+					break;
+				case ssGetTableRefItem: {
+					// Scan whatever up to the next ']' closer.
+					if (c !== ']') {
+						if (pSym === cSymbol[MAXSTRLEN - 1]) {
+							//SetError( FormulaError::StringOverflow);
+							eState = ssStop;
+						} else
+							pSym += c;//*pSym++ = c;
+					} else {
+						--pSrc;
+						eState = ssStop;
+					}
+				}
+					break;
+				case ssGetTableRefColumn: {
+					// Scan whatever up to the next unescaped ']' closer.
+					if (c !== ']' || cLast === '\'') {
+						if (pSym == cSymbol[MAXSTRLEN - 1]) {
+							//SetError( FormulaError::StringOverflow);
+							eState = ssStop;
+						} else
+							pSym += c;//*pSym++ = c;
+					} else {
+						--pSrc;
+						eState = ssStop;
+					}
+				}
+					break;
+				case ssGetReference:
+					if (pSym === cSymbol[MAXSTRLEN - 1]) {
+						//SetError( FormulaError::StringOverflow);
+						eState = ssSkipReference;
+					}
+					SAL_FALLTHROUGH;
+				case ssSkipReference:
+					// ODF reference: ['External'#$'Sheet'.A1:.B2] with dots being
+					// mandatory also if no sheet name. 'External'# is optional,
+					// sheet name is optional, quotes around sheet name are
+					// optional if no quote contained. [#REF!] is valid.
+					// 2nd usage: ['Sheet'.$$'DefinedName']
+					// 3rd usage: ['External'#$$'DefinedName']
+					// 4th usage: ['External'#$'Sheet'.$$'DefinedName']
+					// Also for all these names quotes are optional if no quote
+					// contained.
+				{
 
-							if (SC_COMPILER_FILE_TAB_SEP == c && (nRefInName & kFileSep))
-								nRefInName = 0;
-							else if ('$' == c && '$' == pSrc[0] && !(nRefInName & kOpen))
-							{
-								nRefInName &= ~kMarkAhead;
-								if (!(nRefInName & kDefName))
-								{
-									// eaten, not added to pSym (2 chars)
-									bAddToSymbol = false;
-									++pSrc;
-									nRefInName &= kPast;
-									nRefInName |= kDefName;
-								}
-								else
-								{
-									// ScAddress::Parse() will recognize this as
-									// invalid later.
-									if (eState != ssSkipReference)
-									{
-										/**pSym++ = c;
-										*pSym++ = *pSrc++;*/
-									}
-									bAddToSymbol = false;
-								}
-							}
-							else if (cSheetPrefix == c && nRefInName == 0)
-								nRefInName |= kDollar;
-							else if ('\'' == c)
-							{
-								// TODO: The conventions' parseExternalName()
-								// should handle quoted names, but as long as they
-								// don't remove non-embedded quotes here.
-								if (!(nRefInName & kName))
-								{
-									nRefInName |= (kOpen | kName);
-									bAddToSymbol = !(nRefInName & kDefName);
-								}
-								else if (!(nRefInName & kOpen))
-								{
-									/*OSL_FAIL("ScCompiler::NextSymbol: reference: "
-									"a ''' without the name being enclosed in '...' violates ODF spec");*/
-								}
-								else if (nRefInName & kQuote)
-								{
-									// escaped embedded quote
-									nRefInName &= ~kQuote;
-								}
-								else
-								{
-									switch (pSrc[0])
-									{
-										case '\'':
-											// escapes embedded quote
-											nRefInName |= kQuote;
-											break;
-										case SC_COMPILER_FILE_TAB_SEP:
-											// sheet name should follow
-											nRefInName |= kFileSep;
-											SAL_FALLTHROUGH;
-										default:
-											// quote not followed by quote => close
-											nRefInName |= kClose;
-											nRefInName &= ~kOpen;
-									}
-									bAddToSymbol = !(nRefInName & kDefName);
-								}
-							}
-							else if ('#' == c && nRefInName == 0)
-								nRefInName |= kRefErr;
-							else if (cSheetSep == c && !(nRefInName & kOpen))
-							{
-								// unquoted sheet name separator
-								nRefInName |= kPast;
-								if ('$' == pSrc[0] && '$' == pSrc[1])
-									nRefInName |= kMarkAhead;
-							}
-							else if (':' == c && !(nRefInName & kOpen))
-							{
-								/*OSL_FAIL("ScCompiler::NextSymbol: reference: "
-								"range operator ':' without prior sheet name separator '.' violates ODF spec");*/
-								nRefInName = 0;
-								++mnPredetectedReference;
-							}
-							else if (!(nRefInName & kName))
-							{
-								// start unquoted name
-								nRefInName |= kName;
-							}
+					// nRefInName: 0 := not in sheet name yet. 'External'
+					// is parsed as if it was a sheet name and nRefInName
+					// is reset when # is encountered immediately after closing
+					// quote. Same with 'DefinedName', nRefInName is cleared
+					// when : is encountered.
+
+					// Encountered leading $ before sheet name.
+					var kDollar = (1 << 1);
+					// Encountered ' opening quote, which may be after $ or
+					// not.
+					var kOpen = (1 << 2);
+					// Somewhere in name.
+					var kName = (1 << 3);
+					// Encountered ' in name, will be cleared if double or
+					// transformed to kClose if not, in which case kOpen is
+					// cleared.
+					var kQuote = (1 << 4);
+					// Past ' closing quote.
+					var kClose = (1 << 5);
+					// Encountered # file/sheet separator.
+					var kFileSep = (1 << 6);
+					// Past . sheet name separator.
+					var kPast = (1 << 7);
+					// Marked name $$ follows sheet name separator, detected
+					// while we're still on the separator. Will be cleared when
+					// entering the name.
+					var kMarkAhead = (1 << 8);
+					// In marked defined name.
+					var kDefName = (1 << 9);
+					// Encountered # of #REF!
+					var kRefErr = (1 << 10);
+
+					var bAddToSymbol = true;
+					if ((nMask & OdfRBracket) && !(nRefInName & kOpen)) {
+						/*OSL_ENSURE( nRefInName & (kPast | kDefName | kRefErr),
+                            "ScCompiler::NextSymbol: reference: "
+                        "closing bracket ']' without prior sheet name separator '.' violates ODF spec");*/
+						// eaten, not added to pSym
+						bAddToSymbol = false;
+						eState = ssStop;
+					} else if (cSheetSep === c && nRefInName === 0) {
+						// eat it, no sheet name [.A1]
+						bAddToSymbol = false;
+						nRefInName |= kPast;
+						if ('$' == pSrc[0] && '$' == pSrc[1]) {
+							nRefInName |= kMarkAhead;
 						}
-						else if (':' == c)
-						{
-							// range operator
+					} else if (!(nRefInName & kPast) || (nRefInName & (kMarkAhead | kDefName))) {
+						// Not in col/row yet.
+
+						if (SC_COMPILER_FILE_TAB_SEP === c && (nRefInName & kFileSep)) {
+							nRefInName = 0;
+						}
+						else if ('$' === c && '$' === pSrc[0] && !(nRefInName & kOpen)) {
+							nRefInName &= ~kMarkAhead;
+							if (!(nRefInName & kDefName)) {
+								// eaten, not added to pSym (2 chars)
+								bAddToSymbol = false;
+								++pSrc;
+								nRefInName &= kPast;
+								nRefInName |= kDefName;
+							} else {
+								// ScAddress::Parse() will recognize this as
+								// invalid later.
+								if (eState != ssSkipReference) {
+									pSym += c;
+									/**pSym++ = c;
+									 *pSym++ = *pSrc++;*/
+								}
+								bAddToSymbol = false;
+							}
+						} else if (cSheetPrefix === c && nRefInName === 0) {
+							nRefInName |= kDollar;
+						} else if ('\'' === c) {
+							// TODO: The conventions' parseExternalName()
+							// should handle quoted names, but as long as they
+							// don't remove non-embedded quotes here.
+							if (!(nRefInName & kName)) {
+								nRefInName |= (kOpen | kName);
+								bAddToSymbol = !(nRefInName & kDefName);
+							} else if (!(nRefInName & kOpen)) {
+								/*OSL_FAIL("ScCompiler::NextSymbol: reference: "
+                                "a ''' without the name being enclosed in '...' violates ODF spec");*/
+							} else if (nRefInName & kQuote) {
+								// escaped embedded quote
+								nRefInName &= ~kQuote;
+							} else {
+								switch (pSrc[0]) {
+									case '\'':
+										// escapes embedded quote
+										nRefInName |= kQuote;
+										break;
+									case SC_COMPILER_FILE_TAB_SEP:
+										// sheet name should follow
+										nRefInName |= kFileSep;
+										SAL_FALLTHROUGH;
+									default:
+										// quote not followed by quote => close
+										nRefInName |= kClose;
+										nRefInName &= ~kOpen;
+								}
+								bAddToSymbol = !(nRefInName & kDefName);
+							}
+						} else if ('#' === c && nRefInName === 0)
+							nRefInName |= kRefErr;
+						else if (cSheetSep === c && !(nRefInName & kOpen)) {
+							// unquoted sheet name separator
+							nRefInName |= kPast;
+							if ('$' === pSrc[0] && '$' === pSrc[1])
+								nRefInName |= kMarkAhead;
+						} else if (':' == c && !(nRefInName & kOpen)) {
+							/*OSL_FAIL("ScCompiler::NextSymbol: reference: "
+                            "range operator ':' without prior sheet name separator '.' violates ODF spec");*/
 							nRefInName = 0;
 							++mnPredetectedReference;
+						} else if (!(nRefInName & kName)) {
+							// start unquoted name
+							nRefInName |= kName;
 						}
-						if (bAddToSymbol && eState != ssSkipReference)
-							pSym += c; /**pSym++ = c;*/    // everything is part of reference
+					} else if (':' == c) {
+						// range operator
+						nRefInName = 0;
+						++mnPredetectedReference;
 					}
-						break;
-					case ssStop:
-						;   // nothing, prevent warning
-						break;
+					if (bAddToSymbol && eState != ssSkipReference)
+						pSym += c; /**pSym++ = c;*/    // everything is part of reference
 				}
+					break;
+				case ssStop:
+					;   // nothing, prevent warning
+					break;
+			}
 			cLast = c;
 			c = str[pSrc];
 		}
+
 		if ( bi18n )
 		{
 			/*nSrcPos = nSrcPos + nSpaces;
