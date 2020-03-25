@@ -6648,16 +6648,15 @@ function parserFormula( formula, parent, _ws ) {
 
 
 	var bAutoCorrect = false;
-	parserFormula.prototype.NextNewToken = function( bInArray )
-	{
+	parserFormula.prototype.NextNewToken = function( bInArray ) {
 		var bAllowBooleans = bInArray;
 		var nSpaces = this.NextSymbol(bInArray);
 
-		if (!cSymbol[0])
+		if (!cSymbol[0]) {
 			return false;
+		}
 
-		if( nSpaces )
-		{
+		if ( nSpaces ) {
 			/*ScRawToken aToken;
 			aToken.SetOpCode( ocSpaces );
 			aToken.sbyte.cByte = (sal_uInt8) ( nSpaces > 255 ? 255 : nSpaces );
@@ -6682,9 +6681,9 @@ function parserFormula( formula, parent, _ws ) {
 			return true;*/
 		}
 
-		if ( (cSymbol[0] == '#' || cSymbol[0] == '$') && cSymbol[1] == 0 &&
-			!bAutoCorrect )
-		{   // special case to speed up broken [$]#REF documents
+		if ( (cSymbol[0] === '#' || cSymbol[0] === '$') && cSymbol[1] === 0 && !bAutoCorrect ) {
+
+			// special case to speed up broken [$]#REF documents
 			/* FIXME: ISERROR(#REF!) would be valid and true and the formula to
 			 * be processed as usual. That would need some special treatment,
 			 * also in NextSymbol() because of possible combinations of
@@ -6696,13 +6695,13 @@ function parserFormula( formula, parent, _ws ) {
 			return false;
 		}
 
-		if( IsString() )
+		if( IsString() ) {
 			return true;
+		}
 
 		var bMayBeFuncName;
 		var bAsciiNonAlnum;    // operators, separators, ...
-		if ( cSymbol[0] < 128 )
-		{
+		if ( cSymbol[0] < 128 ) {
 			/*bMayBeFuncName = rtl::isAsciiAlpha( cSymbol[0] );
 			if (!bMayBeFuncName && (cSymbol[0] == '_' && cSymbol[1] == '_') )
 			{
@@ -6711,26 +6710,26 @@ function parserFormula( formula, parent, _ws ) {
 			}
 
 			bAsciiNonAlnum = !bMayBeFuncName && !rtl::isAsciiDigit( cSymbol[0] );*/
-		}
-		else
-		{
+		} else {
 			/*OUString aTmpStr( cSymbol[0] );
 			bMayBeFuncName = ScGlobal::pCharClass->isLetter( aTmpStr, 0 );
 			bAsciiNonAlnum = false;*/
 		}
-		if (bAsciiNonAlnum && cSymbol[1] == 0)
-		{
+
+		if (bAsciiNonAlnum && cSymbol[1] === 0) {
 			// Shortcut for operators and separators that need no further checks or upper.
 			/*if (IsOpCode( OUString( cSymbol), bInArray ))
 				return true;*/
 		}
-		if ( bMayBeFuncName )
-		{
+
+		if ( bMayBeFuncName ) {
 			// a function name must be followed by a parenthesis
-			/*const sal_Unicode* p = aFormula.getStr() + nSrcPos;
-			while( *p == ' ' )
-			p++;
-			bMayBeFuncName = ( *p == '(' );*/
+			var p = this.Formula;
+			var pSrc = 0 + nSrcPos;
+			while( p[pSrc] === ' ' ) {
+				pSrc++;
+			}
+			bMayBeFuncName = ( p[pSrc] === '(' );
 		}
 
 		// Italian ARCTAN.2 resulted in #REF! => IsOpcode() before
@@ -6882,53 +6881,49 @@ function parserFormula( formula, parent, _ws ) {
 
 	var cSymbol;//unicode
 	var mnPredetectedReference;
-
-		var ssGetChar = 0,
-			ssGetBool = 1,
-			ssGetValue = 2,
-			ssGetString = 3,
-			ssSkipString = 4,
-			ssGetIdent = 5,
-			ssGetReference = 6,
-			ssSkipReference = 7,
-			ssGetErrorConstant = 8,
-			ssGetTableRefItem = 8,
-			ssGetTableRefColumn = 9,
-			ssStop = 10;
-		var eState;
-
-
-		var NONE            = 0x00000000,
-			Illegal         = 0x00000000,
-			Char            = 0x00000001,
-			CharBool        = 0x00000002,
-			CharWord        = 0x00000004,
-			CharValue       = 0x00000008,
-			CharString      = 0x00000010,
-			CharDontCare    = 0x00000020,
-			Bool            = 0x00000040,
-			Word            = 0x00000080,
-			WordSep         = 0x00000100,
-			Value           = 0x00000200,
-			ValueSep        = 0x00000400,
-			ValueExp        = 0x00000800,
-			ValueSign       = 0x00001000,
-			ValueValue      = 0x00002000,
-			StringSep       = 0x00004000,
-			NameSep         = 0x00008000,  // there can be only one! '\''
-			CharIdent       = 0x00010000,  // identifier (built-in function) or reference start
-			Ident           = 0x00020000,  // identifier or reference continuation
-			OdfLBracket     = 0x00040000,  // ODF '[' reference bracket
-			OdfRBracket     = 0x00080000,  // ODF ']' reference bracket
-			OdfLabelOp      = 0x00100000,  // ODF '!!' automatic intersection of labels
-			OdfNameMarker   = 0x00200000,  // ODF '$$' marker that starts a defined (range) name
-			CharName        = 0x00400000,  // start character of a defined name
-			Name            = 0x00800000,  // continuation character of a defined name
-			CharErrConst    = 0x01000000;  // start character of an error constant ('#')
+	var ssGetChar = 0,
+		ssGetBool = 1,
+		ssGetValue = 2,
+		ssGetString = 3,
+		ssSkipString = 4,
+		ssGetIdent = 5,
+		ssGetReference = 6,
+		ssSkipReference = 7,
+		ssGetErrorConstant = 8,
+		ssGetTableRefItem = 8,
+		ssGetTableRefColumn = 9,
+		ssStop = 10;
+	var eState;
+	var NONE            = 0x00000000,
+		Illegal         = 0x00000000,
+		Char            = 0x00000001,
+		CharBool        = 0x00000002,
+		CharWord        = 0x00000004,
+		CharValue       = 0x00000008,
+		CharString      = 0x00000010,
+		CharDontCare    = 0x00000020,
+		Bool            = 0x00000040,
+		Word            = 0x00000080,
+		WordSep         = 0x00000100,
+		Value           = 0x00000200,
+		ValueSep        = 0x00000400,
+		ValueExp        = 0x00000800,
+		ValueSign       = 0x00001000,
+		ValueValue      = 0x00002000,
+		StringSep       = 0x00004000,
+		NameSep         = 0x00008000,  // there can be only one! '\''
+		CharIdent       = 0x00010000,  // identifier (built-in function) or reference start
+		Ident           = 0x00020000,  // identifier or reference continuation
+		OdfLBracket     = 0x00040000,  // ODF '[' reference bracket
+		OdfRBracket     = 0x00080000,  // ODF ']' reference bracket
+		OdfLabelOp      = 0x00100000,  // ODF '!!' automatic intersection of labels
+		OdfNameMarker   = 0x00200000,  // ODF '$$' marker that starts a defined (range) name
+		CharName        = 0x00400000,  // start character of a defined name
+		Name            = 0x00800000,  // continuation character of a defined name
+		CharErrConst    = 0x01000000;  // start character of an error constant ('#')
 
 
-	parserFormula.prototype.NextSymbol = function( bInArray )
-	{
+	parserFormula.prototype.NextSymbol = function( bInArray ) {
 		/*cSymbol[MAXSTRLEN-1] = 0;       // end*/
 
 		var pSym = "";
@@ -7387,8 +7382,9 @@ function parserFormula( formula, parent, _ws ) {
 								}
 								bAddToSymbol = !(nRefInName & kDefName);
 							}
-						} else if ('#' === c && nRefInName === 0)
+						} else if ('#' === c && nRefInName === 0) {
 							nRefInName |= kRefErr;
+						}
 						else if (cSheetSep === c && !(nRefInName & kOpen)) {
 							// unquoted sheet name separator
 							nRefInName |= kPast;
@@ -7403,13 +7399,14 @@ function parserFormula( formula, parent, _ws ) {
 							// start unquoted name
 							nRefInName |= kName;
 						}
-					} else if (':' == c) {
+					} else if (':' === c) {
 						// range operator
 						nRefInName = 0;
 						++mnPredetectedReference;
 					}
-					if (bAddToSymbol && eState != ssSkipReference)
+					if (bAddToSymbol && eState !== ssSkipReference) {
 						pSym += c; /**pSym++ = c;*/    // everything is part of reference
+					}
 				}
 					break;
 				case ssStop:
@@ -7485,11 +7482,10 @@ function parserFormula( formula, parent, _ws ) {
 		}
 		else
 		{
-			//nSrcPos = pSrc - pStart;
+			nSrcPos = pSrc - pStart;
 			pSym = 0;
 		}
-		if (mnRangeOpPosInSymbol >= 0 && mnRangeOpPosInSymbol == (pSym-1) - cSymbol[0])
-		{
+		if (mnRangeOpPosInSymbol >= 0 && mnRangeOpPosInSymbol === (pSym - 1) - cSymbol[0]) {
 			// This is a trailing range operator, which is nonsense. Will be caught
 			// in next round.
 
@@ -7499,8 +7495,10 @@ function parserFormula( formula, parent, _ws ) {
 		}
 		/*if ( bAutoCorrect )
 			aCorrectedSymbol = cSymbol;*/
-		if (bAutoIntersection && nSpaces > 1)
+		if (bAutoIntersection && nSpaces > 1) {
 			--nSpaces;  // replace '!!' with only one space
+		}
+
 		return nSpaces;
 	};
 
@@ -7508,8 +7506,9 @@ function parserFormula( formula, parent, _ws ) {
 	parserFormula.prototype.generateParseSymbols = function() {
 		mpCharTable = [];
 
-		for (var i = 0; i < 128; i++)
+		for (var i = 0; i < 128; i++) {
 			mpCharTable[i] = Illegal;
+		}
 
 		/* tab */   mpCharTable[ 9] = CharDontCare | WordSep | ValueSep;
 		/* lf  */   mpCharTable[10] = CharDontCare | WordSep | ValueSep;
@@ -7534,8 +7533,9 @@ function parserFormula( formula, parent, _ws ) {
 		/* . */     mpCharTable[46] = Word | CharValue | Value | Ident | Name;
 		/* / */     mpCharTable[47] = Char | WordSep | ValueSep;
 
-		for (i = 48; i < 58; i++)
+		for (i = 48; i < 58; i++) {
 			/* 0-9 */       mpCharTable[i] = CharValue | Word | Value | ValueExp | ValueValue | Ident | Name;
+		}
 
 		/* : */     mpCharTable[58] = Char | Word;
 		/* ; */     mpCharTable[59] = Char | WordSep | ValueSep;
@@ -7545,31 +7545,30 @@ function parserFormula( formula, parent, _ws ) {
 		/* ? */     mpCharTable[63] = CharWord | Word | Name;
 		/* @ */     // FREE
 
-		for (i = 65; i < 91; i++)
+		for (i = 65; i < 91; i++) {
 			/* A-Z */   mpCharTable[i] = CharWord | Word | CharIdent | Ident | CharName | Name;
-
+		}
 
 
 		/* ^ */     mpCharTable[94] = Char | WordSep | ValueSep;
 		/* _ */     mpCharTable[95] = CharWord | Word | CharIdent | Ident | CharName | Name;
 		/* ` */     // FREE
 
-		for (i = 97; i < 123; i++)
+		for (i = 97; i < 123; i++) {
 			/* a-z */       mpCharTable[i] = CharWord | Word | CharIdent | Ident | CharName | Name;
+		}
 
 		/* { */     mpCharTable[123] = Char | WordSep | ValueSep; // array open
 		/* | */     mpCharTable[124] = Char | WordSep | ValueSep; // array row sep (Should be OOo specific)
 		/* } */     mpCharTable[125] = Char | WordSep | ValueSep; // array close
 		/* ~ */     mpCharTable[126] = Char;        // OOo specific
 		/* 127 */   // FREE
-
-
 	};
 
 	parserFormula.prototype.getCharTableFlags = function(c, cLast)
 	{
 		var nFlags = mpCharTable[c.charCodeAt()];
-		if (c == '-' && cLast == '[')
+		if (c === '-' && cLast === '[')
 			nFlags |= Ident;
 		return nFlags;
 	};
