@@ -52,7 +52,7 @@ function (window, undefined) {
 
   var c_oAscError = Asc.c_oAscError;
 
-  var c_bIsNewFormulaParser = true;
+  var c_bIsNewFormulaParser = false;
 
 	var TOK_TYPE_OPERAND = 1;
 	var TOK_TYPE_FUNCTION = 2;
