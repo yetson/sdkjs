@@ -6500,11 +6500,11 @@ function parserFormula( formula, parent, _ws ) {
 				default:
 					break;
 			}
-			if (!(eLastOp == ocOpen && eOp == ocClose) &&
-				(eLastOp == ocOpen || eLastOp == ocSep || eLastOp == ocArrayRowSep || eLastOp == ocArrayColSep ||
-				eLastOp == ocArrayOpen) &&
-				(eOp == ocSep || eOp == ocClose || eOp == ocArrayRowSep || eOp == ocArrayColSep ||
-				eOp == ocArrayClose)) {
+			if (!(eLastOp === ocOpen && eOp === ocClose) &&
+				(eLastOp === ocOpen || eLastOp === ocSep || eLastOp === ocArrayRowSep || eLastOp === ocArrayColSep ||
+				eLastOp === ocArrayOpen) &&
+				(eOp === ocSep || eOp === ocClose || eOp === ocArrayRowSep || eOp === ocArrayColSep ||
+				eOp === ocArrayClose)) {
 				// TODO: should we check for known functions with optional empty
 				// args so the correction dialog can do better?
 				/*if ( !static_cast<ScTokenArray*>(pArr)->Add( new FormulaMissingToken ) )
@@ -7072,7 +7072,7 @@ function parserFormula( formula, parent, _ws ) {
                         }
                         else*/
 						pSym += c;//*pSym++ = c;
-					} else if (c == '#' && lcl_isUnicodeIgnoreAscii(pSrc, "REF!", 4)) {
+					} else if (c === '#' && lcl_isUnicodeIgnoreAscii(pSrc, "REF!", 4)) {
 						// Completely ugly means to catch broken
 						// [$]#REF!.[$]#REF![$]#REF! (one or multiple parts)
 						// references that were written in ODF named ranges
@@ -7128,10 +7128,10 @@ function parserFormula( formula, parent, _ws ) {
 				}
 					break;
 				case ssGetValue : {
-					if (pSym == cSymbol[MAXSTRLEN - 1]) {
+					if (pSym === cSymbol[MAXSTRLEN - 1]) {
 						//SetError(FormulaError::StringOverflow);
 						eState = ssStop;
-					} else if (c == cDecSep) {
+					} else if (c === cDecSep) {
 						if (++nDecSeps > 1) {
 							// reparse with i18n, may be numeric sheet name as well
 							bi18n = true;
@@ -7250,7 +7250,7 @@ function parserFormula( formula, parent, _ws ) {
 				case ssGetTableRefColumn: {
 					// Scan whatever up to the next unescaped ']' closer.
 					if (c !== ']' || cLast === '\'') {
-						if (pSym == cSymbol[MAXSTRLEN - 1]) {
+						if (pSym === cSymbol[MAXSTRLEN - 1]) {
 							//SetError( FormulaError::StringOverflow);
 							eState = ssStop;
 						} else
@@ -7323,7 +7323,7 @@ function parserFormula( formula, parent, _ws ) {
 						// eat it, no sheet name [.A1]
 						bAddToSymbol = false;
 						nRefInName |= kPast;
-						if ('$' == pSrc[0] && '$' == pSrc[1]) {
+						if ('$' === pSrc[0] && '$' === pSrc[1]) {
 							nRefInName |= kMarkAhead;
 						}
 					} else if (!(nRefInName & kPast) || (nRefInName & (kMarkAhead | kDefName))) {
@@ -7343,7 +7343,7 @@ function parserFormula( formula, parent, _ws ) {
 							} else {
 								// ScAddress::Parse() will recognize this as
 								// invalid later.
-								if (eState != ssSkipReference) {
+								if (eState !== ssSkipReference) {
 									pSym += c;
 									/**pSym++ = c;
 									 *pSym++ = *pSrc++;*/
@@ -7390,7 +7390,7 @@ function parserFormula( formula, parent, _ws ) {
 							nRefInName |= kPast;
 							if ('$' === pSrc[0] && '$' === pSrc[1])
 								nRefInName |= kMarkAhead;
-						} else if (':' == c && !(nRefInName & kOpen)) {
+						} else if (':' === c && !(nRefInName & kOpen)) {
 							/*OSL_FAIL("ScCompiler::NextSymbol: reference: "
                             "range operator ':' without prior sheet name separator '.' violates ODF spec");*/
 							nRefInName = 0;
