@@ -5343,7 +5343,7 @@ function parserFormula( formula, parent, _ws ) {
 		this.isInDependencies = false;
 	};
 
-	parserFormula.prototype.parse2 = function (local, digitDelim, parseResult, ignoreErrors, renameSheetMap) {
+	parserFormula.prototype.parse = function (local, digitDelim, parseResult, ignoreErrors, renameSheetMap) {
 		var elemArr = [];
 		var ph = {operand_str: null, pCurrPos: 0};
 		var needAssemble = false;
@@ -6366,7 +6366,7 @@ function parserFormula( formula, parent, _ws ) {
 	//global
 	var eLastOp = ocOpen;
 
-	parserFormula.prototype.parse = function ( rFormula ) {
+	parserFormula.prototype.parse2 = function ( rFormula ) {
 		/*var ScTokenArray aArr;
 		 var pArr = &aArr;*/
 		rFormula = this.Formula;
