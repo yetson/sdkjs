@@ -1842,24 +1842,32 @@
 			return ret;
 		}
 
-		function getEndValueRange(dx, start, v1, v2) {
+		function getEndValueRange(dx, v1, v2, coord1, coord2) {
 			var x1, x2;
 			if (0 !== dx) {
-				if (start === v1) {
-					x1 = v1;
-					x2 = v2;
-				} else if (start === v2) {
-					x1 = v2;
-					x2 = v1;
-				} else {
-					if (0 > dx) {
+				 if (coord1 > v1 && coord2 < v2) {
+						if (0 > dx) {
+							x1 = v1;
+							x2 = v2;
+						} else {
+							x1 = v2;
+							x2 = v1;
+						}
+					} else if (coord1 === v1 && coord2 === v2) {
+					 if (0 > dx) {
+						 x1 = v2;
+						 x2 = v1;
+					 } else {
+						 x1 = v1;
+						 x2 = v2;
+					 }
+				 } else if (coord1 > v1 && coord2 === v2) {
 						x1 = v2;
 						x2 = v1;
-					} else {
+					} else if (coord1 === v1 && coord2 < v2) {
 						x1 = v1;
 						x2 = v2;
 					}
-				}
 			} else {
 				x1 = v1;
 				x2 = v2;
