@@ -1179,6 +1179,8 @@
                       new asc_Range(arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length -
                       1])];
                 functionAction = function () {
+                    arCopy.r2 = arCopy.r1 === 0 && arCopy.r2 === gc_nMaxRow0 ? activeCell.row : arCopy.r2;
+                    arCopy.c2 = arCopy.c1 === 0 && arCopy.c2 === gc_nMaxCol0 ? activeCell.col : arCopy.c2;
                     // Пройдемся по последней строке
                     for (i = 0; i < hasNumber.arrCols.length; ++i) {
                         c = hasNumber.arrCols[i];
@@ -1208,6 +1210,7 @@
                   new asc_Range(arCopy.c2, hasNumber.arrRows[0], arCopy.c2, hasNumber.arrRows[hasNumber.arrRows.length -
                   1]);
                 functionAction = function () {
+                    arCopy.c2 = arCopy.c1 === 0 && arCopy.c2 === gc_nMaxCol0 ? activeCell.col : arCopy.c2;
                     // Пройдемся по последнему столбцу
                     for (i = 0; i < hasNumber.arrRows.length; ++i) {
                         r = hasNumber.arrRows[i];
@@ -1223,6 +1226,7 @@
                   new asc_Range(hasNumber.arrCols[0], arCopy.r2, hasNumber.arrCols[hasNumber.arrCols.length -
                   1], arCopy.r2);
                 functionAction = function () {
+                     arCopy.r2 = arCopy.r1 === 0 && arCopy.r2 === gc_nMaxRow0 ? activeCell.row : arCopy.r2;
                     // Пройдемся по последней строке
                     for (i = 0; i < hasNumber.arrCols.length; ++i) {
                         c = hasNumber.arrCols[i];
@@ -1238,6 +1242,8 @@
                     changedRange = new asc_Range(arCopy.c2, arCopy.r2, arCopy.c2, arCopy.r2);
                     functionAction = function () {
                         // Одна строка или только в последней строке есть значения...
+                        arCopy.r2 = arCopy.r1 === 0 && arCopy.r2 === gc_nMaxRow0 ? activeCell.row : arCopy.r2;
+                        arCopy.c2 = arCopy.c1 === 0 && arCopy.c2 === gc_nMaxCol0 ? activeCell.col : arCopy.c2;
                         cell = t._getVisibleCell(arCopy.c2, arCopy.r2);
                         // ToDo вводить в первое свободное место, а не сразу за диапазоном
                         text = (new asc_Range(arCopy.c1, arCopy.r2, arCopy.c2 - 1, arCopy.r2)).getName();
@@ -1252,6 +1258,7 @@
                         // Иначе вводим в строку вниз
                         for (i = 0; i < hasNumber.arrCols.length; ++i) {
                             c = hasNumber.arrCols[i];
+                            arCopy.c2 = arCopy.c1 === 0 && arCopy.c2 === gc_nMaxCol0 ? activeCell.col : arCopy.c2;
                             cell = t._getVisibleCell(c, arCopy.r2);
                             // ToDo вводить в первое свободное место, а не сразу за диапазоном
                             text = (new asc_Range(c, arCopy.r1, c, arCopy.r2 - 1)).getName();
