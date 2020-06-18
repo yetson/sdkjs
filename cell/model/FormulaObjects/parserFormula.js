@@ -5162,6 +5162,7 @@ _func[cElementType.cell3D] = _func[cElementType.cell];
 		this.argPosArr = [];
 		this.activeFunction = null;
 		this.cursorPos = undefined;
+		this.functions = [];
 	}
 
 	ParseResult.prototype.addRefPos = function(start, end, index, oper, isName) {
@@ -5238,6 +5239,36 @@ _func[cElementType.cell3D] = _func[cElementType.cell];
 				curPos++;
 			}*/
 		}
+		return null;
+	};
+
+	ParseResult.prototype.getFunction = function(start, end, onStartFunc, needCalcArg) {
+		if (this.functions && this.functions.length) {
+			if (end === undefined) {
+				end = start;
+			}
+			var func, i, arg;
+			for (i = this.functions.length - 1; i >= 0; i--) {
+				if (this.functions[i]) {
+					var _startFunc = onStartFunc ? this.functions[i].start : this.functions[i].args[0].start;
+					var _endFunc = this.functions[i].args[this.functions[i].args.length - 1].end;
+					if (start >= _startFunc && end <= _endFunc) {
+						func = this.functions[i];
+						break;
+					}
+				}
+			}
+			if (needCalcArg && func) {
+				for (i = 0; i < func.args.length; i++) {
+					if (end >= func.args[i].start && end <= func.args[i].end) {
+						arg = i;
+					}
+				}
+			}
+
+			return func ? {func: func, arg: arg} : null;
+		}
+
 		return null;
 	};
 
