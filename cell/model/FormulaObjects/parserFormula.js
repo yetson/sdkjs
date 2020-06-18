@@ -5796,6 +5796,7 @@ function parserFormula( formula, parent, _ws ) {
 		//если activePos - undefined - ищем первую функцию
 		var needCalcArgPos = ignoreErrors;
 		var activePos = parseResult.cursorPos;
+		var activePosEnd = parseResult.cursorPosEnd;
 		var needAddCursorPos = activePos === undefined;
 		var needFuncLevel = 0;
 		var currentFuncLevel = -1;
@@ -5995,10 +5996,15 @@ function parserFormula( formula, parent, _ws ) {
 						needFuncLevel--;
 					}
 					if (!parseResult.activeFunction && levelFuncMap[currentFuncLevel] && levelFuncMap[currentFuncLevel].startPos <= activePos && activePos <= ph.pCurrPos) {
-						parseResult.activeFunction = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos};
+						parseResult.activeFunction = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos, level: currentFuncLevel};
 						parseResult.argPosArr = argPosArrMap[currentFuncLevel];
 					}
+					if (!parseResult.activeFunctionEnd && activePosEnd !== undefined && levelFuncMap[currentFuncLevel] && levelFuncMap[currentFuncLevel].startPos <= activePosEnd && activePosEnd <= ph.pCurrPos) {
+						parseResult.activeFunctionEnd = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos, level: currentFuncLevel};
+						parseResult.argPosArrEnd = argPosArrMap[currentFuncLevel];
+					}
 				}
+
 				var _argPos = argPosArrMap[currentFuncLevel];
 				if (_argPos && _argPos[_argPos.length - 1] && undefined === _argPos[_argPos.length - 1].end) {
 					_argPos[_argPos.length - 1].end = ph.pCurrPos;
@@ -6426,8 +6432,12 @@ function parserFormula( formula, parent, _ws ) {
 				}
 
 				if (!parseResult.activeFunction && levelFuncMap[currentFuncLevel] && levelFuncMap[currentFuncLevel].startPos <= activePos && activePos <= ph.pCurrPos + 1) {
-					parseResult.activeFunction = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos + 1};
+					parseResult.activeFunction = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos + 1, level: currentFuncLevel};
 					parseResult.argPosArr = argPosArrMap[currentFuncLevel];
+				}
+				if (!parseResult.activeFunctionEnd && activePosEnd !== undefined && levelFuncMap[currentFuncLevel] && levelFuncMap[currentFuncLevel].startPos <= activePosEnd && activePosEnd <= ph.pCurrPos) {
+					parseResult.activeFunctionEnd = {func: levelFuncMap[currentFuncLevel].func, start: levelFuncMap[currentFuncLevel].startPos, end: ph.pCurrPos, level: currentFuncLevel};
+					parseResult.argPosArrEnd = argPosArrMap[currentFuncLevel];
 				}
 				if (undefined === parseResult.activeArgumentPos && argFuncMap[currentFuncLevel] && argFuncMap[currentFuncLevel].startPos <= activePos && activePos <= ph.pCurrPos + 1) {
 					parseResult.activeArgumentPos = argFuncMap[currentFuncLevel].count;
