@@ -5805,6 +5805,8 @@ function parserFormula( formula, parent, _ws ) {
 		var argPosArrMap = [];
 		var startArrayArg = null;
 
+		parseResult.functions = [];
+
 		var t = this;
 		var parseOperators = function(){
 			wasLeftParentheses = false;
@@ -6009,6 +6011,12 @@ function parserFormula( formula, parent, _ws ) {
 				if (_argPos && _argPos[_argPos.length - 1] && undefined === _argPos[_argPos.length - 1].end) {
 					_argPos[_argPos.length - 1].end = ph.pCurrPos;
 				}
+
+				if (!parseResult.functions[currentFuncLevel]) {
+					parseResult.functions[currentFuncLevel] = [];
+				}
+				parseResult.functions[currentFuncLevel].push({func: levelFuncMap[currentFuncLevel],args: _argPos});
+
 				currentFuncLevel--;
 			}
 
@@ -6446,6 +6454,11 @@ function parserFormula( formula, parent, _ws ) {
 				if (_argPos && _argPos[_argPos.length - 1] && undefined === _argPos[_argPos.length - 1].end) {
 					_argPos[_argPos.length - 1].end = ph.pCurrPos;
 				}
+
+				if (!parseResult.functions[currentFuncLevel]) {
+					parseResult.functions[currentFuncLevel] = [];
+				}
+				parseResult.functions[currentFuncLevel].push({func: levelFuncMap[currentFuncLevel],args: _argPos});
 			}
 		};
 
