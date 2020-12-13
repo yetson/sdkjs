@@ -37,8 +37,41 @@
  */
 	function(window, undefined) {
 		function openApp(protocol, params, onSuccess, onError)
-		{
+		{	
+			let uri = `${protocol}:${params}`;
+			
+			//ie11 on win10 - WORK
+			//specific to Internet Explorer >= 10, and Microsoft Edge versions 18 and lower on win8 or win10 
+			/*if ((ie >= 10 or ms_edge <= 18) and (win8 or win10)) {
+				window.navigator.msLaunchUri(uri, onSuccess, onError);
+			}*/
 
+			//firefox63 on win10 - WORK
+			//presumably works on firefox <= 63
+			/*if (firefox <= 63) {
+				let iframe = document.createElement("iframe"); 
+				iframe.src = "about:blank"; 
+				iframe.id = "hiddenIframe"; 
+				iframe.style.display = "none"; 
+				document.body.appendChild(iframe); 
+				try { 
+					iframe.contentWindow.location.href = uri; 
+					onSuccess(); 
+				} catch (e) { 
+					if (e.name == "NS_ERROR_UNKNOWN_PROTOCOL") { 
+						onError(); 
+					} else { 
+						onSuccess(); 
+					} 
+				}	
+			}*/
+			
+			//todo opera
+			//todo chrome
+			//todo firefox 64+
+			//todo ms_edge > 18
+			//todo ie9-
+			
 		}
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
