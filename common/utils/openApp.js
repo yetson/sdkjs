@@ -48,6 +48,7 @@
 
 			//firefox63 on win10 - WORK
 			//presumably works on firefox <= 63
+			//https://github.com/ismailhabib/custom-protocol-detection/issues/37
 			/*if (firefox <= 63) {
 				let iframe = document.createElement("iframe"); 
 				iframe.src = "about:blank"; 
@@ -65,10 +66,31 @@
 					} 
 				}	
 			}*/
+
+			//chrome84 on win10 - WORK	
+			//presumably works on chrome before version 85
+			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
+			/*if (chrome < 85) {
+				let isSupported = false;
+				window.focus();
+				window.onblur = function(){
+					isSupported = true;
+				};
+				location.href = uri;
+				setTimeout(function(){
+					window.onblur = null;
+					if (isSupported) {
+						onSuccess();
+					} 
+					else {
+						onError();
+					}
+				}, 300);
+			}*/
 			
 			//todo opera
-			//todo chrome
-			//todo firefox 64+
+			//todo chrome >= 85
+			//todo firefox >= 64
 			//todo ms_edge > 18
 			//todo ie9-
 			
