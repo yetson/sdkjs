@@ -48,7 +48,6 @@
 
 			//firefox63 on win10 - WORK
 			//presumably works on firefox <= 63
-			//https://github.com/ismailhabib/custom-protocol-detection/issues/37
 			/*if (firefox <= 63) {
 				let iframe = document.createElement("iframe"); 
 				iframe.src = "about:blank"; 
@@ -69,15 +68,14 @@
 
 			//chrome84 on win10 - WORK	
 			//presumably works on chrome before version 85
-			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
 			/*if (chrome < 85) {
 				let isSupported = false;
 				window.focus();
-				window.onblur = function(){
+				window.onblur = function() {
 					isSupported = true;
 				};
 				location.href = uri;
-				setTimeout(function(){
+				setTimeout(function() {
 					window.onblur = null;
 					if (isSupported) {
 						onSuccess();
@@ -88,12 +86,102 @@
 				}, 300);
 			}*/
 			
-			//todo opera
+			//firefox >= 64 - IT WORKS, BUT SOMETHIMES (BOTH CASES)
+			//CASE 1:	presumably the same as chrome before version 85 (works every other time)
+			//CASE 2:	https://github.com/ismailhabib/custom-protocol-detection/issues/37
+			//works every other time, as in case 1, don't know, why
+			/*if (!iframe) {
+                let iframe = document.createElement("iframe"); 
+				iframe.src = "about:blank"; 
+				iframe.id = "hiddenIframe"; 
+				iframe.style.display = "none"; 
+				document.body.appendChild(iframe);
+            }
+            try {
+                iframe.contentWindow.location.href = uri;
+                setTimeout(function () {
+                    try {
+                        if (iframe.contentWindow.location.protocol === "about:") {
+                            onSuccess();
+                        } else {
+                            onError();
+                        }
+                    } catch (e) {
+                        if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
+                            onError();
+                        }
+                    }
+                }, 500);
+            } catch (e) {
+                if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
+                    onError();
+                }
+			}*/
+			 
+			//ie < 10 and win < 8 - DID NOT CHECK (3 CASES)
+			/*let aElem = document.createElement("a"); 
+			aElem.href = "#"; 
+			aElem.id = "hiddenLink"; 
+			aElem.style.display = "none"; 
+			document.body.appendChild(aElem);
+			let isSupported = false;
+			let aLink = $('#hiddenLink')[0];
+        	aLink.href = uri;*/
+			//CASE 1
+			/*if (navigator.appName=="Microsoft Internet Explorer" && aLink.protocolLong=="Unknown Protocol") {
+				onError();
+			}*/
+			//CASE 2
+			/*var myWindow = window.open('', '', 'width=0,height=0');
+			myWindow.document.write("<iframe src='" + uri + "'></iframe>");
+			setTimeout(function () {
+				try {
+					myWindow.location.href;
+					myWindow.setTimeout("window.close()", 1000);
+					onSuccess();
+				} catch (e) {
+					myWindow.close();
+					onError();
+				}
+			}, 1000);*/
+			//CASE 3 - IE10 In Windows 7 (perhaps)
+			/*var timeout = setTimeout(failCb, 1000);
+			window.addEventListener("blur", function () {
+				clearTimeout(timeout);
+				onSuccess();
+			});
+			let iframe = document.createElement("iframe"); 
+				iframe.src = "about:blank"; 
+				iframe.id = "hiddenIframe"; 
+				iframe.style.display = "none"; 
+				document.body.appendChild(iframe);
+			try {
+				iframe.contentWindow.location.href = uri;
+			} catch (e) {
+				onError();
+				clearTimeout(timeout);
+			}*/
+
+			//safari - DID NOT CHECK
+			//https://stackoverflow.com/questions/836777/how-to-detect-browsers-protocol-handlers
+			/*window.postMessage("myappinstalled", window.location.origin);
+			window.addEventListener('message', function (msg) {
+				if (msg.data === "myappinstalled") {
+					myappinstalledflag = true;
+				}
+			}, false);
+			if (myappinstalledflag) {
+				location.href = uri;
+				onSuccess();
+			} else {
+				onError();
+			}*/
+
 			//todo chrome >= 85
-			//todo firefox >= 64
-			//todo ms_edge > 18
-			//todo ie9-
-			
+			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
+
+			//todo opera and ms_edge > 18
+			//presumably the same as chrome after version 85 (because the same chromium engine)
 		}
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
