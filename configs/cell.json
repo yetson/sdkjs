@@ -99,6 +99,7 @@
 			"common/openxml.js",
 
 			"common/intervalTree.js",
+			"common/utils/openApp.js",
 
 			"cell/document/empty.js",
 			"cell/model/UndoRedo.js",

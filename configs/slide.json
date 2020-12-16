@@ -95,6 +95,7 @@
 
 			"common/wordcopypaste.js",
 			"common/intervalTree.js",
+			"common/utils/openApp.js",
 
 			"cell/utils/utils.js",
 			"cell/model/WorkbookElems.js",
