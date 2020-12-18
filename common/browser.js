@@ -80,6 +80,18 @@ AscBrowser.isIE10 =  (AscBrowser.userAgent.indexOf("msie10") > -1 || AscBrowser.
 // macOs detect
 AscBrowser.isMacOs = (AscBrowser.userAgent.indexOf('mac') > -1);
 
+//windows version detect
+var windowsFirstIndexInUserAgent = AscBrowser.userAgent.indexOf('windows');
+if (windowsFirstIndexInUserAgent > -1) {
+    var versionCodeFirstIndexInUserAgent = windowsFirstIndexInUserAgent + 11;
+    var userAgentLength = AscBrowser.userAgent.length;
+    var windowsSubstringInUserAgent = AscBrowser.userAgent.slice(versionCodeFirstIndexInUserAgent, userAgentLength);
+    var windowsCodeString = windowsSubstringInUserAgent.slice(0, windowsSubstringInUserAgent.indexOf(';'));
+    AscBrowser.windowsVersionCode = parseFloat(windowsCodeString);
+} else {
+    AscBrowser.windowsVersionCode = "None";
+}
+
 // chrome detect
 AscBrowser.isChrome = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("chrome") > -1);
 if (AscBrowser.isChrome)
@@ -138,6 +150,17 @@ AscBrowser.isWebkit = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("webkit"
 AscBrowser.isArm = (AscBrowser.userAgent.indexOf("arm") > -1);
 
 AscBrowser.isMozilla = !AscBrowser.isIE && (AscBrowser.userAgent.indexOf("firefox") > -1);
+
+//firefox version detect
+var firefoxFirstIndexInUserAgent = AscBrowser.userAgent.indexOf('firefox');
+if (AscBrowser.isMozilla) {
+    var versionFirstIndexInUserAgent = firefoxFirstIndexInUserAgent + 8;
+    var userAgentLength = AscBrowser.userAgent.length;
+    var firefoxVersionStringInUserAgent = AscBrowser.userAgent.slice(versionFirstIndexInUserAgent, userAgentLength);
+    AscBrowser.mozillaVersion = parseFloat(firefoxVersionStringInUserAgent);
+} else {
+    AscBrowser.mozillaVersion = "None";
+}
 
 AscBrowser.isLinuxOS = (AscBrowser.userAgent.indexOf(" linux ") > -1);
 

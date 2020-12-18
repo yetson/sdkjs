@@ -38,18 +38,31 @@
 	function(window, undefined) {
 		function openApp(protocol, params, onSuccess, onError)
 		{	
-			let uri = `${protocol}:${params}`;
-			
-			//ie11 on win10 - WORK
-			//specific to Internet Explorer >= 10, and Microsoft Edge versions 18 and lower on win8 or win10 
-			/*if ((ie >= 10 or ms_edge <= 18) and (win8 or win10)) {
-				window.navigator.msLaunchUri(uri, onSuccess, onError);
-			}*/
+			var uri = protocol + ':' + params;
 
-			//firefox63 on win10 - WORK
-			//presumably works on firefox <= 63
-			/*if (firefox <= 63) {
-				let iframe = document.createElement("iframe"); 
+			//will be needed later
+			//var isIE9 = AscCommon.AscBrowser.isIE9;
+			//var isIeEdge = AscCommon.AscBrowser.isIeEdge;
+
+			var isIESince10 = (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isIE10);
+			var isIE10OnWindows7 = (AscCommon.AscBrowser.isIE10 && AscCommon.AscBrowser.windowsVersionCode == 6.1);
+			var isMozillaBefore64 = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.mozillaVersion < 64);
+			var isMozillaSince64 = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.mozillaVersion >= 64);
+			var isChromeBefore85 = (AscCommon.AscBrowser.isChrome &&  AscCommon.AscBrowser.chromeVersion < 85);
+			var isChromeSince85 = (AscCommon.AscBrowser.isChrome && AscCommon.AscBrowser.chromeVersion >= 85);
+			var isWindowsSince8 = (AscCommon.AscBrowser.windowsVersionCode >= 6.2);
+
+			//ie11 on win10 - WORK (!)
+			//ms_edge < 19 - DID NOT CHECK
+			//specific to Internet Explorer >= 10, and Microsoft Edge versions 18 and lower on win8 or win10 
+			if ((isIESince10 /*|| ms_edge < 19*/) && (isWindowsSince8)) {
+				window.navigator.msLaunchUri(uri, onSuccess, onError);
+			}
+
+			//firefox63 on win10 - WORK (!)
+			//presumably works on firefox < 64
+			if (isMozillaBefore64) {
+				var iframe = document.createElement("iframe"); 
 				iframe.src = "about:blank"; 
 				iframe.id = "hiddenIframe"; 
 				iframe.style.display = "none"; 
@@ -64,12 +77,45 @@
 						onSuccess(); 
 					} 
 				}	
-			}*/
+			}
 
-			//chrome84 on win10 - WORK	
-			//presumably works on chrome before version 85
-			/*if (chrome < 85) {
-				let isSupported = false;
+			//firefox72 and firefox84 on win10 - WORK (!)
+			//presumably works on firefox >= 64 
+			//https://github.com/ismailhabib/custom-protocol-detection/issues/37
+			if (isMozillaSince64) {		
+				if (!iframe) {
+					var iframe = document.createElement("iframe"); 
+					iframe.src = "about:blank"; 
+					iframe.id = "hiddenIframe"; 
+					iframe.style.display = "none"; 
+					document.body.appendChild(iframe);
+				}
+				try {
+					iframe.contentWindow.location.href = uri;
+					setTimeout(function () {
+						try {
+							if (iframe.contentWindow.location.protocol === "about:") {
+								onSuccess();
+							} else {
+								onError();
+							}
+						} catch (e) {
+							if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
+								onError();
+							}
+						}
+					}, 500);
+				} catch (e) {
+					if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
+						onError();
+					}
+				}
+			}			
+
+			//chrome84 on win10 - WORK (!)
+			//presumably works on chrome < 85
+			if (isChromeBefore85) {
+				var isSupported = false;
 				window.focus();
 				window.onblur = function() {
 					isSupported = true;
@@ -84,48 +130,22 @@
 						onError();
 					}
 				}, 300);
-			}*/
+			}
 			
-			//firefox >= 64 - IT WORKS, BUT SOMETHIMES (BOTH CASES)
-			//CASE 1:	presumably the same as chrome before version 85 (works every other time)
-			//CASE 2:	https://github.com/ismailhabib/custom-protocol-detection/issues/37
-			//works every other time, as in case 1, don't know, why
-			/*if (!iframe) {
-                let iframe = document.createElement("iframe"); 
-				iframe.src = "about:blank"; 
-				iframe.id = "hiddenIframe"; 
-				iframe.style.display = "none"; 
-				document.body.appendChild(iframe);
-            }
-            try {
-                iframe.contentWindow.location.href = uri;
-                setTimeout(function () {
-                    try {
-                        if (iframe.contentWindow.location.protocol === "about:") {
-                            onSuccess();
-                        } else {
-                            onError();
-                        }
-                    } catch (e) {
-                        if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
-                            onError();
-                        }
-                    }
-                }, 500);
-            } catch (e) {
-                if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
-                    onError();
-                }
+			//todo chrome >= 85 (!) 
+			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
+			/*if (isChromeSince85) {
+				//todo something
 			}*/
 			 
-			//ie < 10 and win < 8 - DID NOT CHECK (3 CASES)
-			/*let aElem = document.createElement("a"); 
+			//ie on win < 8 - DID NOT CHECK (3 CASES) (!)
+			/*var aElem = document.createElement("a"); 
 			aElem.href = "#"; 
 			aElem.id = "hiddenLink"; 
 			aElem.style.display = "none"; 
 			document.body.appendChild(aElem);
-			let isSupported = false;
-			let aLink = $('#hiddenLink')[0];
+			var isSupported = false;
+			var aLink = $('#hiddenLink')[0];
         	aLink.href = uri;*/
 			//CASE 1
 			/*if (navigator.appName=="Microsoft Internet Explorer" && aLink.protocolLong=="Unknown Protocol") {
@@ -144,44 +164,42 @@
 					onError();
 				}
 			}, 1000);*/
-			//CASE 3 - IE10 In Windows 7 (perhaps)
-			/*var timeout = setTimeout(failCb, 1000);
-			window.addEventListener("blur", function () {
-				clearTimeout(timeout);
-				onSuccess();
-			});
-			let iframe = document.createElement("iframe"); 
-				iframe.src = "about:blank"; 
-				iframe.id = "hiddenIframe"; 
-				iframe.style.display = "none"; 
-				document.body.appendChild(iframe);
-			try {
-				iframe.contentWindow.location.href = uri;
-			} catch (e) {
-				onError();
-				clearTimeout(timeout);
-			}*/
-
-			//safari - DID NOT CHECK
-			//https://stackoverflow.com/questions/836777/how-to-detect-browsers-protocol-handlers
-			/*window.postMessage("myappinstalled", window.location.origin);
-			window.addEventListener('message', function (msg) {
-				if (msg.data === "myappinstalled") {
-					myappinstalledflag = true;
+			//CASE 3 - IE10 In Windows 7 DID NOT CHECK (!)
+			/*if (isIE10OnWindows7) {
+				var timeout = setTimeout(onError, 1000);
+				window.addEventListener("blur", function () {
+					clearTimeout(timeout);
+					onSuccess();
+				});
+				var iframe = document.createElement("iframe"); 
+					iframe.src = "about:blank"; 
+					iframe.id = "hiddenIframe"; 
+					iframe.style.display = "none"; 
+					document.body.appendChild(iframe);
+				try {
+					iframe.contentWindow.location.href = uri;
+				} catch (e) {
+					onError();
+					clearTimeout(timeout);
 				}
-			}, false);
-			if (myappinstalledflag) {
-				location.href = uri;
-				onSuccess();
-			} else {
-				onError();
 			}*/
-
-			//todo chrome >= 85
-			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
-
-			//todo opera and ms_edge > 18
-			//presumably the same as chrome after version 85 (because the same chromium engine)
+			
+			//safari - DID NOT CHECK (!)
+			//https://stackoverflow.com/questions/836777/how-to-detect-browsers-protocol-handlers
+			/*if (AscCommon.AscBrowser.isSafari) {
+				window.postMessage("myappinstalled", window.location.origin);
+				window.addEventListener('message', function (msg) {
+					if (msg.data === "myappinstalled") {
+						myappinstalledflag = true;
+					}
+				}, false);
+				if (myappinstalledflag) {
+					location.href = uri;
+					onSuccess();
+				} else {
+					onError();
+				}
+			}*/
 		}
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
