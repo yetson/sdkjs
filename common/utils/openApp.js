@@ -36,32 +36,98 @@
  * @param {undefined} undefined
  */
 	function(window, undefined) {
-		function openApp(protocol, params, onSuccess, onError)
+		function openApp(protocol, params, onSuccess, onError, timeoutMs=1000)
 		{	
 			var uri = protocol + ':' + params;
-
-			//will be needed later
-			//var isIE9 = AscCommon.AscBrowser.isIE9;
-			//var isIeEdge = AscCommon.AscBrowser.isIeEdge;
-
-			var isIESince10 = (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isIE10);
+			
+			var isIeEdge = AscCommon.AscBrowser.isIeEdge;
+			var isIE9 = AscCommon.AscBrowser.isIE9;
 			var isIE10OnWindows7 = (AscCommon.AscBrowser.isIE10 && AscCommon.AscBrowser.windowsVersionCode == 6.1);
+			var isIESince10 = (AscCommon.AscBrowser.isIE || AscCommon.AscBrowser.isIE10);
 			var isMozillaBefore64 = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.mozillaVersion < 64);
 			var isMozillaSince64 = (AscCommon.AscBrowser.isMozilla && AscCommon.AscBrowser.mozillaVersion >= 64);
 			var isChromeBefore85 = (AscCommon.AscBrowser.isChrome &&  AscCommon.AscBrowser.chromeVersion < 85);
 			var isChromeSince85 = (AscCommon.AscBrowser.isChrome && AscCommon.AscBrowser.chromeVersion >= 85);
+			var isWindowsBefore8 = (AscCommon.AscBrowser.windowsVersionCode < 6.2);
 			var isWindowsSince8 = (AscCommon.AscBrowser.windowsVersionCode >= 6.2);
+
+			var isBrowserSupported = false;
+			
+			function createIframe(target, uri) {
+				var iframe = target.createElement("iframe"); 
+				iframe.src = uri; 
+				iframe.id = "hiddenIframe"; 
+				iframe.style.display = "none"; 
+				target.body.appendChild(iframe);
+				return iframe;
+			}
+
+			function unsupportedCb() {
+				console.log("Browser is not supported");
+			}
+
+			//ie on win < 8 - DID NOT CHECK (2 CASES) (!)
+			if (isWindowsBefore8 && (isIE9 || isIeEdge || isIESince10)) {
+				isBrowserSupported = true;
+				//CASE 1
+				var aElem = document.createElement("a"); 
+				aElem.href = "#"; 
+				aElem.id = "hiddenLink"; 
+				aElem.style.display = "none"; 
+				document.body.appendChild(aElem);
+				var aLink = $('#hiddenLink')[0];
+				aLink.href = uri;
+				if (navigator.appName=="Microsoft Internet Explorer" && aLink.protocolLong=="Unknown Protocol") {
+					onError();
+				} else {
+					onSuccess();
+				}
+				//CASE 2
+				/*var myWindow = window.open('', '', 'width=0,height=0');
+				myWindow.document.write("<iframe src='" + uri + "'></iframe>");
+				setTimeout(function () {
+					try {
+						myWindow.location.href;
+						myWindow.setTimeout("window.close()", timeoutMs);
+						onSuccess();
+					} catch (e) {
+						myWindow.close();
+						onError();
+					}
+				}, timeoutMs);*/
+			}
+
+			//ie10 in win7 - DID NOT CHECK (!)
+			if (isIE10OnWindows7) {
+				isBrowserSupported = true;
+				var timeout = setTimeout(onError, timeoutMs);
+				window.addEventListener("blur", function () {
+					clearTimeout(timeout);
+					onSuccess();
+				});
+				if (!iframe) {
+					var iframe = createIframe(document, "about:blank");
+				}
+				try {
+					iframe.contentWindow.location.href = uri;
+				} catch (e) {
+					onError();
+					clearTimeout(timeout);
+				}
+			}
 
 			//ie11 on win10 - WORK (!)
 			//ms_edge < 19 - DID NOT CHECK
 			//specific to Internet Explorer >= 10, and Microsoft Edge versions 18 and lower on win8 or win10 
 			if ((isIESince10 /*|| ms_edge < 19*/) && (isWindowsSince8)) {
+				isBrowserSupported = true;
 				window.navigator.msLaunchUri(uri, onSuccess, onError);
 			}
 
 			//firefox63 on win10 - WORK (!)
 			//presumably works on firefox < 64
 			if (isMozillaBefore64) {
+				isBrowserSupported = true;
 				var iframe = document.createElement("iframe"); 
 				iframe.src = "about:blank"; 
 				iframe.id = "hiddenIframe"; 
@@ -82,7 +148,8 @@
 			//firefox72 and firefox84 on win10 - WORK (!)
 			//presumably works on firefox >= 64 
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/37
-			if (isMozillaSince64) {		
+			if (isMozillaSince64) {	
+				isBrowserSupported = true;	
 				if (!iframe) {
 					var iframe = document.createElement("iframe"); 
 					iframe.src = "about:blank"; 
@@ -104,7 +171,7 @@
 								onError();
 							}
 						}
-					}, 500);
+					}, timeoutMs);
 				} catch (e) {
 					if (e.name === "NS_ERROR_UNKNOWN_PROTOCOL" || e.name === "NS_ERROR_FAILURE" || e.name === "SecurityError") {
 						onError();
@@ -115,6 +182,7 @@
 			//chrome84 on win10 - WORK (!)
 			//presumably works on chrome < 85
 			if (isChromeBefore85) {
+				isBrowserSupported = true;
 				var isSupported = false;
 				window.focus();
 				window.onblur = function() {
@@ -129,77 +197,73 @@
 					else {
 						onError();
 					}
-				}, 300);
+				}, timeoutMs);
 			}
 			
-			//todo chrome >= 85 (!) 
+			//todo chrome >= 85 () 
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
-			/*if (isChromeSince85) {
-				//todo something
-			}*/
-			 
-			//ie on win < 8 - DID NOT CHECK (3 CASES) (!)
-			/*var aElem = document.createElement("a"); 
-			aElem.href = "#"; 
-			aElem.id = "hiddenLink"; 
-			aElem.style.display = "none"; 
-			document.body.appendChild(aElem);
-			var isSupported = false;
-			var aLink = $('#hiddenLink')[0];
-        	aLink.href = uri;*/
-			//CASE 1
-			/*if (navigator.appName=="Microsoft Internet Explorer" && aLink.protocolLong=="Unknown Protocol") {
-				onError();
-			}*/
-			//CASE 2
-			/*var myWindow = window.open('', '', 'width=0,height=0');
-			myWindow.document.write("<iframe src='" + uri + "'></iframe>");
-			setTimeout(function () {
-				try {
-					myWindow.location.href;
-					myWindow.setTimeout("window.close()", 1000);
-					onSuccess();
-				} catch (e) {
-					myWindow.close();
-					onError();
-				}
-			}, 1000);*/
-			//CASE 3 - IE10 In Windows 7 DID NOT CHECK (!)
-			/*if (isIE10OnWindows7) {
-				var timeout = setTimeout(onError, 1000);
-				window.addEventListener("blur", function () {
-					clearTimeout(timeout);
-					onSuccess();
-				});
-				var iframe = document.createElement("iframe"); 
-					iframe.src = "about:blank"; 
-					iframe.id = "hiddenIframe"; 
-					iframe.style.display = "none"; 
-					document.body.appendChild(iframe);
-				try {
-					iframe.contentWindow.location.href = uri;
-				} catch (e) {
-					onError();
-					clearTimeout(timeout);
-				}
-			}*/
-			
-			//safari - DID NOT CHECK (!)
-			//https://stackoverflow.com/questions/836777/how-to-detect-browsers-protocol-handlers
-			/*if (AscCommon.AscBrowser.isSafari) {
-				window.postMessage("myappinstalled", window.location.origin);
-				window.addEventListener('message', function (msg) {
-					if (msg.data === "myappinstalled") {
-						myappinstalledflag = true;
+			if (isChromeSince85) {
+				isBrowserSupported = true;
+
+				function removeEventListeners(eventHandler) {
+					for(var key in window){
+						if(key.search('on') === 0) {
+							window.removeEventListener(key.slice(2), eventHandler);
+						}
 					}
-				}, false);
-				if (myappinstalledflag) {
-					location.href = uri;
-					onSuccess();
-				} else {
-					onError();
 				}
-			}*/
+
+				var timeout = setTimeout(() => {
+					onSuccess();
+					console.log("without events")
+					removeEventListeners(eventHandler);
+				}, timeoutMs);
+				
+				function eventHandler(event) {
+					console.log(event.type);
+					if (event.type === "blur") {
+						clearTimeout(timeout);
+						onSuccess();
+						removeEventListeners(eventHandler);
+					} else if (/*ловит клик по кнопке bold*/event.type !== "click" && event.type !== "beforeunload") {
+						clearTimeout(timeout);
+						onError();
+						removeEventListeners(eventHandler);
+					}
+				}
+
+				for(var key in window){
+					if(key.search('on') === 0) {
+						window.addEventListener(key.slice(2), eventHandler);
+					}
+				}
+
+				location.href = uri;
+			}
+			
+			//safari - DID NOT CHECK 
+			//https://stackoverflow.com/questions/836777/how-to-detect-browsers-protocol-handlers
+			//https://github.com/vireshshah/custom-protocol-check/blob/73c208523fa3debe0b39fcb38bb4080d4e191d8e/index.js#L245
+			if (AscCommon.AscBrowser.isSafari) {
+				isBrowserSupported = true;
+				var timeout = setTimeout(function() {
+					onError();
+					window.onblur = null;
+				}, timeoutMs);
+				if (!iframe) {
+					var iframe = createIframe(document, "about:blank");
+				}	
+				window.onblur = function() {
+					clearTimeout(timeout);
+					onSuccess();
+				};			
+				iframe.contentWindow.location.href = uri;
+			}
+
+			//if browser is not supported
+			if (!isBrowserSupported) {
+				unsupportedCb();
+			}
 		}
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommon'] = window['AscCommon'] || {};
