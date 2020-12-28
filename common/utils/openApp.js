@@ -38,8 +38,39 @@
 	function(window, undefined) {
 		function openApp(protocol, params, onSuccess, onError, timeoutMs)
 		{	
-			var uri = protocol + ':' + params;
+			function removeEventListenersInChromeCheck(eventHandler) {
+				for(var key in window){
+					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
+						window.removeEventListener(key.slice(2), eventHandler);
+					}
+				}
+			}
+			function eventHandlerInChromeCheck(event) {
+				console.log(event.type);
+				if (event.type === "blur") {
+					clearTimeout(timeout);
+					onSuccess();
+					console.log("blur success");
+					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
+				} else {
+					isCatchEvent = true;
+					console.log("error", event.type);
+					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
+				}
+			}
+			function createIframe(target, uri) {
+				var iframe = target.createElement("iframe"); 
+				iframe.src = uri; 
+				iframe.id = "hiddenIframe"; 
+				iframe.style.display = "none"; 
+				target.body.appendChild(iframe);
+				return iframe;
+			}
+			function unsupportedCb() {
+				console.log("Browser is not supported");
+			}
 
+			var uri = protocol + ':' + params;
 			timeoutMs = timeoutMs || 1000;
 			
 			var isIeEdge = AscCommon.AscBrowser.isIeEdge;
@@ -54,20 +85,8 @@
 			var isWindowsSince8 = (AscCommon.AscBrowser.windowsVersionCode >= 6.2);
 
 			var isBrowserSupported = false;
+			var isCatchEvent = false;
 			
-			function createIframe(target, uri) {
-				var iframe = target.createElement("iframe"); 
-				iframe.src = uri; 
-				iframe.id = "hiddenIframe"; 
-				iframe.style.display = "none"; 
-				target.body.appendChild(iframe);
-				return iframe;
-			}
-
-			function unsupportedCb() {
-				console.log("Browser is not supported");
-			}
-
 			//ie on win < 8 - DID NOT CHECK (2 CASES) (!)
 			if (isWindowsBefore8 && (isIE9 || isIeEdge || isIESince10)) {
 				isBrowserSupported = true;
@@ -205,39 +224,16 @@
 			//todo chrome >= 85 () 
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
 			if (isChromeSince85) {
-				function removeEventListeners(eventHandler) {
-					for(var key in window){
-						if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
-							window.removeEventListener(key.slice(2), eventHandler);
-						}
-					}
-				}
-
-				function eventHandler(event) {
-					var isCatchEvent = false;
-					if (event.type === "blur") {
-						clearTimeout(timeout);
-						onSuccess();
-						removeEventListeners(eventHandler);
-					} else {
-						isCatchEvent = true;
-						removeEventListeners(eventHandler);
-					}
-					setTimeout(function() {
-						isCatchEvent ? onError() : onSuccess();
-					}, timeoutMs);
-				}
-
 				isBrowserSupported = true;
 
 				var timeout = setTimeout(function() {
-					onSuccess();
-					removeEventListeners(eventHandler);
+					isCatchEvent ? onError() : onSuccess();
+					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
 				}, timeoutMs);
 				
 				for(var key in window){
 					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
-						window.addEventListener(key.slice(2), eventHandler);
+						window.addEventListener(key.slice(2), eventHandlerInChromeCheck);
 					}
 				}
 
