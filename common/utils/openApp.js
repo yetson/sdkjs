@@ -36,9 +36,11 @@
  * @param {undefined} undefined
  */
 	function(window, undefined) {
-		function openApp(protocol, params, onSuccess, onError, timeoutMs=1000)
+		function openApp(protocol, params, onSuccess, onError, timeoutMs)
 		{	
 			var uri = protocol + ':' + params;
+
+			timeoutMs = timeoutMs || 1000;
 			
 			var isIeEdge = AscCommon.AscBrowser.isIeEdge;
 			var isIE9 = AscCommon.AscBrowser.isIE9;
@@ -203,37 +205,38 @@
 			//todo chrome >= 85 () 
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
 			if (isChromeSince85) {
-				isBrowserSupported = true;
-
 				function removeEventListeners(eventHandler) {
 					for(var key in window){
-						if(key.search('on') === 0) {
+						if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
 							window.removeEventListener(key.slice(2), eventHandler);
 						}
 					}
 				}
 
-				var timeout = setTimeout(() => {
-					onSuccess();
-					console.log("without events")
-					removeEventListeners(eventHandler);
-				}, timeoutMs);
-				
 				function eventHandler(event) {
-					console.log(event.type);
+					var isCatchEvent = false;
 					if (event.type === "blur") {
 						clearTimeout(timeout);
 						onSuccess();
 						removeEventListeners(eventHandler);
-					} else if (/*ловит клик по кнопке bold*/event.type !== "click" && event.type !== "beforeunload") {
-						clearTimeout(timeout);
-						onError();
+					} else {
+						isCatchEvent = true;
 						removeEventListeners(eventHandler);
 					}
+					setTimeout(function() {
+						isCatchEvent ? onError() : onSuccess();
+					}, timeoutMs);
 				}
 
+				isBrowserSupported = true;
+
+				var timeout = setTimeout(function() {
+					onSuccess();
+					removeEventListeners(eventHandler);
+				}, timeoutMs);
+				
 				for(var key in window){
-					if(key.search('on') === 0) {
+					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
 						window.addEventListener(key.slice(2), eventHandler);
 					}
 				}
