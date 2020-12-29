@@ -46,16 +46,11 @@
 				}
 			}
 			function eventHandlerInChromeCheck(event) {
-				console.log(event.type);
 				if (event.type === "blur") {
-					clearTimeout(timeout);
-					onSuccess();
-					console.log("blur success");
+					isCatchEvent = false; 
 					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
 				} else {
 					isCatchEvent = true;
-					console.log("error", event.type);
-					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
 				}
 			}
 			function createIframe(target, uri) {
@@ -225,18 +220,15 @@
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
 			if (isChromeSince85) {
 				isBrowserSupported = true;
-
 				var timeout = setTimeout(function() {
 					isCatchEvent ? onError() : onSuccess();
 					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
 				}, timeoutMs);
-				
-				for(var key in window){
-					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
+				for (var key in window) {
+					if (/^on(blur|key|mouse|touch|wheel)/.test(key)) {
 						window.addEventListener(key.slice(2), eventHandlerInChromeCheck);
 					}
 				}
-
 				location.href = uri;
 			}
 			
