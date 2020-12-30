@@ -38,21 +38,6 @@
 	function(window, undefined) {
 		function openApp(protocol, params, onSuccess, onError, timeoutMs)
 		{	
-			function removeEventListenersInChromeCheck(eventHandler) {
-				for(var key in window){
-					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
-						window.removeEventListener(key.slice(2), eventHandler);
-					}
-				}
-			}
-			function eventHandlerInChromeCheck(event) {
-				if (event.type === "blur") {
-					isCatchEvent = false; 
-					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
-				} else {
-					isCatchEvent = true;
-				}
-			}
 			function createIframe(target, uri) {
 				var iframe = target.createElement("iframe"); 
 				iframe.src = uri; 
@@ -82,7 +67,7 @@
 			var isBrowserSupported = false;
 			var isCatchEvent = false;
 			
-			//ie on win < 8 - DID NOT CHECK (2 CASES) (!)
+			//ie on win < 8 - DID NOT CHECK (2 CASES)
 			if (isWindowsBefore8 && (isIE9 || isIeEdge || isIESince10)) {
 				isBrowserSupported = true;
 				//CASE 1
@@ -113,7 +98,7 @@
 				}, timeoutMs);*/
 			}
 
-			//ie10 in win7 - DID NOT CHECK (!)
+			//ie10 in win7 - DID NOT CHECK
 			if (isIE10OnWindows7) {
 				isBrowserSupported = true;
 				var timeout = setTimeout(onError, timeoutMs);
@@ -121,8 +106,9 @@
 					clearTimeout(timeout);
 					onSuccess();
 				});
+				var iframe = document.querySelector("#hiddenIframe");
 				if (!iframe) {
-					var iframe = createIframe(document, "about:blank");
+					iframe = createIframe(document, "about:blank");
 				}
 				try {
 					iframe.contentWindow.location.href = uri;
@@ -132,7 +118,7 @@
 				}
 			}
 
-			//ie11 on win10 - WORK (!)
+			//ie11 on win10 - WORK 
 			//ms_edge < 19 - DID NOT CHECK
 			//specific to Internet Explorer >= 10, and Microsoft Edge versions 18 and lower on win8 or win10 
 			if ((isIESince10 /*|| ms_edge < 19*/) && (isWindowsSince8)) {
@@ -140,15 +126,14 @@
 				window.navigator.msLaunchUri(uri, onSuccess, onError);
 			}
 
-			//firefox63 on win10 - WORK (!)
+			//firefox63 on win10 - WORK
 			//presumably works on firefox < 64
 			if (isMozillaBefore64) {
 				isBrowserSupported = true;
-				var iframe = document.createElement("iframe"); 
-				iframe.src = "about:blank"; 
-				iframe.id = "hiddenIframe"; 
-				iframe.style.display = "none"; 
-				document.body.appendChild(iframe); 
+				var iframe = document.querySelector("#hiddenIframe");
+				if (!iframe) {
+					iframe = createIframe(document, "about:blank"); 
+				}
 				try { 
 					iframe.contentWindow.location.href = uri; 
 					onSuccess(); 
@@ -161,17 +146,14 @@
 				}	
 			}
 
-			//firefox72 and firefox84 on win10 - WORK (!)
+			//firefox72 and firefox84 on win10 - WORK
 			//presumably works on firefox >= 64 
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/37
 			if (isMozillaSince64) {	
 				isBrowserSupported = true;	
+				var iframe = document.querySelector("#hiddenIframe");
 				if (!iframe) {
-					var iframe = document.createElement("iframe"); 
-					iframe.src = "about:blank"; 
-					iframe.id = "hiddenIframe"; 
-					iframe.style.display = "none"; 
-					document.body.appendChild(iframe);
+					iframe = createIframe(document, "about:blank"); 
 				}
 				try {
 					iframe.contentWindow.location.href = uri;
@@ -195,28 +177,40 @@
 				}
 			}			
 
-			//chrome84 on win10 - WORK (!)
+			//chrome84 on win10 - WORK
 			//presumably works on chrome < 85
 			if (isChromeBefore85) {
 				isBrowserSupported = true;
-				var isSupported = false;
 				window.focus();
 				window.onblur = function() {
-					isSupported = true;
+					onSuccess();
+					clearTimeout(timeout);
 				};
 				location.href = uri;
-				setTimeout(function() {
+				var timeout = setTimeout(function() {
 					window.onblur = null;
-					if (isSupported) {
-						onSuccess();
-					} 
-					else {
-						onError();
-					}
+					onError();
 				}, timeoutMs);
 			}
+
+			function removeEventListenersInChromeCheck(eventHandler) {
+				for(var key in window){
+					if(/^on(blur|key|mouse|touch|wheel)/.test(key)) {
+						window.removeEventListener(key.slice(2), eventHandler);
+					}
+				}
+			}
+			function eventHandlerInChromeCheck(event) {
+				if (event.type === "blur") {
+					onSuccess(); 
+					clearTimeout(timeout);
+					removeEventListenersInChromeCheck(eventHandlerInChromeCheck);
+				} else {
+					isCatchEvent = true;
+				}
+			}
 			
-			//todo chrome >= 85 () 
+			//chrome >= 85 - POSSIBLE CHECK
 			//https://github.com/ismailhabib/custom-protocol-detection/issues/45
 			if (isChromeSince85) {
 				isBrowserSupported = true;
@@ -241,9 +235,10 @@
 					onError();
 					window.onblur = null;
 				}, timeoutMs);
+				var iframe = document.querySelector("#hiddenIframe");
 				if (!iframe) {
-					var iframe = createIframe(document, "about:blank");
-				}	
+					iframe = createIframe(document, "about:blank");
+				}
 				window.onblur = function() {
 					clearTimeout(timeout);
 					onSuccess();
