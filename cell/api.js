@@ -4925,6 +4925,7 @@ var editor;
       if (ws) {
 		  ws.draw();
       }
+      this.controller.updateScrollBars();
     }
   };
 
