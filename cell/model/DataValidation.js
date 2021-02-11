@@ -147,9 +147,6 @@
 	CDataFormula.prototype.asc_setValue = function (val) {
 		this.text = val;
 	};
-	CDataFormula.prototype.asc_setValue = function (val) {
-		this.text = val;
-	};
 	CDataFormula.prototype.setOffset = function (offset) {
 		if (this._formula) {
 			this.text = this._formula.changeOffset(offset, null, true).assemble(true);
