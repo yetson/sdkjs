@@ -733,9 +733,9 @@
      * @alias DocToMarkdown
      * @param {object} oConfig
      */
-    Api.prototype["pluginMethod_DocToMarkdown"] = function(oConfig)
+    Api.prototype["pluginMethod_DocToMarkdown"] = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags)
     {
-        return this.DocToMarkdown(oConfig);
+        return this.DocToMarkdown(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags);
     };
     /**
      * Convert doc content to html.
@@ -744,9 +744,9 @@
      * @alias DocToHtml
      * @param {object} oConfig
      */
-    Api.prototype["pluginMethod_DocToHtml"] = function(oConfig)
+    Api.prototype["pluginMethod_DocToHtml"] = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags)
     {
-        return this.DocToHtml(oConfig);
+        return this.DocToHtml(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags);
     };
 
 })(window);
