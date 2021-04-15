@@ -12892,7 +12892,7 @@
 	};
 
 	/**
-	 * Convert doc content to markdown text.
+	 * Convert docuement to markdown or html text.
 	 * @memberof Api
 	 * @typeofeditors ["CDE"]
 	 * @param {"markdown" | "html"} [sConvertType="markdown"] - type of converting.
