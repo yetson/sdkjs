@@ -726,5 +726,27 @@
     {
         return this.CoAuthoringChatSendMessage(sText);
     };
+    /**
+     * Convert doc content to markdown.
+     * @memberof Api
+     * @typeofeditors ["CDE"]
+     * @alias DocToMarkdown
+     * @param {object} oConfig
+     */
+    Api.prototype["pluginMethod_DocToMarkdown"] = function(oConfig)
+    {
+        return this.DocToMarkdown(oConfig);
+    };
+    /**
+     * Convert doc content to html.
+     * @memberof Api
+     * @typeofeditors ["CDE"]
+     * @alias DocToHtml
+     * @param {object} oConfig
+     */
+    Api.prototype["pluginMethod_DocToHtml"] = function(oConfig)
+    {
+        return this.DocToHtml(oConfig);
+    };
 
 })(window);
