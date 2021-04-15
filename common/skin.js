@@ -65,7 +65,7 @@ var EditorSkins = {
 		ScrollOutlineHoverColor   : "#CBCBCB",
 		ScrollOutlineActiveColor  : "#ADADAD",
 		ScrollerColor             : "#F7F7F7",
-		ScrollerHoverColor        : "#C0C0C0",
+		ScrollerHoverColor        : "#CBCBCB",
 		ScrollerActiveColor       : "#ADADAD",
 		ScrollArrowColor          : "#ADADAD",
 		ScrollArrowHoverColor     : "#F7F7F7",
