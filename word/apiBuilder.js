@@ -12911,8 +12911,7 @@
 			base64img : bBase64img || false,
 			demoteHeadings : bDemoteHeadings || false,
 			renderHTMLTags : bRenderHTMLTags || false
-		};
-
+	};
 		var oMarkdown = new ApiConvert(oConfig);
 		return oMarkdown.DoMarkdown();
 	};

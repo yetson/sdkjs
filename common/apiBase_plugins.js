@@ -731,7 +731,11 @@
      * @memberof Api
      * @typeofeditors ["CDE"]
      * @alias DocToMarkdown
-     * @param {object} oConfig
+     * @param {bool} [bHtmlHeadings=false] - If you have used multiple Heading 1 headings in your Doc, set this param true to demote all heading levels to conform with the following standard: single H1 as title, H2 as top-level heading in the text body.
+	 * @param {bool} [bBase64img=false] - set this param true if you want images to be created in base64 format.
+	 * @param {bool} [bDemoteHeadings=false] - Not all Markdown renderers handle Markdown-style IDs. If that is the case for your target platform, set this param true to generate HTML headings and IDs.
+	 * @param {bool} [bRenderHTMLTags=false] - By default, angle brackets (<) will be replaced by the &lt; entity. If you really want to embed HTML tags in your Markdown, set this param true to preserve them. 
+	 * Or, if you just want to use an occasional HTML tag, you can escape the opening angle bracket like this: \<tag>text\</tag>.
      */
     Api.prototype["pluginMethod_DocToMarkdown"] = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags)
     {
@@ -742,7 +746,11 @@
      * @memberof Api
      * @typeofeditors ["CDE"]
      * @alias DocToHtml
-     * @param {object} oConfig
+     * @param {bool} [bHtmlHeadings=false] - If you have used multiple Heading 1 headings in your Doc, set this param true to demote all heading levels to conform with the following standard: single H1 as title, H2 as top-level heading in the text body.
+	 * @param {bool} [bBase64img=false] - set this param true if you want images to be created in base64 format.
+	 * @param {bool} [bDemoteHeadings=false] - Not all Markdown renderers handle Markdown-style IDs. If that is the case for your target platform, set this param true to generate HTML headings and IDs.
+	 * @param {bool} [bRenderHTMLTags=false] - By default, angle brackets (<) will be replaced by the &lt; entity. If you really want to embed HTML tags in your Markdown, set this param true to preserve them. 
+	 * Or, if you just want to use an occasional HTML tag, you can escape the opening angle bracket like this: \<tag>text\</tag>.
      */
     Api.prototype["pluginMethod_DocToHtml"] = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags)
     {
