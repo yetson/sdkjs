@@ -175,7 +175,7 @@ var EditorSkins = {
 		RulerTableColor2          : "#B2B2B2",
 
 		ScrollBackgroundColor       : "#666666",
-		ScrollOutlineColor          : "#404040",
+		ScrollOutlineColor          : "#2A2A2A",
 		ScrollOutlineHoverColor     : "#999999",
 		ScrollOutlineActiveColor    : "#ADADAD",
 		ScrollerColor               : "#404040",
