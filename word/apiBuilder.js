@@ -12895,6 +12895,7 @@
 	 * Convert doc content to markdown text.
 	 * @memberof Api
 	 * @typeofeditors ["CDE"]
+	 * @param {"markdown" | "html"} [sConvertType="markdown"] - type of converting.
 	 * @param {bool} [bHtmlHeadings=false] - If you have used multiple Heading 1 headings in your Doc, set this param true to demote all heading levels to conform with the following standard: single H1 as title, H2 as top-level heading in the text body.
 	 * @param {bool} [bBase64img=false] - set this param true if you want images to be created in base64 format.
 	 * @param {bool} [bDemoteHeadings=false] - Not all Markdown renderers handle Markdown-style IDs. If that is the case for your target platform, set this param true to generate HTML headings and IDs.
@@ -12902,43 +12903,22 @@
 	 * Or, if you just want to use an occasional HTML tag, you can escape the opening angle bracket like this: \<tag>text\</tag>.
 	 * @returns {string}
 	 */
-	Api.prototype.DocToMarkdown = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags) 
+	Api.prototype.ConvertDocument = function(sConvertType, bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags) 
 	{
 		var oConfig = 
 		{
+			convertType : sConvertType || "markdown",
 			htmlHeadings : bHtmlHeadings || false,
 			base64img : bBase64img || false,
 			demoteHeadings : bDemoteHeadings || false,
 			renderHTMLTags : bRenderHTMLTags || false
 		};
 		var oMarkdown = new ApiConvert(oConfig);
-		return oMarkdown.DoMarkdown();
+		if (sConvertType === "markdown")
+			return oMarkdown.DoMarkdown();
+		else
+			return oMarkdown.DoHtml();
 	};
-	/**
-	 * Convert doc content to html text.
-	 * @memberof Api
-	 * @typeofeditors ["CDE"]
-	 * @param {bool} [bHtmlHeadings=false] - If you have used multiple Heading 1 headings in your Doc, set this param true to demote all heading levels to conform with the following standard: single H1 as title, H2 as top-level heading in the text body.
-	 * @param {bool} [bBase64img=false] - set this param true if you want images to be created in base64 format.
-	 * @param {bool} [bDemoteHeadings=false] - Not all Markdown renderers handle Markdown-style IDs. If that is the case for your target platform, set this param true to generate HTML headings and IDs.
-	 * @param {bool} [bRenderHTMLTags=false] - By default, angle brackets (<) will be replaced by the &lt; entity. If you really want to embed HTML tags in your Markdown, set this param true to preserve them. 
-	 * Or, if you just want to use an occasional HTML tag, you can escape the opening angle bracket like this: \<tag>text\</tag>.
-	 * @returns {string}
-	 */
-	Api.prototype.DocToHtml = function(bHtmlHeadings, bBase64img, bDemoteHeadings, bRenderHTMLTags) 
-	{
-		var oConfig = 
-		{
-			htmlHeadings : bHtmlHeadings || false,
-			base64img : bBase64img || false,
-			demoteHeadings : bDemoteHeadings || false,
-			renderHTMLTags : bRenderHTMLTags || false
-		};
-
-		var oMarkdown = new ApiConvert(oConfig);
-		return oMarkdown.DoHtml();
-	};
-
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Export
