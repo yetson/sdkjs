@@ -7944,6 +7944,87 @@
 			}
 		}
 
+
+		if (x > this.cellsLeft && y > this.cellsTop && canEdit && readyMode) {
+			c = this._findColUnderCursor(x, true);
+			r = this._findRowUnderCursor(y, true);
+
+			if (c === null || r === null) {
+				return oResDefault;
+			}
+
+			var pivotButtons = this.model.getPivotTableButtons(new asc_Range(c.col, r.row, c.col, r.row));
+			var pivotButton = pivotButtons.find(function (element) {
+				return element.row === r.row && element.col === c.col;
+			});
+			var activeCell = this.model.getSelection().activeCell;
+			var dataValidation = this.model.getDataValidation(activeCell.col, activeCell.row);
+			var isDataValidation = dataValidation && dataValidation.isListValues();
+			var isTableTotal = this.model.isTableTotal(activeCell.col, activeCell.row);
+			col = activeCell.col;
+			row = activeCell.row;
+			this._drawElements(function (_vr, _offsetX, _offsetY) {
+				res = null;
+				var _isDataValidation = false;
+				var _isPivot = false;
+				var _isTableTotal = false;
+				if (_vr.contains(c.col, r.row)) {
+					_offsetX += x;
+					_offsetY += y;
+					if (isDataValidation) {
+						_isDataValidation = this._hitCursorFilterButton(_offsetX, _offsetY, col, row, true);
+					} else if (pivotButton) {
+						_isPivot = this._hitCursorFilterButton(_offsetX, _offsetY, c.col, r.row, null, pivotButton.idPivotCollapse);
+					} else if (isTableTotal) {
+						_isTableTotal = this._hitCursorFilterButton(_offsetX, _offsetY, col, row, true);
+					}
+
+					if (_isDataValidation) {
+						res = {
+							cursor: kCurAutoFilter,
+							target: c_oTargetType.FilterObject,
+							col: c.col,
+							row: r.row,
+							isDataValidation: _isDataValidation
+						};
+					} else if (_isPivot && pivotButton) {
+						if (pivotButton.idPivotCollapse) {
+							res = {
+								cursor: kCurHyperlink,
+								target: c_oTargetType.FilterObject,
+								col: c.col,
+								row: r.row,
+								idPivotCollapse: pivotButton.idPivotCollapse
+							};
+						} else {
+							res = {
+								cursor: kCurAutoFilter,
+								target: c_oTargetType.FilterObject,
+								col: c.col,
+								row: r.row,
+								idPivot: pivotButton.idPivot
+							};
+						}
+					} else if (_isTableTotal) {
+						res = {
+							cursor: kCurAutoFilter,
+							target: c_oTargetType.FilterObject,
+							col: c.col,
+							row: r.row,
+							idTableTotal: {id: isTableTotal.index, colId: isTableTotal.colIndex}
+						};
+					} else if (!pivotButton) {
+						res = this.af_checkCursor(_offsetX, _offsetY, r.row, c.col);
+					}
+				}
+				return (null === res);
+			});
+			if (res) {
+				return res;
+			}
+		}
+
+
 		isSelGraphicObject = this.objectRender.selectedGraphicObjectsExists();
 		if (dialogOtherRanges && canEdit && !isSelGraphicObject && this.model.getSelection().isSingleRange()) {
 			this._drawElements(function (_vr, _offsetX, _offsetY) {
@@ -8045,54 +8126,6 @@
 						// Кто-то сделал lock
 						userIdAllProps = isLocked.UserId;
 					}
-				}
-			}
-
-			if (canEdit && readyMode) {
-				var pivotButtons = this.model.getPivotTableButtons(new asc_Range(c.col, r.row, c.col, r.row));
-				var pivotButton = pivotButtons.find(function (element) {
-					return element.row === r.row && element.col === c.col;
-				});
-				var activeCell = this.model.getSelection().activeCell;
-				var dataValidation = this.model.getDataValidation(activeCell.col, activeCell.row);
-				var isDataValidation = dataValidation && dataValidation.isListValues();
-				var isTableTotal = this.model.isTableTotal(activeCell.col, activeCell.row);
-				col = activeCell.col;
-				row = activeCell.row;
-				this._drawElements(function (_vr, _offsetX, _offsetY) {
-					res = null;
-					var _isDataValidation = false;
-					var _isPivot = false;
-					var _isTableTotal = false;
-					if (_vr.contains(c.col, r.row)) {
-						_offsetX += x;
-						_offsetY += y;
-						if (isDataValidation) {
-							_isDataValidation = this._hitCursorFilterButton(_offsetX, _offsetY, col, row, true);
-						} else if (pivotButton) {
-							_isPivot = this._hitCursorFilterButton(_offsetX, _offsetY, c.col, r.row, null, pivotButton.idPivotCollapse);
-						} else if (isTableTotal) {
-							_isTableTotal = this._hitCursorFilterButton(_offsetX, _offsetY, col, row, true);
-						}
-
-						if (_isDataValidation) {
-							res = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: c.col, row: r.row, isDataValidation: _isDataValidation};
-						} else if (_isPivot && pivotButton) {
-							if(pivotButton.idPivotCollapse) {
-								res = {cursor: kCurHyperlink, target: c_oTargetType.FilterObject, col: c.col, row: r.row, idPivotCollapse: pivotButton.idPivotCollapse};
-							} else {
-								res = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: c.col, row: r.row, idPivot: pivotButton.idPivot};
-							}
-						} else if (_isTableTotal) {
-							res = {cursor: kCurAutoFilter, target: c_oTargetType.FilterObject, col: c.col, row: r.row, idTableTotal: {id: isTableTotal.index, colId: isTableTotal.colIndex}};
-						} else if (!pivotButton) {
-							res = this.af_checkCursor(_offsetX, _offsetY, r.row, c.col);
-						}
-					}
-					return (null === res);
-				});
-				if (res) {
-					return res;
 				}
 			}
 
