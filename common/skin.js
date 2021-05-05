@@ -279,6 +279,89 @@ function setter_from_interface(obj)
 
 var GlobalSkin = EditorSkins["theme-light"];
 
+function updateGlobalSkinColors(theme)
+{
+	var skin = GlobalSkin;
+
+	skin.BackgroundColor = theme["canvas-background"];
+	skin.PageOutline = theme["canvas-page-border"];
+
+	skin.RulerDark = theme["canvas-ruler-margins-background"];
+	skin.RulerLight = theme["canvas-ruler-background"];
+	skin.RulerOutline = theme["border-toolbar"];
+	skin.RulerMarkersOutlineColor = theme[""];
+	skin.RulerMarkersOutlineColorOld = theme[""];
+	skin.RulerMarkersFillColor = theme["background-normal"];
+	skin.RulerMarkersFillColorOld = theme["background-normal"];
+	skin.RulerTextColor = theme["canvas-ruler-mark"];
+	skin.RulerTabsColor = theme["canvas-high-contrast"];
+	skin.RulerTabsColorOld = theme["canvas-high-contrast-disabled"];
+	skin.RulerTableColor1 = theme["background-normal"];
+	skin.RulerTableColor2 = theme["canvas-ruler-handle-border"];
+
+	skin.ScrollBackgroundColor = theme["canvas-background"];
+	skin.ScrollOutlineColor = theme["canvas-scroll-thumb-border"];
+	skin.ScrollOutlineHoverColor = theme["canvas-scroll-thumb-border-hover"];
+	skin.ScrollOutlineActiveColor = theme["canvas-scroll-thumb-border-pressed"];
+	skin.ScrollerColor = theme["canvas-scroll-thumb"];
+	skin.ScrollerHoverColor = theme["canvas-scroll-thumb-hover"];
+	skin.ScrollerActiveColor = theme["canvas-scroll-thumb-pressed"];
+	skin.ScrollArrowColor = theme["canvas-scroll-arrow"];
+	skin.ScrollArrowHoverColor = theme["canvas-scroll-arrow-hover"];
+	skin.ScrollArrowActiveColor = theme["canvas-scroll-arrow-pressed"];
+	skin.ScrollerTargetColor = theme["canvas-scroll-thumb-target"];
+	skin.ScrollerTargetHoverColor = theme["canvas-scroll-thumb-target-hover"];
+	skin.ScrollerTargetActiveColor = theme["canvas-scroll-thumb-target-pressed"];
+
+	/* presentations */
+	skin.BackgroundColorThumbnails = theme["background-toolbar"];
+	skin.BackgroundColorThumbnailsActive = theme["background-toolbar"];
+	skin.BackgroundColorThumbnailsHover = theme["background-toolbar"];
+	skin.ThumbnailsPageOutlineActive = theme["border-preview-select"];
+	skin.ThumbnailsPageOutlineHover = theme["border-preview-hover"];
+	skin.ThumbnailsPageNumberText = theme["text-normal"];
+	skin.ThumbnailsPageNumberTextActive = theme["text-normal"];
+	skin.ThumbnailsPageNumberTextHover = theme["text-normal"];
+	skin.BackgroundColorNotes = theme["canvas-background"];
+
+	skin.BorderSplitterColor = theme["border-toolbar"];
+
+	// demonstration
+	skin.DemBackgroundColor = theme["canvas-background"];
+	skin.DemButtonBackgroundColor = theme[""];
+	skin.DemButtonBackgroundColorHover = theme[""];
+	skin.DemButtonBackgroundColorActive = theme[""];
+	skin.DemButtonBorderColor = theme[""];
+	skin.DemButtonTextColor = theme[""];
+	skin.DemButtonTextColorActive = theme[""];
+	skin.DemSplitterColor = theme[""];
+	skin.DemTextColor = theme[""];
+
+	/* spreadsheets */
+	skin.Background = theme["canvas-background"];
+	skin.BackgroundActive = theme["canvas-cell-title-selected"];
+	skin.BackgroundHighlighted = theme["canvas-cell-title-hover"];
+
+	skin.Border = theme["canvas-cell-title-border"];
+	skin.BorderActive = theme["canvas-cell-title-border-selected"];
+	skin.BorderHighlighted = theme["canvas-cell-title-border-hover"];
+
+	skin.Color = theme["text-normal"];
+	skin.ColorActive = theme["text-normal"];
+	skin.ColorHighlighted = theme["text-normal"];
+
+	skin.BackgroundDark = theme["canvas-dark-cell-title"];
+	skin.BackgroundDarkActive = theme["canvas-dark-cell-title-selected"];
+	skin.BackgroundDarkHighlighted = theme["canvas-dark-cell-title-hover"];
+
+	skin.ColorDark = theme["text-contrast-background"];
+	skin.ColorDarkActive = theme["text-contrast-background"];
+	skin.ColorDarkHighlighted = theme["text-contrast-background"];
+
+	skin.GroupDataBorder = theme["border-toolbar"];
+	skin.EditorBorder = theme[""];
+}
+
 function updateGlobalSkin(obj)
 {
 	if (!obj) return;
@@ -309,86 +392,7 @@ function updateGlobalSkin(obj)
 	for (var item in obj)
 		GlobalSkin[item] = obj[item];
 
-	// TODO: переделать на имена интерфейса
-	if (obj["Name"]) GlobalSkin.Name = obj["Name"];
-	if (obj["RulersButton"]) GlobalSkin.RulersButton = obj["RulersButton"];
-	if (obj["NavigationButtons"]) GlobalSkin.NavigationButtons = obj["NavigationButtons"];
-	if (obj["BackgroundColor"]) GlobalSkin.BackgroundColor = obj["BackgroundColor"];
-	if (obj["PageOutline"]) GlobalSkin.PageOutline = obj["PageOutline"];
-	if (obj["RulerDark"]) GlobalSkin.RulerDark = obj["RulerDark"];
-	if (obj["RulerLight"]) GlobalSkin.RulerLight = obj["RulerLight"];
-	if (obj["RulerOutline"]) GlobalSkin.RulerOutline = obj["RulerOutline"];
-	if (obj["RulerMarkersOutlineColor"]) GlobalSkin.RulerMarkersOutlineColor = obj["RulerMarkersOutlineColor"];
-	if (obj["RulerMarkersFillColor"]) GlobalSkin.RulerMarkersFillColor = obj["RulerMarkersFillColor"];
-	if (obj["RulerMarkersFillColorOld"]) GlobalSkin.RulerMarkersFillColorOld = obj["RulerMarkersFillColorOld"];
-	if (obj["RulerTextColor"]) GlobalSkin.RulerTextColor = obj["RulerTextColor"];
-	if (obj["RulerTabsColor"]) GlobalSkin.RulerTabsColor = obj["RulerTabsColor"];
-	if (obj["RulerTabsColorOld"]) GlobalSkin.RulerTabsColorOld = obj["RulerTabsColorOld"];
-	if (obj["RulerTableColor1"]) GlobalSkin.RulerTableColor1 = obj["RulerTableColor1"];
-	if (obj["RulerTableColor2"]) GlobalSkin.RulerTableColor2 = obj["RulerTableColor2"];
-	if (obj["ScrollBackgroundColor"]) GlobalSkin.ScrollBackgroundColor = obj["ScrollBackgroundColor"];
-	if (obj["ScrollOutlineColor"]) GlobalSkin.ScrollOutlineColor = obj["ScrollOutlineColor"];
-	if (obj["ScrollOutlineHoverColor"]) GlobalSkin.ScrollOutlineHoverColor = obj["ScrollOutlineHoverColor"];
-	if (obj["ScrollOutlineActiveColor"]) GlobalSkin.ScrollOutlineActiveColor = obj["ScrollOutlineActiveColor"];
-	if (obj["ScrollerColor"]) GlobalSkin.ScrollerColor = obj["ScrollerColor"];
-	if (obj["ScrollerHoverColor"]) GlobalSkin.ScrollerHoverColor = obj["ScrollerHoverColor"];
-	if (obj["ScrollerActiveColor"]) GlobalSkin.ScrollerActiveColor = obj["ScrollerActiveColor"];
-	if (obj["ScrollArrowColor"]) GlobalSkin.ScrollArrowColor = obj["ScrollArrowColor"];
-	if (obj["ScrollArrowHoverColor"]) GlobalSkin.ScrollArrowHoverColor = obj["ScrollArrowHoverColor"];
-	if (obj["ScrollArrowActiveColor"]) GlobalSkin.ScrollArrowActiveColor = obj["ScrollArrowActiveColor"];
-	if (obj["ScrollerTargetColor"]) GlobalSkin.ScrollerTargetColor = obj["ScrollerTargetColor"];
-	if (obj["ScrollerTargetHoverColor"]) GlobalSkin.ScrollerTargetHoverColor = obj["ScrollerTargetHoverColor"];
-	if (obj["ScrollerTargetActiveColor"]) GlobalSkin.ScrollerTargetActiveColor = obj["ScrollerTargetActiveColor"];
-	if (obj["STYLE_THUMBNAIL_WIDTH"]) GlobalSkin.STYLE_THUMBNAIL_WIDTH = obj["STYLE_THUMBNAIL_WIDTH"];
-	if (obj["STYLE_THUMBNAIL_HEIGHT"]) GlobalSkin.STYLE_THUMBNAIL_HEIGHT = obj["STYLE_THUMBNAIL_HEIGHT"];
-	if (obj["isNeedInvertOnActive"]) GlobalSkin.isNeedInvertOnActive = obj["isNeedInvertOnActive"];
-	if (obj["ContentControlsBack"]) GlobalSkin.ContentControlsBack = obj["ContentControlsBack"];
-	if (obj["ContentControlsHover"]) GlobalSkin.ContentControlsHover = obj["ContentControlsHover"];
-	if (obj["ContentControlsActive"]) GlobalSkin.ContentControlsActive = obj["ContentControlsActive"];
-	if (obj["ContentControlsText"]) GlobalSkin.ContentControlsText = obj["ContentControlsText"];
-	if (obj["ContentControlsTextActive"]) GlobalSkin.ContentControlsTextActive = obj["ContentControlsTextActive"];
-	if (obj["ContentControlsAnchorActive"]) GlobalSkin.ContentControlsAnchorActive = obj["ContentControlsAnchorActive"];
-	if (obj["BackgroundColorThumbnails"]) GlobalSkin.BackgroundColorThumbnails = obj["BackgroundColorThumbnails"];
-	if (obj["BackgroundColorThumbnailsActive"]) GlobalSkin.BackgroundColorThumbnailsActive = obj["BackgroundColorThumbnailsActive"];
-	if (obj["BackgroundColorThumbnailsHover"]) GlobalSkin.BackgroundColorThumbnailsHover = obj["BackgroundColorThumbnailsHover"];
-	if (obj["ThumbnailsPageOutlineActive"]) GlobalSkin.ThumbnailsPageOutlineActive = obj["ThumbnailsPageOutlineActive"];
-	if (obj["ThumbnailsPageOutlineHover"]) GlobalSkin.ThumbnailsPageOutlineHover = obj["ThumbnailsPageOutlineHover"];
-	if (obj["ThumbnailsPageNumberText"]) GlobalSkin.ThumbnailsPageNumberText = obj["ThumbnailsPageNumberText"];
-	if (obj["ThumbnailsPageNumberTextActive"]) GlobalSkin.ThumbnailsPageNumberTextActive = obj["ThumbnailsPageNumberTextActive"];
-	if (obj["ThumbnailsPageNumberTextHover"]) GlobalSkin.ThumbnailsPageNumberTextHover = obj["ThumbnailsPageNumberTextHover"];
-	if (obj["THEMES_THUMBNAIL_WIDTH"]) GlobalSkin.THEMES_THUMBNAIL_WIDTH = obj["THEMES_THUMBNAIL_WIDTH"];
-	if (obj["THEMES_THUMBNAIL_HEIGHT"]) GlobalSkin.THEMES_THUMBNAIL_HEIGHT = obj["THEMES_THUMBNAIL_HEIGHT"];
-	if (obj["BorderSplitterColor"]) GlobalSkin.BorderSplitterColor = obj["BorderSplitterColor"];
-	if (obj["SupportNotes"]) GlobalSkin.SupportNotes = obj["SupportNotes"];
-	if (obj["SplitterWidthMM"]) GlobalSkin.SplitterWidthMM = obj["SplitterWidthMM"];
-	if (obj["ThumbnailScrollWidthNullIfNoScrolling"]) GlobalSkin.ThumbnailScrollWidthNullIfNoScrolling = obj["ThumbnailScrollWidthNullIfNoScrolling"];
-	if (obj["DemBackgroundColor"]) GlobalSkin.DemBackgroundColor = obj["DemBackgroundColor"];
-	if (obj["DemButtonBackgroundColor"]) GlobalSkin.DemButtonBackgroundColor = obj["DemButtonBackgroundColor"];
-	if (obj["DemButtonBackgroundColorHover"]) GlobalSkin.DemButtonBackgroundColorHover = obj["DemButtonBackgroundColorHover"];
-	if (obj["DemButtonBackgroundColorActive"]) GlobalSkin.DemButtonBackgroundColorActive = obj["DemButtonBackgroundColorActive"];
-	if (obj["DemButtonBorderColor"]) GlobalSkin.DemButtonBorderColor = obj["DemButtonBorderColor"];
-	if (obj["DemButtonTextColor"]) GlobalSkin.DemButtonTextColor = obj["DemButtonTextColor"];
-	if (obj["DemButtonTextColorActive"]) GlobalSkin.DemButtonTextColorActive = obj["DemButtonTextColorActive"];
-	if (obj["DemSplitterColor"]) GlobalSkin.DemSplitterColor = obj["DemSplitterColor"];
-	if (obj["DemTextColor"]) GlobalSkin.DemTextColor = obj["DemTextColor"];
-
-	if (obj["Background"]) GlobalSkin.Background = obj["Background"];
-	if (obj["Border"]) GlobalSkin.Border = obj["Border"];
-	if (obj["Color"]) GlobalSkin.Color = obj["Color"];
-	if (obj["BackgroundDark"]) GlobalSkin.BackgroundDark = obj["BackgroundDark"];
-	if (obj["ColorDark"]) GlobalSkin.ColorDark = obj["ColorDark"];
-	if (obj["BackgroundActive"]) GlobalSkin.BackgroundActive = obj["BackgroundActive"];
-	if (obj["BorderActive"]) GlobalSkin.BorderActive = obj["BorderActive"];
-	if (obj["ColorActive"]) GlobalSkin.ColorActive = obj["ColorActive"];
-	if (obj["BackgroundDarkActive"]) GlobalSkin.BackgroundDarkActive = obj["BackgroundDarkActive"];
-	if (obj["ColorDarkActive"]) GlobalSkin.ColorDarkActive = obj["ColorDarkActive"];
-	if (obj["BackgroundHighlighted"]) GlobalSkin.BackgroundHighlighted = obj["BackgroundHighlighted"];
-	if (obj["BorderHighlighted"]) GlobalSkin.BorderHighlighted = obj["BorderHighlighted"];
-	if (obj["ColorHighlighted"]) GlobalSkin.ColorHighlighted = obj["ColorHighlighted"];
-	if (obj["BackgroundDarkHighlighted"]) GlobalSkin.BackgroundDarkHighlighted = obj["BackgroundDarkHighlighted"];
-	if (obj["ColorDarkHighlighted"]) GlobalSkin.ColorDarkHighlighted = obj["ColorDarkHighlighted"];
-	if (obj["GroupDataBorder"]) GlobalSkin.GroupDataBorder = obj["GroupDataBorder"];
-	if (obj["EditorBorder"]) GlobalSkin.EditorBorder = obj["EditorBorder"];
+	updateGlobalSkinColors(obj);
 
 	if (window.g_asc_plugins)
 		window.g_asc_plugins.onThemeChanged(GlobalSkin);
