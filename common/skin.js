@@ -104,6 +104,7 @@ var EditorSkins = {
 		ThumbnailsPageNumberText        : "#000000",
 		ThumbnailsPageNumberTextActive  : "#000000",
 		ThumbnailsPageNumberTextHover   : "#000000",
+		ThumbnailsLockColor             : "#D34F4F",
 		BackgroundColorNotes            : "#F0F0F0",
 
 		THEMES_THUMBNAIL_WIDTH          : 85,
@@ -218,6 +219,7 @@ var EditorSkins = {
 		ThumbnailsPageNumberText        : "#FFFFFF",
 		ThumbnailsPageNumberTextActive  : "#FFFFFF",
 		ThumbnailsPageNumberTextHover   : "#FFFFFF",
+		ThumbnailsLockColor             : "#D34F4F",
 		BackgroundColorNotes            : "#666666",
 
 		THEMES_THUMBNAIL_WIDTH  : 85,
@@ -283,83 +285,104 @@ function updateGlobalSkinColors(theme)
 {
 	var skin = GlobalSkin;
 
-	skin.BackgroundColor = theme["canvas-background"];
-	skin.PageOutline = theme["canvas-page-border"];
+	var correctColor = function (c) {
+		return AscCommon.RgbaTextToRgbaHex(c);
+	};
 
-	skin.RulerDark = theme["canvas-ruler-margins-background"];
-	skin.RulerLight = theme["canvas-ruler-background"];
-	skin.RulerOutline = theme["border-toolbar"];
-	skin.RulerMarkersOutlineColor = theme[""];
-	skin.RulerMarkersOutlineColorOld = theme[""];
-	skin.RulerMarkersFillColor = theme["background-normal"];
-	skin.RulerMarkersFillColorOld = theme["background-normal"];
-	skin.RulerTextColor = theme["canvas-ruler-mark"];
-	skin.RulerTabsColor = theme["canvas-high-contrast"];
-	skin.RulerTabsColorOld = theme["canvas-high-contrast-disabled"];
-	skin.RulerTableColor1 = theme["background-normal"];
-	skin.RulerTableColor2 = theme["canvas-ruler-handle-border"];
+	var colorMap = {
+		BackgroundColor                : "canvas-background",
+		PageOutline                    : "canvas-page-border",
 
-	skin.ScrollBackgroundColor = theme["canvas-background"];
-	skin.ScrollOutlineColor = theme["canvas-scroll-thumb-border"];
-	skin.ScrollOutlineHoverColor = theme["canvas-scroll-thumb-border-hover"];
-	skin.ScrollOutlineActiveColor = theme["canvas-scroll-thumb-border-pressed"];
-	skin.ScrollerColor = theme["canvas-scroll-thumb"];
-	skin.ScrollerHoverColor = theme["canvas-scroll-thumb-hover"];
-	skin.ScrollerActiveColor = theme["canvas-scroll-thumb-pressed"];
-	skin.ScrollArrowColor = theme["canvas-scroll-arrow"];
-	skin.ScrollArrowHoverColor = theme["canvas-scroll-arrow-hover"];
-	skin.ScrollArrowActiveColor = theme["canvas-scroll-arrow-pressed"];
-	skin.ScrollerTargetColor = theme["canvas-scroll-thumb-target"];
-	skin.ScrollerTargetHoverColor = theme["canvas-scroll-thumb-target-hover"];
-	skin.ScrollerTargetActiveColor = theme["canvas-scroll-thumb-target-pressed"];
+		RulerDark                      : "canvas-ruler-margins-background",
+		RulerLight                     : "canvas-ruler-background",
+		RulerOutline                   : "border-toolbar",
+		RulerMarkersOutlineColor       : "",
+		RulerMarkersOutlineColorOld    : "",
+		RulerMarkersFillColor          : "background-normal",
+		RulerMarkersFillColorOld       : "background-normal",
+		RulerTextColor                 : "canvas-ruler-mark",
+		RulerTabsColor                 : "canvas-high-contrast",
+		RulerTabsColorOld              : "canvas-high-contrast-disabled",
+		RulerTableColor1               : "background-normal",
+		RulerTableColor2               : "canvas-ruler-handle-border",
 
-	/* presentations */
-	skin.BackgroundColorThumbnails = theme["background-toolbar"];
-	skin.BackgroundColorThumbnailsActive = theme["background-toolbar"];
-	skin.BackgroundColorThumbnailsHover = theme["background-toolbar"];
-	skin.ThumbnailsPageOutlineActive = theme["border-preview-select"];
-	skin.ThumbnailsPageOutlineHover = theme["border-preview-hover"];
-	skin.ThumbnailsPageNumberText = theme["text-normal"];
-	skin.ThumbnailsPageNumberTextActive = theme["text-normal"];
-	skin.ThumbnailsPageNumberTextHover = theme["text-normal"];
-	skin.BackgroundColorNotes = theme["canvas-background"];
+		ScrollBackgroundColor          : "canvas-background",
+		ScrollOutlineColor             : "canvas-scroll-thumb-border",
+		ScrollOutlineHoverColor        : "canvas-scroll-thumb-border-hover",
+		ScrollOutlineActiveColor       : "canvas-scroll-thumb-border-pressed",
+		ScrollerColor                  : "canvas-scroll-thumb",
+		ScrollerHoverColor             : "canvas-scroll-thumb-hover",
+		ScrollerActiveColor            : "canvas-scroll-thumb-pressed",
+		ScrollArrowColor               : "canvas-scroll-arrow",
+		ScrollArrowHoverColor          : "canvas-scroll-arrow-hover",
+		ScrollArrowActiveColor         : "canvas-scroll-arrow-pressed",
+		ScrollerTargetColor            : "canvas-scroll-thumb-target",
+		ScrollerTargetHoverColor       : "canvas-scroll-thumb-target-hover",
+		ScrollerTargetActiveColor      : "canvas-scroll-thumb-target-pressed",
 
-	skin.BorderSplitterColor = theme["border-toolbar"];
+		/* presentations */
+		BackgroundColorThumbnails       : "background-toolbar",
+		BackgroundColorThumbnailsActive : "background-toolbar",
+		BackgroundColorThumbnailsHover  : "background-toolbar",
+		ThumbnailsPageOutlineActive     : "border-preview-select",
+		ThumbnailsPageOutlineHover      : "border-preview-hover",
+		ThumbnailsPageNumberText        : "text-normal",
+		ThumbnailsPageNumberTextActive  : "text-normal",
+		ThumbnailsPageNumberTextHover   : "text-normal",
+		BackgroundColorNotes            : "canvas-background",
 
-	// demonstration
-	skin.DemBackgroundColor = theme["canvas-background"];
-	skin.DemButtonBackgroundColor = theme[""];
-	skin.DemButtonBackgroundColorHover = theme[""];
-	skin.DemButtonBackgroundColorActive = theme[""];
-	skin.DemButtonBorderColor = theme[""];
-	skin.DemButtonTextColor = theme[""];
-	skin.DemButtonTextColorActive = theme[""];
-	skin.DemSplitterColor = theme[""];
-	skin.DemTextColor = theme[""];
+		BorderSplitterColor             : "border-toolbar",
 
-	/* spreadsheets */
-	skin.Background = theme["canvas-background"];
-	skin.BackgroundActive = theme["canvas-cell-title-selected"];
-	skin.BackgroundHighlighted = theme["canvas-cell-title-hover"];
+		// demonstration
+		DemBackgroundColor              : "canvas-background",
+		DemButtonBackgroundColor        : "",
+		DemButtonBackgroundColorHover   : "",
+		DemButtonBackgroundColorActive  : "",
+		DemButtonBorderColor            : "",
+		DemButtonTextColor              : "",
+		DemButtonTextColorActive        : "",
+		DemSplitterColor                : "",
+		DemTextColor                    : "",
 
-	skin.Border = theme["canvas-cell-title-border"];
-	skin.BorderActive = theme["canvas-cell-title-border-selected"];
-	skin.BorderHighlighted = theme["canvas-cell-title-border-hover"];
+		/* spreadsheets */
+		Background                      : "canvas-background",
+		BackgroundActive                : "canvas-cell-title-selected",
+		BackgroundHighlighted           : "canvas-cell-title-hover",
 
-	skin.Color = theme["text-normal"];
-	skin.ColorActive = theme["text-normal"];
-	skin.ColorHighlighted = theme["text-normal"];
+		Border                          : "canvas-cell-title-border",
+		BorderActive                    : "canvas-cell-title-border-selected",
+		BorderHighlighted               : "canvas-cell-title-border-hover",
 
-	skin.BackgroundDark = theme["canvas-dark-cell-title"];
-	skin.BackgroundDarkActive = theme["canvas-dark-cell-title-selected"];
-	skin.BackgroundDarkHighlighted = theme["canvas-dark-cell-title-hover"];
+		Color                           : "text-normal",
+		ColorActive                     : "text-normal",
+		ColorHighlighted                : "text-normal",
 
-	skin.ColorDark = theme["text-contrast-background"];
-	skin.ColorDarkActive = theme["text-contrast-background"];
-	skin.ColorDarkHighlighted = theme["text-contrast-background"];
+		BackgroundDark                  : "canvas-dark-cell-title",
+		BackgroundDarkActive            : "canvas-dark-cell-title-selected",
+		BackgroundDarkHighlighted       : "canvas-dark-cell-title-hover",
 
-	skin.GroupDataBorder = theme["border-toolbar"];
-	skin.EditorBorder = theme[""];
+		ColorDark                       : "text-contrast-background",
+		ColorDarkActive                 : "text-contrast-background",
+		ColorDarkHighlighted            : "text-contrast-background",
+
+		GroupDataBorder                 : "border-toolbar",
+		EditorBorder                    : ""
+	};
+
+	for (var color in colorMap)
+	{
+		if (undefined === GlobalSkin[color])
+			continue;
+		if ("" === colorMap[color])
+			continue;
+		if (undefined === theme[colorMap[color]])
+			continue;
+
+		if (0 === GlobalSkin[color].indexOf("rgb"))
+			GlobalSkin[color] = theme[colorMap[color]];
+		else
+			GlobalSkin[color] = correctColor(theme[colorMap[color]]);
+	}
 }
 
 function updateGlobalSkin(obj)
@@ -403,6 +426,64 @@ function updateGlobalSkin(obj)
 window['AscCommon'] = window['AscCommon'] || {};
 window['AscCommon'].GlobalSkin = GlobalSkin;
 window['AscCommon'].updateGlobalSkin = updateGlobalSkin;
+
+window['AscCommon'].RgbaHexToRGBA = function(color)
+{
+	var index = 0;
+	if ("#".charCodeAt(0) === color.charCodeAt(0))
+		index++;
+
+	var ret = {
+		R : 0,
+		G : 0,
+		B : 0,
+		A : 255
+	};
+
+	if (6 <= color.length)
+	{
+		ret.R = parseInt( color.substring( index, index + 2 ), 16 );
+		ret.G = parseInt( color.substring( index + 2, index + 4 ), 16 );
+		ret.B = parseInt( color.substring( index + 4, index + 6 ), 16 );
+	}
+	else
+	{
+		ret.R = parseInt( colorHEX.substring( index, index + 1 ), 16 );
+		ret.G = parseInt( colorHEX.substring( index + 1, index + 2 ), 16 );
+		ret.B = parseInt( colorHEX.substring( index + 2, index + 3 ), 16 );
+
+		ret.R = (ret.R << 4) | ret.R;
+		ret.G = (ret.G << 4) | ret.G;
+		ret.R = (ret.B << 4) | ret.B;
+	}
+
+	return ret;
+};
+window['AscCommon'].RgbaTextToRgbaHex = function(color)
+{
+	if (0 !== color.indexOf("rgb"))
+		return color;
+
+	var start = color.indexOf("(");
+	var end = color.indexOf(")");
+	var tmp = color.substring(start + 1, end);
+	var colors = tmp.split(",");
+
+	for (var i in colors)
+		colors[i] = colors[i].trim();
+
+	var r = colors[0] || 0;
+	var g = colors[1] || 0;
+	var b = colors[2] || 0;
+	var a = (colors[3] === undefined) ? 255 : colors[3];
+
+	var toHex = function (c) {
+		var res = Number(c).toString(16);
+		return res.length === 1 ? "0" + res : res;
+	};
+
+	return "#" + toHex(r) + toHex(g) + toHex(b);
+};
 
 if (AscCommon.TEMP_STYLE_THUMBNAIL_WIDTH !== undefined && AscCommon.TEMP_STYLE_THUMBNAIL_HEIGHT !== undefined)
 {
