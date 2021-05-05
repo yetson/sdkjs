@@ -448,9 +448,9 @@ window['AscCommon'].RgbaHexToRGBA = function(color)
 	}
 	else
 	{
-		ret.R = parseInt( colorHEX.substring( index, index + 1 ), 16 );
-		ret.G = parseInt( colorHEX.substring( index + 1, index + 2 ), 16 );
-		ret.B = parseInt( colorHEX.substring( index + 2, index + 3 ), 16 );
+		ret.R = parseInt( color.substring( index, index + 1 ), 16 );
+		ret.G = parseInt( color.substring( index + 1, index + 2 ), 16 );
+		ret.B = parseInt( color.substring( index + 2, index + 3 ), 16 );
 
 		ret.R = (ret.R << 4) | ret.R;
 		ret.G = (ret.G << 4) | ret.G;
