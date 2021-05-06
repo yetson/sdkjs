@@ -296,8 +296,8 @@ function updateGlobalSkinColors(theme)
 		RulerDark                      : "canvas-ruler-margins-background",
 		RulerLight                     : "canvas-ruler-background",
 		RulerOutline                   : "border-toolbar",
-		RulerMarkersOutlineColor       : "",
-		RulerMarkersOutlineColorOld    : "",
+		RulerMarkersOutlineColor       : "canvas-ruler-handle-border",
+		RulerMarkersOutlineColorOld    : "canvas-ruler-handle-border-disabled",
 		RulerMarkersFillColor          : "background-normal",
 		RulerMarkersFillColorOld       : "background-normal",
 		RulerTextColor                 : "canvas-ruler-mark",
@@ -334,15 +334,15 @@ function updateGlobalSkinColors(theme)
 		BorderSplitterColor             : "border-toolbar",
 
 		// demonstration
-		DemBackgroundColor              : "canvas-background",
-		DemButtonBackgroundColor        : "",
-		DemButtonBackgroundColorHover   : "",
-		DemButtonBackgroundColorActive  : "",
-		DemButtonBorderColor            : "",
-		DemButtonTextColor              : "",
-		DemButtonTextColorActive        : "",
-		DemSplitterColor                : "",
-		DemTextColor                    : "",
+		DemBackgroundColor              : "background-toolbar",
+		DemButtonBackgroundColor        : "background-normal",
+		DemButtonBackgroundColorHover   : "highlight-buttin-hover",
+		DemButtonBackgroundColorActive  : "highlight-button-pressed",
+		DemButtonBorderColor            : "border-regular-control",
+		DemButtonTextColor              : "text-normal",
+		DemButtonTextColorActive        : "text-normal-pressed",
+		DemSplitterColor                : "border-divider",
+		DemTextColor                    : "text-normal",
 
 		/* spreadsheets */
 		Background                      : "canvas-background",
@@ -366,7 +366,7 @@ function updateGlobalSkinColors(theme)
 		ColorDarkHighlighted            : "text-contrast-background",
 
 		GroupDataBorder                 : "border-toolbar",
-		EditorBorder                    : ""
+		EditorBorder                    : "border-toolbar"
 	};
 
 	for (var color in colorMap)
