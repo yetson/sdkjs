@@ -8579,6 +8579,12 @@ CMathContent.prototype.GetTextContent = function(bSelectedText) {
 	}
 	return {str: str, bIsContainsOperator: bIsContainsOperator, paraRunArr: paraRunArr};
 };
+
+CMathContent.prototype.CollectDocumentStatistics = function(ParaStats) {
+    var Count = this.Content.length;
+    for (var Index = 0; Index < Count; Index++)
+        this.Content[Index].CollectDocumentStatistics(ParaStats);
+};
 function CMathAutoCorrectEngine(Elem, CurPos, Paragraph) {
 
     this.ActionElement    = Elem;                                               // элемент на которотом срабатывает автодополнение

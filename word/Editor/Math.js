@@ -1658,6 +1658,7 @@ ParaMath.prototype.Get_Layout = function(DrawingLayout, UseContentPos, ContentPo
 
 ParaMath.prototype.CollectDocumentStatistics = function(ParaStats)
 {
+    this.Root.CollectDocumentStatistics(ParaStats);
     // TODO: ParaMath.CollectDocumentStatistics
 };
 

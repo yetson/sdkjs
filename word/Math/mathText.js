@@ -150,7 +150,7 @@ CMathBaseText.prototype.IsPunctuation = function()
 };
 CMathBaseText.prototype.Is_NBSP = function()
 {
-    return false;
+    return (this.value === nbsp_charcode);
 };
 CMathBaseText.prototype.Can_AddNumbering = function()
 {

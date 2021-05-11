@@ -2679,12 +2679,14 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 	{
 		var Item     = this.Content[Index];
 		var ItemType = Item.Type;
+        var isMathT  = (para_Math_Text === ItemType || para_Math_Ampersand === ItemType || para_Math_BreakOperator === ItemType);
+        var isSpace  = (isMathT && 0x20 === Item.value);
 
 		var bSymbol  = false;
 		var bSpace   = false;
 		var bNewWord = false;
 
-		if ((para_Text === ItemType && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
+		if (((para_Text === ItemType || (isMathT && !isSpace)) && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
 		{
 			if (false === ParaStats.Word)
 				bNewWord = true;
@@ -2695,7 +2697,7 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 			ParaStats.Word           = true;
 			ParaStats.EmptyParagraph = false;
 		}
-		else if ((para_Text === ItemType && true === Item.Is_NBSP()) || para_Space === ItemType || para_Tab === ItemType)
+		else if (((para_Text === ItemType || isMathT) && (true === Item.Is_NBSP() || isSpace)) || para_Space === ItemType || para_Tab === ItemType)
 		{
 			bSymbol = true;
 			bSpace  = true;
