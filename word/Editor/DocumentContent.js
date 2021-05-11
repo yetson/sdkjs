@@ -2041,6 +2041,7 @@ CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 	{
 		var Element = this.Content[Index];
 		Element.CollectDocumentStatistics(Stats);
+		Stats.Add_Line(Element.Lines.length);
 	}
 };
 CDocumentContent.prototype.Document_CreateFontMap = function(FontMap)

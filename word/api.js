@@ -2838,6 +2838,7 @@ background-repeat: no-repeat;\
 			this.ParagraphCount = obj.ParagraphCount;
 			this.SymbolsCount   = obj.SymbolsCount;
 			this.SymbolsWSCount = obj.SymbolsWSCount;
+			this.LineCount      = obj.LineCount;
 		}
 		else
 		{
@@ -2846,6 +2847,7 @@ background-repeat: no-repeat;\
 			this.ParagraphCount = -1;
 			this.SymbolsCount   = -1;
 			this.SymbolsWSCount = -1;
+			this.LineCount      = -1;
 		}
 	}
 
@@ -2886,6 +2888,14 @@ background-repeat: no-repeat;\
 		return this.SymbolsWSCount;
 	};
 	CDocInfoProp.prototype.put_SymbolsWSCount = function(v)
+	{
+		this.SymbolsWSCount = v;
+	};
+	CDocInfoProp.prototype.get_LineCount = function()
+	{
+		return this.SymbolsWSCount;
+	};
+	CDocInfoProp.prototype.put_LineCount = function(v)
 	{
 		this.SymbolsWSCount = v;
 	};

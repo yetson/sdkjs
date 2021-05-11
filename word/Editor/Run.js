@@ -2702,6 +2702,7 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 
 			ParaStats.Word = false;
 		}
+        //TODO: MS каждый иероглиф считает за новое слово
 
 		if (true === bSymbol)
 			ParaStats.Stats.Add_Symbol(bSpace);

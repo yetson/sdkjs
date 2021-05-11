@@ -1364,6 +1364,7 @@ function CStatistics(LogicDocument)
     this.Paragraphs      = 0;
     this.SymbolsWOSpaces = 0;
     this.SymbolsWhSpaces = 0;
+	this.Lines           = 0;
 }
 
 CStatistics.prototype =
@@ -1381,12 +1382,13 @@ CStatistics.prototype =
         this.Paragraphs      = 0;
         this.SymbolsWOSpaces = 0;
         this.SymbolsWhSpaces = 0;
+		this.Lines           = 0;
 
 
         var LogicDocument = this.LogicDocument;
         this.PagesId = setTimeout(function(){LogicDocument.Statistics_GetPagesInfo();}, 1);
         this.Id      = setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
-        this.Send();
+        // this.Send();
     },
 
     Next_ParagraphsInfo : function(StartPos)
@@ -1395,7 +1397,7 @@ CStatistics.prototype =
         var LogicDocument = this.LogicDocument;
         clearTimeout(this.Id);
         this.Id = setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
-        this.Send();
+        // this.Send();
     },
 
     Next_PagesInfo : function()
@@ -1403,7 +1405,7 @@ CStatistics.prototype =
         var LogicDocument = this.LogicDocument;
         clearTimeout(this.PagesId);
         this.PagesId = setTimeout(function(){LogicDocument.Statistics_GetPagesInfo();}, 100);
-        this.Send();
+        // this.Send();
     },
 
     Stop_PagesInfo : function()
@@ -1445,7 +1447,8 @@ CStatistics.prototype =
             WordsCount     : this.Words,
             ParagraphCount : this.Paragraphs,
             SymbolsCount   : this.SymbolsWOSpaces,
-            SymbolsWSCount : this.SymbolsWhSpaces
+            SymbolsWSCount : this.SymbolsWhSpaces,
+			LineCount      : this.Lines
         };
 
         this.Api.sync_DocInfoCallback(Stats);
@@ -1479,7 +1482,14 @@ CStatistics.prototype =
         this.SymbolsWhSpaces++;
         if ( true != bSpace )
             this.SymbolsWOSpaces++;
-    }
+    },
+	Add_Line : function (Count)
+	{
+		if ( "undefined" != typeof( Count ) )
+            this.Lines += Count;
+        else
+            this.Lines++;
+	}
 };
 
 function CDocumentRecalcInfo()
@@ -16357,11 +16367,15 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 	{
 		var Element = this.Content[Index];
 		Element.CollectDocumentStatistics(this.Statistics);
+		if ( (Index !== (Count - 1) || !Element.IsEmpty()) && Element.Lines)
+			this.Statistics.Add_Line(Element.Lines.length);
 
 		if (CurIndex > 20)
 		{
-			this.Statistics.Next_ParagraphsInfo(Index + 1);
-			break;
+			// не понятно почему разбиваем их по 20 штук
+			// чтобы при большом объёме статистика постепенно подгружалась?
+			// this.Statistics.Next_ParagraphsInfo(Index + 1);
+			// break;
 		}
 	}
 
@@ -16382,6 +16396,7 @@ CDocument.prototype.Statistics_GetPagesInfo = function()
 		{
 			this.DrawingObjects.documentStatistics(CurPage, this.Statistics);
 		}
+
 
 		this.Statistics.Stop_PagesInfo();
 	}
