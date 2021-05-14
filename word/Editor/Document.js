@@ -1351,8 +1351,9 @@ CDocumentPage.prototype.CheckFrameClipStart = function(nIndex, oGraphics)
 
 function CStatistics(LogicDocument)
 {
-    this.LogicDocument = LogicDocument;
-    this.Api           = LogicDocument.Get_Api();
+    this.LogicDocument  = LogicDocument;
+    this.Api            = LogicDocument.Get_Api();
+	this.isUseSelection = false;
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
     this.PagesId  = null; // Id таймера для подсчета страниц
@@ -1374,9 +1375,6 @@ CStatistics.prototype =
 //-----------------------------------------------------------------------------------
     Start : function()
     {
-        this.StartPos = 0;
-        this.CurPage  = 0;
-
         this.Pages           = 0;
         this.Words           = 0;
         this.Paragraphs      = 0;
@@ -1386,6 +1384,9 @@ CStatistics.prototype =
 
 
         var LogicDocument = this.LogicDocument;
+		var Selected = LogicDocument.GetSelectedContent();
+		this.isUseSelection = (LogicDocument.Selection.Use && Selected.Elements.length !== 0 && Selected.DrawingObjects.length === 0);
+        this.StartPos = (this.isUseSelection) ? Math.min(this.LogicDocument.Selection.StartPos, this.LogicDocument.Selection.EndPos) : 0;
         this.PagesId = setTimeout(function(){LogicDocument.Statistics_GetPagesInfo();}, 1);
         this.Id      = setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
         // this.Send();
@@ -16358,16 +16359,15 @@ CDocument.prototype.Statistics_Start = function()
 };
 CDocument.prototype.Statistics_GetParagraphsInfo = function()
 {
-	var Count   = this.Content.length;
-	var CurPage = this.Statistics.CurPage;
+	var Count   = (this.Selection.Use) ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.Content.length - 1;
 
 	var Index    = 0;
 	var CurIndex = 0;
-	for (Index = this.Statistics.StartPos; Index < Count; ++Index, ++CurIndex)
+	for (Index = this.Statistics.StartPos; Index <= Count; ++Index, ++CurIndex)
 	{
 		var Element = this.Content[Index];
 		Element.CollectDocumentStatistics(this.Statistics);
-		if ( (Index !== (Count - 1) || !Element.IsEmpty()) && Element.Lines)
+		if ( (Index !== Count || !Element.IsEmpty()) && Element.Lines)
 			this.Statistics.Add_Line(Element.Lines.length);
 
 		if (CurIndex > 20)
@@ -16384,15 +16384,24 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 };
 CDocument.prototype.Statistics_GetPagesInfo = function()
 {
-	this.Statistics.Update_Pages(this.Pages.length);
-
 	if (null !== this.FullRecalc.Id)
 	{
 		this.Statistics.Next_PagesInfo();
 	}
 	else
 	{
-		for (var CurPage = 0, PagesCount = this.Pages.length; CurPage < PagesCount; ++CurPage)
+		var Start = 0,
+			End   = this.Pages.length - 1;
+		if (this.Statistics.isUseSelection)
+		{
+			// если есть селект, то считаем только заселекченные страницы
+			var bounds = this.GetSelectionBounds();
+			Start = Math.min(bounds.Start.Page, bounds.End.Page);
+			End   = Math.max(bounds.Start.Page, bounds.End.Page);
+		}
+		this.Statistics.Update_Pages(End - Start + 1);
+
+		for (var CurPage = Start; CurPage <= End; ++CurPage)
 		{
 			this.DrawingObjects.documentStatistics(CurPage, this.Statistics);
 		}

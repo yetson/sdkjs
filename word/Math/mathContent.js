@@ -8581,8 +8581,14 @@ CMathContent.prototype.GetTextContent = function(bSelectedText) {
 };
 
 CMathContent.prototype.CollectDocumentStatistics = function(ParaStats) {
-    var Count = this.Content.length;
-    for (var Index = 0; Index < Count; Index++)
+    var Start = 0,
+        End   = this.Content.length - 1;
+    if(ParaStats.Stats.isUseSelection)
+    {
+        Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+        End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+    }
+    for (var Index = Start; Index <= End; Index++)
         this.Content[Index].CollectDocumentStatistics(ParaStats);
 };
 function CMathAutoCorrectEngine(Elem, CurPos, Paragraph) {

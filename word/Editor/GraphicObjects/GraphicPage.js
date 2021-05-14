@@ -187,8 +187,16 @@ CGraphicPage.prototype =
         var cur_array = this.inlineObjects.concat(this.behindDocObjects).concat(this.beforeTextObjects);
         for(var i = 0; i < cur_array.length; ++i)
         {
-            if(cur_array[i].documentStatistics)
-                cur_array[i].documentStatistics(Statistics);
+            if (Statistics.isUseSelection)
+            {
+                if(cur_array[i].documentStatistics && cur_array[i].selected)
+                    cur_array[i].documentStatistics(Statistics);
+            }
+            else
+            {
+                if(cur_array[i].documentStatistics)
+                    cur_array[i].documentStatistics(Statistics);
+            }
         }
 
     },

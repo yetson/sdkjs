@@ -2674,19 +2674,34 @@ ParaRun.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, n
 
 ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-	var Count = this.Content.length;
-	for (var Index = 0; Index < Count; Index++)
+    var Start = 0,
+		End   = this.Content.length;
+	if (ParaStats.Stats.isUseSelection)
+	{
+		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	}
+	for (var Index = Start; Index < End; Index++)
 	{
 		var Item     = this.Content[Index];
 		var ItemType = Item.Type;
-        var isMathT  = (para_Math_Text === ItemType || para_Math_Ampersand === ItemType || para_Math_BreakOperator === ItemType);
-        var isSpace  = (isMathT && 0x20 === Item.value);
+		// Добавил para_Math_Placeholder, так как MS учитывает их в статистике
+		var isMathT  = (para_Math_Text === ItemType || para_Math_Ampersand === ItemType || para_Math_BreakOperator === ItemType || para_Math_Placeholder === ItemType);
+		var isSpace  = (isMathT && 0x20 === Item.value);
 
 		var bSymbol  = false;
 		var bSpace   = false;
 		var bNewWord = false;
-
-		if (((para_Text === ItemType || (isMathT && !isSpace)) && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
+        // MS каждый иероглиф считает за новое слово
+        var val = Item.Value || Item.value;
+		if (AscCommon.isEastAsianScript(val))
+		{
+			bSymbol = true;
+			bNewWord = true;
+			ParaStats.Word = false;
+			ParaStats.EmptyParagraph = false;
+		}
+		else if (((para_Text === ItemType || (isMathT && !isSpace)) && false === Item.Is_NBSP()) || (para_PageNum === ItemType || para_PageCount === ItemType))
 		{
 			if (false === ParaStats.Word)
 				bNewWord = true;
@@ -2704,7 +2719,6 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 
 			ParaStats.Word = false;
 		}
-        //TODO: MS каждый иероглиф считает за новое слово
 
 		if (true === bSymbol)
 			ParaStats.Stats.Add_Symbol(bSpace);

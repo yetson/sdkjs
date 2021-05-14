@@ -11012,9 +11012,15 @@ Paragraph.prototype.Get_CurrentPage_Relative = function()
 Paragraph.prototype.CollectDocumentStatistics = function(Stats)
 {
 	var ParaStats = new CParagraphStatistics(Stats);
-	var Count     = this.Content.length;
+	var Start = 0,
+		End   = this.Content.length - 1;
+	if (Stats.isUseSelection)
+	{
+		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	}
 
-	for (var Index = 0; Index < Count; Index++)
+	for (var Index = Start; Index <= End; Index++)
 	{
 		var Item = this.Content[Index];
 		Item.CollectDocumentStatistics(ParaStats);

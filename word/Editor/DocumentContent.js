@@ -2036,8 +2036,14 @@ CDocumentContent.prototype.Get_CurrentPage_Relative = function()
 };
 CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 {
-	var Count = this.Content.length;
-	for (var Index = 0; Index < Count; Index++)
+	var Start = 0,
+	    End   = this.Content.length - 1;
+	if (Stats.isUseSelection)
+	{
+		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	}
+	for (var Index = Start; Index <= End; Index++)
 	{
 		var Element = this.Content[Index];
 		Element.CollectDocumentStatistics(Stats);
