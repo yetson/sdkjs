@@ -464,8 +464,8 @@
 		this.model.setDirtyConditionalFormatting(null);
 		this.model.initPivotTables();
 		this.model.updatePivotTablesStyle(null);
-		this._cleanCellsTextMetricsCache();
 		this._prepareCellTextMetricsCache();
+		this._cleanCellsTextMetricsCache();
 
 		// initializing is completed
 		this.handlers.trigger("initialized");
