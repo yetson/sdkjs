@@ -1388,7 +1388,8 @@ CStatistics.prototype =
 		this.isUseSelection = (LogicDocument.Selection.Use && Selected.Elements.length !== 0 && Selected.DrawingObjects.length === 0);
         this.StartPos = (this.isUseSelection) ? Math.min(this.LogicDocument.Selection.StartPos, this.LogicDocument.Selection.EndPos) : 0;
         this.PagesId = setTimeout(function(){LogicDocument.Statistics_GetPagesInfo();}, 1);
-        this.Id      = setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
+        this.Id      = null;//setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
+		LogicDocument.Statistics_GetParagraphsInfo();
         // this.Send();
     },
 
@@ -1422,11 +1423,11 @@ CStatistics.prototype =
 
     Stop_ParagraphsInfo : function()
     {
-        if (null != this.Id)
-        {
-            clearTimeout(this.Id);
-            this.Id = null;
-        }
+        // if (null != this.Id)
+        // {
+        //     clearTimeout(this.Id);
+        //     this.Id = null;
+        // }
 
         this.Check_Stop();
     },
@@ -16359,7 +16360,7 @@ CDocument.prototype.Statistics_Start = function()
 };
 CDocument.prototype.Statistics_GetParagraphsInfo = function()
 {
-	var Count   = (this.Selection.Use) ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.Content.length - 1;
+	var Count = (this.Statistics.isUseSelection) ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.Content.length - 1;
 
 	var Index    = 0;
 	var CurIndex = 0;
