@@ -1273,6 +1273,13 @@ var editor;
   };
 
   spreadsheet_api.prototype.openDocument = function(file) {
+	  if (file.changes && this.VersionHistory)
+	  {
+		  this.VersionHistory.changes = file.changes;
+		  this.VersionHistory.applyChanges(this);
+	  }
+
+
 	this._openDocument(file.data);
 	this._openOnClient();
   };
