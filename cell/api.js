@@ -1273,16 +1273,35 @@ var editor;
   };
 
   spreadsheet_api.prototype.openDocument = function(file) {
-	  if (file.changes && this.VersionHistory)
-	  {
-		  this.VersionHistory.changes = file.changes;
-		  this.VersionHistory.applyChanges(this);
-	  }
-
+	//todo native.js -> openDocument
+  	if (file.changes && this.VersionHistory) {
+		this.VersionHistory.changes = file.changes;
+		this.VersionHistory.applyChanges(this);
+	}
 
 	this._openDocument(file.data);
 	this._openOnClient();
   };
+
+	spreadsheet_api.prototype.asc_CloseFile = function()
+	{
+		History.Clear();
+		g_oIdCounter.Clear();
+		g_oTableId.Clear();
+		AscCommon.CollaborativeEditing.Clear();
+		this.isApplyChangesOnOpenEnabled = true;
+		this.isDocumentLoadComplete = false;
+
+		/*var oLogicDocument = this.WordControl.m_oLogicDocument;
+		oLogicDocument.StopRecalculate();
+		oLogicDocument.Stop_CheckSpelling();
+		AscCommon.pptx_content_loader.ImageMapChecker = {};*/
+
+		if (this.wbModel.DrawingDocument) {
+			this.wbModel.DrawingDocument.CloseFile();
+		}
+	};
+
 	spreadsheet_api.prototype.openDocumentFromZip = function (wb, data) {
 		var t = this;
 		return new Promise(function (resolve, reject) {
