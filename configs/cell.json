@@ -246,6 +246,7 @@
 			"slide/apiBuilder.js",
 			"cell/apiBuilder.js",
 
+			"common/versionHistory.js",
 			"common/clipboard_base.js",
 			"common/text_input.js",
 			"common/Drawings/Format/OleObject.js",
