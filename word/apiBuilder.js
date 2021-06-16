@@ -5401,6 +5401,56 @@
 		oDocument.Register_Field(oField);
 		this.Paragraph.AddToParagraph(oField);
 	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiParagraph
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiParagraph.prototype.ToJSON = function()
+	{
+		var sPrJSON = '';
+		sPrJSON += JSON.stringify(this.Paragraph.Pr);
+		sPrJSON.replace("Brd", "pBrd");
+		//sPrJSON.replace("Bullet", "pBrd");
+		sPrJSON.replace("ContextualSpacing", "contextualSpacing");
+		sPrJSON.replace("DefaultRunPr", "pBrd");
+		sPrJSON.replace("DefaultTab", "pBrd");
+		sPrJSON.replace("FramePr", "framePr");
+		sPrJSON.replace("Ind", "ind");
+		sPrJSON.replace("Jc", "jc");
+		sPrJSON.replace("KeepLines", "keepLines");
+		sPrJSON.replace("KeepNext", "keepNext");
+		//sPrJSON.replace("LnSpcReduction", "pBrd");
+		//sPrJSON.replace("Lvl", "pBrd");
+		sPrJSON.replace("NumPr", "numPr");
+		sPrJSON.replace("OutlineLvl", "outlineLvl");
+		sPrJSON.replace("PStyle", "pStyle");
+		sPrJSON.replace("PageBreakBefore", "pageBreakBefore");
+		//sPrJSON.replace("PrChange", "pBrd");
+		//sPrJSON.replace("ReviewInfo", "pBrd");
+		sPrJSON.replace("Shd", "shd");
+		sPrJSON.replace("Spacing", "spacing");
+		sPrJSON.replace("SuppressLineNumbers", "suppressLineNumbers");
+		sPrJSON.replace("Tabs", "tabs");
+		sPrJSON.replace("WidowControl", "widowControl");
+		
+		var oParaObject = JSON.parse(sPrJSON);
+		var oTempElm = null;
+		oParaObject["content"] = [];
+
+		for (var nElm = 0; nElm < this.Paragraph.Content.length; nElm++)
+		{
+			oTempElm = this.Paragraph.Content[nElm];
+			switch (oTempElm.Type)
+			{
+				case para_Run:
+					oParaObject["content"].push((new ApiRun(oTempElm).ToJSON()));
+					break;
+			}
+		}
+
+	};
 	//------------------------------------------------------------------------------------------------------------------
 	//
 	// ApiRun
@@ -6043,6 +6093,94 @@
 		}
 		
 		oDocument.Register_Field(oField);
+	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiRun
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiRun.prototype.ToJSON = function()
+	{
+		var sPrJSON = ''
+		var oCompiledPr = this.Run.Pr;
+
+		sPrJSON += JSON.stringify(oCompiledPr);
+		sPrJSON.replace("BoldCS", "bCs");
+		sPrJSON.replace("Bold", "b");
+		sPrJSON.replace("CS", "cs");
+		sPrJSON.replace("Caps", "caps");
+		sPrJSON.replace("Color", "color");
+		sPrJSON.replace("DStrikeout", "dstrike");
+		//sPrJSON.replace("FontFamily", "dstrike");
+		//sPrJSON.replace("FontRef", "dstrike");
+		//sPrJSON.replace("FontScale", "dstrike");
+		//sPrJSON.replace("FontSize", "dstrike");
+		//sPrJSON.replace("FontSizeCS", "dstrike");
+		//sPrJSON.replace("FontSizeCSOrig", "dstrike");
+		//sPrJSON.replace("FontSizeOrig", "dstrike");
+		sPrJSON.replace("HighLight", "highlight");
+		//sPrJSON.replace("HighlightColor", "highlight");
+		sPrJSON.replace("ItalicCS", "iCs");
+		sPrJSON.replace("Italic", "i");
+		sPrJSON.replace("Lang", "lang");
+		sPrJSON.replace("Position", "position");
+		//sPrJSON.replace("PrChange", "i");
+		sPrJSON.replace("RFonts", "rFonts");
+		sPrJSON.replace("RStyle", "rStyle");
+		sPrJSON.replace("RTL", "rtl");
+		//sPrJSON.replace("ReviewInfo", "rtl");
+		sPrJSON.replace("Shd", "shd");
+		sPrJSON.replace("SmallCaps", "smallCaps");
+		sPrJSON.replace("Spacing", "spacing");
+		sPrJSON.replace("Strikeout", "strike");
+		//sPrJSON.replace("TextFill", "TextFill");
+		//sPrJSON.replace("TextOutline", "TextOutline");
+		sPrJSON.replace("Underline", "u");
+		//sPrJSON.replace("Unifill", "u");
+		sPrJSON.replace("Vanish", "vanish");
+		sPrJSON.replace("VertAlign", "vertAlign");
+
+		var oRunObject        = JSON.parse(sPrJSON);
+		oRunObject["content"] = [];
+		
+		var ContentLen        = this.Run.Content.length;
+		var sTempRunText = '';
+		for (var CurPos = 0; CurPos < ContentLen; CurPos++)
+		{
+			var Item     = this.Run.Content[CurPos];
+			var ItemType = Item.Type;
+
+			switch (ItemType)
+			{
+				case para_Drawing:
+				case para_PageNum:
+				case para_PageCount:
+				{
+					oRunObject["content"].push(sTempRunText);
+					sTempRunText = '';
+					break;
+				}
+				case para_End:
+				{
+					break;
+				}
+				case para_Text :
+				{
+					sTempRunText += String.fromCharCode(Item.Value);
+					break;
+				}
+				case para_Space:
+				case para_NewLine:
+				case para_Tab:
+				{
+					sTempRunText += " ";
+					break;
+				}
+			}
+		}
+		oRunObject["content"].push(sTempRunText);
+
+		return JSON.stringify(oRunObject);
 	};
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -10196,6 +10334,999 @@
 
 		return null;
 	};
+	/**
+	 * Convert to JSON object. 
+	 * @memberof ApiDrawing
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiDrawing.prototype.ToJSON = function()
+	{
+		var oDrawing = this.Drawing;
+		var oDrawingObject = {
+			docPr: HandleDocPr(this.Drawing.docPr),
+			effectExtent: HandleEffectExtent(this.Drawing.EffectExtent),
+			extent: HandleExtent(this.Drawing.Extent),
+			graphic: HandleGrapicObject(this.Drawing.GraphicObj),
+			positionH: HandlePosH(this.Drawing.PositionH),
+			positionV: HandlePosV(this.Drawing.PositionV),
+			simplePos: HandleSimplePos(this.Drawing.SimplePos),
+			distB: this.Drawing.Distance ? this.Drawing.Distance.B : null,
+			distL: this.Drawing.Distance ? this.Drawing.Distance.L : null,
+			distR: this.Drawing.Distance ? this.Drawing.Distance.R : null,
+			distT: this.Drawing.Distance ? this.Drawing.Distance.T : null,
+			allowOverlap: this.Drawing.AllowOverlap,
+			behindDoc: this.Drawing.behindDoc,
+			hidden: this.Drawing.Hidden,
+			layoutInCell: this.Drawing.LayoutInCell,
+			locked: this.Drawing.Locked,
+			relativeHeight: this.Drawing.RelativeHeight,
+			wrapType: GetWrapType(this.Drawing.wrappingType)
+		};
+
+		function HandleShape(oShapeObject)
+		{
+
+		};
+
+		function HandleImage(oImgObject)
+		{
+			oDrawingObject["inline"]["blipFill"] = oImgObject.blipFill;
+			oDrawingObject["inline"]["cNvPicPr"] = oImgObject.nvPicPr;
+			oDrawingObject["inline"]["spPr"]     = oImgObject.spPr;
+		};
+		function HandleHlink(oHlink)
+		{
+			if (!oHlink)
+				return null;
+			
+			return {
+				action: oHlink.action,
+				endSnd: oHlink.endSnd,
+				highlightClick: oHlink.highlightClick,
+				history: oHlink.history,
+				id: oHlink.id,
+				invalidUrl: oHlink.invalidUrl,
+				tgtFrame: oHlink.tgtFrame,
+				tooltip: oHlink.tooltip
+			}
+		};
+		function HandleExternalData(oExtData)
+		{
+			if (!oExtData)
+				return null;
+			
+			return {
+				autoUpdate: oExtData.autoUpdate,
+				id: oExtData.id
+			}
+		};
+		function HandleProtection(oProtection)
+		{
+			if (!oProtection)
+				return null;
+			
+			return {
+				chartObject: oProtection.chartObject,
+				data: oProtection.data,
+				formatting: oProtection.formatting,
+				selection: oProtection.selection,
+				userInterface: oProtection.userInterface
+			}
+		};
+		function HandlePivotSource(oPivotSource)
+		{
+			if (!oPivotSource)
+				return null;
+			
+			return {
+				fmtId: oPivotSource.fmtId,
+				name: oPivotSource.name
+			}
+		};
+		function HandleSimplePos(oSimplePos)
+		{
+			if (!oSimplePos)
+				return null;
+			
+			return {
+				x: oSimplePos.X,
+				y: oSimplePos.Y
+			}
+		};
+		function HandlePosV(oPosV)
+		{
+			if (!oPosV)
+				return null;
+			
+			return {
+				align: oPosV.Align,
+				relativeFrom: oPosV.RelativeFrom
+			}
+		};
+		function HandlePosH(oPosH)
+		{
+			if (!oPosH)
+				return null;
+			
+			return {
+				align: oPosH.Align,
+				relativeFrom: oPosH.RelativeFrom
+			}
+		};
+		function HandleExtent(oExtent)
+		{
+			if (!oExtent)
+				return null;
+
+			return {
+				cy: oExtent.H,
+				cx: oExtent.W
+			}
+		};
+		function HandleEffectExtent(oEffExt)
+		{
+			if (!oEffExt)
+				return null;
+
+			return {
+				b: oEffExt.B,
+				l: oEffExt.L,
+				r: oEffExt.R,
+				t: oEffExt.T
+			}
+		};
+		function GetWrapType(nType)
+		{
+			switch (nType)
+			{
+				case WRAPPING_TYPE_NONE:
+					return "none";
+				case WRAPPING_TYPE_SQUARE:
+					return "square";
+				case WRAPPING_TYPE_THROUGH:
+					return "through";
+				case WRAPPING_TYPE_TIGHT:
+					return "tight";
+				case WRAPPING_TYPE_TOP_AND_BOTTOM:
+					return "top_and_bottom";
+				default:
+					return "none";
+			}
+		};
+		function HandleGrapicObject(oGraphicObj)
+		{
+			if (!oGraphicObj)
+				return null;
+
+			if (oGraphicObj.isChart())
+				return HandleChartSpace(oGraphicObj);
+			if (oGraphicObj.isImage())
+				return HandleImage(oGraphicObj);
+			if (oGraphicObj.isShape())
+				return HandleShape(oGraphicObj);
+			
+			return null;
+		};
+		function HandleDocPr(oDocPr)
+		{
+			if (!oDocPr)
+				return null;
+			
+			return {
+				hlinkClick: HandleHlink(oDocPr.hlinkClick),
+				hlinkHover: HandleHlink(oDocPr.hlinkHover),
+				descr: oDocPr.descr,
+				hidden: oDocPr.isHidden,
+				id: oDocPr.id,
+				name: oDocPr.name,
+				title: HandleTitle(oDocPr.title)
+			}
+		};
+		function HandleNumLit(oNumLit)
+		{
+			if (!oNumLit)
+				return null;
+
+			var arrResultPts = [];
+			for (var nItem = 0; nItem < oNumLit.pts.length; nItem++)
+			{
+				arrResultPts.push({
+					v: oNumLit.pts[nItem].val,
+					formatCode:  oNumLit.pts[nItem].formatCode,
+					idx: oNumLit.pts[nItem].idx,
+				});
+			}
+
+			return {
+				formatCode: oNumLit.formatCode,
+				pt: arrResultPts,
+				ptCount: oNumLit.ptCount
+			}
+		};
+		function HandleStrLit(oStrLit)
+		{
+			if (!oStrLit)
+				return null;
+
+			var arrResultPts = [];
+			for (var nItem = 0; nItem < oStrLit.pts.length; nItem++)
+			{
+				arrResultPts.push({
+					v: oStrLit.pts[nItem].val,
+					idx: oStrLit.pts[nItem].idx,
+				});
+			}
+
+			return {
+				formatCode: oStrLit.formatCode,
+				pt: arrResultPts,
+				ptCount: oStrLit.ptCount
+			}
+		};
+		function HandleErrBars(oErrBars)
+		{
+			if (!oErrBars)
+				return null;
+
+			return {
+				errBarType: oErrBars.errBarType,
+				errDir: oErrBars.errDir,
+				errValType: oErrBars.errValType,
+				minus: {
+					numLit: HandleNumLit(oErrBars.minus.numLit),
+					numRef: HandleNumRef(oErrBars.minus.numRef)
+				},
+				noEndCap: oErrBars.noEndCap,
+				plus: {
+					numLit: HandleNumLit(oErrBars.plus.numLit),
+					numRef: HandleNumRef(oErrBars.plus.numRef)
+				},
+				spPr: HandleSpPr(oErrBars.spPr),
+				val: oErrBars.val
+			}
+		};
+		function HandleDataPoints(arrDpts)
+		{
+			var arrResultDataPoints = [];
+
+			for (var nItem = 0; nItem < arrDpts.length; nItem++)
+			{
+				arrResultDataPoints.push({
+					bubble3D: arrDpts[nItem].bubble3D,
+					explosion: arrDpts[nItem].explosion,
+					idx: arrDpts[nItem].idx,
+					invertIfNegative: arrDpts[nItem].invertIfNegative,
+					marker: HandleMarker(arrDpts[nItem].marker)
+				});
+			}
+
+			return arrResultDataPoints;
+		};
+		function HandleMultiLvlStrRef(oRef)
+		{
+			if (!oRef)
+				return null;
+			
+			return {
+				f: oRef.f,
+				multiLvlStrCache: HandleMultiLvlStrCache(oRef.multiLvlStrCache)
+			}
+		};
+		function HandleMultiLvlStrCache(oCache)
+		{
+			if (!oChange)
+				return null;
+
+			var arrLvl = [];
+
+			for (var nPoint = 0; nPoint < oChange.lvl.length; nPoint++)
+			{
+				arrLvl.push({
+					v: oChange.lvl[nPoint].val,
+					idx: oChange.lvl[nPoint].idx
+				});
+			}
+			
+			return {
+				lvl: arrLvl,
+				ptCount: oCache.ptCount
+			}
+		};
+		function HandleCBarSeries(arrSeries)
+		{
+			var arrResultSeries = [];
+
+			for (var nItem = 0; nItem < arrSeries.length; nItem++)
+			{
+				arrResultSeries.push({
+					cat: {
+						multiLvlStrRef: HandleMultiLvlStrRef(arrSeries[nItem].cat.multiLvlStrRef),
+						numLit: HandleNumLit(arrSeries[nItem].cat.numLit),
+						numRef: HandleNumRef(arrSeries[nItem].cat.numRef),
+						strLit: HandleStrLit(arrSeries[nItem].cat.strLit),
+						strRef: HandleStrRef(arrSeries[nItem].cat.strRef)
+					},
+					dLbls: HandleDLbls(arrSeries[nItem].dLbls),
+					dPt: HandleDataPoints(arrSeries[nItem].dPt),
+					errBars: HandleErrBars(arrSeries[nItem].errBars),
+					idx: arrSeries[nItem].idx,
+					invertIfNegative: arrSeries[nItem].invertIfNegative,
+					order: arrSeries[nItem].order,
+					pictureOptions: arrSeries[nItem].pictureOptions,
+					shape: arrSeries[nItem].shape,
+					spPr: HandleSpPr(arrSeries[nItem].spPr),
+					trendline: arrSeries[nItem].trendline,
+					tx: HandleTx(arrSeries[nItem].tx),
+					val : {
+						numLit: HandleNumLit(arrSeries[nItem].val.numLit),
+						numRef: HandleNumRef(arrSeries[nItem].val.numRef)
+					}
+				});
+			}
+
+			return arrResultSeries;
+		};
+		function HandleStrRef(oStrRef)
+		{
+			if (!oStrRef)
+				return null;
+
+			var arrResultPts = [];
+			for (var nItem = 0; nItem < oStrRef.strCache.pts.length; nItem++)
+			{
+				arrResultPts.push({
+					v: oStrRef.strCache.pts[nItem].val,
+					idx: oStrRef.strCache.pts[nItem].idx
+				});
+			}
+
+			var oResultStrRef = {
+				f: oStrRef.f,
+				strCache: {
+					ptCount: oStrRef.ptCount,
+					pt: arrResultPts
+				}
+			}
+
+			return oResultStrRef;
+		};
+		function HandleNumRef(oNumRef)
+		{
+			if (!oNumRef)
+				return null;
+
+			var arrResultPts = [];
+			for (var nItem = 0; nItem < oNumRef.numCache.pts.length; nItem++)
+			{
+				arrResultPts.push({
+					v: oNumRef.numCache.pts[nItem].val,
+					formatCode:  oNumRef.numCache.pts[nItem].formatCode,
+					idx: oNumRef.numCache.pts[nItem].idx,
+				});
+			}
+
+			var oResultNumRef = {
+				f: oNumRef.f,
+				numCache: { 
+					formatCode: oNumRef.formatCode,
+					ptCount: oNumRef.ptCount,
+					pt: arrResultPts
+				}
+			}
+			return oResultNumRef;
+		};
+		function HandleGeometry(oGeometry)
+		{
+			if (!oGeometry)
+				return null;
+			
+			var arrAhPolarResult = [];
+			var arrAhXYResult    = [];
+			var arrAvResult      = [];
+			var arrCxnResult     = [];
+			var arrGdResult      = [];
+			var arrPathResult    = [];
+			for (var nItem = 0; nItem < oGeometry.ahPolarLst.length; nItem++)
+			{
+				arrAhPolarResult.push({
+					pos: {
+						x: oGeometry.ahPolarLst[nItem].posX,
+						y: oGeometry.ahPolarLst[nItem].posY
+					},
+					gdRefAng: oGeometry.ahPolarLst[nItem].gdRefAng,
+					gdRefR: oGeometry.ahPolarLst[nItem].gdRefR,
+					maxAng: oGeometry.ahPolarLst[nItem].maxAng,
+					maxR: oGeometry.ahPolarLst[nItem].maxR,
+					minAng: oGeometry.ahPolarLst[nItem].minAng,
+					minR: oGeometry.ahPolarLst[nItem].minR
+				});
+			}
+			for (var nItem = 0; nItem < oGeometry.ahXYLst.length; nItem++)
+			{
+				arrAhXYResult.push({
+					pos: {
+						x: oGeometry.ahXYLst[nItem].posX,
+						y: oGeometry.ahXYLst[nItem].posY
+					},
+					gdRefX: oGeometry.ahXYLst[nItem].gdRefX,
+					gdRefY: oGeometry.ahXYLst[nItem].gdRefY,
+					maxX: oGeometry.ahXYLst[nItem].maxX,
+					maxY: oGeometry.ahXYLst[nItem].maxY,
+					minX: oGeometry.ahXYLst[nItem].minX,
+					minY: oGeometry.ahXYLst[nItem].minY
+				});
+			}
+			for (var nItem = 0; nItem < oGeometry.avLst.length; nItem++)
+			{
+				arrAvResult.push({
+					fmla: oGeometry.avLst[nItem].formula,
+					name: oGeometry.avLst[nItem].Name
+				});
+			}
+			for (var nItem = 0; nItem < oGeometry.cnxLst.length; nItem++)
+			{
+				arrCxnResult.push({
+					pos: {
+						x: oGeometry.cnxLst[nItem].x,
+						y: oGeometry.cnxLst[nItem].y
+					},
+					ang: oGeometry.cnxLst[nItem].ang
+				});
+			}
+			for (var nItem = 0; nItem < oGeometry.gdLst.length; nItem++)
+			{
+				arrGdResult.push({
+					fmla: oGeometry.gdLst[nItem].formula,
+					name: oGeometry.gdLst[nItem].Name
+				});
+			}
+			for (var nItem = 0; nItem < oGeometry.pathLst.length; nItem++)
+			{
+				var arrCommands = [];
+				for (var nCommand = 0; nCommand < oGeometry.pathLst[nItem].ArrPathCommandInfo.length; nCommand++)
+				{
+					var arrObjKeys = Object.keys(oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand]);
+					var oCommand   = {};
+					switch (oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand].id)
+					{
+						case 0:
+							oCommand["id"] =  "moveTo";
+							break;
+						case 1:
+							oCommand["id"] =  "lnTo";
+							break;
+						case 2:
+							oCommand["id"] =  "arcTo";
+							break;
+						case 3:
+							oCommand["id"] =  "cubicBezTo";
+							break;
+						case 4:
+							oCommand["id"] =  "quadBezTo";
+							break;
+						case 5:
+							oCommand["id"] =  "close";
+							break;
+					}
+					if (oCommand["id"] !== "arcTo" && oCommand["id"] !== "close")
+						oCommand["pt"] = {};
+					for (var nKey = 0; nKey < arrObjKeys.length; nKey++)
+					{
+						if (arrObjKeys[nKey] === "id")
+							continue;
+						if (!oCommand["pt"])
+							oCommand[arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
+						else 
+							oCommand["pt"][arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
+					}
+
+					arrCommands.push(oCommand);
+				}
+				arrPathResult.push({
+					commands: arrCommands,
+					extrusionOk: oGeometry.pathLst[nItem].extrusionOk,
+					fill: oGeometry.pathLst[nItem].fill,
+					h: oGeometry.pathLst[nItem].pathH,
+					stroke: oGeometry.pathLst[nItem].stroke,
+					w: oGeometry.pathLst[nItem].pathW
+				});
+			}
+			return {
+				ahLst: {
+					ahPolar: arrAhPolarResult,
+					ahXY: arrAhXYResult
+				},
+				avLst: arrAvResult,
+				cnxLst: arrCxnResult,
+				gdLst: arrGdResult,
+				pathLst: arrPathResult,
+				rect: oGeometry.rectS
+			}
+		};
+		function HandleSpPr(oSpPr)
+		{
+			if (!oSpPr)
+				return null;
+
+			var oXfrm = oSpPr.xfrm ? {
+				ext: {
+					cx: oSpPr.xfrm.extX,
+					cy: oSpPr.xfrm.extY
+				},
+				off: {
+					x: oSpPr.xfrm.offX,
+					y: oSpPr.xfrm.offY
+				},
+				flipH: oSpPr.xfrm.flipH,
+				flipV: oSpPr.xfrm.flipV,
+				rot: oSpPr.xfrm.rot
+			} : null;
+
+			return {
+				custGeom: HandleGeometry(oSpPr.geometry),
+				effectDag: oSpPr.effectProps ? oSpPr.effectProps.EffectDag : null,
+				effectLst: oSpPr.effectProps ? oSpPr.effectProps.EffectLst : null,
+				ln: {
+					algn: oSpPr.ln.algn,
+					cap: oSpPr.ln.cap,
+					cmpd: oSpPr.ln.cmpd,
+					headEnd: oSpPr.ln.headEnd,
+					prstDash: oSpPr.ln.prstDash,
+					tailEnd: oSpPr.ln.tailEnd,
+					w: oSpPr.ln.w
+				},
+				solidFill: {
+
+				},
+				xfrm: oXfrm,
+				bwMode: oSpPr.bwMode
+			}
+		};
+		function HandleTxPr(oTxPr)
+		{
+			if (!oTxPr)
+				return null;
+
+			return {
+				bodyPr: {
+					anchor: oTxPr.bodyPr.anchor,
+					anchorCtr: oTxPr.bodyPr.anchorCtr,
+					bIns: oTxPr.bodyPr.bIns,
+					compatLnSpc: oTxPr.bodyPr.compatLnSpc,
+					forceAA: oTxPr.bodyPr.forceAA,
+					fromWordArt: oTxPr.bodyPr.fromWordArt,
+					horzOverflow: oTxPr.bodyPr.horzOverflow,
+					lIns: oTxPr.bodyPr.lIns,
+					numCol: oTxPr.bodyPr.numCol,
+					rIns: oTxPr.bodyPr.rIns,
+					rot: oTxPr.bodyPr.rot,
+					rtlCol: oTxPr.bodyPr.rtlCol,
+					spcCol: oTxPr.bodyPr.spcCol,
+					spcFirstLastPara: oTxPr.bodyPr.spcFirstLastPara,
+					tIns: oTxPr.bodyPr.tIns,
+					upright: oTxPr.bodyPr.upright,
+					vert: oTxPr.bodyPr.vert,
+					vertOverflow: oTxPr.bodyPr.vertOverflow,
+					wrap: oTxPr.bodyPr.wrap
+				},
+				lstStyle: oTxPr.lstStyle,
+				content: []
+			}
+			
+		};
+		function HandleTx(oTx)
+		{
+			if (!oTx)
+				return null;
+
+			return {
+				strRef: HandleStrRef(oTx.strRef),
+				v: oTx.val
+			}
+		};
+		function HandleSlacing(oScaling)
+		{
+			if (!oScaling)
+				return null;
+			
+			return {
+				logBase: oScaling.logBase,
+				max: oScaling.max,
+				min: oScaling.min,
+				orientation: oScaling.orientation
+			}
+		};
+		function HandleNumFmt(oNumFmt)
+		{
+			if (!oNumFmt)
+				return null;
+			
+			return {
+				formatCode: oNumFmt.formatCode,
+				sourceLinked: oNumFmt.sourceLinked
+			}
+		};
+		function HandleDispUnits(oDispUnits)
+		{
+			if (!oDispUnits)
+				return null;
+			
+			return {
+				builtInUnit: oDispUnits.builtInUnit,
+				custUnit: oDispUnits.custUnit,
+				dispUnitsLbl: {
+					layout: HandleLayout(oDispUnits.dispUnitsLbl.layout),
+					spPr: HandleSpPr(oDispUnits.dispUnitsLbl.spPr),
+					tx: HandleTx(oDispUnits.dispUnitsLbl.tx),
+					txPr: HandleTxPr(oDispUnits.dispUnitsLbl.txPr)
+				}
+			}
+		};
+		function HandleValAx(oValAx)
+		{
+			if (!oValAx)
+				return null;
+			
+			return {
+				axId: oValAx.axId,
+				axPos: oValAx.axPos,
+				crossAx: oValAx.crossAx.axId,
+				crossBetween: oValAx.crossBetween,
+				crosses: oValAx.crosses,
+				crossesAt: oValAx.crossesAt,
+				delete: oValAx.bDelete,
+				dispUnits: HandleDispUnits(oValAx.dispUnits),
+				extLst: oValAx.extLst, /// ???
+				majorGridlines: HandleSpPr(oValAx.majorGridlines),
+				majorTickMark: oValAx.majorTickMark,
+				majorUnit: oValAx.majorUnit,
+				minorGridlines: HandleSpPr(oValAx.minorGridlines),
+				minorTickMark: oValAx.minorTickMark,
+				numFmt: HandleNumFmt(oValAx.numFmt),
+				scaling: HandleSlacing(oValAx.scaling),
+				spPr: HandleSpPr(oValAx.spPr),
+				tickLblPos: oValAx.tickLblPos,
+				title: HandleTitle(oValAx.title),
+				txPr: HandleTxPr(oValAx.txPr)
+			}
+		};
+		function HandlePlotArea(oPlotArea)
+		{
+			if (!oPlotArea)
+				return null;
+
+			return {
+				barChart: HandleBarCharts(oPlotArea.charts),
+				catAx: HandleCatAx(oPlotArea.catAx),
+				dateAx: oPlotArea.dateAx,
+				dTable: oPlotArea.dTable,
+				layout: oPlotArea.layout,
+				serAx: oPlotArea.serAx,
+				spPr: HandleSpPr(oPlotArea.spPr),
+				valAx: HandleValAx(oPlotArea.valAx)
+			}
+		};
+		function HandleCatAx(oCatAx)
+		{
+			if (!oCatAx)
+				return null;
+
+			return {
+				auto: oCatAx.auto,
+				axId: oCatAx.axId,
+				axPos: oCatAx.axPos,
+				crossAx: oCatAx.crossAx.axId,
+				crosses: oCatAx.crosses,
+				crossesAt: oCatAx.crossesAt,
+				delete: oCatAx.bDelete,
+				extLst: oCatAx.extLst,
+				lblAlgn: oCatAx.lblAlgn,
+				lvlOffset: oCatAx.lblOffset,
+				majorGridlines: oCatAx.majorGridlines,
+				majorTickMark: oCatAx.majorTickMark,
+				minorGridlines: oCatAx.minorGridlines,
+				minorTickMark: oCatAx.minorTickMark,
+				noMultiLvlLbl: oCatAx.noMultiLvlLbl,
+				numFrm: {
+					formatCode: oCatAx.numFmt.formatCode,
+					sourceLinked: oCatAx.numFmt.sourceLinked
+				},
+				scaling: {
+					logBase: oCatAx.scaling.logBase,
+					max: oCatAx.scaling.max,
+					min: oCatAx.scaling.min,
+					orientation: oCatAx.scaling.orientation
+				},
+				spPr: HandleSpPr(oCatAx.spPr),
+				tickLblPos: oCatAx.tickLblPos,
+				tickLblSkip: oCatAx.tickLblSkip,
+				tickMarkSkip: oCatAx.tickMarkSkip,
+				title: oCatAx.title,
+				txPr: HandleTxPr(oCatAx.txPr)
+			}
+		};
+		function HandleLayout(oLayout)
+		{
+			if (!oLayout)
+				return null;
+			
+			return {
+				h: oLayout.h,
+				hMode: oLayout.hMode,
+				layoutTarget: oLayout.layoutTarget,
+				w: oLayout.w,
+				wMode: oLayout.wMode,
+				x: oLayout.x,
+				xMode: oLayout.xMode,
+				y: oLayout.y,
+				yMode: oLayout.yMode
+			}
+		};
+		function HandleDlbl(oDlbl)
+		{
+			if (!oDlbl)
+				return null;
+			
+			return {
+				delete: oDlbl.bDelete,
+				dLblPos: oDlbl.dLblPos,
+				idx: oDlbl.idx,
+				layout: HandleLayout(oDlbl.layout),
+				numFmt: HandleNumFmt(oDlbl.numFmt),
+				separator: oDlbl.separator, // ???
+				showBubbleSize: oDlbl.showBubbleSize,
+				showCatName: oDlbl.showCatName,
+				showLegendKey: oDlbl.showLegendKey,
+				showPercent: oDlbl.showPercent,
+				showSerName: oDlbl.showSerName,
+				showVal: oDlbl.showVal,
+				spPr: HandleSpPr(oDlbl.spPr),
+				txPr: HandleTxPr(oDlbl.txPr),
+				tx: HandleTx(oDlbl.tx)
+			}
+		};
+		function HandleDLbls(dLbls)
+		{
+			if (!dLbls)
+				return null;
+			
+			return {
+				delete: dLbls.bDelete,
+				dLbl: dLbls.dLbl,
+				dLblPos: dLbls.dLblPos,
+				leaderLines: HandleSpPr(dLbls.leaderLines),
+				numFmt: HandleNumFmt(dLbls.numFmt),
+				separator: dLbls.separator, // ???
+				showBubbleSize: dLbls.showBubbleSize,
+				showCatName: dLbls.showCatName,
+				showLeaderLines: dLbls.showLeaderLines,
+				showLegendKey: dLbls.showLegendKey,
+				showPercent: dLbls.showPercent,
+				showSerName: dLbls.showSerName,
+				showVal: dLbls.showVal,
+				spPr: HandleSpPr(dLbls.spPr),
+				txPr: HandleTxPr(dLbls.txPr)
+			}
+		};
+		function HandleBarCharts(arrBarCharts)
+		{
+			var arrResult = [];
+
+			for (var nItem = 0; nItem < arrBarCharts.length; nItem++)
+			{
+				arrResult.push({
+					axId: [arrBarCharts[nItem].axId[0].axId, arrBarCharts[nItem].axId[1].axId],
+					barDir: arrBarCharts[nItem].barDir,
+					dLbls: HandleDLbls(arrBarCharts[nItem].dLbls),
+					gapWidth: arrBarCharts[nItem].gapWidth,
+					grouping: arrBarCharts[nItem].grouping,
+					overlap: arrBarCharts[nItem].overlap,
+					serLines: HandleSpPr(arrBarCharts[nItem].serLines),
+					ser: HandleCBarSeries(arrBarCharts[nItem].series),
+					varyColors: arrBarCharts[nItem].varyColors
+				})
+			}
+
+			return arrResult;
+		};
+		function HandleTitle(oTitle)
+		{
+			if (!oTitle)
+				return null;
+			
+			return {
+				layout: HandleLayout(oTitle.layout),
+				overlay: oTitle.overlay,
+				spPr: HandleSpPr(oTitle.spPr),
+				tx: HandleTx(oTitle.tx),
+				txPr: HandleTxPr(oTitle.txPr)
+			}
+		};
+		function HandlePrintSettings(oPrintSettings)
+		{
+			if (!oPrintSettings)
+				return null;
+
+			return {
+				headerFooter: {
+					evenFooter: oPrintSettings.headerFooter.evenFooter,
+					evenHeader: oPrintSettings.headerFooter.evenHeader,
+					firstFooter: oPrintSettings.headerFooter.firstFooter,
+					firstHeader: oPrintSettings.headerFooter.firstHeader,
+					oddFooter: oPrintSettings.headerFooter.oddFooter,
+					oddHeader: oPrintSettings.headerFooter.oddHeader,
+					alignWithMargins: oPrintSettings.headerFooter.alignWithMargins,
+					differentFirst: oPrintSettings.headerFooter.differentFirst,
+					differentOddEven: oPrintSettings.headerFooter.differentOddEven
+				},
+				pageMargins: {
+					b: oPrintSettings.pageMargins.b,
+					footer: oPrintSettings.pageMargins.footer,
+					header: oPrintSettings.pageMargins.header,
+					l: oPrintSettings.pageMargins.l,
+					r: oPrintSettings.pageMargins.r,
+					t: oPrintSettings.pageMargins.t,
+				},
+				pageSetup: {
+					blackAndWhite: oPrintSettings.pageSetup.blackAndWhite,
+					copies: oPrintSettings.pageSetup.copies,
+					draft: oPrintSettings.pageSetup.draft,
+					firstPageNumber: oPrintSettings.pageSetup.firstPageNumber,
+					horizontalDpi: oPrintSettings.pageSetup.horizontalDpi,
+					orientation: oPrintSettings.pageSetup.orientation,
+					paperHeight: oPrintSettings.pageSetup.paperHeight,
+					paperSize: oPrintSettings.pageSetup.paperSize,
+					paperWidth: oPrintSettings.pageSetup.paperWidth,
+					useFirstPageNumb: oPrintSettings.pageSetup.useFirstPageNumb,
+					verticalDpi: oPrintSettings.pageSetup.verticalDpi
+				}
+			}
+		};
+		function HandleWall(oWall)
+		{
+			if (!oWall)
+				return null;
+			
+			return {
+				pictureOptions: {
+					applyToEnd: oWall.pictureOptions.applyToEnd,
+					applyToFront: oWall.pictureOptions.applyToFront,
+					applyToSides: oWall.pictureOptions.applyToSides,
+					pictureFormat: oWall.pictureOptions.pictureFormat,
+					pictureStackUnit: oWall.pictureOptions.pictureStackUnit
+				},
+				spPr: HandleSpPr(oWall.spPr),
+				thickness: oWall.thickness
+			}
+		};
+		function HandleMarker(oMarker)
+		{
+			if (!oMarker)
+				return null;
+			
+			return {
+				size: oMarker.size,
+				spPr: HandleSpPr(oMarker.spPr),
+				symbol: oMarker.symbol
+			}
+		};
+		function HandlePivotFmt(oFmt)
+		{
+			if (!oFmt)
+				return null;
+			
+			return {
+				dLbl: HandleDlbl(oFmt.dLbl),
+				idx: oFmt.idx,
+				marker: HandleMarker(oFmt.marker),
+				spPr: HandleSpPr(oFmt.spPr),
+				txPr: HandleTxPr(oFmt.txPr)
+			}
+			
+		};
+		function HandlePivotFmts(arrFmts)
+		{
+			var arrResultDataPoints = [];
+
+			for (var nItem = 0; nItem < arrFmts.length; nItem++)
+			{
+				arrResultDataPoints.push({
+					bubble3D: arrFmts[nItem].bubble3D,
+					explosion: arrFmts[nItem].explosion,
+					idx: arrFmts[nItem].idx,
+					invertIfNegative: arrFmts[nItem].invertIfNegative,
+					marker: HandleMarker(arrFmts[nItem].marker)
+				});
+			}
+
+			return arrResultDataPoints;
+		};
+		function HandleView3D(oView3D)
+		{
+			if (!oView3D)
+				return null;
+			
+			return {
+				depthPercent: oView3D.depthPercent,
+				hPercent: oView3D.hPercent,
+				perspective: oView3D.perspective,
+				rAngAx: oView3D.rAngAx,
+				rotX: oView3D.rotX,
+				rotY: oView3D.rotY
+			}
+		};
+		function HandleLegendEntry(oLegendEntry)
+		{
+			if (!oLegendEntry)
+				return null;
+			
+			return {
+				delete: oLegendEntry.bDelete,
+				idx: oLegendEntry.idx,
+				txPr: HandleTxPr(oLegendEntry.txPr)
+			}
+		};
+		function HandleLegendEntries(arrEntries)
+		{
+			var arrResults = [];
+
+			for (var nItem = 0; nItem < arrEntries.length; nItem++)
+			{
+				arrResults.push(HandleLegendEntry(arrEntries[nItem]));	
+			}
+
+			return arrResults;
+		};
+		function HandleChartSpace(oChartSpace)
+		{
+			if (!oChartSpace)
+				return null;
+
+			return {
+				chart: {
+					autoTitleDeleted: oChartSpace.chart.autoTitleDeleted,
+					backwall: HandleWall(oChartSpace.chart.backWall),
+					dispBlanksAs: oChartSpace.chart.dispBlanksAs,
+					floor: HandleWall(oChartSpace.chart.floor),
+					legend: {
+						layout: HandleLayout(oChartSpace.chart.legend.layout),
+						legendEntry: HandleLegendEntries(oChartSpace.chart.legend.legendEntryes),
+						legendPos: oChartSpace.chart.legend.legendPos,
+						overlay: oChartSpace.chart.legend.overlay,
+						spPr: HandleSpPr(oChartSpace.chart.legend.spPr),
+						txPr: HandleTxPr(oChartSpace.chart.legend.txPr)
+					},
+					pivotFmts: oChartSpace.chart.pivotFmts,
+					plotArea: HandlePlotArea(oChartSpace.chart.plotArea),
+					plotVisOnly: oChartSpace.chart.plotVisOnly,
+					showDLblsOverMax: oChartSpace.chart.showDLblsOverMax,
+					sideWall: HandleWall(oChartSpace.chart.sideWall),
+					title: HandleTitle(oChartSpace.chart.title),
+					view3D: HandleView3D(oChartSpace.chart.view3D)
+				},
+				clrMapOvr: oChartSpace.clrMapOvr,
+				date1904: oChartSpace.date1904,
+				externalData: HandleExternalData(oChartSpace.externalData),
+				lang: oChartSpace.lang,
+				pivotSource: HandlePivotSource(oChartSpace.pivotSource),
+				printSettings: HandlePrintSettings(oChartSpace.printSettings),
+				protection: HandleProtection(oChartSpace.protection),
+				roundedCorners: oChartSpace.roundedCorners,
+				spPr: HandleSpPr(oChartSpace.spPr),
+				style: oChartSpace.style,
+				txPr: HandleTxPr(oChartSpace.txPr),
+				userShapes: oChartSpace.userShapes
+			};
+			
+
+			//delete oDrawingObject["inline"]["chart"]["parent"];
+			//delete oDrawingObject["inline"]["chart"]["legent"]["parent"];
+		};
+		
+		return;
+	};
+ 
 
 
 	//------------------------------------------------------------------------------------------------------------------
