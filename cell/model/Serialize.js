@@ -6052,8 +6052,8 @@
 			else
 				res = c_oSerConstants::ReadUnknown;
 			return res;
-		}
-    }*/
+		}*/
+    }
     /** @constructor */
     function Binary_SharedStringTableReader(stream, wb, aSharedStrings)
     {
