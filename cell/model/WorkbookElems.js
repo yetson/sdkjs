@@ -6320,6 +6320,7 @@ function RangeDataManagerElem(bbox, data)
 		this.TableStyleInfo = null;
 
 		this.QueryTable = null;
+		this.tableType = null;
 		
 		this.altText = null;
 		this.altTextSummary = null;
@@ -6359,6 +6360,7 @@ function RangeDataManagerElem(bbox, data)
 		if (this.QueryTable) {
 			res.QueryTable = this.QueryTable.clone();
 		}
+		res.tableType = this.tableType;
 
 		res.DisplayName = this.DisplayName;
 
@@ -7552,7 +7554,7 @@ function RangeDataManagerElem(bbox, data)
 		this.CalculatedColumnFormula = null;
 
 		//формируется на сохранения
-		//this.queryTableFieldId = null;
+		this.queryTableFieldId = null;
 		this.uniqueName = null;
 
 		//queryTableField
@@ -7610,6 +7612,9 @@ function RangeDataManagerElem(bbox, data)
 		res.fillFormulas = this.fillFormulas;
 		res.queryName = this.queryName;
 		res.rowNumbers = this.rowNumbers;
+
+		res.queryTableFieldId = this.queryTableFieldId;
+		res.uniqueName = this.uniqueName;
 
 		return res;
 	};
