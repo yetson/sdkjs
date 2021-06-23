@@ -10344,24 +10344,24 @@
 	{
 		var oDrawing = this.Drawing;
 		var oDrawingObject = {
-			docPr: HandleDocPr(this.Drawing.docPr),
-			effectExtent: HandleEffectExtent(this.Drawing.EffectExtent),
-			extent: HandleExtent(this.Drawing.Extent),
-			graphic: HandleGrapicObject(this.Drawing.GraphicObj),
-			positionH: HandlePosH(this.Drawing.PositionH),
-			positionV: HandlePosV(this.Drawing.PositionV),
-			simplePos: HandleSimplePos(this.Drawing.SimplePos),
-			distB: this.Drawing.Distance ? this.Drawing.Distance.B : null,
-			distL: this.Drawing.Distance ? this.Drawing.Distance.L : null,
-			distR: this.Drawing.Distance ? this.Drawing.Distance.R : null,
-			distT: this.Drawing.Distance ? this.Drawing.Distance.T : null,
-			allowOverlap: this.Drawing.AllowOverlap,
-			behindDoc: this.Drawing.behindDoc,
-			hidden: this.Drawing.Hidden,
-			layoutInCell: this.Drawing.LayoutInCell,
-			locked: this.Drawing.Locked,
+			docPr:          HandleDocPr(this.Drawing.docPr),
+			effectExtent:   HandleEffectExtent(this.Drawing.EffectExtent),
+			extent:         HandleExtent(this.Drawing.Extent),
+			graphic:        HandleGrapicObject(this.Drawing.GraphicObj),
+			positionH:      HandlePosH(this.Drawing.PositionH),
+			positionV:      HandlePosV(this.Drawing.PositionV),
+			simplePos:      HandleSimplePos(this.Drawing.SimplePos),
+			distB:          this.Drawing.Distance ? this.Drawing.Distance.B : this.Drawing.Distance,
+			distL:          this.Drawing.Distance ? this.Drawing.Distance.L : this.Drawing.Distance,
+			distR:          this.Drawing.Distance ? this.Drawing.Distance.R : this.Drawing.Distance,
+			distT:          this.Drawing.Distance ? this.Drawing.Distance.T : this.Drawing.Distance,
+			allowOverlap:   this.Drawing.AllowOverlap,
+			behindDoc:      this.Drawing.behindDoc,
+			hidden:         this.Drawing.Hidden,
+			layoutInCell:   this.Drawing.LayoutInCell,
+			locked:         this.Drawing.Locked,
 			relativeHeight: this.Drawing.RelativeHeight,
-			wrapType: GetWrapType(this.Drawing.wrappingType)
+			wrapType:       GetWrapType(this.Drawing.wrappingType)
 		};
 
 		function HandleShape(oShapeObject)
@@ -10378,56 +10378,56 @@
 		function HandleHlink(oHlink)
 		{
 			if (!oHlink)
-				return null;
+				return oHlink;
 			
 			return {
-				action: oHlink.action,
-				endSnd: oHlink.endSnd,
+				action:         oHlink.action,
+				endSnd:         oHlink.endSnd,
 				highlightClick: oHlink.highlightClick,
-				history: oHlink.history,
-				id: oHlink.id,
-				invalidUrl: oHlink.invalidUrl,
-				tgtFrame: oHlink.tgtFrame,
-				tooltip: oHlink.tooltip
+				history:        oHlink.history,
+				id:             oHlink.id,
+				invalidUrl:     oHlink.invalidUrl,
+				tgtFrame:       oHlink.tgtFrame,
+				tooltip:        oHlink.tooltip
 			}
 		};
 		function HandleExternalData(oExtData)
 		{
 			if (!oExtData)
-				return null;
+				return oExtData;
 			
 			return {
 				autoUpdate: oExtData.autoUpdate,
-				id: oExtData.id
+				id:         oExtData.id
 			}
 		};
 		function HandleProtection(oProtection)
 		{
 			if (!oProtection)
-				return null;
+				return oProtection;
 			
 			return {
-				chartObject: oProtection.chartObject,
-				data: oProtection.data,
-				formatting: oProtection.formatting,
-				selection: oProtection.selection,
+				chartObject:   oProtection.chartObject,
+				data:          oProtection.data,
+				formatting:    oProtection.formatting,
+				selection:     oProtection.selection,
 				userInterface: oProtection.userInterface
 			}
 		};
 		function HandlePivotSource(oPivotSource)
 		{
 			if (!oPivotSource)
-				return null;
+				return oPivotSource;
 			
 			return {
 				fmtId: oPivotSource.fmtId,
-				name: oPivotSource.name
+				name:  oPivotSource.name
 			}
 		};
 		function HandleSimplePos(oSimplePos)
 		{
 			if (!oSimplePos)
-				return null;
+				return oSimplePos;
 			
 			return {
 				x: oSimplePos.X,
@@ -10437,27 +10437,27 @@
 		function HandlePosV(oPosV)
 		{
 			if (!oPosV)
-				return null;
+				return oPosV;
 			
 			return {
-				align: oPosV.Align,
+				align:        oPosV.Align,
 				relativeFrom: oPosV.RelativeFrom
 			}
 		};
 		function HandlePosH(oPosH)
 		{
 			if (!oPosH)
-				return null;
+				return oPosH;
 			
 			return {
-				align: oPosH.Align,
+				align:        oPosH.Align,
 				relativeFrom: oPosH.RelativeFrom
 			}
 		};
 		function HandleExtent(oExtent)
 		{
 			if (!oExtent)
-				return null;
+				return oExtent;
 
 			return {
 				cy: oExtent.H,
@@ -10467,7 +10467,7 @@
 		function HandleEffectExtent(oEffExt)
 		{
 			if (!oEffExt)
-				return null;
+				return oEffExt;
 
 			return {
 				b: oEffExt.B,
@@ -10516,11 +10516,11 @@
 			return {
 				hlinkClick: HandleHlink(oDocPr.hlinkClick),
 				hlinkHover: HandleHlink(oDocPr.hlinkHover),
-				descr: oDocPr.descr,
-				hidden: oDocPr.isHidden,
-				id: oDocPr.id,
-				name: oDocPr.name,
-				title: HandleTitle(oDocPr.title)
+				descr:      oDocPr.descr,
+				hidden:     oDocPr.isHidden,
+				id:         oDocPr.id,
+				name:       oDocPr.name,
+				title:      oDocPr.title
 			}
 		};
 		function HandleNumLit(oNumLit)
@@ -10532,46 +10532,45 @@
 			for (var nItem = 0; nItem < oNumLit.pts.length; nItem++)
 			{
 				arrResultPts.push({
-					v: oNumLit.pts[nItem].val,
-					formatCode:  oNumLit.pts[nItem].formatCode,
-					idx: oNumLit.pts[nItem].idx,
+					v:          oNumLit.pts[nItem].val,
+					formatCode: oNumLit.pts[nItem].formatCode,
+					idx:        oNumLit.pts[nItem].idx,
 				});
 			}
 
 			return {
 				formatCode: oNumLit.formatCode,
-				pt: arrResultPts,
-				ptCount: oNumLit.ptCount
+				pt:         arrResultPts,
+				ptCount:    oNumLit.ptCount
 			}
 		};
 		function HandleStrLit(oStrLit)
 		{
 			if (!oStrLit)
-				return null;
+				return oStrLit;
 
 			var arrResultPts = [];
 			for (var nItem = 0; nItem < oStrLit.pts.length; nItem++)
 			{
 				arrResultPts.push({
-					v: oStrLit.pts[nItem].val,
+					v:   oStrLit.pts[nItem].val,
 					idx: oStrLit.pts[nItem].idx,
 				});
 			}
 
 			return {
-				formatCode: oStrLit.formatCode,
-				pt: arrResultPts,
-				ptCount: oStrLit.ptCount
+				pt:         arrResultPts,
+				ptCount:    oStrLit.ptCount
 			}
 		};
 		function HandleErrBars(oErrBars)
 		{
 			if (!oErrBars)
-				return null;
+				return oErrBars;
 
 			return {
 				errBarType: oErrBars.errBarType,
-				errDir: oErrBars.errDir,
+				errDir:     oErrBars.errDir,
 				errValType: oErrBars.errValType,
 				minus: {
 					numLit: HandleNumLit(oErrBars.minus.numLit),
@@ -10583,7 +10582,7 @@
 					numRef: HandleNumRef(oErrBars.plus.numRef)
 				},
 				spPr: HandleSpPr(oErrBars.spPr),
-				val: oErrBars.val
+				val:  oErrBars.val
 			}
 		};
 		function HandleDataPoints(arrDpts)
@@ -10593,11 +10592,13 @@
 			for (var nItem = 0; nItem < arrDpts.length; nItem++)
 			{
 				arrResultDataPoints.push({
-					bubble3D: arrDpts[nItem].bubble3D,
-					explosion: arrDpts[nItem].explosion,
-					idx: arrDpts[nItem].idx,
+					bubble3D:         arrDpts[nItem].bubble3D,
+					explosion:        arrDpts[nItem].explosion,
+					idx:              arrDpts[nItem].idx,
 					invertIfNegative: arrDpts[nItem].invertIfNegative,
-					marker: HandleMarker(arrDpts[nItem].marker)
+					marker:           HandleMarker(arrDpts[nItem].marker),
+					pictureOptions:   HandlePicOptions(arrDpts[nItem].pictureOptions),
+					spPr:             HandleSpPr(arrDpts[nItem].spPr)
 				});
 			}
 
@@ -10606,32 +10607,70 @@
 		function HandleMultiLvlStrRef(oRef)
 		{
 			if (!oRef)
-				return null;
+				return oRef;
 			
 			return {
-				f: oRef.f,
+				f:                oRef.f,
 				multiLvlStrCache: HandleMultiLvlStrCache(oRef.multiLvlStrCache)
 			}
 		};
 		function HandleMultiLvlStrCache(oCache)
 		{
 			if (!oChange)
-				return null;
+				return oChange;
 
 			var arrLvl = [];
 
 			for (var nPoint = 0; nPoint < oChange.lvl.length; nPoint++)
 			{
 				arrLvl.push({
-					v: oChange.lvl[nPoint].val,
+					v:   oChange.lvl[nPoint].val,
 					idx: oChange.lvl[nPoint].idx
 				});
 			}
 			
 			return {
-				lvl: arrLvl,
+				lvl:     arrLvl,
 				ptCount: oCache.ptCount
 			}
+		};
+		function HandleTrendline(oTrendLine)
+		{
+			if (!oTrendLine)
+				return oTrendLine;
+
+			return {
+				backward:  oTrendLine.backward,
+				dispEq:    oTrendLine.dispEq,
+				dispRSqr:  oTrendLine.dispRSqr,
+				forward:   oTrendLine.forward,
+				intercept: oTrendLine.intercept,
+				name:      oTrendLine.name,
+				order:     oTrendLine.order,
+				period:    oTrendLine.period,
+				spPr:      HandleSpPr(oTrendLine.spPr),
+				trendlineLbl: {
+					layout: HandleLayout(oTrendLine.trendlineLbl.layout),
+					numFmt: HandleNumFmt(oTrendLine.trendlineLbl.numFmt),
+					spPr:   HandleSpPr(oTrendLine.trendlineLbl.spPr),
+					tx:     HandleChartTx(oTrendLine.trendlineLbl.tx),
+					txPr:   HandleTxPr(oTrendLine.trendlineLbl.txPr)
+				},
+				trendlineType: oTrendLine.trendlineType
+			}
+		};
+		function HandlePicOptions(oPicOptions)
+		{
+			if (!oPicOptions)
+				return oPicOptions;
+
+			return {
+				applyToEnd:       oPicOptions.applyToEnd,
+				applyToFront:     oPicOptions.applyToFront,
+				applyToSides:     oPicOptions.applyToSides,
+				pictureFormat:    oPicOptions.pictureFormat,
+				pictureStackUnit: oPicOptions.pictureStackUnit
+			};
 		};
 		function HandleCBarSeries(arrSeries)
 		{
@@ -10642,22 +10681,22 @@
 				arrResultSeries.push({
 					cat: {
 						multiLvlStrRef: HandleMultiLvlStrRef(arrSeries[nItem].cat.multiLvlStrRef),
-						numLit: HandleNumLit(arrSeries[nItem].cat.numLit),
-						numRef: HandleNumRef(arrSeries[nItem].cat.numRef),
-						strLit: HandleStrLit(arrSeries[nItem].cat.strLit),
-						strRef: HandleStrRef(arrSeries[nItem].cat.strRef)
+						numLit:         HandleNumLit(arrSeries[nItem].cat.numLit),
+						numRef:         HandleNumRef(arrSeries[nItem].cat.numRef),
+						strLit:         HandleStrLit(arrSeries[nItem].cat.strLit),
+						strRef:         HandleStrRef(arrSeries[nItem].cat.strRef)
 					},
-					dLbls: HandleDLbls(arrSeries[nItem].dLbls),
-					dPt: HandleDataPoints(arrSeries[nItem].dPt),
-					errBars: HandleErrBars(arrSeries[nItem].errBars),
-					idx: arrSeries[nItem].idx,
+					dLbls:            HandleDLbls(arrSeries[nItem].dLbls),
+					dPt:              HandleDataPoints(arrSeries[nItem].dPt),
+					errBars:          HandleErrBars(arrSeries[nItem].errBars),
+					idx:              arrSeries[nItem].idx,
 					invertIfNegative: arrSeries[nItem].invertIfNegative,
-					order: arrSeries[nItem].order,
-					pictureOptions: arrSeries[nItem].pictureOptions,
-					shape: arrSeries[nItem].shape,
-					spPr: HandleSpPr(arrSeries[nItem].spPr),
-					trendline: arrSeries[nItem].trendline,
-					tx: HandleTx(arrSeries[nItem].tx),
+					order:            arrSeries[nItem].order,
+					pictureOptions:   HandlePicOptions(arrSeries[nItem].pictureOptions),
+					shape:            arrSeries[nItem].shape,
+					spPr:             HandleSpPr(arrSeries[nItem].spPr),
+					trendline:        HandleTrendline(arrSeries[nItem].trendline),
+					tx:               HandleSerTx(arrSeries[nItem].tx),
 					val : {
 						numLit: HandleNumLit(arrSeries[nItem].val.numLit),
 						numRef: HandleNumRef(arrSeries[nItem].val.numRef)
@@ -10670,13 +10709,13 @@
 		function HandleStrRef(oStrRef)
 		{
 			if (!oStrRef)
-				return null;
+				return oStrRef;
 
 			var arrResultPts = [];
 			for (var nItem = 0; nItem < oStrRef.strCache.pts.length; nItem++)
 			{
 				arrResultPts.push({
-					v: oStrRef.strCache.pts[nItem].val,
+					v:   oStrRef.strCache.pts[nItem].val,
 					idx: oStrRef.strCache.pts[nItem].idx
 				});
 			}
@@ -10685,7 +10724,7 @@
 				f: oStrRef.f,
 				strCache: {
 					ptCount: oStrRef.ptCount,
-					pt: arrResultPts
+					pt:      arrResultPts
 				}
 			}
 
@@ -10694,32 +10733,31 @@
 		function HandleNumRef(oNumRef)
 		{
 			if (!oNumRef)
-				return null;
+				return oNumRef;
 
 			var arrResultPts = [];
 			for (var nItem = 0; nItem < oNumRef.numCache.pts.length; nItem++)
 			{
 				arrResultPts.push({
-					v: oNumRef.numCache.pts[nItem].val,
-					formatCode:  oNumRef.numCache.pts[nItem].formatCode,
-					idx: oNumRef.numCache.pts[nItem].idx,
+					v:          oNumRef.numCache.pts[nItem].val,
+					formatCode: oNumRef.numCache.pts[nItem].formatCode,
+					idx:        oNumRef.numCache.pts[nItem].idx,
 				});
 			}
 
-			var oResultNumRef = {
+			return {
 				f: oNumRef.f,
 				numCache: { 
 					formatCode: oNumRef.formatCode,
-					ptCount: oNumRef.ptCount,
-					pt: arrResultPts
+					ptCount:    oNumRef.ptCount,
+					pt:         arrResultPts
 				}
 			}
-			return oResultNumRef;
 		};
 		function HandleGeometry(oGeometry)
 		{
 			if (!oGeometry)
-				return null;
+				return oGeometry;
 			
 			var arrAhPolarResult = [];
 			var arrAhXYResult    = [];
@@ -10835,19 +10873,19 @@
 			return {
 				ahLst: {
 					ahPolar: arrAhPolarResult,
-					ahXY: arrAhXYResult
+					ahXY:    arrAhXYResult
 				},
-				avLst: arrAvResult,
-				cnxLst: arrCxnResult,
-				gdLst: arrGdResult,
+				avLst:   arrAvResult,
+				cnxLst:  arrCxnResult,
+				gdLst:   arrGdResult,
 				pathLst: arrPathResult,
-				rect: oGeometry.rectS
+				rect:    oGeometry.rectS
 			}
 		};
 		function HandleSpPr(oSpPr)
 		{
 			if (!oSpPr)
-				return null;
+				return oSpPr;
 
 			var oXfrm = oSpPr.xfrm ? {
 				ext: {
@@ -10861,252 +10899,959 @@
 				flipH: oSpPr.xfrm.flipH,
 				flipV: oSpPr.xfrm.flipV,
 				rot: oSpPr.xfrm.rot
-			} : null;
+			} : oSpPr.xfrm;
+
+			var oEffectLst = oSpPr.effectProps ? HandleEffectLst(oSpPr.effectProps.EffectLst) : oSpPr.effectProps;
+			var oEffectDag = oSpPr.effectProps ? HandleEffectDag(oSpPr.effectProps.EffectDag) : oSpPr.effectProps;
+			var oLineJoin  = oSpPr.ln.Join ? {lim : oSpPr.ln.Join.limit} : oSpPr.ln.Join;
+			if (oLineJoin)
+			{
+				switch (oSpPr.ln.Join.type)
+				{
+					case 0:
+						oLineJoin["type"] = "empty";
+						break;
+					case 1:
+						oLineJoin["type"] = "round";
+						break;
+					case 2:
+						oLineJoin["type"] = "bevel";
+						break;
+					case 3:
+						oLineJoin["type"] = "miter";
+						break;
+				}
+			}
+			
+			return {
+				custGeom:  HandleGeometry(oSpPr.geometry),
+				effectDag: oEffectDag,
+				effectLst: oEffectLst,
+				ln: {
+					fill:     HandleFill(oSpPr.ln.Fill),
+					lineJoin: oLineJoin,
+					
+					algn:     oSpPr.ln.algn,
+					cap:      oSpPr.ln.cap,
+					cmpd:     oSpPr.ln.cmpd,
+					w:        oSpPr.ln.w,
+
+					headEnd:  oSpPr.ln.headEnd ? 
+					{
+						len:  oSpPr.ln.headEnd.len,
+						type: oSpPr.ln.headEnd.type,
+						w:    oSpPr.ln.headEnd.w
+					} : oSpPr.ln.headEnd,
+
+					prstDash: oSpPr.ln.prstDash,
+
+					tailEnd:  oSpPr.ln.tailEnd ? 
+					{
+						len: oSpPr.ln.tailEnd.len,
+						type: oSpPr.ln.tailEnd.type,
+						w: oSpPr.ln.tailEnd.w
+					} : oSpPr.ln.prstDash,
+				},
+
+				fill:   HandleFill(oSpPr.Fill),
+				xfrm:   oXfrm,
+				bwMode: oSpPr.bwMode
+			}
+		};
+		function HandleEffectLst(oEffectLst)
+		{
+			if (!oEffectLst)
+				return oEffectLst;
+			
+			return {
+				blur: oEffectLst.blur ? 
+				{
+					grow: oEffectLst.blur.grow,
+					rad:  oEffectLst.blur.rad
+				} : oEffectLst.blur,
+
+				fillOverlay: oEffectLst.fillOverlay ? 
+				{
+					fill:  HandleFill(oEffectLst.fillOverlay.fill),
+					blend: oEffectLst.fillOverlay.blend
+				} : oEffectLst.fillOverlay,
+
+				glow: oEffectLst.glow ? 
+				{
+					color: HandleColor(oEffectLst.glow.color),
+					rad:   oEffectLst.glow.rad
+				} : oEffectLst.glow,
+
+				innerShdw: oEffectLst.innerShdw ? 
+				{
+					color:   HandleColor(oEffectLst.innerShdw.color),
+					blurRad: oEffectLst.innerShdw.blurRad,
+					dir:     oEffectLst.innerShdw.dir,
+					dist:    oEffectLst.innerShdw.dist
+				} : oEffectLst.innerShdw,
+
+				outerShdw: oEffectLst.outerShdw ? 
+				{
+					color:        HandleColor(oEffectLst.outerShdw.color),
+					algn:         oEffectLst.outerShdw.algn,
+					blurRad:      oEffectLst.outerShdw.blurRad,
+					dir:          oEffectLst.outerShdw.dir,
+					dist:         oEffectLst.outerShdw.dist,
+					kx:           oEffectLst.outerShdw.kx,
+					ky:           oEffectLst.outerShdw.ky,
+					rotWithShape: oEffectLst.outerShdw.rotWithShape,
+					sx:           oEffectLst.outerShdw.sx,
+					sy:           oEffectLst.outerShdw.sy
+				} : oEffectLst.outerShdw,
+
+				prstShdw: oEffectLst.prstShdw ? 
+				{
+					color: HandleColor(oEffectLst.prstShdw.color),
+					dir:   oEffectLst.prstShdw.dir,
+					dist:  oEffectLst.prstShdw.dis,
+					prst:  oEffectLst.prstShdw.prst
+				} : oEffectLst.prstShdw,
+
+				reflection: oEffectLst.reflection ?
+				{
+					algn:         oEffectLst.reflection.algn,
+					blurRad:      oEffectLst.reflection.blurRad,
+					dir:          oEffectLst.reflection.dir,
+					dist:         oEffectLst.reflection.dist,
+					endA:         oEffectLst.reflection.endA,
+					endPos:       oEffectLst.reflection.endPos,
+					fadeDir:      oEffectLst.reflection.fadeDir,
+					kx:           oEffectLst.reflection.kx,
+					ky:           oEffectLst.reflection.ky,
+					rotWithShape: oEffectLst.reflection.rotWithShape,
+					stA:          oEffectLst.reflection.stA,
+					stPos:        oEffectLst.reflection.stPos,
+					sx:           oEffectLst.reflection.sx,
+					sy:           oEffectLst.reflection.sy
+				} : oEffectLst.reflection,
+
+				softEdge: oEffectLst.softEdge ? 
+				{
+					rad: oEffectLst.softEdge.rad
+				} : oEffectLst.softEdge
+			}
+		};
+		function HandleEffectDag(oEffectDag)
+		{
+			if (!oEffectDag)
+				return oEffectDag;
+			
+			var arrEffectLst = [];
+			for (var nEffect = 0; nEffect < oEffectDag.effectList.length; nEffect++)
+			{
+				var oElm = null;
+				if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaBiLevel)
+				{
+					oElm = {
+						elm: {
+							thresh: oEffectDag.effectList[nEffect].tresh
+						},
+						type: "alphaBiLvl"
+					}
+										
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaCeiling)
+				{
+					oElm = {
+						elm: null,
+						type: "alphaCeiling"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaFloor)
+				{
+					oElm = {
+						elm: null,
+						type: "alphaFloor"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaInv)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].unicolor)
+						},
+						type: "alphaInv"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaMod)
+				{
+					oElm = {
+						elm: {
+							cont: HandleEffectDag(oEffectDag.effectList[nEffect].cont)
+						},
+						type: "alphaMod"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaModFix)
+				{
+					oElm = {
+						elm: {
+							amt: oEffectDag.effectList[nEffect].amt
+						},
+						type: "alphaModFix"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaOutset)
+				{
+					oElm = {
+						elm: {
+							rad: oEffectDag.effectList[nEffect].rad
+						},
+						type: "alphaOutset"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaRepl)
+				{
+					oElm = {
+						elm: {
+							a: oEffectDag.effectList[nEffect].a
+						},
+						type: "alphaRepl"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBiLevel)
+				{
+					oElm = {
+						elm: {
+							thresh: oEffectDag.effectList[nEffect].thresh
+						},
+						type: "biLvl"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBlend)
+				{
+					oElm = {
+						elm: {
+							cont: HandleEffectDag(oEffectDag.effectList[nEffect].cont),
+							blend: oEffectDag.effectList[nEffect].blend
+						},
+						type: "blend"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBlur)
+				{
+					oElm = {
+						elm: {
+							grow: oEffectDag.effectList[nEffect].grow,
+							rad: oEffectDag.effectList[nEffect].rad
+						},
+						type: "blur"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CClrChange)
+				{
+					oElm = {
+						elm: {
+							clrFrom: HandleColor(oEffectDag.effectList[nEffect].clrFrom),
+							clrTo: HandleColor(oEffectDag.effectList[nEffect].clrTo),
+							useA: oEffectDag.effectList[nEffect].useA
+						},
+						type: "clrChange"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CClrRepl)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].color)
+						},
+						type: "clrRepl"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CEffectContainer)
+				{
+					oElm = {
+						elm: HandleEffectDag(oEffectDag.effectList[nEffect]),
+						type: "effCont"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CDuotone)
+				{
+					var arrColors = [];
+					for (var nColor = 0; nColor < oEffectDag.effectList[nEffect].colors.length; nColor++)
+					{
+						arrColors.push(HandleColor(oEffectDag.effectList[nEffect].colors[nColor]));
+					}
+					oElm = {
+						elm: {
+							colors: arrColors
+						},
+						type: "duotone"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CEffectElement)
+				{
+					oElm = {
+						elm: {
+							ref: oEffectDag.effectList[nEffect].ref
+						},
+						type: "effect"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CFillEffect)
+				{
+					oElm = {
+						elm: {
+							fill: HandleFill(oEffectDag.effectList[nEffect].fill)
+						},
+						type: "fill"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CFillOverlay)
+				{
+					oElm = {
+						elm: {
+							fill: HandleFill(oEffectDag.effectList[nEffect].fill),
+							blend: oEffectDag.effectList[nEffect].blend
+						},
+						type: "fillOvrl"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CGlow)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].color),
+							rad: oEffectDag.effectList[nEffect].rad
+						},
+						type: "glow"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CGrayscl)
+				{
+					oElm = {
+						elm: null,
+						type: "gray"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CHslEffect)
+				{
+					oElm = {
+						elm: {
+							hue: oEffectDag.effectList[nEffect].h,
+							lum: oEffectDag.effectList[nEffect].l,
+							sat: oEffectDag.effectList[nEffect].s
+						},
+						type: "hsl"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CInnerShdw)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].color),
+							blurRad: oEffectDag.effectList[nEffect].blurRad,
+							dir: oEffectDag.effectList[nEffect].dir,
+							dist: oEffectDag.effectList[nEffect].dist
+						},
+						type: "innerShdw"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CLumEffect)
+				{
+					oElm = {
+						elm: {
+							bright: oEffectDag.effectList[nEffect].bright,
+							contrast: oEffectDag.effectList[nEffect].contrast
+						},
+						type: "lum"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.COuterShdw)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].color),
+							algn: oEffectDag.effectList[nEffect].algn,
+							blurRad: oEffectDag.effectList[nEffect].blurRad,
+							dir: oEffectDag.effectList[nEffect].dir,
+							dist: oEffectDag.effectList[nEffect].dist,
+							kx: oEffectDag.effectList[nEffect].kx,
+							ky: oEffectDag.effectList[nEffect].ky,
+							rotWithShape: oEffectDag.effectList[nEffect].rotWithShape,
+							sx: oEffectDag.effectList[nEffect].sx,
+							sy: oEffectDag.effectList[nEffect].sy
+						},
+						type: "outerShdw"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CPrstShdw)
+				{
+					oElm = {
+						elm: {
+							color: HandleColor(oEffectDag.effectList[nEffect].color),
+							dir: oEffectDag.effectList[nEffect].dir,
+							dist: oEffectDag.effectList[nEffect].dis,
+							prst: oEffectDag.effectList[nEffect].prst
+						},
+						type: "prstShdw"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CReflection)
+				{
+					oElm = {
+						elm: {
+							algn: oEffectDag.effectList[nEffect].algn,
+							blurRad: oEffectDag.effectList[nEffect].blurRad,
+							dir: oEffectDag.effectList[nEffect].dir,
+							dist: oEffectDag.effectList[nEffect].dist,
+							endA: oEffectDag.effectList[nEffect].endA,
+							endPos: oEffectDag.effectList[nEffect].endPos,
+							fadeDir: oEffectDag.effectList[nEffect].fadeDir,
+							kx: oEffectDag.effectList[nEffect].kx,
+							ky: oEffectDag.effectList[nEffect].ky,
+							rotWithShape: oEffectDag.effectList[nEffect].rotWithShape,
+							stA: oEffectDag.effectList[nEffect].stA,
+							stPos: oEffectDag.effectList[nEffect].stPos,
+							sx: oEffectDag.effectList[nEffect].sx,
+							sy: oEffectDag.effectList[nEffect].sy
+						},
+						type: "reflection"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CRelOff)
+				{
+					oElm = {
+						elm: {
+							tx: oEffectDag.effectList[nEffect].tx,
+							ty: oEffectDag.effectList[nEffect].ty
+						},
+						type: "relOff"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CSoftEdge)
+				{
+					oElm = {
+						elm: {
+							rad: oEffectDag.effectList[nEffect].rad
+						},
+						type: "softEdge"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CTintEffect)
+				{
+					oElm = {
+						elm: {
+							amt: oEffectDag.effectList[nEffect].amt,
+							hue: oEffectDag.effectList[nEffect].hue
+						},
+						type: "tint"
+					}
+				}
+				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CXfrmEffect)
+				{
+					oElm = {
+						elm: {
+							kx: oEffectDag.effectList[nEffect].kx,
+							ky: oEffectDag.effectList[nEffect].ky,
+							sx: oEffectDag.effectList[nEffect].sx,
+							sy: oEffectDag.effectList[nEffect].sy,
+							tx: oEffectDag.effectList[nEffect].tx,
+							ty: oEffectDag.effectList[nEffect].ty
+						},
+						type: "xfrm"
+					}
+				}
+				arrEffectLst.push(oElm);
+			}
+			return {
+				effectList: arrEffectLst,
+				name: oEffectDag.name,
+				type: oEffectDag.type
+			}
+		};
+		function HandleFill(oFill)
+		{
+			if (!oFill)
+				return oFill;
+
+			var arrColorMods = [];
+			var oColor = oFill.fill.color ? {
+				red:   oFill.fill.color.RGBA.R,
+				green: oFill.fill.color.RGBA.G,
+				blue:  oFill.fill.color.RGBA.B,
+				alpha: oFill.fill.color.RGBA.A 
+			} : oFill.fill.color;
+			if (oFill.fill.Mods)
+			{
+				for (var nMod = 0; nMod < oFill.fill.Mods.length; nMod++)
+				{
+					arrColorMods.push({
+						name: oFill.fill.Mods[nMod].name,
+						val: oFill.fill.Mods[nMod].val
+					});
+				}
+			}
 
 			return {
-				custGeom: HandleGeometry(oSpPr.geometry),
-				effectDag: oSpPr.effectProps ? oSpPr.effectProps.EffectDag : null,
-				effectLst: oSpPr.effectProps ? oSpPr.effectProps.EffectLst : null,
-				ln: {
-					algn: oSpPr.ln.algn,
-					cap: oSpPr.ln.cap,
-					cmpd: oSpPr.ln.cmpd,
-					headEnd: oSpPr.ln.headEnd,
-					prstDash: oSpPr.ln.prstDash,
-					tailEnd: oSpPr.ln.tailEnd,
-					w: oSpPr.ln.w
-				},
-				solidFill: {
+				color: oColor,
+				mods: arrColorMods
+			}
+		};
+		function HandleShd(oShd)
+		{
+			if (!oShd)
+				return oShd;
 
+			return {
+				val: oShd.Value,
+				color: {
+					auto: oShd.Color.Auto,
+					r:    oShd.Color.r,
+					g:    oShd.Color.g,
+					b:    oShd.Color.b
 				},
-				xfrm: oXfrm,
-				bwMode: oSpPr.bwMode
+				fill: {
+					auto: oShd.Fill.Auto,
+					r:    oShd.Fill.r,
+					g:    oShd.Fill.g,
+					b:    oShd.Fill.b
+				},
+				fillRef: oShd.FillRef ? {
+					idx:   oShd.FillRef.idx,
+					color: HandleColor(oShd.FillRef.Color)
+				} : oShd.FillRef,
+				themeColor: HandleFill(oShd.FillRef.Unifill),
+				themeFill:  HandleFill(oShd.FillRef.themeFill)
+			}
+		};
+		function HandleColor(oColor)
+		{
+			if (!oColor)
+				return oColor;
+
+			var arrColorMods = [];
+			var oColor = oColor.color ? {
+				red:   oColor.color.RGBA.R,
+				green: oColor.color.RGBA.G,
+				blue:  oColor.color.RGBA.B,
+				alpha: oColor.color.RGBA.A 
+			} : oColor.color;
+			if (oColor.Mods)
+			{
+				for (var nMod = 0; nMod < oColor.Mods.length; nMod++)
+				{
+					arrColorMods.push({
+						name: oColor.Mods[nMod].name,
+						val:  oColor.Mods[nMod].val
+					});
+				}
+			}
+
+			return {
+				color: oColor,
+				mods: arrColorMods
 			}
 		};
 		function HandleTxPr(oTxPr)
 		{
 			if (!oTxPr)
-				return null;
+				return oTxPr;
 
 			return {
 				bodyPr: {
-					anchor: oTxPr.bodyPr.anchor,
-					anchorCtr: oTxPr.bodyPr.anchorCtr,
-					bIns: oTxPr.bodyPr.bIns,
-					compatLnSpc: oTxPr.bodyPr.compatLnSpc,
-					forceAA: oTxPr.bodyPr.forceAA,
-					fromWordArt: oTxPr.bodyPr.fromWordArt,
-					horzOverflow: oTxPr.bodyPr.horzOverflow,
-					lIns: oTxPr.bodyPr.lIns,
-					numCol: oTxPr.bodyPr.numCol,
-					rIns: oTxPr.bodyPr.rIns,
-					rot: oTxPr.bodyPr.rot,
-					rtlCol: oTxPr.bodyPr.rtlCol,
-					spcCol: oTxPr.bodyPr.spcCol,
+					flatTx:           oTxPr.bodyPr.flatTx,
+					normAutofit:      oTxPr.bodyPr.textFit ? {
+						fontScale:      oTxPr.bodyPr.fontScale,
+						lnSpcReduction: oTxPr.bodyPr.lnSpcReduction
+					} : oTxPr.bodyPr.flatTx,
+					prstTxWarp:       HandleGeometry(oTxPr.bodyPr.prstTxWarp),
+					anchor:           oTxPr.bodyPr.anchor,
+					anchorCtr:        oTxPr.bodyPr.anchorCtr,
+					bIns:             oTxPr.bodyPr.bIns,
+					compatLnSpc:      oTxPr.bodyPr.compatLnSpc,
+					forceAA:          oTxPr.bodyPr.forceAA,
+					fromWordArt:      oTxPr.bodyPr.fromWordArt,
+					horzOverflow:     oTxPr.bodyPr.horzOverflow,
+					lIns:             oTxPr.bodyPr.lIns,
+					numCol:           oTxPr.bodyPr.numCol,
+					rIns:             oTxPr.bodyPr.rIns,
+					rot:              oTxPr.bodyPr.rot,
+					rtlCol:           oTxPr.bodyPr.rtlCol,
+					spcCol:           oTxPr.bodyPr.spcCol,
 					spcFirstLastPara: oTxPr.bodyPr.spcFirstLastPara,
-					tIns: oTxPr.bodyPr.tIns,
-					upright: oTxPr.bodyPr.upright,
-					vert: oTxPr.bodyPr.vert,
-					vertOverflow: oTxPr.bodyPr.vertOverflow,
-					wrap: oTxPr.bodyPr.wrap
+					tIns:             oTxPr.bodyPr.tIns,
+					upright:          oTxPr.bodyPr.upright,
+					vert:             oTxPr.bodyPr.vert,
+					vertOverflow:     oTxPr.bodyPr.vertOverflow,
+					wrap:             oTxPr.bodyPr.wrap
 				},
-				lstStyle: oTxPr.lstStyle,
+				lstStyle: HandleLstStyle(oTxPr.lstStyle),
 				content: []
 			}
-			
 		};
-		function HandleTx(oTx)
+		function HandleLstStyle(oListStyle)
+		{
+			if (!oListStyle)
+				return oListStyle;
+			
+			var arrResult = [];
+
+			for (var nLvl = 0; nLvl < oListStyle.levels.length; nLvl++)
+			{
+				arrResult.push(HandleParaPr(oListStyle.levels[nLvl]));
+			}
+
+			return arrResult;
+		};
+		function HandleParaPr(oParaPr)
+		{
+			if (!oParaPr)
+				return oParaPr;
+
+			return {
+				contextualSpacing: oParaPr.ContextualSpacing,
+				framePr:           oParaPr.FramePr ? 
+				{
+					dropCap: oParaPr.FramePr.DropCap,
+					h:       oParaPr.FramePr.H,
+					hAnchor: oParaPr.FramePr.HAnchor,
+					hRule:   oParaPr.FramePr.HRule,
+					hSpace:  oParaPr.FramePr.HSpace,
+					lines:   oParaPr.FramePr.Lines,
+					vAnchor: oParaPr.FramePr.VAnchor,
+					vSpace:  oParaPr.FramePr.VSpace,
+					w:       oParaPr.FramePr.W,
+					wrap:    oParaPr.FramePr.Wrap,
+					x:       oParaPr.FramePr.X,
+					xAlign:  oParaPr.FramePr.XAlign,
+					y:       oParaPr.FramePr.Y,
+					yAlign:  oParaPr.FramePr.YAlign
+				} :  oParaPr.FramePr,
+				ind:               oParaPr.Ind ? 
+				{
+					left:      oParaPr.Ind.Left, /// start ?
+					right:     oParaPr.Ind.Right, /// end ?
+					firstLine: oParaPr.Ind.FirstLine
+				} : oParaPr.Ind,
+				jc:                oParaPr.Jc,
+				keepLine:          oParaPr.KeepLines,
+				keepNext:          oParaPr.KeepNext,
+				numPr:             oParaPr.NumPr ? {
+					ilvl:  oParaPr.NumPr.Lvl,
+					numId: oParaPr.NumPr.NumId
+				} : oParaPr.NumPr,
+				outlineLvl:        oParaPr.OutlineLvl,
+				pageBreakBefore:   oParaPr.PageBreakBefore,
+				pBdr:              oParaPr.Brd ? 
+				{
+					between: oParaPr.Brd.Between,
+					bottom:  oParaPr.Brd.Bottom,
+					left:    oParaPr.Brd.Left,
+					right:   oParaPr.Brd.Right,
+					top:     oParaPr.Brd.Top
+				} : oParaPr.Brd,
+				pPrChange:         HandleParaPr(oParaPr.PrChange),
+				pStyle:            oParaPr.PStyle,
+				shd:               HandleShd(oParaPr.Shd),
+				spacing:           oParaPr.Spacing ? 
+				{
+					line:              oParaPr.Spacing.Line,
+					lineRule:          oParaPr.Spacing.LineRule,
+					before:            oParaPr.Spacing.Before,
+					beforePct:         oParaPr.Spacing.BeforePct,
+					beforeAutoSpacing: oParaPr.Spacing.BeforeAutoSpacing,
+					after:             oParaPr.Spacing.After,
+					afterPct:          oParaPr.Spacing.AfterPct,
+					afterAutoSpacing:  oParaPr.Spacing.AfterAutoSpacing
+				} : oParaPr.Spacing,
+				tabs:              HandleTabs(oParaPr.Tabs),
+				widowControl:      oParaPr.WidowControl
+			}
+		};
+		function HandleTabs(oTabs)
+		{
+			if (!oTabs)
+				return oTabs;
+				
+			var oTabs = {
+				tabs: []
+			};
+
+			for (var nTab = 0; nTab < oTabs.Tabs.length; nTab++)
+			{
+				oTabs.tabs.push({
+					val:    oTabs.Tabs[nTab].Value,
+					pos:    oTabs.Tabs[nTab].Pos,
+					leader: oTabs.Tabs[nTab].Leader
+				});
+			}
+
+			return oTabs;
+		};
+		function HandleSerTx(oTx)
 		{
 			if (!oTx)
-				return null;
+				return oTx;
 
 			return {
 				strRef: HandleStrRef(oTx.strRef),
-				v: oTx.val
+				v:      oTx.val
 			}
 		};
-		function HandleSlacing(oScaling)
+		function HandleChartTx(oTx)
+		{
+			if (!oTx)
+				return oTx;
+
+			return {
+				strRef: HandleStrRef(oTx.strRef),
+				rich:   HandleTxPr(oTx.rich)
+			}
+		};
+		function HandleScaling(oScaling)
 		{
 			if (!oScaling)
-				return null;
+				return oScaling;
 			
 			return {
-				logBase: oScaling.logBase,
-				max: oScaling.max,
-				min: oScaling.min,
+				logBase:     oScaling.logBase,
+				max:         oScaling.max,
+				min:         oScaling.min,
 				orientation: oScaling.orientation
 			}
 		};
 		function HandleNumFmt(oNumFmt)
 		{
 			if (!oNumFmt)
-				return null;
+				return oNumFmt;
 			
 			return {
-				formatCode: oNumFmt.formatCode,
+				formatCode:   oNumFmt.formatCode,
 				sourceLinked: oNumFmt.sourceLinked
 			}
 		};
 		function HandleDispUnits(oDispUnits)
 		{
 			if (!oDispUnits)
-				return null;
+				return oDispUnits;
 			
 			return {
 				builtInUnit: oDispUnits.builtInUnit,
-				custUnit: oDispUnits.custUnit,
+				custUnit:    oDispUnits.custUnit,
 				dispUnitsLbl: {
 					layout: HandleLayout(oDispUnits.dispUnitsLbl.layout),
-					spPr: HandleSpPr(oDispUnits.dispUnitsLbl.spPr),
-					tx: HandleTx(oDispUnits.dispUnitsLbl.tx),
-					txPr: HandleTxPr(oDispUnits.dispUnitsLbl.txPr)
+					spPr:   HandleSpPr(oDispUnits.dispUnitsLbl.spPr),
+					tx:     HandleChartTx(oDispUnits.dispUnitsLbl.tx),
+					txPr:   HandleTxPr(oDispUnits.dispUnitsLbl.txPr)
 				}
 			}
 		};
 		function HandleValAx(oValAx)
 		{
 			if (!oValAx)
-				return null;
+				return oValAx;
 			
 			return {
-				axId: oValAx.axId,
-				axPos: oValAx.axPos,
-				crossAx: oValAx.crossAx.axId,
-				crossBetween: oValAx.crossBetween,
-				crosses: oValAx.crosses,
-				crossesAt: oValAx.crossesAt,
-				delete: oValAx.bDelete,
-				dispUnits: HandleDispUnits(oValAx.dispUnits),
-				extLst: oValAx.extLst, /// ???
+				axId:           oValAx.axId,
+				axPos:          oValAx.axPos,
+				crossAx:        oValAx.crossAx.axId,
+				crossBetween:   oValAx.crossBetween,
+				crosses:        oValAx.crosses,
+				crossesAt:      oValAx.crossesAt,
+				delete:         oValAx.bDelete,
+				dispUnits:      HandleDispUnits(oValAx.dispUnits),
+				extLst:         oValAx.extLst, /// ???
 				majorGridlines: HandleSpPr(oValAx.majorGridlines),
-				majorTickMark: oValAx.majorTickMark,
-				majorUnit: oValAx.majorUnit,
+				majorTickMark:  oValAx.majorTickMark,
+				majorUnit:      oValAx.majorUnit,
 				minorGridlines: HandleSpPr(oValAx.minorGridlines),
-				minorTickMark: oValAx.minorTickMark,
-				numFmt: HandleNumFmt(oValAx.numFmt),
-				scaling: HandleSlacing(oValAx.scaling),
-				spPr: HandleSpPr(oValAx.spPr),
-				tickLblPos: oValAx.tickLblPos,
-				title: HandleTitle(oValAx.title),
-				txPr: HandleTxPr(oValAx.txPr)
+				minorTickMark:  oValAx.minorTickMark,
+				minorUnit:      oValAx.minorUnit,
+				numFmt:         HandleNumFmt(oValAx.numFmt),
+				scaling:        HandleScaling(oValAx.scaling),
+				spPr:           HandleSpPr(oValAx.spPr),
+				tickLblPos:     oValAx.tickLblPos,
+				title:          HandleTitle(oValAx.title),
+				txPr:           HandleTxPr(oValAx.txPr)
 			}
 		};
 		function HandlePlotArea(oPlotArea)
 		{
 			if (!oPlotArea)
-				return null;
+				return oPlotArea;
 
 			return {
 				barChart: HandleBarCharts(oPlotArea.charts),
-				catAx: HandleCatAx(oPlotArea.catAx),
-				dateAx: oPlotArea.dateAx,
-				dTable: oPlotArea.dTable,
-				layout: oPlotArea.layout,
-				serAx: oPlotArea.serAx,
-				spPr: HandleSpPr(oPlotArea.spPr),
-				valAx: HandleValAx(oPlotArea.valAx)
+				catAx:    HandleCatAx(oPlotArea.catAx),
+				dateAx:   HandleDateAx(oPlotArea.dateAx),
+				dTable:   HandleDataTable(oPlotArea.dTable),
+				layout:   HandleLayout(oPlotArea.layout),
+				serAx:    HandleSerAx(oPlotArea.serAx),
+				spPr:     HandleSpPr(oPlotArea.spPr),
+				valAx:    HandleValAx(oPlotArea.valAx)
+			}
+		};
+		function HandleDataTable(oData)
+		{
+			if (!oData)
+				return oData;
+
+			return {
+				showHorzBorder: oData.showHorzBorder,
+				showKeys:       oData.showKeys,
+				showOutline:    oData.showOutline,
+				showVertBorder: oData.showVertBorder,
+				spPr:           HandleSpPr(oData.spPr),
+				txPr:           HandleTxPr(oData.txPr)
+			};
+		};
+		function HandleSerAx(oSerAx)
+		{
+			if (!oSerAx)
+				return oSerAx;
+
+			return {
+				axId:           oSerAx.axId,
+				axPos:          oSerAx.axPos,
+				crossAx:        oSerAx.crossAx.axId,
+				crosses:        oSerAx.crosses,
+				crossesAt:      oSerAx.crossesAt,
+				delete:         oSerAx.bDelete,
+				extLst:         oSerAx.extLst, /// ?
+				majorGridlines: HandleSpPr(oSerAx.majorGridlines),
+				majorTickMark:  oSerAx.majorTickMark,
+				minorGridlines: HandleSpPr(oSerAx.minorGridlines),
+				minorTickMark:  oSerAx.minorTickMark,
+				numFrm:         HandleNumFmt(oSerAx.numFmt),
+				scaling:        HandleScaling(oSerAx.scaling),
+				spPr:           HandleSpPr(oSerAx.spPr),
+				tickLblPos:     oSerAx.tickLblPos,
+				tickLblSkip:    oSerAx.tickLblSkip,
+				tickMarkSkip:   oSerAx.tickMarkSkip,
+				title:          HandleTitle(oSerAx.title),
+				txPr:           HandleTxPr(oSerAx.txPr)
 			}
 		};
 		function HandleCatAx(oCatAx)
 		{
 			if (!oCatAx)
-				return null;
+				return oCatAx;
 
 			return {
-				auto: oCatAx.auto,
-				axId: oCatAx.axId,
-				axPos: oCatAx.axPos,
-				crossAx: oCatAx.crossAx.axId,
-				crosses: oCatAx.crosses,
-				crossesAt: oCatAx.crossesAt,
-				delete: oCatAx.bDelete,
-				extLst: oCatAx.extLst,
-				lblAlgn: oCatAx.lblAlgn,
-				lvlOffset: oCatAx.lblOffset,
-				majorGridlines: oCatAx.majorGridlines,
-				majorTickMark: oCatAx.majorTickMark,
-				minorGridlines: oCatAx.minorGridlines,
-				minorTickMark: oCatAx.minorTickMark,
-				noMultiLvlLbl: oCatAx.noMultiLvlLbl,
-				numFrm: {
-					formatCode: oCatAx.numFmt.formatCode,
-					sourceLinked: oCatAx.numFmt.sourceLinked
-				},
-				scaling: {
-					logBase: oCatAx.scaling.logBase,
-					max: oCatAx.scaling.max,
-					min: oCatAx.scaling.min,
-					orientation: oCatAx.scaling.orientation
-				},
-				spPr: HandleSpPr(oCatAx.spPr),
-				tickLblPos: oCatAx.tickLblPos,
-				tickLblSkip: oCatAx.tickLblSkip,
-				tickMarkSkip: oCatAx.tickMarkSkip,
-				title: oCatAx.title,
-				txPr: HandleTxPr(oCatAx.txPr)
+				auto:           oCatAx.auto,
+				axId:           oCatAx.axId,
+				axPos:          oCatAx.axPos,
+				crossAx:        oCatAx.crossAx.axId,
+				crosses:        oCatAx.crosses,
+				crossesAt:      oCatAx.crossesAt,
+				delete:         oCatAx.bDelete,
+				extLst:         oCatAx.extLst, /// ?
+				lblAlgn:        oCatAx.lblAlgn,
+				lblOffset:      oCatAx.lblOffset,
+				majorGridlines: HandleSpPr(oCatAx.majorGridlines),
+				majorTickMark:  oCatAx.majorTickMark,
+				minorGridlines: HandleSpPr(oCatAx.minorGridlines),
+				minorTickMark:  oCatAx.minorTickMark,
+				noMultiLvlLbl:  oCatAx.noMultiLvlLbl,
+				numFrm:         HandleNumFmt(oCatAx.numFmt),
+				scaling:        HandleScaling(oCatAx.scaling),
+				spPr:           HandleSpPr(oCatAx.spPr),
+				tickLblPos:     oCatAx.tickLblPos,
+				tickLblSkip:    oCatAx.tickLblSkip,
+				tickMarkSkip:   oCatAx.tickMarkSkip,
+				title:          HandleTitle(oCatAx.title),
+				txPr:           HandleTxPr(oCatAx.txPr)
+			}
+		};
+		function HandleDateAx(oDateAx)
+		{
+			if (!oDateAx)
+				return oDateAx;
+
+			return {
+				auto:           oDateAx.auto,
+				axId:           oDateAx.axId,
+				axPos:          oDateAx.axPos,
+				baseTimeUnit:   oDateAx.baseTimeUnit,
+				crossAx:        oDateAx.crossAx.axId,
+				crosses:        oDateAx.crosses,
+				crossesAt:      oDateAx.crossesAt,
+				delete:         oDateAx.bDelete,
+				extLst:         oDateAx.extLst,
+				lblOffset:      oDateAx.lblOffset,
+				majorGridlines: HandleSpPr(oDateAx.majorGridlines),
+				majorTickMark:  oDateAx.majorTickMark,
+				majorTimeUnit:  oDateAx.majorTimeUnit,
+				majorUnit:      oDateAx.majorUnit,
+				minorGridlines: HandleSpPr(oDateAx.minorGridlines),
+				minorTickMark:  oDateAx.minorTickMark,
+				minorTimeUnit:  oDateAx.minorTimeUnit,
+				minorUnit:      oDateAx.minorUnit,
+				numFrm:         HandleNumFmt(oDateAx.numFmt),
+				scaling:        HandleScaling(oDateAx.scaling),
+				spPr:           HandleSpPr(oDateAx.spPr),
+				tickLblPos:     oDateAx.tickLblPos,
+				title:          HandleTitle(oDateAx.title),
+				txPr:           HandleTxPr(oDateAx.txPr)
 			}
 		};
 		function HandleLayout(oLayout)
 		{
 			if (!oLayout)
-				return null;
+				return oLayout;
 			
 			return {
-				h: oLayout.h,
-				hMode: oLayout.hMode,
+				h:            oLayout.h,
+				hMode:        oLayout.hMode,
 				layoutTarget: oLayout.layoutTarget,
-				w: oLayout.w,
-				wMode: oLayout.wMode,
-				x: oLayout.x,
-				xMode: oLayout.xMode,
-				y: oLayout.y,
-				yMode: oLayout.yMode
+				w:            oLayout.w,
+				wMode:        oLayout.wMode,
+				x:            oLayout.x,
+				xMode:        oLayout.xMode,
+				y:            oLayout.y,
+				yMode:        oLayout.yMode
 			}
 		};
 		function HandleDlbl(oDlbl)
 		{
 			if (!oDlbl)
-				return null;
+				return oDlbl;
 			
 			return {
-				delete: oDlbl.bDelete,
-				dLblPos: oDlbl.dLblPos,
-				idx: oDlbl.idx,
-				layout: HandleLayout(oDlbl.layout),
-				numFmt: HandleNumFmt(oDlbl.numFmt),
-				separator: oDlbl.separator, // ???
+				delete:         oDlbl.bDelete,
+				dLblPos:        oDlbl.dLblPos,
+				idx:            oDlbl.idx,
+				layout:         HandleLayout(oDlbl.layout),
+				numFmt:         HandleNumFmt(oDlbl.numFmt),
+				separator:      oDlbl.separator,
 				showBubbleSize: oDlbl.showBubbleSize,
-				showCatName: oDlbl.showCatName,
-				showLegendKey: oDlbl.showLegendKey,
-				showPercent: oDlbl.showPercent,
-				showSerName: oDlbl.showSerName,
-				showVal: oDlbl.showVal,
-				spPr: HandleSpPr(oDlbl.spPr),
-				txPr: HandleTxPr(oDlbl.txPr),
-				tx: HandleTx(oDlbl.tx)
+				showCatName:    oDlbl.showCatName,
+				showLegendKey:  oDlbl.showLegendKey,
+				showPercent:    oDlbl.showPercent,
+				showSerName:    oDlbl.showSerName,
+				showVal:        oDlbl.showVal,
+				spPr:           HandleSpPr(oDlbl.spPr),
+				txPr:           HandleTxPr(oDlbl.txPr),
+				tx:             HandleChartTx(oDlbl.tx)
 			}
 		};
 		function HandleDLbls(dLbls)
 		{
 			if (!dLbls)
-				return null;
+				return dLbls;
 			
 			return {
-				delete: dLbls.bDelete,
-				dLbl: dLbls.dLbl,
-				dLblPos: dLbls.dLblPos,
-				leaderLines: HandleSpPr(dLbls.leaderLines),
-				numFmt: HandleNumFmt(dLbls.numFmt),
-				separator: dLbls.separator, // ???
-				showBubbleSize: dLbls.showBubbleSize,
-				showCatName: dLbls.showCatName,
+				delete:          dLbls.bDelete,
+				dLbl:            dLbls.dLbl,
+				dLblPos:         dLbls.dLblPos,
+				leaderLines:     HandleSpPr(dLbls.leaderLines),
+				numFmt:          HandleNumFmt(dLbls.numFmt),
+				separator:       dLbls.separator,
+				showBubbleSize:  dLbls.showBubbleSize,
+				showCatName:     dLbls.showCatName,
 				showLeaderLines: dLbls.showLeaderLines,
-				showLegendKey: dLbls.showLegendKey,
-				showPercent: dLbls.showPercent,
-				showSerName: dLbls.showSerName,
-				showVal: dLbls.showVal,
-				spPr: HandleSpPr(dLbls.spPr),
-				txPr: HandleTxPr(dLbls.txPr)
+				showLegendKey:   dLbls.showLegendKey,
+				showPercent:     dLbls.showPercent,
+				showSerName:     dLbls.showSerName,
+				showVal:         dLbls.showVal,
+				spPr:            HandleSpPr(dLbls.spPr),
+				txPr:            HandleTxPr(dLbls.txPr)
 			}
 		};
 		function HandleBarCharts(arrBarCharts)
@@ -11116,14 +11861,14 @@
 			for (var nItem = 0; nItem < arrBarCharts.length; nItem++)
 			{
 				arrResult.push({
-					axId: [arrBarCharts[nItem].axId[0].axId, arrBarCharts[nItem].axId[1].axId],
-					barDir: arrBarCharts[nItem].barDir,
-					dLbls: HandleDLbls(arrBarCharts[nItem].dLbls),
-					gapWidth: arrBarCharts[nItem].gapWidth,
-					grouping: arrBarCharts[nItem].grouping,
-					overlap: arrBarCharts[nItem].overlap,
-					serLines: HandleSpPr(arrBarCharts[nItem].serLines),
-					ser: HandleCBarSeries(arrBarCharts[nItem].series),
+					axId:       [arrBarCharts[nItem].axId[0].axId, arrBarCharts[nItem].axId[1].axId],
+					barDir:     arrBarCharts[nItem].barDir,
+					dLbls:      HandleDLbls(arrBarCharts[nItem].dLbls),
+					gapWidth:   arrBarCharts[nItem].gapWidth,
+					grouping:   arrBarCharts[nItem].grouping,
+					overlap:    arrBarCharts[nItem].overlap,
+					serLines:   HandleSpPr(arrBarCharts[nItem].serLines),
+					ser:        HandleCBarSeries(arrBarCharts[nItem].series),
 					varyColors: arrBarCharts[nItem].varyColors
 				})
 			}
@@ -11133,138 +11878,125 @@
 		function HandleTitle(oTitle)
 		{
 			if (!oTitle)
-				return null;
+				return oTitle;
 			
 			return {
-				layout: HandleLayout(oTitle.layout),
+				layout:  HandleLayout(oTitle.layout),
 				overlay: oTitle.overlay,
-				spPr: HandleSpPr(oTitle.spPr),
-				tx: HandleTx(oTitle.tx),
-				txPr: HandleTxPr(oTitle.txPr)
+				spPr:    HandleSpPr(oTitle.spPr),
+				tx:      HandleChartTx(oTitle.tx),
+				txPr:    HandleTxPr(oTitle.txPr)
 			}
 		};
 		function HandlePrintSettings(oPrintSettings)
 		{
 			if (!oPrintSettings)
-				return null;
+				return oPrintSettings;
 
 			return {
 				headerFooter: {
-					evenFooter: oPrintSettings.headerFooter.evenFooter,
-					evenHeader: oPrintSettings.headerFooter.evenHeader,
-					firstFooter: oPrintSettings.headerFooter.firstFooter,
-					firstHeader: oPrintSettings.headerFooter.firstHeader,
-					oddFooter: oPrintSettings.headerFooter.oddFooter,
-					oddHeader: oPrintSettings.headerFooter.oddHeader,
+					evenFooter:       oPrintSettings.headerFooter.evenFooter,
+					evenHeader:       oPrintSettings.headerFooter.evenHeader,
+					firstFooter:      oPrintSettings.headerFooter.firstFooter,
+					firstHeader:      oPrintSettings.headerFooter.firstHeader,
+					oddFooter:        oPrintSettings.headerFooter.oddFooter,
+					oddHeader:        oPrintSettings.headerFooter.oddHeader,
 					alignWithMargins: oPrintSettings.headerFooter.alignWithMargins,
-					differentFirst: oPrintSettings.headerFooter.differentFirst,
+					differentFirst:   oPrintSettings.headerFooter.differentFirst,
 					differentOddEven: oPrintSettings.headerFooter.differentOddEven
 				},
 				pageMargins: {
-					b: oPrintSettings.pageMargins.b,
+					b:      oPrintSettings.pageMargins.b,
 					footer: oPrintSettings.pageMargins.footer,
 					header: oPrintSettings.pageMargins.header,
-					l: oPrintSettings.pageMargins.l,
-					r: oPrintSettings.pageMargins.r,
-					t: oPrintSettings.pageMargins.t,
+					l:      oPrintSettings.pageMargins.l,
+					r:      oPrintSettings.pageMargins.r,
+					t:      oPrintSettings.pageMargins.t,
 				},
 				pageSetup: {
-					blackAndWhite: oPrintSettings.pageSetup.blackAndWhite,
-					copies: oPrintSettings.pageSetup.copies,
-					draft: oPrintSettings.pageSetup.draft,
-					firstPageNumber: oPrintSettings.pageSetup.firstPageNumber,
-					horizontalDpi: oPrintSettings.pageSetup.horizontalDpi,
-					orientation: oPrintSettings.pageSetup.orientation,
-					paperHeight: oPrintSettings.pageSetup.paperHeight,
-					paperSize: oPrintSettings.pageSetup.paperSize,
-					paperWidth: oPrintSettings.pageSetup.paperWidth,
+					blackAndWhite:    oPrintSettings.pageSetup.blackAndWhite,
+					copies:           oPrintSettings.pageSetup.copies,
+					draft:            oPrintSettings.pageSetup.draft,
+					firstPageNumber:  oPrintSettings.pageSetup.firstPageNumber,
+					horizontalDpi:    oPrintSettings.pageSetup.horizontalDpi,
+					orientation:      oPrintSettings.pageSetup.orientation,
+					paperHeight:      oPrintSettings.pageSetup.paperHeight,
+					paperSize:        oPrintSettings.pageSetup.paperSize,
+					paperWidth:       oPrintSettings.pageSetup.paperWidth,
 					useFirstPageNumb: oPrintSettings.pageSetup.useFirstPageNumb,
-					verticalDpi: oPrintSettings.pageSetup.verticalDpi
+					verticalDpi:      oPrintSettings.pageSetup.verticalDpi
 				}
 			}
 		};
 		function HandleWall(oWall)
 		{
 			if (!oWall)
-				return null;
+				return oWall;
 			
 			return {
-				pictureOptions: {
-					applyToEnd: oWall.pictureOptions.applyToEnd,
-					applyToFront: oWall.pictureOptions.applyToFront,
-					applyToSides: oWall.pictureOptions.applyToSides,
-					pictureFormat: oWall.pictureOptions.pictureFormat,
-					pictureStackUnit: oWall.pictureOptions.pictureStackUnit
-				},
-				spPr: HandleSpPr(oWall.spPr),
-				thickness: oWall.thickness
+				pictureOptions: HandlePicOptions(oWall.pictureOptions),
+				spPr:           HandleSpPr(oWall.spPr),
+				thickness:      oWall.thickness
 			}
 		};
 		function HandleMarker(oMarker)
 		{
 			if (!oMarker)
-				return null;
+				return oMarker;
 			
 			return {
-				size: oMarker.size,
-				spPr: HandleSpPr(oMarker.spPr),
+				size:   oMarker.size,
+				spPr:   HandleSpPr(oMarker.spPr),
 				symbol: oMarker.symbol
 			}
 		};
 		function HandlePivotFmt(oFmt)
 		{
 			if (!oFmt)
-				return null;
+				return oFmt;
 			
 			return {
-				dLbl: HandleDlbl(oFmt.dLbl),
-				idx: oFmt.idx,
+				dLbl:   HandleDlbl(oFmt.dLbl),
+				idx:    oFmt.idx,
 				marker: HandleMarker(oFmt.marker),
-				spPr: HandleSpPr(oFmt.spPr),
-				txPr: HandleTxPr(oFmt.txPr)
+				spPr:   HandleSpPr(oFmt.spPr),
+				txPr:   HandleTxPr(oFmt.txPr)
 			}
-			
 		};
 		function HandlePivotFmts(arrFmts)
 		{
-			var arrResultDataPoints = [];
+			var arrResult = [];
 
 			for (var nItem = 0; nItem < arrFmts.length; nItem++)
 			{
-				arrResultDataPoints.push({
-					bubble3D: arrFmts[nItem].bubble3D,
-					explosion: arrFmts[nItem].explosion,
-					idx: arrFmts[nItem].idx,
-					invertIfNegative: arrFmts[nItem].invertIfNegative,
-					marker: HandleMarker(arrFmts[nItem].marker)
-				});
+				arrResult.push(HandlePivotFmt(arrFmts[nItem]));
 			}
 
-			return arrResultDataPoints;
+			return arrResult;
 		};
 		function HandleView3D(oView3D)
 		{
 			if (!oView3D)
-				return null;
+				return oView3D;
 			
 			return {
 				depthPercent: oView3D.depthPercent,
-				hPercent: oView3D.hPercent,
-				perspective: oView3D.perspective,
-				rAngAx: oView3D.rAngAx,
-				rotX: oView3D.rotX,
-				rotY: oView3D.rotY
+				hPercent:     oView3D.hPercent,
+				perspective:  oView3D.perspective,
+				rAngAx:       oView3D.rAngAx,
+				rotX:         oView3D.rotX,
+				rotY:         oView3D.rotY
 			}
 		};
 		function HandleLegendEntry(oLegendEntry)
 		{
 			if (!oLegendEntry)
-				return null;
+				return oLegendEntry;
 			
 			return {
 				delete: oLegendEntry.bDelete,
-				idx: oLegendEntry.idx,
-				txPr: HandleTxPr(oLegendEntry.txPr)
+				idx:    oLegendEntry.idx,
+				txPr:   HandleTxPr(oLegendEntry.txPr)
 			}
 		};
 		function HandleLegendEntries(arrEntries)
@@ -11281,42 +12013,42 @@
 		function HandleChartSpace(oChartSpace)
 		{
 			if (!oChartSpace)
-				return null;
+				return oChartSpace;
 
 			return {
 				chart: {
 					autoTitleDeleted: oChartSpace.chart.autoTitleDeleted,
-					backwall: HandleWall(oChartSpace.chart.backWall),
-					dispBlanksAs: oChartSpace.chart.dispBlanksAs,
-					floor: HandleWall(oChartSpace.chart.floor),
+					backwall:         HandleWall(oChartSpace.chart.backWall),
+					dispBlanksAs:     oChartSpace.chart.dispBlanksAs,
+					floor:            HandleWall(oChartSpace.chart.floor),
 					legend: {
-						layout: HandleLayout(oChartSpace.chart.legend.layout),
+						layout:      HandleLayout(oChartSpace.chart.legend.layout),
 						legendEntry: HandleLegendEntries(oChartSpace.chart.legend.legendEntryes),
-						legendPos: oChartSpace.chart.legend.legendPos,
-						overlay: oChartSpace.chart.legend.overlay,
-						spPr: HandleSpPr(oChartSpace.chart.legend.spPr),
-						txPr: HandleTxPr(oChartSpace.chart.legend.txPr)
+						legendPos:   oChartSpace.chart.legend.legendPos,
+						overlay:     oChartSpace.chart.legend.overlay,
+						spPr:        HandleSpPr(oChartSpace.chart.legend.spPr),
+						txPr:        HandleTxPr(oChartSpace.chart.legend.txPr)
 					},
-					pivotFmts: oChartSpace.chart.pivotFmts,
-					plotArea: HandlePlotArea(oChartSpace.chart.plotArea),
-					plotVisOnly: oChartSpace.chart.plotVisOnly,
+					pivotFmts:        HandlePivotFmts(oChartSpace.chart.pivotFmts),
+					plotArea:         HandlePlotArea(oChartSpace.chart.plotArea),
+					plotVisOnly:      oChartSpace.chart.plotVisOnly,
 					showDLblsOverMax: oChartSpace.chart.showDLblsOverMax,
-					sideWall: HandleWall(oChartSpace.chart.sideWall),
-					title: HandleTitle(oChartSpace.chart.title),
-					view3D: HandleView3D(oChartSpace.chart.view3D)
+					sideWall:         HandleWall(oChartSpace.chart.sideWall),
+					title:            HandleTitle(oChartSpace.chart.title),
+					view3D:           HandleView3D(oChartSpace.chart.view3D)
 				},
-				clrMapOvr: oChartSpace.clrMapOvr,
-				date1904: oChartSpace.date1904,
-				externalData: HandleExternalData(oChartSpace.externalData),
-				lang: oChartSpace.lang,
-				pivotSource: HandlePivotSource(oChartSpace.pivotSource),
-				printSettings: HandlePrintSettings(oChartSpace.printSettings),
-				protection: HandleProtection(oChartSpace.protection),
+				clrMapOvr:      oChartSpace.clrMapOvr ? oChartSpace.clrMapOvr.color_map : oChartSpace.clrMapOvr,
+				date1904:       oChartSpace.date1904,
+				externalData:   HandleExternalData(oChartSpace.externalData),
+				lang:           oChartSpace.lang,
+				pivotSource:    HandlePivotSource(oChartSpace.pivotSource),
+				printSettings:  HandlePrintSettings(oChartSpace.printSettings),
+				protection:     HandleProtection(oChartSpace.protection),
 				roundedCorners: oChartSpace.roundedCorners,
-				spPr: HandleSpPr(oChartSpace.spPr),
-				style: oChartSpace.style,
-				txPr: HandleTxPr(oChartSpace.txPr),
-				userShapes: oChartSpace.userShapes
+				spPr:           HandleSpPr(oChartSpace.spPr),
+				style:          oChartSpace.style,
+				txPr:           HandleTxPr(oChartSpace.txPr),
+				userShapes:     oChartSpace.userShapes
 			};
 			
 
