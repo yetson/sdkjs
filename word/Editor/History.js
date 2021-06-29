@@ -268,7 +268,7 @@ CHistory.prototype =
 				if (Item.Data)
 				{
                     var IsAddStat = (Item.Data.hasOwnProperty("Add") && Item.Data.Items.length) || (Item.Data.Type === AscDFH.historyitem_Paragraph_Numbering);
-                    if (IsAddStat)
+                    if (IsAddStat && Statistics)
                     {
                         var flag = false;
                         if (Item.Class instanceof CDocumentContent)
@@ -336,7 +336,7 @@ CHistory.prototype =
                         
                     }
 					Item.Data.Undo();
-                    if (IsAddStat)
+                    if (IsAddStat && Statistics)
                     {
                         if (Item.Class === this.Document)
                         {
@@ -402,7 +402,7 @@ CHistory.prototype =
 			if (Item.Data)
 			{
                 var IsAddStat = (Item.Data.hasOwnProperty("Add") && Item.Data.Items.length) || (Item.Data.Type === AscDFH.historyitem_Paragraph_Numbering);
-                if (IsAddStat)
+                if (IsAddStat && Statistics)
                 {
                     var flag = false;
                     if (Item.Class instanceof CDocumentContent)
@@ -470,7 +470,7 @@ CHistory.prototype =
                     
                 }
 				Item.Data.Redo();
-                if (IsAddStat)
+                if (IsAddStat && Statistics)
                 {
                     if (Item.Class === this.Document)
                     {

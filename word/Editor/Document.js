@@ -1353,7 +1353,6 @@ function CStatistics(LogicDocument)
 {
     this.LogicDocument  = LogicDocument;
     this.Api            = LogicDocument.Get_Api();
-	this.isUseSelection = false;
 	this.IsWorking      = true;
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
@@ -16047,15 +16046,12 @@ CDocument.prototype.private_OnSelectionEnd = function()
 	this.Api.sendEvent("asc_onSelectionEnd");
 	var SelectedStatistics = new CStatistics(this);
 	SelectedStatistics.bAdd = true;
-	SelectedStatistics.isUseSelection = true;
-
-	var Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
-	var End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
-	for (var i = Start; i <= End; i++)
-		this.Content[i].CollectDocumentStatistics(SelectedStatistics);
+	var Selected = this.GetSelectedContent();
+	for (var i = 0; i < Selected.Elements.length; i++)
+		Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
 
 	var bounds = this.GetSelectionBounds();
-	SelectedStatistics.Update_Pages( ( (bounds.Direction === 1 ? bounds.End.Page - bounds.Start.Page : bounds.Start.Page - bounds.End.Page) + 1) );
+	SelectedStatistics.Update_Pages(bounds.End.Page - bounds.Start.Page + 1);
 	// отправить статитстику в интерфейс
 	console.log(SelectedStatistics);
 };
@@ -16586,17 +16582,14 @@ CDocument.prototype.OnSelectStatisticsChange = function()
 	{
 		var SelectedStatistics = new CStatistics(this);
 		SelectedStatistics.bAdd = true;
-		SelectedStatistics.isUseSelection = true;
-
-		var Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
-		var End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
-		for (var i = Start; i <= End; i++)
-			this.Content[i].CollectDocumentStatistics(SelectedStatistics);
+		var Selected = this.GetSelectedContent();
+		for (var i = 0; i < Selected.Elements.length; i++)
+			Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
 
 		// для подсчета количества страниц
 		var bounds = this.GetSelectionBounds();
-		SelectedStatistics.Update_Pages( ( (bounds.Direction === 1 ? bounds.End.Page - bounds.Start.Page : bounds.Start.Page - bounds.End.Page) + 1) );
-		
+		SelectedStatistics.Update_Pages(bounds.End.Page - bounds.Start.Page + 1);
+
 		// отправить статитстику в интерфейс
 		console.log(SelectedStatistics);
 	}

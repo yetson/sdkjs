@@ -3558,26 +3558,14 @@ CTable.prototype.CollectDocumentStatistics = function(Stats)
 	if (!Stats.GetWorkingState())
 		return;
 
-	if (Stats.isUseSelection)
+	for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
 	{
-		var Cells = this.GetSelectionArray();
-		for (var Index = 0; Index < Cells.length; Index++)
-		{
-			var Row = this.Content[Cells[Index].Row];
-			Row.GetCell(Cells[Index].Cell).Content.CollectDocumentStatistics(Stats);
-		}
-	}
-	else
-	{
-		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
-		{
-			var Row        = this.Content[CurRow];
-			var CellsCount = Row.Get_CellsCount();
+		var Row        = this.Content[CurRow];
+		var CellsCount = Row.Get_CellsCount();
 
-			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
-			{
-				Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
-			}
+		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+		{
+			Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
 		}
 	}
 };
@@ -13878,8 +13866,10 @@ CTable.prototype.RemoveTableCells = function()
 		oDeletedFirstCellPos = {Row : 0, Cell : 0};
 
 	// Удалим все ячейки
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+		Statistics.bAdd = false;
+
 	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
 	{
 		var oRow = this.Content[nCurRow];
@@ -13887,7 +13877,7 @@ CTable.prototype.RemoveTableCells = function()
 		{
 			var nCurCell = arrDeleteInfo[nCurRow][nIndex];
 			var oCell = oRow.GetCell(nCurCell);
-			if (oCell.Content && oCell.Content.CollectDocumentStatistics)
+			if (oCell.Content && oCell.Content.CollectDocumentStatistics && Statistics)
 				oCell.Content.CollectDocumentStatistics(Statistics);
 
 			oRow.RemoveCell(nCurCell);

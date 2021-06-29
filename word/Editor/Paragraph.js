@@ -3458,9 +3458,12 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 {
 	var Direction = nCount;
 	var Result    = true;
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+	}
 
 	if (true === this.Selection.Use)
 	{
@@ -3699,9 +3702,12 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 
 			this.Document_SetThisElementCurrent(false);
 
-			Statistics.bAdd = true;
-			this.CollectDocumentStatistics(Statistics);
-			console.log(Statistics);
+			if (Statistics)
+			{
+				Statistics.bAdd = true;
+				this.CollectDocumentStatistics(Statistics);
+				console.log(Statistics);
+			}
 			return true;
 		}
 	}
@@ -3723,9 +3729,12 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 				this.SetSelectionContentPos(oStartPos, oSearchPos.Pos);
 				this.Remove(1, false, false, false, false);
 				this.RemoveSelection();
-				Statistics.bAdd = true;
-				this.CollectDocumentStatistics(Statistics);
-				console.log(Statistics);
+				if (Statistics)
+				{
+					Statistics.bAdd = true;
+					this.CollectDocumentStatistics(Statistics);
+					console.log(Statistics);
+				}
 				return true;
 			}
 		}
@@ -3764,9 +3773,12 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 				//this.Selection.EndPos   = ContentPos;
 				//this.Correct_Content(ContentPos, ContentPos);
 				//this.Document_SetThisElementCurrent(false);
-				Statistics.bAdd = true;
-				this.CollectDocumentStatistics(Statistics);
-				console.log(Statistics);
+				if (Statistics)
+				{
+					Statistics.bAdd = true;
+					this.CollectDocumentStatistics(Statistics);
+					console.log(Statistics);
+				}
 				return true;
 			}
 
@@ -3880,9 +3892,12 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 			}
 		}
 	}
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
-	console.log(Statistics);
+	if (Statistics)
+	{
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
+	}
 	return Result;
 };
 Paragraph.prototype.Remove_ParaEnd = function()
@@ -4085,9 +4100,12 @@ Paragraph.prototype.Internal_GetTextPr = function(LetterPos)
  */
 Paragraph.prototype.Add = function(Item)
 {
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+	}
 	// Выставляем родительский класс
 	Item.Parent = this;
 
@@ -4307,9 +4325,12 @@ Paragraph.prototype.Add = function(Item)
 			break;
 		}
 	}
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
-	console.log(Statistics);
+	if (Statistics)
+	{
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
+	}
 };
 /**
  * Данная функция вызывается, когда уже точно известно, что у нас либо выделение начинается с начала параграфа, либо мы
@@ -6911,9 +6932,12 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 {
 	var Hyperlink = null;
 
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+	}
 	if (true === this.Selection.Use)
 	{
 		// Создаем гиперссылку
@@ -7105,8 +7129,11 @@ Paragraph.prototype.AddHyperlink = function(HyperProps)
 	}
 
 	this.Correct_Content();
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
+	if (Statistics)
+	{
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+	}
 	return Hyperlink;
 };
 /**
@@ -8792,10 +8819,13 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 	if (true === SelectionUse && true !== SelectedOneElement && true === this.Is_Empty() && !this.GetNumPr())
 		return;
 
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
-	Statistics.Off();
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+		Statistics.Off();
+	}
 	this.RemoveNumPr();
 
 	// Рассчитаем количество табов, идущих в начале параграфа
@@ -8969,10 +8999,13 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 	this.CompiledPr.NeedRecalc = true;
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 	this.UpdateDocumentOutline();
-	Statistics.On();
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
-	console.log(Statistics);
+	if (Statistics)
+	{
+		Statistics.On();
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
+	}
 };
 /**
  * Добавляем нумерацию к данному параграфу, не делая никаких дополнительных действий
@@ -9071,9 +9104,12 @@ Paragraph.prototype.RemoveNumPr = function()
 {
 	// Если у нас была задана нумерации в стиле, тогда чтобы ее отменить(не удаляя нумерацию в стиле)
 	// мы проставляем NumPr с NumId undefined
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+	}
 	var OldNumPr = this.GetNumPr();
 	var NewNumPr = undefined;
 	if (undefined != this.CompiledPr.Pr.ParaPr.StyleNumPr)
@@ -9149,8 +9185,11 @@ Paragraph.prototype.RemoveNumPr = function()
 	this.CompiledPr.NeedRecalc = true;
 	this.private_UpdateTrackRevisionOnChangeParaPr(true);
 	this.UpdateDocumentOutline();
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
+	if (Statistics)
+	{
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+	}
 };
 /**
  * Проверяем есть ли у данного параграфа нумерация
@@ -11057,11 +11096,6 @@ Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsUndoRedo)
 	var ParaStats = new CParagraphStatistics(Stats);
 	var Start = 0,
 		End   = this.Content.length - 1;
-	if (Stats.isUseSelection)
-	{
-		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
-		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
-	}
 
 	for (var Index = Start; Index <= End; Index++)
 	{
@@ -12271,10 +12305,13 @@ Paragraph.prototype.Split = function(NewParagraph)
  */
 Paragraph.prototype.Concat = function(Para, isUseConcatedStyle)
 {
-	var Statistics = this.GetLogicDocument().Statistics;
-	Statistics.bAdd = false;
-	this.CollectDocumentStatistics(Statistics);
-	Para.CollectDocumentStatistics(Statistics);
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		this.CollectDocumentStatistics(Statistics);
+		Para.CollectDocumentStatistics(Statistics);
+	}
 	this.DeleteCommentOnRemove = false;
 	Para.DeleteCommentOnRemove = false;
 
@@ -12324,8 +12361,11 @@ Paragraph.prototype.Concat = function(Para, isUseConcatedStyle)
 	if (true === isUseConcatedStyle)
 		Para.CopyPr(this);
 	
-	Statistics.bAdd = true;
-	this.CollectDocumentStatistics(Statistics);
+	if (Statistics)
+	{
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+	}
 };
 /**
  * Присоединяем содержимое параграфа oPara до содержимого текущего параграфа
@@ -13787,7 +13827,7 @@ Paragraph.prototype.AcceptRevisionChanges = function(Type, bAll)
 
     if (true === this.Selection.Use || true === bAll)
     {
-		var Statistics = (Type !== c_oAscRevisionsChangeType.TextAdd) ? this.GetLogicDocument().Statistics : null;
+		var Statistics = (Type !== c_oAscRevisionsChangeType.TextAdd && this.GetLogicDocument()) ? this.GetLogicDocument().Statistics : null;
 		if (Statistics) {
 			Statistics.bAdd = false;
 			this.CollectDocumentStatistics(Statistics);
@@ -13872,7 +13912,7 @@ Paragraph.prototype.RejectRevisionChanges = function(Type, bAll)
 
 	if (true === this.Selection.Use || true === bAll)
 	{
-		var Statistics = (Type !== c_oAscRevisionsChangeType.TextRem) ? this.GetLogicDocument().Statistics : null;
+		var Statistics = (Type !== c_oAscRevisionsChangeType.TextRem && this.GetLogicDocument()) ? this.GetLogicDocument().Statistics : null;
 		if (Statistics) {
 			Statistics.bAdd = false;
 			this.CollectDocumentStatistics(Statistics);
@@ -14763,13 +14803,16 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	}
 	else
 	{
-		var Statistics = this.GetLogicDocument().Statistics;
-		var bWork = Statistics.GetWorkingState();
-		Statistics.On();
-		Statistics.bAdd = false;
-		this.CollectDocumentStatistics(Statistics);
-		if(!bWork)
-			Statistics.Off();
+		var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+		if (Statistics)
+		{
+			var bWork = Statistics.GetWorkingState();
+			Statistics.On();
+			Statistics.bAdd = false;
+			this.CollectDocumentStatistics(Statistics);
+			if(!bWork)
+				Statistics.Off();
+		}
 		var oContentControl = new CInlineLevelSdt();
 		oContentControl.SetDefaultTextPr(this.GetDirectTextPr());
 		oContentControl.SetPlaceholder(c_oAscDefaultPlaceholderName.Text);

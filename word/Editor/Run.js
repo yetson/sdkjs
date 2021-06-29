@@ -2676,11 +2676,7 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats, IsUndoRedo)
 {
     var Start = 0,
 		End   = this.Content.length;
-	if (ParaStats.Stats.isUseSelection)
-	{
-		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
-		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
-	}
+
 	for (var Index = Start; Index < End; Index++)
 	{
 		var Item     = this.Content[Index];

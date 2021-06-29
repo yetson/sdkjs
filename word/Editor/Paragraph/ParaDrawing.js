@@ -2951,6 +2951,7 @@ ParaDrawing.prototype.PreDelete = function()
 	var Statistics = this.LogicDocument ? this.LogicDocument.Statistics : null;
 	if (Statistics)
 		Statistics.bAdd = false;
+
 	var arrDocContents = this.GetAllDocContents();
 	for (var nIndex = 0, nCount = arrDocContents.length; nIndex < nCount; ++nIndex)
 	{

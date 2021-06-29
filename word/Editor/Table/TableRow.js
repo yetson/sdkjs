@@ -218,8 +218,10 @@ CTableRow.prototype =
     PreDelete : function()
     {
         var CellsCount = this.Get_CellsCount();
-		var Statistics = this.Table.GetLogicDocument().Statistics;
-		Statistics.bAdd = false;
+		var Statistics = this.Table.GetLogicDocument() ? this.Table.GetLogicDocument().Statistics : null;
+		if (Statistics)
+			Statistics.bAdd = false;
+
         for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
         {
             var Cell = this.Get_Cell( CurCell );
@@ -229,7 +231,7 @@ CTableRow.prototype =
             for ( var Pos = 0; Pos < ContentCount; Pos++ )
             {
                 CellContent[Pos].PreDelete();
-				if (CellContent[Pos].CollectDocumentStatistics && !CellContent[Pos].IsTable())
+				if (CellContent[Pos].CollectDocumentStatistics && !CellContent[Pos].IsTable() && Statistics)
 					CellContent[Pos].CollectDocumentStatistics(Statistics);
             }
         }
