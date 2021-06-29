@@ -192,6 +192,2050 @@
 		}
 		return arrRuns[max_pos_Index];
 	};
+	
+	// start of serialize functions
+	function SerDocContent(arrContent)
+	{
+		var arrResult = [];
+		for (var nElm  = 0; nElm < arrContent.length; nElm++)
+		{
+			if (arrContent[nElm].IsParagraph())
+				arrResult.push(JSON.parse((new ApiParagraph(arrContent[nElm]).ToJSON())));
+			else if (arrContent[nElm] instanceof AscCommonWord.ParaRun)
+				arrResult.push(JSON.parse((new ApiRun(arrContent[nElm]).ToJSON())));
+		}
+	};
+	function SerHlink(oHlink)
+	{
+		if (!oHlink)
+			return oHlink;
+		
+		return {
+			action:         oHlink.action,
+			endSnd:         oHlink.endSnd,
+			highlightClick: oHlink.highlightClick,
+			history:        oHlink.history,
+			id:             oHlink.id,
+			invalidUrl:     oHlink.invalidUrl,
+			tgtFrame:       oHlink.tgtFrame,
+			tooltip:        oHlink.tooltip
+		}
+	};
+	function SerExternalData(oExtData)
+	{
+		if (!oExtData)
+			return oExtData;
+		
+		return {
+			autoUpdate: oExtData.autoUpdate,
+			id:         oExtData.id
+		}
+	};
+	function SerProtection(oProtection)
+	{
+		if (!oProtection)
+			return oProtection;
+		
+		return {
+			chartObject:   oProtection.chartObject,
+			data:          oProtection.data,
+			formatting:    oProtection.formatting,
+			selection:     oProtection.selection,
+			userInterface: oProtection.userInterface
+		}
+	};
+	function SerPivotSource(oPivotSource)
+	{
+		if (!oPivotSource)
+			return oPivotSource;
+		
+		return {
+			fmtId: oPivotSource.fmtId,
+			name:  oPivotSource.name
+		}
+	};
+	function SerSimplePos(oSimplePos)
+	{
+		if (!oSimplePos)
+			return oSimplePos;
+		
+		return {
+			x: oSimplePos.X,
+			y: oSimplePos.Y
+		}
+	};
+	function SerPosV(oPosV)
+	{
+		if (!oPosV)
+			return oPosV;
+		
+		return {
+			align:        oPosV.Align,
+			relativeFrom: oPosV.RelativeFrom
+		}
+	};
+	function SerPosH(oPosH)
+	{
+		if (!oPosH)
+			return oPosH;
+		
+		return {
+			align:        oPosH.Align,
+			relativeFrom: oPosH.RelativeFrom
+		}
+	};
+	function SerExtent(oExtent)
+	{
+		if (!oExtent)
+			return oExtent;
+
+		return {
+			cy: oExtent.H,
+			cx: oExtent.W
+		}
+	};
+	function SerEffectExtent(oEffExt)
+	{
+		if (!oEffExt)
+			return oEffExt;
+
+		return {
+			b: oEffExt.B,
+			l: oEffExt.L,
+			r: oEffExt.R,
+			t: oEffExt.T
+		}
+	};
+	function GetWrapType(nType)
+	{
+		switch (nType)
+		{
+			case WRAPPING_TYPE_NONE:
+				return "none";
+			case WRAPPING_TYPE_SQUARE:
+				return "square";
+			case WRAPPING_TYPE_THROUGH:
+				return "through";
+			case WRAPPING_TYPE_TIGHT:
+				return "tight";
+			case WRAPPING_TYPE_TOP_AND_BOTTOM:
+				return "top_and_bottom";
+			default:
+				return "none";
+		}
+	};
+	function SerGrapicObject(oGraphicObj)
+	{
+		if (!oGraphicObj)
+			return null;
+
+		if (oGraphicObj.isChart())
+			return SerChartSpace(oGraphicObj);
+		if (oGraphicObj.isImage())
+			return SerImage(oGraphicObj);
+		if (oGraphicObj.isShape())
+			return SerShape(oGraphicObj);
+		
+		return null;
+	};
+	function SerDocPr(oDocPr)
+	{
+		if (!oDocPr)
+			return null;
+		
+		return {
+			hlinkClick: SerHlink(oDocPr.hlinkClick),
+			hlinkHover: SerHlink(oDocPr.hlinkHover),
+			descr:      oDocPr.descr,
+			hidden:     oDocPr.isHidden,
+			id:         oDocPr.id,
+			name:       oDocPr.name,
+			title:      oDocPr.title
+		}
+	};
+	function SerNumLit(oNumLit)
+	{
+		if (!oNumLit)
+			return null;
+
+		var arrResultPts = [];
+		for (var nItem = 0; nItem < oNumLit.pts.length; nItem++)
+		{
+			arrResultPts.push({
+				v:          oNumLit.pts[nItem].val,
+				formatCode: oNumLit.pts[nItem].formatCode,
+				idx:        oNumLit.pts[nItem].idx,
+			});
+		}
+
+		return {
+			formatCode: oNumLit.formatCode,
+			pt:         arrResultPts,
+			ptCount:    oNumLit.ptCount
+		}
+	};
+	function SerStrLit(oStrLit)
+	{
+		if (!oStrLit)
+			return oStrLit;
+
+		var arrResultPts = [];
+		for (var nItem = 0; nItem < oStrLit.pts.length; nItem++)
+		{
+			arrResultPts.push({
+				v:   oStrLit.pts[nItem].val,
+				idx: oStrLit.pts[nItem].idx,
+			});
+		}
+
+		return {
+			pt:         arrResultPts,
+			ptCount:    oStrLit.ptCount
+		}
+	};
+	function SerErrBars(oErrBars)
+	{
+		if (!oErrBars)
+			return oErrBars;
+
+		return {
+			errBarType: oErrBars.errBarType,
+			errDir:     oErrBars.errDir,
+			errValType: oErrBars.errValType,
+			minus: {
+				numLit: SerNumLit(oErrBars.minus.numLit),
+				numRef: SerNumRef(oErrBars.minus.numRef)
+			},
+			noEndCap: oErrBars.noEndCap,
+			plus: {
+				numLit: SerNumLit(oErrBars.plus.numLit),
+				numRef: SerNumRef(oErrBars.plus.numRef)
+			},
+			spPr: SerSpPr(oErrBars.spPr),
+			val:  oErrBars.val
+		}
+	};
+	function SerDataPoints(arrDpts)
+	{
+		var arrResultDataPoints = [];
+
+		for (var nItem = 0; nItem < arrDpts.length; nItem++)
+		{
+			arrResultDataPoints.push({
+				bubble3D:         arrDpts[nItem].bubble3D,
+				explosion:        arrDpts[nItem].explosion,
+				idx:              arrDpts[nItem].idx,
+				invertIfNegative: arrDpts[nItem].invertIfNegative,
+				marker:           SerMarker(arrDpts[nItem].marker),
+				pictureOptions:   SerPicOptions(arrDpts[nItem].pictureOptions),
+				spPr:             SerSpPr(arrDpts[nItem].spPr)
+			});
+		}
+
+		return arrResultDataPoints;
+	};
+	function SerMultiLvlStrRef(oRef)
+	{
+		if (!oRef)
+			return oRef;
+		
+		return {
+			f:                oRef.f,
+			multiLvlStrCache: SerMultiLvlStrCache(oRef.multiLvlStrCache)
+		}
+	};
+	function SerMultiLvlStrCache(oCache)
+	{
+		if (!oChange)
+			return oChange;
+
+		var arrLvl = [];
+
+		for (var nPoint = 0; nPoint < oChange.lvl.length; nPoint++)
+		{
+			arrLvl.push({
+				v:   oChange.lvl[nPoint].val,
+				idx: oChange.lvl[nPoint].idx
+			});
+		}
+		
+		return {
+			lvl:     arrLvl,
+			ptCount: oCache.ptCount
+		}
+	};
+	function SerTrendline(oTrendLine)
+	{
+		if (!oTrendLine)
+			return oTrendLine;
+
+		return {
+			backward:  oTrendLine.backward,
+			dispEq:    oTrendLine.dispEq,
+			dispRSqr:  oTrendLine.dispRSqr,
+			forward:   oTrendLine.forward,
+			intercept: oTrendLine.intercept,
+			name:      oTrendLine.name,
+			order:     oTrendLine.order,
+			period:    oTrendLine.period,
+			spPr:      SerSpPr(oTrendLine.spPr),
+			trendlineLbl: {
+				layout: SerLayout(oTrendLine.trendlineLbl.layout),
+				numFmt: SerNumFmt(oTrendLine.trendlineLbl.numFmt),
+				spPr:   SerSpPr(oTrendLine.trendlineLbl.spPr),
+				tx:     SerChartTx(oTrendLine.trendlineLbl.tx),
+				txPr:   SerTxPr(oTrendLine.trendlineLbl.txPr)
+			},
+			trendlineType: oTrendLine.trendlineType
+		}
+	};
+	function SerPicOptions(oPicOptions)
+	{
+		if (!oPicOptions)
+			return oPicOptions;
+
+		return {
+			applyToEnd:       oPicOptions.applyToEnd,
+			applyToFront:     oPicOptions.applyToFront,
+			applyToSides:     oPicOptions.applyToSides,
+			pictureFormat:    oPicOptions.pictureFormat,
+			pictureStackUnit: oPicOptions.pictureStackUnit
+		};
+	};
+	function SerCBarSeries(arrSeries)
+	{
+		var arrResultSeries = [];
+
+		for (var nItem = 0; nItem < arrSeries.length; nItem++)
+		{
+			arrResultSeries.push({
+				cat: {
+					multiLvlStrRef: SerMultiLvlStrRef(arrSeries[nItem].cat.multiLvlStrRef),
+					numLit:         SerNumLit(arrSeries[nItem].cat.numLit),
+					numRef:         SerNumRef(arrSeries[nItem].cat.numRef),
+					strLit:         SerStrLit(arrSeries[nItem].cat.strLit),
+					strRef:         SerStrRef(arrSeries[nItem].cat.strRef)
+				},
+				dLbls:            SerDLbls(arrSeries[nItem].dLbls),
+				dPt:              SerDataPoints(arrSeries[nItem].dPt),
+				errBars:          SerErrBars(arrSeries[nItem].errBars),
+				idx:              arrSeries[nItem].idx,
+				invertIfNegative: arrSeries[nItem].invertIfNegative,
+				order:            arrSeries[nItem].order,
+				pictureOptions:   SerPicOptions(arrSeries[nItem].pictureOptions),
+				shape:            arrSeries[nItem].shape,
+				spPr:             SerSpPr(arrSeries[nItem].spPr),
+				trendline:        SerTrendline(arrSeries[nItem].trendline),
+				tx:               SerSerTx(arrSeries[nItem].tx),
+				val : {
+					numLit: SerNumLit(arrSeries[nItem].val.numLit),
+					numRef: SerNumRef(arrSeries[nItem].val.numRef)
+				}
+			});
+		}
+
+		return arrResultSeries;
+	};
+	function SerStrRef(oStrRef)
+	{
+		if (!oStrRef)
+			return oStrRef;
+
+		var arrResultPts = [];
+		for (var nItem = 0; nItem < oStrRef.strCache.pts.length; nItem++)
+		{
+			arrResultPts.push({
+				v:   oStrRef.strCache.pts[nItem].val,
+				idx: oStrRef.strCache.pts[nItem].idx
+			});
+		}
+
+		var oResultStrRef = {
+			f: oStrRef.f,
+			strCache: {
+				ptCount: oStrRef.ptCount,
+				pt:      arrResultPts
+			}
+		}
+
+		return oResultStrRef;
+	};
+	function SerNumRef(oNumRef)
+	{
+		if (!oNumRef)
+			return oNumRef;
+
+		var arrResultPts = [];
+		for (var nItem = 0; nItem < oNumRef.numCache.pts.length; nItem++)
+		{
+			arrResultPts.push({
+				v:          oNumRef.numCache.pts[nItem].val,
+				formatCode: oNumRef.numCache.pts[nItem].formatCode,
+				idx:        oNumRef.numCache.pts[nItem].idx,
+			});
+		}
+
+		return {
+			f: oNumRef.f,
+			numCache: { 
+				formatCode: oNumRef.formatCode,
+				ptCount:    oNumRef.ptCount,
+				pt:         arrResultPts
+			}
+		}
+	};
+	function SerGeometry(oGeometry)
+	{
+		if (!oGeometry)
+			return oGeometry;
+		
+		var arrAhPolarResult = [];
+		var arrAhXYResult    = [];
+		var arrAvResult      = [];
+		var arrCxnResult     = [];
+		var arrGdResult      = [];
+		var arrPathResult    = [];
+		for (var nItem = 0; nItem < oGeometry.ahPolarLst.length; nItem++)
+		{
+			arrAhPolarResult.push({
+				pos: {
+					x: oGeometry.ahPolarLst[nItem].posX,
+					y: oGeometry.ahPolarLst[nItem].posY
+				},
+				gdRefAng: oGeometry.ahPolarLst[nItem].gdRefAng,
+				gdRefR: oGeometry.ahPolarLst[nItem].gdRefR,
+				maxAng: oGeometry.ahPolarLst[nItem].maxAng,
+				maxR: oGeometry.ahPolarLst[nItem].maxR,
+				minAng: oGeometry.ahPolarLst[nItem].minAng,
+				minR: oGeometry.ahPolarLst[nItem].minR
+			});
+		}
+		for (var nItem = 0; nItem < oGeometry.ahXYLst.length; nItem++)
+		{
+			arrAhXYResult.push({
+				pos: {
+					x: oGeometry.ahXYLst[nItem].posX,
+					y: oGeometry.ahXYLst[nItem].posY
+				},
+				gdRefX: oGeometry.ahXYLst[nItem].gdRefX,
+				gdRefY: oGeometry.ahXYLst[nItem].gdRefY,
+				maxX: oGeometry.ahXYLst[nItem].maxX,
+				maxY: oGeometry.ahXYLst[nItem].maxY,
+				minX: oGeometry.ahXYLst[nItem].minX,
+				minY: oGeometry.ahXYLst[nItem].minY
+			});
+		}
+		for (var nItem = 0; nItem < oGeometry.avLst.length; nItem++)
+		{
+			arrAvResult.push({
+				fmla: oGeometry.avLst[nItem].formula,
+				name: oGeometry.avLst[nItem].Name
+			});
+		}
+		for (var nItem = 0; nItem < oGeometry.cnxLst.length; nItem++)
+		{
+			arrCxnResult.push({
+				pos: {
+					x: oGeometry.cnxLst[nItem].x,
+					y: oGeometry.cnxLst[nItem].y
+				},
+				ang: oGeometry.cnxLst[nItem].ang
+			});
+		}
+		for (var nItem = 0; nItem < oGeometry.gdLst.length; nItem++)
+		{
+			arrGdResult.push({
+				fmla: oGeometry.gdLst[nItem].formula,
+				name: oGeometry.gdLst[nItem].Name
+			});
+		}
+		for (var nItem = 0; nItem < oGeometry.pathLst.length; nItem++)
+		{
+			var arrCommands = [];
+			for (var nCommand = 0; nCommand < oGeometry.pathLst[nItem].ArrPathCommandInfo.length; nCommand++)
+			{
+				var arrObjKeys = Object.keys(oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand]);
+				var oCommand   = {};
+				switch (oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand].id)
+				{
+					case 0:
+						oCommand["id"] =  "moveTo";
+						break;
+					case 1:
+						oCommand["id"] =  "lnTo";
+						break;
+					case 2:
+						oCommand["id"] =  "arcTo";
+						break;
+					case 3:
+						oCommand["id"] =  "cubicBezTo";
+						break;
+					case 4:
+						oCommand["id"] =  "quadBezTo";
+						break;
+					case 5:
+						oCommand["id"] =  "close";
+						break;
+				}
+				if (oCommand["id"] !== "arcTo" && oCommand["id"] !== "close")
+					oCommand["pt"] = {};
+				for (var nKey = 0; nKey < arrObjKeys.length; nKey++)
+				{
+					if (arrObjKeys[nKey] === "id")
+						continue;
+					if (!oCommand["pt"])
+						oCommand[arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
+					else 
+						oCommand["pt"][arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
+				}
+
+				arrCommands.push(oCommand);
+			}
+			arrPathResult.push({
+				commands: arrCommands,
+				extrusionOk: oGeometry.pathLst[nItem].extrusionOk,
+				fill: oGeometry.pathLst[nItem].fill,
+				h: oGeometry.pathLst[nItem].pathH,
+				stroke: oGeometry.pathLst[nItem].stroke,
+				w: oGeometry.pathLst[nItem].pathW
+			});
+		}
+		return {
+			ahLst: {
+				ahPolar: arrAhPolarResult,
+				ahXY:    arrAhXYResult
+			},
+			avLst:   arrAvResult,
+			cnxLst:  arrCxnResult,
+			gdLst:   arrGdResult,
+			pathLst: arrPathResult,
+			rect:    oGeometry.rectS
+		}
+	};
+	function SerSpPr(oSpPr)
+	{
+		if (!oSpPr)
+			return oSpPr;
+
+		var oXfrm = oSpPr.xfrm ? {
+			ext: {
+				cx: oSpPr.xfrm.extX,
+				cy: oSpPr.xfrm.extY
+			},
+			off: {
+				x: oSpPr.xfrm.offX,
+				y: oSpPr.xfrm.offY
+			},
+			flipH: oSpPr.xfrm.flipH,
+			flipV: oSpPr.xfrm.flipV,
+			rot: oSpPr.xfrm.rot
+		} : oSpPr.xfrm;
+
+		var oEffectLst = oSpPr.effectProps ? SerEffectLst(oSpPr.effectProps.EffectLst) : oSpPr.effectProps;
+		var oEffectDag = oSpPr.effectProps ? SerEffectDag(oSpPr.effectProps.EffectDag) : oSpPr.effectProps;
+		var oLineJoin  = oSpPr.ln ? (oSpPr.ln.Join ? {lim : oSpPr.ln.Join.limit} : oSpPr.ln.Join) : oSpPr.ln;
+		if (oLineJoin)
+		{
+			switch (oSpPr.ln.Join.type)
+			{
+				case 0:
+					oLineJoin["type"] = "empty";
+					break;
+				case 1:
+					oLineJoin["type"] = "round";
+					break;
+				case 2:
+					oLineJoin["type"] = "bevel";
+					break;
+				case 3:
+					oLineJoin["type"] = "miter";
+					break;
+			}
+		}
+		
+		return {
+			custGeom:  SerGeometry(oSpPr.geometry),
+			effectDag: oEffectDag,
+			effectLst: oEffectLst,
+			ln: SerLn(oSpPr.ln),
+
+			fill:   SerFill(oSpPr.Fill),
+			xfrm:   oXfrm,
+			bwMode: oSpPr.bwMode
+		}
+	};
+	function SerLn(oLn)
+	{
+		if (!oLn)
+			return oLn;
+		
+		var oLineJoin  = oLn.Join ? {lim : oLn.Join.limit} : oLn.Join;
+		return {
+			fill:     SerFill(oLn.Fill),
+				lineJoin: oLineJoin,
+				
+				algn:     oLn.algn,
+				cap:      oLn.cap,
+				cmpd:     oLn.cmpd,
+				w:        oLn.w,
+
+				headEnd:  oLn.headEnd ? 
+				{
+					len:  oLn.headEnd.len,
+					type: oLn.headEnd.type,
+					w:    oLn.headEnd.w
+				} : oLn.headEnd,
+
+				prstDash: oLn.prstDash,
+
+				tailEnd:  oLn.tailEnd ? 
+				{
+					len:  oLn.tailEnd.len,
+					type: oLn.tailEnd.type,
+					w:    oLn.tailEnd.w
+				} : oLn.prstDash,
+		}
+	};
+	function SerEffectLst(oEffectLst)
+	{
+		if (!oEffectLst)
+			return oEffectLst;
+		
+		return {
+			blur: oEffectLst.blur ? 
+			{
+				grow: oEffectLst.blur.grow,
+				rad:  oEffectLst.blur.rad
+			} : oEffectLst.blur,
+
+			fillOverlay: oEffectLst.fillOverlay ? 
+			{
+				fill:  SerFill(oEffectLst.fillOverlay.fill),
+				blend: oEffectLst.fillOverlay.blend
+			} : oEffectLst.fillOverlay,
+
+			glow: oEffectLst.glow ? 
+			{
+				color: SerColor(oEffectLst.glow.color),
+				rad:   oEffectLst.glow.rad
+			} : oEffectLst.glow,
+
+			innerShdw: oEffectLst.innerShdw ? 
+			{
+				color:   SerColor(oEffectLst.innerShdw.color),
+				blurRad: oEffectLst.innerShdw.blurRad,
+				dir:     oEffectLst.innerShdw.dir,
+				dist:    oEffectLst.innerShdw.dist
+			} : oEffectLst.innerShdw,
+
+			outerShdw: oEffectLst.outerShdw ? 
+			{
+				color:        SerColor(oEffectLst.outerShdw.color),
+				algn:         oEffectLst.outerShdw.algn,
+				blurRad:      oEffectLst.outerShdw.blurRad,
+				dir:          oEffectLst.outerShdw.dir,
+				dist:         oEffectLst.outerShdw.dist,
+				kx:           oEffectLst.outerShdw.kx,
+				ky:           oEffectLst.outerShdw.ky,
+				rotWithShape: oEffectLst.outerShdw.rotWithShape,
+				sx:           oEffectLst.outerShdw.sx,
+				sy:           oEffectLst.outerShdw.sy
+			} : oEffectLst.outerShdw,
+
+			prstShdw: oEffectLst.prstShdw ? 
+			{
+				color: SerColor(oEffectLst.prstShdw.color),
+				dir:   oEffectLst.prstShdw.dir,
+				dist:  oEffectLst.prstShdw.dis,
+				prst:  oEffectLst.prstShdw.prst
+			} : oEffectLst.prstShdw,
+
+			reflection: oEffectLst.reflection ?
+			{
+				algn:         oEffectLst.reflection.algn,
+				blurRad:      oEffectLst.reflection.blurRad,
+				dir:          oEffectLst.reflection.dir,
+				dist:         oEffectLst.reflection.dist,
+				endA:         oEffectLst.reflection.endA,
+				endPos:       oEffectLst.reflection.endPos,
+				fadeDir:      oEffectLst.reflection.fadeDir,
+				kx:           oEffectLst.reflection.kx,
+				ky:           oEffectLst.reflection.ky,
+				rotWithShape: oEffectLst.reflection.rotWithShape,
+				stA:          oEffectLst.reflection.stA,
+				stPos:        oEffectLst.reflection.stPos,
+				sx:           oEffectLst.reflection.sx,
+				sy:           oEffectLst.reflection.sy
+			} : oEffectLst.reflection,
+
+			softEdge: oEffectLst.softEdge ? 
+			{
+				rad: oEffectLst.softEdge.rad
+			} : oEffectLst.softEdge
+		}
+	};
+	function SerEffectDag(oEffectDag)
+	{
+		if (!oEffectDag)
+			return oEffectDag;
+			
+		var arrEffectLst = [];
+		var baseArrEffectLst = Array.isArray(oEffectDag) ? oEffectDag : oEffectDag.effectList;
+		for (var nEffect = 0; nEffect < baseArrEffectLst.length; nEffect++)
+		{
+			var oElm = null;
+			if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaBiLevel)
+			{
+				oElm = {
+					elm: {
+						thresh: baseArrEffectLst[nEffect].tresh
+					},
+					type: "alphaBiLvl"
+				}
+									
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaCeiling)
+			{
+				oElm = {
+					elm: null,
+					type: "alphaCeiling"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaFloor)
+			{
+				oElm = {
+					elm: null,
+					type: "alphaFloor"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaInv)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].unicolor)
+					},
+					type: "alphaInv"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaMod)
+			{
+				oElm = {
+					elm: {
+						cont: SerEffectDag(baseArrEffectLst[nEffect].cont)
+					},
+					type: "alphaMod"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaModFix)
+			{
+				oElm = {
+					elm: {
+						amt: baseArrEffectLst[nEffect].amt
+					},
+					type: "alphaModFix"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaOutset)
+			{
+				oElm = {
+					elm: {
+						rad: baseArrEffectLst[nEffect].rad
+					},
+					type: "alphaOutset"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CAlphaRepl)
+			{
+				oElm = {
+					elm: {
+						a: baseArrEffectLst[nEffect].a
+					},
+					type: "alphaRepl"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CBiLevel)
+			{
+				oElm = {
+					elm: {
+						thresh: baseArrEffectLst[nEffect].thresh
+					},
+					type: "biLvl"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CBlend)
+			{
+				oElm = {
+					elm: {
+						cont: SerEffectDag(baseArrEffectLst[nEffect].cont),
+						blend: baseArrEffectLst[nEffect].blend
+					},
+					type: "blend"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CBlur)
+			{
+				oElm = {
+					elm: {
+						grow: baseArrEffectLst[nEffect].grow,
+						rad: baseArrEffectLst[nEffect].rad
+					},
+					type: "blur"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CClrChange)
+			{
+				oElm = {
+					elm: {
+						clrFrom: SerColor(baseArrEffectLst[nEffect].clrFrom),
+						clrTo: SerColor(baseArrEffectLst[nEffect].clrTo),
+						useA: baseArrEffectLst[nEffect].useA
+					},
+					type: "clrChange"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CClrRepl)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].color)
+					},
+					type: "clrRepl"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CEffectContainer)
+			{
+				oElm = {
+					elm: SerEffectDag(baseArrEffectLst[nEffect]),
+					type: "effCont"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CDuotone)
+			{
+				var arrColors = [];
+				for (var nColor = 0; nColor < baseArrEffectLst[nEffect].colors.length; nColor++)
+				{
+					arrColors.push(SerColor(baseArrEffectLst[nEffect].colors[nColor]));
+				}
+				oElm = {
+					elm: {
+						colors: arrColors
+					},
+					type: "duotone"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CEffectElement)
+			{
+				oElm = {
+					elm: {
+						ref: baseArrEffectLst[nEffect].ref
+					},
+					type: "effect"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CFillEffect)
+			{
+				oElm = {
+					elm: {
+						fill: SerFill(baseArrEffectLst[nEffect].fill)
+					},
+					type: "fill"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CFillOverlay)
+			{
+				oElm = {
+					elm: {
+						fill: SerFill(baseArrEffectLst[nEffect].fill),
+						blend: baseArrEffectLst[nEffect].blend
+					},
+					type: "fillOvrl"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CGlow)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].color),
+						rad: baseArrEffectLst[nEffect].rad
+					},
+					type: "glow"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CGrayscl)
+			{
+				oElm = {
+					elm: null,
+					type: "gray"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CHslEffect)
+			{
+				oElm = {
+					elm: {
+						hue: baseArrEffectLst[nEffect].h,
+						lum: baseArrEffectLst[nEffect].l,
+						sat: baseArrEffectLst[nEffect].s
+					},
+					type: "hsl"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CInnerShdw)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].color),
+						blurRad: baseArrEffectLst[nEffect].blurRad,
+						dir: baseArrEffectLst[nEffect].dir,
+						dist: baseArrEffectLst[nEffect].dist
+					},
+					type: "innerShdw"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CLumEffect)
+			{
+				oElm = {
+					elm: {
+						bright: baseArrEffectLst[nEffect].bright,
+						contrast: baseArrEffectLst[nEffect].contrast
+					},
+					type: "lum"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.COuterShdw)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].color),
+						algn: baseArrEffectLst[nEffect].algn,
+						blurRad: baseArrEffectLst[nEffect].blurRad,
+						dir: baseArrEffectLst[nEffect].dir,
+						dist: baseArrEffectLst[nEffect].dist,
+						kx: baseArrEffectLst[nEffect].kx,
+						ky: baseArrEffectLst[nEffect].ky,
+						rotWithShape: baseArrEffectLst[nEffect].rotWithShape,
+						sx: baseArrEffectLst[nEffect].sx,
+						sy: baseArrEffectLst[nEffect].sy
+					},
+					type: "outerShdw"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CPrstShdw)
+			{
+				oElm = {
+					elm: {
+						color: SerColor(baseArrEffectLst[nEffect].color),
+						dir: baseArrEffectLst[nEffect].dir,
+						dist: baseArrEffectLst[nEffect].dis,
+						prst: baseArrEffectLst[nEffect].prst
+					},
+					type: "prstShdw"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CReflection)
+			{
+				oElm = {
+					elm: {
+						algn: baseArrEffectLst[nEffect].algn,
+						blurRad: baseArrEffectLst[nEffect].blurRad,
+						dir: baseArrEffectLst[nEffect].dir,
+						dist: baseArrEffectLst[nEffect].dist,
+						endA: baseArrEffectLst[nEffect].endA,
+						endPos: baseArrEffectLst[nEffect].endPos,
+						fadeDir: baseArrEffectLst[nEffect].fadeDir,
+						kx: baseArrEffectLst[nEffect].kx,
+						ky: baseArrEffectLst[nEffect].ky,
+						rotWithShape: baseArrEffectLst[nEffect].rotWithShape,
+						stA: baseArrEffectLst[nEffect].stA,
+						stPos: baseArrEffectLst[nEffect].stPos,
+						sx: baseArrEffectLst[nEffect].sx,
+						sy: baseArrEffectLst[nEffect].sy
+					},
+					type: "reflection"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CRelOff)
+			{
+				oElm = {
+					elm: {
+						tx: baseArrEffectLst[nEffect].tx,
+						ty: baseArrEffectLst[nEffect].ty
+					},
+					type: "relOff"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CSoftEdge)
+			{
+				oElm = {
+					elm: {
+						rad: baseArrEffectLst[nEffect].rad
+					},
+					type: "softEdge"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CTintEffect)
+			{
+				oElm = {
+					elm: {
+						amt: baseArrEffectLst[nEffect].amt,
+						hue: baseArrEffectLst[nEffect].hue
+					},
+					type: "tint"
+				}
+			}
+			else if (baseArrEffectLst[nEffect] instanceof AscFormat.CXfrmEffect)
+			{
+				oElm = {
+					elm: {
+						kx: baseArrEffectLst[nEffect].kx,
+						ky: baseArrEffectLst[nEffect].ky,
+						sx: baseArrEffectLst[nEffect].sx,
+						sy: baseArrEffectLst[nEffect].sy,
+						tx: baseArrEffectLst[nEffect].tx,
+						ty: baseArrEffectLst[nEffect].ty
+					},
+					type: "xfrm"
+				}
+			}
+			arrEffectLst.push(oElm);
+		}
+		return {
+			effectList: arrEffectLst,
+			name: oEffectDag.name,
+			type: oEffectDag.type
+		}
+	};
+	function SerFill(oFill)
+	{
+		if (!oFill)
+			return oFill;
+
+		var arrColorMods = [];
+		var oColor = oFill.fill.color ? {
+			red:   oFill.fill.color.RGBA.R,
+			green: oFill.fill.color.RGBA.G,
+			blue:  oFill.fill.color.RGBA.B,
+			alpha: oFill.fill.color.RGBA.A 
+		} : oFill.fill.color;
+		if (oFill.fill.Mods)
+		{
+			for (var nMod = 0; nMod < oFill.fill.Mods.length; nMod++)
+			{
+				arrColorMods.push({
+					name: oFill.fill.Mods[nMod].name,
+					val: oFill.fill.Mods[nMod].val
+				});
+			}
+		}
+
+		return {
+			color: oColor,
+			mods: arrColorMods
+		}
+	};
+	function SerShd(oShd)
+	{
+		if (!oShd)
+			return oShd;
+
+		return {
+			val: oShd.Value,
+			color: {
+				auto: oShd.Color.Auto,
+				r:    oShd.Color.r,
+				g:    oShd.Color.g,
+				b:    oShd.Color.b
+			},
+			fill: {
+				auto: oShd.Fill.Auto,
+				r:    oShd.Fill.r,
+				g:    oShd.Fill.g,
+				b:    oShd.Fill.b
+			},
+			fillRef: oShd.FillRef ? {
+				idx:   oShd.FillRef.idx,
+				color: SerColor(oShd.FillRef.Color)
+			} : oShd.FillRef,
+			themeColor: SerFill(oShd.FillRef.Unifill),
+			themeFill:  SerFill(oShd.FillRef.themeFill)
+		}
+	};
+	function SerColor(oColor)
+	{
+		if (!oColor)
+			return oColor;
+
+		var arrColorMods = [];
+		var oColor = oColor.color ? {
+			red:   oColor.color.RGBA.R,
+			green: oColor.color.RGBA.G,
+			blue:  oColor.color.RGBA.B,
+			alpha: oColor.color.RGBA.A 
+		} : oColor.color;
+		if (oColor.Mods)
+		{
+			for (var nMod = 0; nMod < oColor.Mods.length; nMod++)
+			{
+				arrColorMods.push({
+					name: oColor.Mods[nMod].name,
+					val:  oColor.Mods[nMod].val
+				});
+			}
+		}
+
+		return {
+			color: oColor,
+			mods: arrColorMods
+		}
+	};
+	function SerTxPr(oTxPr)
+	{
+		if (!oTxPr)
+			return oTxPr;
+
+		return {
+			bodyPr: SerBodyPr(oTxPr.bodyPr),
+			lstStyle: SerLstStyle(oTxPr.lstStyle),
+			content: []
+		}
+	};
+	function SerBodyPr(oBodyPr)
+	{
+		if (!oBodyPr)
+			return oBodyPr;
+
+		return {
+			flatTx:               oBodyPr.flatTx,
+				normAutofit:      oBodyPr.textFit ? {
+					fontScale:      oBodyPr.fontScale,
+					lnSpcReduction: oBodyPr.lnSpcReduction
+				} : oBodyPr.flatTx,
+				prstTxWarp:       SerGeometry(oBodyPr.prstTxWarp),
+				anchor:           oBodyPr.anchor,
+				anchorCtr:        oBodyPr.anchorCtr,
+				bIns:             oBodyPr.bIns,
+				compatLnSpc:      oBodyPr.compatLnSpc,
+				forceAA:          oBodyPr.forceAA,
+				fromWordArt:      oBodyPr.fromWordArt,
+				horzOverflow:     oBodyPr.horzOverflow,
+				lIns:             oBodyPr.lIns,
+				numCol:           oBodyPr.numCol,
+				rIns:             oBodyPr.rIns,
+				rot:              oBodyPr.rot,
+				rtlCol:           oBodyPr.rtlCol,
+				spcCol:           oBodyPr.spcCol,
+				spcFirstLastPara: oBodyPr.spcFirstLastPara,
+				tIns:             oBodyPr.tIns,
+				upright:          oBodyPr.upright,
+				vert:             oBodyPr.vert,
+				vertOverflow:     oBodyPr.vertOverflow,
+				wrap:             oBodyPr.wrap
+		}
+	};
+	function SerLstStyle(oListStyle)
+	{
+		if (!oListStyle)
+			return oListStyle;
+		
+		var arrResult = [];
+
+		for (var nLvl = 0; nLvl < oListStyle.levels.length; nLvl++)
+		{
+			arrResult.push(SerParaPr(oListStyle.levels[nLvl]));
+		}
+
+		return arrResult;
+	};
+	function SerParaPr(oParaPr)
+	{
+		if (!oParaPr)
+			return oParaPr;
+
+		return {
+			contextualSpacing: oParaPr.ContextualSpacing,
+			framePr:           oParaPr.FramePr ? 
+			{
+				dropCap: oParaPr.FramePr.DropCap,
+				h:       oParaPr.FramePr.H,
+				hAnchor: oParaPr.FramePr.HAnchor,
+				hRule:   oParaPr.FramePr.HRule,
+				hSpace:  oParaPr.FramePr.HSpace,
+				lines:   oParaPr.FramePr.Lines,
+				vAnchor: oParaPr.FramePr.VAnchor,
+				vSpace:  oParaPr.FramePr.VSpace,
+				w:       oParaPr.FramePr.W,
+				wrap:    oParaPr.FramePr.Wrap,
+				x:       oParaPr.FramePr.X,
+				xAlign:  oParaPr.FramePr.XAlign,
+				y:       oParaPr.FramePr.Y,
+				yAlign:  oParaPr.FramePr.YAlign
+			} :  oParaPr.FramePr,
+			ind:               oParaPr.Ind ? 
+			{
+				left:      oParaPr.Ind.Left, /// start ?
+				right:     oParaPr.Ind.Right, /// end ?
+				firstLine: oParaPr.Ind.FirstLine
+			} : oParaPr.Ind,
+			jc:                oParaPr.Jc,
+			keepLines:         oParaPr.KeepLines,
+			keepNext:          oParaPr.KeepNext,
+			numPr:             oParaPr.NumPr ? {
+				ilvl:  oParaPr.NumPr.Lvl,
+				numId: oParaPr.NumPr.NumId
+			} : oParaPr.NumPr,
+			outlineLvl:        oParaPr.OutlineLvl,
+			pageBreakBefore:   oParaPr.PageBreakBefore,
+			pBdr:              oParaPr.Brd ? 
+			{
+				between: oParaPr.Brd.Between,
+				bottom:  oParaPr.Brd.Bottom,
+				left:    oParaPr.Brd.Left,
+				right:   oParaPr.Brd.Right,
+				top:     oParaPr.Brd.Top
+			} : oParaPr.Brd,
+			pPrChange:         SerParaPr(oParaPr.PrChange),
+			pStyle:            oParaPr.PStyle,
+			shd:               SerShd(oParaPr.Shd),
+			spacing:           oParaPr.Spacing ? 
+			{
+				line:              oParaPr.Spacing.Line,
+				lineRule:          oParaPr.Spacing.LineRule,
+				before:            oParaPr.Spacing.Before,
+				beforePct:         oParaPr.Spacing.BeforePct,
+				beforeAutoSpacing: oParaPr.Spacing.BeforeAutoSpacing,
+				after:             oParaPr.Spacing.After,
+				afterPct:          oParaPr.Spacing.AfterPct,
+				afterAutoSpacing:  oParaPr.Spacing.AfterAutoSpacing
+			} : oParaPr.Spacing,
+			tabs:              SerTabs(oParaPr.Tabs),
+			widowControl:      oParaPr.WidowControl,
+			bullet:            SerBullet(oParaPr.Bullet)
+		}
+	};
+	function SerTabs(oTabs)
+	{
+		if (!oTabs)
+			return oTabs;
+			
+		var oTabs = {
+			tabs: []
+		};
+
+		for (var nTab = 0; nTab < oTabs.Tabs.length; nTab++)
+		{
+			oTabs.tabs.push({
+				val:    oTabs.Tabs[nTab].Value,
+				pos:    oTabs.Tabs[nTab].Pos,
+				leader: oTabs.Tabs[nTab].Leader
+			});
+		}
+
+		return oTabs;
+	};
+	function SerSerTx(oTx)
+	{
+		if (!oTx)
+			return oTx;
+
+		return {
+			strRef: SerStrRef(oTx.strRef),
+			v:      oTx.val
+		}
+	};
+	function SerChartTx(oTx)
+	{
+		if (!oTx)
+			return oTx;
+
+		return {
+			strRef: SerStrRef(oTx.strRef),
+			rich:   SerTxPr(oTx.rich)
+		}
+	};
+	function SerScaling(oScaling)
+	{
+		if (!oScaling)
+			return oScaling;
+		
+		return {
+			logBase:     oScaling.logBase,
+			max:         oScaling.max,
+			min:         oScaling.min,
+			orientation: oScaling.orientation
+		}
+	};
+	function SerNumFmt(oNumFmt)
+	{
+		if (!oNumFmt)
+			return oNumFmt;
+		
+		return {
+			formatCode:   oNumFmt.formatCode,
+			sourceLinked: oNumFmt.sourceLinked
+		}
+	};
+	function SerDispUnits(oDispUnits)
+	{
+		if (!oDispUnits)
+			return oDispUnits;
+		
+		return {
+			builtInUnit: oDispUnits.builtInUnit,
+			custUnit:    oDispUnits.custUnit,
+			dispUnitsLbl: {
+				layout: SerLayout(oDispUnits.dispUnitsLbl.layout),
+				spPr:   SerSpPr(oDispUnits.dispUnitsLbl.spPr),
+				tx:     SerChartTx(oDispUnits.dispUnitsLbl.tx),
+				txPr:   SerTxPr(oDispUnits.dispUnitsLbl.txPr)
+			}
+		}
+	};
+	function SerValAx(oValAx)
+	{
+		if (!oValAx)
+			return oValAx;
+		
+		return {
+			axId:           oValAx.axId,
+			axPos:          oValAx.axPos,
+			crossAx:        oValAx.crossAx.axId,
+			crossBetween:   oValAx.crossBetween,
+			crosses:        oValAx.crosses,
+			crossesAt:      oValAx.crossesAt,
+			delete:         oValAx.bDelete,
+			dispUnits:      SerDispUnits(oValAx.dispUnits),
+			extLst:         oValAx.extLst, /// ???
+			majorGridlines: SerSpPr(oValAx.majorGridlines),
+			majorTickMark:  oValAx.majorTickMark,
+			majorUnit:      oValAx.majorUnit,
+			minorGridlines: SerSpPr(oValAx.minorGridlines),
+			minorTickMark:  oValAx.minorTickMark,
+			minorUnit:      oValAx.minorUnit,
+			numFmt:         SerNumFmt(oValAx.numFmt),
+			scaling:        SerScaling(oValAx.scaling),
+			spPr:           SerSpPr(oValAx.spPr),
+			tickLblPos:     oValAx.tickLblPos,
+			title:          SerTitle(oValAx.title),
+			txPr:           SerTxPr(oValAx.txPr)
+		}
+	};
+	function SerPlotArea(oPlotArea)
+	{
+		if (!oPlotArea)
+			return oPlotArea;
+
+		return {
+			barChart: SerBarCharts(oPlotArea.charts),
+			catAx:    SerCatAx(oPlotArea.catAx),
+			dateAx:   SerDateAx(oPlotArea.dateAx),
+			dTable:   SerDataTable(oPlotArea.dTable),
+			layout:   SerLayout(oPlotArea.layout),
+			serAx:    SerSerAx(oPlotArea.serAx),
+			spPr:     SerSpPr(oPlotArea.spPr),
+			valAx:    SerValAx(oPlotArea.valAx)
+		}
+	};
+	function SerDataTable(oData)
+	{
+		if (!oData)
+			return oData;
+
+		return {
+			showHorzBorder: oData.showHorzBorder,
+			showKeys:       oData.showKeys,
+			showOutline:    oData.showOutline,
+			showVertBorder: oData.showVertBorder,
+			spPr:           SerSpPr(oData.spPr),
+			txPr:           SerTxPr(oData.txPr)
+		};
+	};
+	function SerSerAx(oSerAx)
+	{
+		if (!oSerAx)
+			return oSerAx;
+
+		return {
+			axId:           oSerAx.axId,
+			axPos:          oSerAx.axPos,
+			crossAx:        oSerAx.crossAx.axId,
+			crosses:        oSerAx.crosses,
+			crossesAt:      oSerAx.crossesAt,
+			delete:         oSerAx.bDelete,
+			extLst:         oSerAx.extLst, /// ?
+			majorGridlines: SerSpPr(oSerAx.majorGridlines),
+			majorTickMark:  oSerAx.majorTickMark,
+			minorGridlines: SerSpPr(oSerAx.minorGridlines),
+			minorTickMark:  oSerAx.minorTickMark,
+			numFrm:         SerNumFmt(oSerAx.numFmt),
+			scaling:        SerScaling(oSerAx.scaling),
+			spPr:           SerSpPr(oSerAx.spPr),
+			tickLblPos:     oSerAx.tickLblPos,
+			tickLblSkip:    oSerAx.tickLblSkip,
+			tickMarkSkip:   oSerAx.tickMarkSkip,
+			title:          SerTitle(oSerAx.title),
+			txPr:           SerTxPr(oSerAx.txPr)
+		}
+	};
+	function SerCatAx(oCatAx)
+	{
+		if (!oCatAx)
+			return oCatAx;
+
+		return {
+			auto:           oCatAx.auto,
+			axId:           oCatAx.axId,
+			axPos:          oCatAx.axPos,
+			crossAx:        oCatAx.crossAx.axId,
+			crosses:        oCatAx.crosses,
+			crossesAt:      oCatAx.crossesAt,
+			delete:         oCatAx.bDelete,
+			extLst:         oCatAx.extLst, /// ?
+			lblAlgn:        oCatAx.lblAlgn,
+			lblOffset:      oCatAx.lblOffset,
+			majorGridlines: SerSpPr(oCatAx.majorGridlines),
+			majorTickMark:  oCatAx.majorTickMark,
+			minorGridlines: SerSpPr(oCatAx.minorGridlines),
+			minorTickMark:  oCatAx.minorTickMark,
+			noMultiLvlLbl:  oCatAx.noMultiLvlLbl,
+			numFrm:         SerNumFmt(oCatAx.numFmt),
+			scaling:        SerScaling(oCatAx.scaling),
+			spPr:           SerSpPr(oCatAx.spPr),
+			tickLblPos:     oCatAx.tickLblPos,
+			tickLblSkip:    oCatAx.tickLblSkip,
+			tickMarkSkip:   oCatAx.tickMarkSkip,
+			title:          SerTitle(oCatAx.title),
+			txPr:           SerTxPr(oCatAx.txPr)
+		}
+	};
+	function SerDateAx(oDateAx)
+	{
+		if (!oDateAx)
+			return oDateAx;
+
+		return {
+			auto:           oDateAx.auto,
+			axId:           oDateAx.axId,
+			axPos:          oDateAx.axPos,
+			baseTimeUnit:   oDateAx.baseTimeUnit,
+			crossAx:        oDateAx.crossAx.axId,
+			crosses:        oDateAx.crosses,
+			crossesAt:      oDateAx.crossesAt,
+			delete:         oDateAx.bDelete,
+			extLst:         oDateAx.extLst,
+			lblOffset:      oDateAx.lblOffset,
+			majorGridlines: SerSpPr(oDateAx.majorGridlines),
+			majorTickMark:  oDateAx.majorTickMark,
+			majorTimeUnit:  oDateAx.majorTimeUnit,
+			majorUnit:      oDateAx.majorUnit,
+			minorGridlines: SerSpPr(oDateAx.minorGridlines),
+			minorTickMark:  oDateAx.minorTickMark,
+			minorTimeUnit:  oDateAx.minorTimeUnit,
+			minorUnit:      oDateAx.minorUnit,
+			numFrm:         SerNumFmt(oDateAx.numFmt),
+			scaling:        SerScaling(oDateAx.scaling),
+			spPr:           SerSpPr(oDateAx.spPr),
+			tickLblPos:     oDateAx.tickLblPos,
+			title:          SerTitle(oDateAx.title),
+			txPr:           SerTxPr(oDateAx.txPr)
+		}
+	};
+	function SerLayout(oLayout)
+	{
+		if (!oLayout)
+			return oLayout;
+		
+		return {
+			h:            oLayout.h,
+			hMode:        oLayout.hMode,
+			layoutTarget: oLayout.layoutTarget,
+			w:            oLayout.w,
+			wMode:        oLayout.wMode,
+			x:            oLayout.x,
+			xMode:        oLayout.xMode,
+			y:            oLayout.y,
+			yMode:        oLayout.yMode
+		}
+	};
+	function SerDlbl(oDlbl)
+	{
+		if (!oDlbl)
+			return oDlbl;
+		
+		return {
+			delete:         oDlbl.bDelete,
+			dLblPos:        oDlbl.dLblPos,
+			idx:            oDlbl.idx,
+			layout:         SerLayout(oDlbl.layout),
+			numFmt:         SerNumFmt(oDlbl.numFmt),
+			separator:      oDlbl.separator,
+			showBubbleSize: oDlbl.showBubbleSize,
+			showCatName:    oDlbl.showCatName,
+			showLegendKey:  oDlbl.showLegendKey,
+			showPercent:    oDlbl.showPercent,
+			showSerName:    oDlbl.showSerName,
+			showVal:        oDlbl.showVal,
+			spPr:           SerSpPr(oDlbl.spPr),
+			txPr:           SerTxPr(oDlbl.txPr),
+			tx:             SerChartTx(oDlbl.tx)
+		}
+	};
+	function SerDLbls(dLbls)
+	{
+		if (!dLbls)
+			return dLbls;
+		
+		return {
+			delete:          dLbls.bDelete,
+			dLbl:            dLbls.dLbl,
+			dLblPos:         dLbls.dLblPos,
+			leaderLines:     SerSpPr(dLbls.leaderLines),
+			numFmt:          SerNumFmt(dLbls.numFmt),
+			separator:       dLbls.separator,
+			showBubbleSize:  dLbls.showBubbleSize,
+			showCatName:     dLbls.showCatName,
+			showLeaderLines: dLbls.showLeaderLines,
+			showLegendKey:   dLbls.showLegendKey,
+			showPercent:     dLbls.showPercent,
+			showSerName:     dLbls.showSerName,
+			showVal:         dLbls.showVal,
+			spPr:            SerSpPr(dLbls.spPr),
+			txPr:            SerTxPr(dLbls.txPr)
+		}
+	};
+	function SerBarCharts(arrBarCharts)
+	{
+		var arrResult = [];
+
+		for (var nItem = 0; nItem < arrBarCharts.length; nItem++)
+		{
+			arrResult.push({
+				axId:       [arrBarCharts[nItem].axId[0].axId, arrBarCharts[nItem].axId[1].axId],
+				barDir:     arrBarCharts[nItem].barDir,
+				dLbls:      SerDLbls(arrBarCharts[nItem].dLbls),
+				gapWidth:   arrBarCharts[nItem].gapWidth,
+				grouping:   arrBarCharts[nItem].grouping,
+				overlap:    arrBarCharts[nItem].overlap,
+				serLines:   SerSpPr(arrBarCharts[nItem].serLines),
+				ser:        SerCBarSeries(arrBarCharts[nItem].series),
+				varyColors: arrBarCharts[nItem].varyColors
+			})
+		}
+
+		return arrResult;
+	};
+	function SerTitle(oTitle)
+	{
+		if (!oTitle)
+			return oTitle;
+		
+		return {
+			layout:  SerLayout(oTitle.layout),
+			overlay: oTitle.overlay,
+			spPr:    SerSpPr(oTitle.spPr),
+			tx:      SerChartTx(oTitle.tx),
+			txPr:    SerTxPr(oTitle.txPr)
+		}
+	};
+	function SerPrintSettings(oPrintSettings)
+	{
+		if (!oPrintSettings)
+			return oPrintSettings;
+
+		return {
+			headerFooter: {
+				evenFooter:       oPrintSettings.headerFooter.evenFooter,
+				evenHeader:       oPrintSettings.headerFooter.evenHeader,
+				firstFooter:      oPrintSettings.headerFooter.firstFooter,
+				firstHeader:      oPrintSettings.headerFooter.firstHeader,
+				oddFooter:        oPrintSettings.headerFooter.oddFooter,
+				oddHeader:        oPrintSettings.headerFooter.oddHeader,
+				alignWithMargins: oPrintSettings.headerFooter.alignWithMargins,
+				differentFirst:   oPrintSettings.headerFooter.differentFirst,
+				differentOddEven: oPrintSettings.headerFooter.differentOddEven
+			},
+			pageMargins: {
+				b:      oPrintSettings.pageMargins.b,
+				footer: oPrintSettings.pageMargins.footer,
+				header: oPrintSettings.pageMargins.header,
+				l:      oPrintSettings.pageMargins.l,
+				r:      oPrintSettings.pageMargins.r,
+				t:      oPrintSettings.pageMargins.t,
+			},
+			pageSetup: {
+				blackAndWhite:    oPrintSettings.pageSetup.blackAndWhite,
+				copies:           oPrintSettings.pageSetup.copies,
+				draft:            oPrintSettings.pageSetup.draft,
+				firstPageNumber:  oPrintSettings.pageSetup.firstPageNumber,
+				horizontalDpi:    oPrintSettings.pageSetup.horizontalDpi,
+				orientation:      oPrintSettings.pageSetup.orientation,
+				paperHeight:      oPrintSettings.pageSetup.paperHeight,
+				paperSize:        oPrintSettings.pageSetup.paperSize,
+				paperWidth:       oPrintSettings.pageSetup.paperWidth,
+				useFirstPageNumb: oPrintSettings.pageSetup.useFirstPageNumb,
+				verticalDpi:      oPrintSettings.pageSetup.verticalDpi
+			}
+		}
+	};
+	function SerWall(oWall)
+	{
+		if (!oWall)
+			return oWall;
+		
+		return {
+			pictureOptions: SerPicOptions(oWall.pictureOptions),
+			spPr:           SerSpPr(oWall.spPr),
+			thickness:      oWall.thickness
+		}
+	};
+	function SerMarker(oMarker)
+	{
+		if (!oMarker)
+			return oMarker;
+		
+		return {
+			size:   oMarker.size,
+			spPr:   SerSpPr(oMarker.spPr),
+			symbol: oMarker.symbol
+		}
+	};
+	function SerPivotFmt(oFmt)
+	{
+		if (!oFmt)
+			return oFmt;
+		
+		return {
+			dLbl:   SerDlbl(oFmt.dLbl),
+			idx:    oFmt.idx,
+			marker: SerMarker(oFmt.marker),
+			spPr:   SerSpPr(oFmt.spPr),
+			txPr:   SerTxPr(oFmt.txPr)
+		}
+	};
+	function SerPivotFmts(arrFmts)
+	{
+		var arrResult = [];
+
+		for (var nItem = 0; nItem < arrFmts.length; nItem++)
+		{
+			arrResult.push(SerPivotFmt(arrFmts[nItem]));
+		}
+
+		return arrResult;
+	};
+	function SerView3D(oView3D)
+	{
+		if (!oView3D)
+			return oView3D;
+		
+		return {
+			depthPercent: oView3D.depthPercent,
+			hPercent:     oView3D.hPercent,
+			perspective:  oView3D.perspective,
+			rAngAx:       oView3D.rAngAx,
+			rotX:         oView3D.rotX,
+			rotY:         oView3D.rotY
+		}
+	};
+	function SerLegendEntry(oLegendEntry)
+	{
+		if (!oLegendEntry)
+			return oLegendEntry;
+		
+		return {
+			delete: oLegendEntry.bDelete,
+			idx:    oLegendEntry.idx,
+			txPr:   SerTxPr(oLegendEntry.txPr)
+		}
+	};
+	function SerLegendEntries(arrEntries)
+	{
+		var arrResults = [];
+
+		for (var nItem = 0; nItem < arrEntries.length; nItem++)
+		{
+			arrResults.push(SerLegendEntry(arrEntries[nItem]));	
+		}
+
+		return arrResults;
+	};
+	function SerBlipFill(oBlipFill)
+	{
+		if (!oBlipFill)
+			return oBlipFill;
+
+		return {
+			blip: SerEffectDag(oBlipFill.Effects),
+			srcRect: oBlipFill.srcRect ? {
+				b: oBlipFill.srcRect.b,
+				l: oBlipFill.srcRect.l,
+				r: oBlipFill.srcRect.r,
+				t: oBlipFill.srcRect.t
+			} : oBlipFill.srcRect,
+			stretch: oBlipFill.stretch,
+			tile: oBlipFill.tile ? {
+				algn: oBlipFill.tile.algn,
+				flip: oBlipFill.tile.flip,
+				sx: oBlipFill.tile.sx,
+				sy: oBlipFill.tile.sy,
+				tx: oBlipFill.tile.tx,
+				ty: oBlipFill.tile.ty
+			} : oBlipFill.tile
+		};
+	};
+	function SerUniNvPr(oUniNvPr)
+	{
+		if (!oUniNvPr)
+			return oUniNvPr;
+
+		return {
+			cNvPr: oUniNvPr.cNvPr ? {
+				hlinkClick: SerHlink(oUniNvPr.cNvPr.hlinkClick),
+				hlinkHover: SerHlink(oUniNvPr.cNvPr.hlinkHover),
+				descr:      oUniNvPr.cNvPr.descr,
+				hidden:     oUniNvPr.cNvPr.isHidden,
+				id:         oUniNvPr.cNvPr.id,
+				name:       oUniNvPr.cNvPr.name,
+				title:      oUniNvPr.cNvPr.title
+			} : oUniNvPr.cNvPr,
+			nvPr: oUniNvPr.nvPr ? {
+				
+			} : oUniNvPr.nvPr 
+		};
+	};
+	function SerBullet(oBullet)
+	{
+		if (!oBullet)
+			return oBullet;
+
+		var sBulletColorType = "";
+		switch (oBullet.bulletColor.type)
+		{
+			case AscFormat.BULLET_TYPE_COLOR_NONE:
+				sBulletColorType = "none";
+				break;
+			case AscFormat.BULLET_TYPE_COLOR_CLRTX:
+				sBulletColorType = "clrtx";
+				break;
+			case AscFormat.BULLET_TYPE_COLOR_CLR:
+				sBulletColorType = "clr";
+				break;	
+			default:
+				sBulletColorType = "none";
+				break;
+		}
+		var sBulleSizeType = "";
+		switch (oBullet.bulletSize.type)
+		{
+			case AscFormat.BULLET_TYPE_SIZE_NONE:
+				sBulleSizeType = "none";
+				break;
+			case AscFormat.BULLET_TYPE_SIZE_TX:
+				sBulleSizeType = "tx";
+				break;
+			case AscFormat.BULLET_TYPE_SIZE_PCT:
+				sBulleSizeType = "pct";
+				break;	
+			case AscFormat.BULLET_TYPE_SIZE_PTS:
+				sBulleSizeType = "pts";
+				break;	
+			default:
+				sBulleSizeType = "none";
+				break;
+		}
+		var sBulleTypefaceType = "";
+		switch (oBullet.bulletTypeface.type)
+		{
+			case AscFormat.BULLET_TYPE_TYPEFACE_NONE:
+				sBulleSizeType = "none";
+				break;
+			case AscFormat.BULLET_TYPE_TYPEFACE_TX:
+				sBulleSizeType = "tx";
+				break;
+			case AscFormat.BULLET_TYPE_TYPEFACE_BUFONT:
+				sBulleSizeType = "bufont";
+				break;	
+			default:
+				sBulleSizeType = "none";
+				break;
+		}
+		var sBulleType = "";
+		switch (oBullet.bulletType)
+		{
+			case AscFormat.BULLET_TYPE_BULLET_NONE:
+				sBulleSizeType = "none";
+				break;
+			case AscFormat.BULLET_TYPE_BULLET_CHAR:
+				sBulleSizeType = "char";
+				break;
+			case AscFormat.BULLET_TYPE_BULLET_AUTONUM:
+				sBulleSizeType = "autonum";
+				break;	
+			case AscFormat.BULLET_TYPE_BULLET_BLIP:
+				sBulleSizeType = "blip";
+				break;
+			default:
+				sBulleSizeType = "none";
+				break;
+		}
+		return {
+			bulletColor: {
+				type: sBulletColorType,
+				color: SerColor(oBullet.bulletColor.UniColor)
+			},
+			bulletSize: {
+				type: sBulleSizeType,
+				val: oBullet.bulletSize.val
+			},
+			bulletTypeface: {
+				type: sBulleTypefaceType,
+				typeface: oBullet.bulletTypeface.typeface
+			},
+			bulletType: sBulleType
+		}
+	};
+	function SerSpStyle(oStyle)
+	{
+		if (!oStyle)
+			return oStyle;
+		
+		return {
+			lnRef:     oStyle.lnRef ? {
+				idx:   oShd.lnRef.idx,
+				color: SerColor(oStyle.lnRef.Color)
+			} : oStyle.lnRef,
+			fillRef:   oStyle.fillRef ? {
+				idx:   oShd.fillRef.idx,
+				color: SerColor(oStyle.fillRef.Color)
+			} : oStyle.fillRef,
+			effectRef: oStyle.effectRef ? {
+				idx:   oShd.effectRef.idx,
+				color: SerColor(oStyle.effectRef.Color)
+			} : oStyle.effectRef,
+			fontRef:   oStyle.fontRef ? {
+				idx:   oShd.fontRef.idx,
+				color: SerColor(oStyle.fontRef.Color)
+			} : oStyle.fontRef
+		}
+	};
+	function SerChartSpace(oChartSpace)
+	{
+		if (!oChartSpace)
+			return oChartSpace;
+
+		return {
+			chart: {
+				autoTitleDeleted: oChartSpace.chart.autoTitleDeleted,
+				backwall:         SerWall(oChartSpace.chart.backWall),
+				dispBlanksAs:     oChartSpace.chart.dispBlanksAs,
+				floor:            SerWall(oChartSpace.chart.floor),
+				legend: {
+					layout:      SerLayout(oChartSpace.chart.legend.layout),
+					legendEntry: SerLegendEntries(oChartSpace.chart.legend.legendEntryes),
+					legendPos:   oChartSpace.chart.legend.legendPos,
+					overlay:     oChartSpace.chart.legend.overlay,
+					spPr:        SerSpPr(oChartSpace.chart.legend.spPr),
+					txPr:        SerTxPr(oChartSpace.chart.legend.txPr)
+				},
+				pivotFmts:        SerPivotFmts(oChartSpace.chart.pivotFmts),
+				plotArea:         SerPlotArea(oChartSpace.chart.plotArea),
+				plotVisOnly:      oChartSpace.chart.plotVisOnly,
+				showDLblsOverMax: oChartSpace.chart.showDLblsOverMax,
+				sideWall:         SerWall(oChartSpace.chart.sideWall),
+				title:            SerTitle(oChartSpace.chart.title),
+				view3D:           SerView3D(oChartSpace.chart.view3D)
+			},
+			clrMapOvr:      oChartSpace.clrMapOvr ? oChartSpace.clrMapOvr.color_map : oChartSpace.clrMapOvr,
+			date1904:       oChartSpace.date1904,
+			externalData:   SerExternalData(oChartSpace.externalData),
+			lang:           oChartSpace.lang,
+			pivotSource:    SerPivotSource(oChartSpace.pivotSource),
+			printSettings:  SerPrintSettings(oChartSpace.printSettings),
+			protection:     SerProtection(oChartSpace.protection),
+			roundedCorners: oChartSpace.roundedCorners,
+			spPr:           SerSpPr(oChartSpace.spPr),
+			style:          oChartSpace.style,
+			txPr:           SerTxPr(oChartSpace.txPr),
+			userShapes:     oChartSpace.userShapes, /// ???
+			type:           "chartSpace"
+		};
+	};
+	function SerImage(oImgObject)
+	{
+		if (!oImgObject)
+			return oImgObject;
+		
+		return {
+			blipFill: SerBlipFill(oImgObject.blipFill),
+			nvPicPr:  SerUniNvPr(oImgObject.nvPicPr),
+			spPr:     SerSpPr(oImgObject.spPr),
+			type:     "image"
+		}
+	};
+	function SerShape(oShapeObject)
+	{
+		if (!oShapeObject)
+			return oShapeObject;
+
+		var oContentHolder = textBoxContent || txBody.content.Content;
+		var arrContent     = null;
+		if (oContentHolder)
+			arrContent = oContentHolder.Content;
+
+		return {
+			nvSpPr:   SerUniNvPr(oShapeObject.nvSpPr),
+			spPr:     SerSpPr(oShapeObject.spPr),
+			style:    SerSpStyle(oShapeObject.style),
+			bodyPr:   SerBodyPr(oShapeObject.bodyPr),
+			lstStyle: oShapeObject.txBody ? SerLstStyle(oShapeObject.txBody.lstStyle) : null,
+			content:  SerContent(arrContent),
+			type:     "shape"
+		}
+	};
+	function SerTextPr(oTextPr)
+	{
+		if (!oTextPr)
+			return oTextPr;
+		
+		return {
+			b:         oTextPr.Bold,
+			bCs:       oTextPr.BoldCs,
+			caps:      oTextPr.Caps,
+			color:     oTextPr.Color ? {
+				auto: oTextPr.Color.Auto,
+				r:    oTextPr.Color.r,
+				g:    oTextPr.Color.g,
+				b:    oTextPr.Color.b
+			} : oTextPr.Color,
+			cs:        oTextPr.CS,
+			dstrike:   oTextPr.DStrikeout,
+			highlight: oTextPr.HighLight ? (oTextPr.HighLight !== -1 ? {
+				auto: oTextPr.HighLight.Auto,
+				r:    oTextPr.HighLight.r,
+				g:    oTextPr.HighLight.g,
+				b:    oTextPr.HighLight.b
+			} : "none") : oTextPr.HighLight,
+			i:         oTextPr.Italic,
+			iCs:       oTextPr.ItalicCS,
+			lang:      oTextPr.Lang ? {
+				bidi:     oTextPr.LangBidi,
+				eastAsia: oTextPr.Lang.EastAsia,
+				val:      oTextPr.Lang.Val
+			} : oTextPr.Lang,
+			outline:   oTextPr.TextOutline,
+			position:  oTextPr.Position,
+			rFonts:    oTextPr.RFonts ? {
+				ascii: oTextPr.RFonts.Ascii,
+				asciiTheme: oTextPr.RFonts.AsciiAsciiTheme,
+				cs: oTextPr.RFonts.AsciiCS,
+				cstheme: oTextPr.RFonts.AsciiCSTheme,
+				eastAsia: oTextPr.RFonts.AsciiEastAsia,
+				eastAsiaTheme: oTextPr.RFonts.AsciiEastAsiaTheme,
+				hAnsi: oTextPr.RFonts.AsciiHAnsi,
+				hAnsiTheme: oTextPr.RFonts.AsciiHAnsiTheme,
+				hint: oTextPr.RFonts.AsciiHint
+			} : oTextPr.RFonts,
+			rPrChange: SerTextPr(oTextPr.PrChange),
+			rStyle:    oTextPr.RStyle,
+			rtl:       oTextPr.RTL,
+			shd:       SerShd(oTextPr.Shd),
+			smallCaps: oTextPr.SmallCaps,
+			spacing:   oTextPr.Spacing,
+			strike:    oTextPr.Strikeout,
+			u:         oTextPr.Underline,
+			vanish:    oTextPr.Vanish,
+			vertAlign: oTextPr.VertAlign,
+			FontRef:   null, /// FontRef, ///???,
+			Unifill:   null ///Unifill /// ???
+		}
+	};
+	function SerSdtPr(oSdtPr)
+	{
+		if (!oSdtPr)
+			return oSdtPr;
+
+		var arrListItemComboBox = [];
+		if (oSdtPr.ComboBox)
+		{
+			for (var nItem = 0; nItem < oSdtPr.ComboBox.ListItems; nItem++)
+			{
+				arrListItemComboBox.push({
+					displayText: oSdtPr.ComboBox.ListItems[nItem].DisplayText,
+					value: oSdtPr.ComboBox.ListItems[nItem].Value,
+				});
+			}
+		}
+
+		var arrListItemDropDown = [];
+		if (oSdtPr.DropDown)
+		{
+			for (var nItem = 0; nItem < oSdtPr.DropDown.ListItems; nItem++)
+			{
+				arrListItemDropDown.push({
+					displayText: oSdtPr.DropDown.ListItems[nItem].DisplayText,
+					value: oSdtPr.DropDown.ListItems[nItem].Value,
+				});
+			}
+		}
+
+		return {
+			alias: oSdtPr.Alias,
+
+			comboBox: oSdtPr.ComboBox ? {
+				listItem:  arrListItemComboBox,
+				lastValue: oSdtPr.ComboBox.LastValue
+			} : oSdtPr.ComboBox,
+
+			date: oSdtPr.Date ? {
+				calendar:   oSdtPr.Date.Calendar,
+				dateFormat: oSdtPr.Date.DateFormat,
+				lid:        oSdtPr.Date.LangId,
+				fullDate:   oSdtPr.Date.FullDate
+			} : oSdtPr.Date,
+
+			docPartObj: oSdtPr.DocPartObj ? {
+				docPartCategory: oSdtPr.DocPartObj.Category,
+				docPartGallery:  oSdtPr.DocPartObj.Gallery,
+				docPartUnique:   oSdtPr.DocPartObj.Unique
+			} : oSdtPr.DocPartObj,
+
+			dropDownList: oSdtPr.DropDown ? {
+				listItem:  arrListItemDropDown,
+				lastValue: oSdtPr.DropDown.LastValue
+			} : oSdtPr.DropDown,
+
+			equation : oSdtPr.Equation,
+			id:        oSdtPr.Id,
+			label:     oSdtPr.Label,
+			lock:      oSdtPr.Lock,
+			picture:   oSdtPr.Picture,
+
+			placeholder: oSdtPr.Placeholder ? {
+				docPart: oSdtPr.Placeholder
+			} : oSdtPr.Placeholder,
+
+			rPr:           SerTextPr(oSdtPr.TextPr),
+			showingPlcHdr: oSdtPr.ShowingPlcHdr,
+			tag:           oSdtPr.Tag,
+			temporary:     oSdtPr.Temporary,
+			text:          oSdtPr.Text
+		}
+	};
+	function SetParaMath(oParaMath)
+	{
+		if (!oParaMath)
+			return oParaMath;
+
+		var oMathObject = {
+			oMathParaPr: {
+				jc: oParaMath.Jc
+			},
+			content: [],
+			type: "paraMath"
+		}
+		return {
+
+		}
+	};
+	// end of serialize functions
 
 	/**
 	 * Class representing a container for paragraphs and tables.
@@ -2066,6 +4110,35 @@
 		var Range = new ApiRange(this.ParaHyperlink, Start, End);
 
 		return Range;
+	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiHyperlink
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiHyperlink.prototype.ToJSON = function()
+	{
+		var oLinkObject = {
+			anchor:  this.ParaHyperlink.Anchor,
+			tooltip: this.ParaHyperlink.ToolTip,
+			content: [],
+			type:    "hyperlink"
+		};
+		
+		var oTempElm = null;
+		for (var nElm = 0; nElm < this.ParaHyperlink.Content.length; nElm++)
+		{
+			oTempElm = this.ParaHyperlink.Content[nElm];
+			
+			if (oTempElm instanceof AscCommonWord.ParaRun)
+				oLinkObject.content.push(JSON.parse(new ApiRun(oTempElm).ToJSON()));
+			else if (oTempElm instanceof AscCommonWord.CInlineLevelSdt)
+				oLinkObject.content.push(JSON.parse(new ApiInlineLvlSdt(oTempElm).ToJSON()));
+					
+		}
+
+		return JSON.stringify(oLinkObject);
 	};
 
 	/**
@@ -5409,47 +7482,30 @@
 	 */
 	ApiParagraph.prototype.ToJSON = function()
 	{
-		var sPrJSON = '';
-		sPrJSON += JSON.stringify(this.Paragraph.Pr);
-		sPrJSON.replace("Brd", "pBrd");
-		//sPrJSON.replace("Bullet", "pBrd");
-		sPrJSON.replace("ContextualSpacing", "contextualSpacing");
-		sPrJSON.replace("DefaultRunPr", "pBrd");
-		sPrJSON.replace("DefaultTab", "pBrd");
-		sPrJSON.replace("FramePr", "framePr");
-		sPrJSON.replace("Ind", "ind");
-		sPrJSON.replace("Jc", "jc");
-		sPrJSON.replace("KeepLines", "keepLines");
-		sPrJSON.replace("KeepNext", "keepNext");
-		//sPrJSON.replace("LnSpcReduction", "pBrd");
-		//sPrJSON.replace("Lvl", "pBrd");
-		sPrJSON.replace("NumPr", "numPr");
-		sPrJSON.replace("OutlineLvl", "outlineLvl");
-		sPrJSON.replace("PStyle", "pStyle");
-		sPrJSON.replace("PageBreakBefore", "pageBreakBefore");
-		//sPrJSON.replace("PrChange", "pBrd");
-		//sPrJSON.replace("ReviewInfo", "pBrd");
-		sPrJSON.replace("Shd", "shd");
-		sPrJSON.replace("Spacing", "spacing");
-		sPrJSON.replace("SuppressLineNumbers", "suppressLineNumbers");
-		sPrJSON.replace("Tabs", "tabs");
-		sPrJSON.replace("WidowControl", "widowControl");
+		var oParaObject = {
+			pPr: SerParaPr(this.Paragraph.Pr),
+			content: [],
+			type: "paragraph"
+		};
 		
-		var oParaObject = JSON.parse(sPrJSON);
 		var oTempElm = null;
-		oParaObject["content"] = [];
-
 		for (var nElm = 0; nElm < this.Paragraph.Content.length; nElm++)
 		{
 			oTempElm = this.Paragraph.Content[nElm];
-			switch (oTempElm.Type)
+			
+			if (oTempElm instanceof AscCommonWord.ParaRun)
 			{
-				case para_Run:
-					oParaObject["content"].push((new ApiRun(oTempElm).ToJSON()));
-					break;
+				var oRunObject = JSON.parse(new ApiRun(oTempElm).ToJSON());
+				if (oRunObject.content.length !== 0)
+					oParaObject.content.push(oRunObject);
 			}
+			else if (oTempElm instanceof AscCommonWord.CTable)
+				oParaObject.content.push(JSON.parse(new ApiTable(oTempElm).ToJSON()));
+			else if (oTempElm instanceof AscCommonWord.ParaHyperlink)
+				oParaObject.content.push(JSON.parse(new ApiHyperlink(oTempElm).ToJSON()));		
 		}
 
+		return JSON.stringify(oParaObject);
 	};
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -6101,50 +8157,33 @@
 	 */
 	ApiRun.prototype.ToJSON = function()
 	{
-		var sPrJSON = ''
-		var oCompiledPr = this.Run.Pr;
-
-		sPrJSON += JSON.stringify(oCompiledPr);
-		sPrJSON.replace("BoldCS", "bCs");
-		sPrJSON.replace("Bold", "b");
-		sPrJSON.replace("CS", "cs");
-		sPrJSON.replace("Caps", "caps");
-		sPrJSON.replace("Color", "color");
-		sPrJSON.replace("DStrikeout", "dstrike");
-		//sPrJSON.replace("FontFamily", "dstrike");
-		//sPrJSON.replace("FontRef", "dstrike");
-		//sPrJSON.replace("FontScale", "dstrike");
-		//sPrJSON.replace("FontSize", "dstrike");
-		//sPrJSON.replace("FontSizeCS", "dstrike");
-		//sPrJSON.replace("FontSizeCSOrig", "dstrike");
-		//sPrJSON.replace("FontSizeOrig", "dstrike");
-		sPrJSON.replace("HighLight", "highlight");
-		//sPrJSON.replace("HighlightColor", "highlight");
-		sPrJSON.replace("ItalicCS", "iCs");
-		sPrJSON.replace("Italic", "i");
-		sPrJSON.replace("Lang", "lang");
-		sPrJSON.replace("Position", "position");
-		//sPrJSON.replace("PrChange", "i");
-		sPrJSON.replace("RFonts", "rFonts");
-		sPrJSON.replace("RStyle", "rStyle");
-		sPrJSON.replace("RTL", "rtl");
-		//sPrJSON.replace("ReviewInfo", "rtl");
-		sPrJSON.replace("Shd", "shd");
-		sPrJSON.replace("SmallCaps", "smallCaps");
-		sPrJSON.replace("Spacing", "spacing");
-		sPrJSON.replace("Strikeout", "strike");
-		//sPrJSON.replace("TextFill", "TextFill");
-		//sPrJSON.replace("TextOutline", "TextOutline");
-		sPrJSON.replace("Underline", "u");
-		//sPrJSON.replace("Unifill", "u");
-		sPrJSON.replace("Vanish", "vanish");
-		sPrJSON.replace("VertAlign", "vertAlign");
-
-		var oRunObject        = JSON.parse(sPrJSON);
-		oRunObject["content"] = [];
+		var oRunObject = {
+			rPr:     SerTextPr(this.Run.Pr),
+			content: [],
+			type:    "run"
+		}
 		
+		function SerPageNum(oPageNum) /// ???
+		{
+			if (!oPageNum)
+				return oPageNum;
+
+			return {
+
+			}
+		};
+		function SerPageCount(oPageCount)
+		{
+			if (!oPageCount)
+				return oPageCount;
+
+			return {
+				
+			}
+		};
 		var ContentLen        = this.Run.Content.length;
-		var sTempRunText = '';
+		var sTempRunText      = '';
+
 		for (var CurPos = 0; CurPos < ContentLen; CurPos++)
 		{
 			var Item     = this.Run.Content[CurPos];
@@ -6152,11 +8191,14 @@
 
 			switch (ItemType)
 			{
-				case para_Drawing:
 				case para_PageNum:
+					break;
 				case para_PageCount:
+					break;
+				case para_Drawing:
 				{
 					oRunObject["content"].push(sTempRunText);
+					oRunObject["content"].push(JSON.parse(new ApiDrawing(Item).ToJSON()))
 					sTempRunText = '';
 					break;
 				}
@@ -6178,7 +8220,8 @@
 				}
 			}
 		}
-		oRunObject["content"].push(sTempRunText);
+		if (ContentLen !== 0)
+			oRunObject["content"].push(sTempRunText);
 
 		return JSON.stringify(oRunObject);
 	};
@@ -10344,13 +12387,13 @@
 	{
 		var oDrawing = this.Drawing;
 		var oDrawingObject = {
-			docPr:          HandleDocPr(this.Drawing.docPr),
-			effectExtent:   HandleEffectExtent(this.Drawing.EffectExtent),
-			extent:         HandleExtent(this.Drawing.Extent),
-			graphic:        HandleGrapicObject(this.Drawing.GraphicObj),
-			positionH:      HandlePosH(this.Drawing.PositionH),
-			positionV:      HandlePosV(this.Drawing.PositionV),
-			simplePos:      HandleSimplePos(this.Drawing.SimplePos),
+			docPr:          SerDocPr(this.Drawing.docPr),
+			effectExtent:   SerEffectExtent(this.Drawing.EffectExtent),
+			extent:         SerExtent(this.Drawing.Extent),
+			graphic:        SerGrapicObject(this.Drawing.GraphicObj),
+			positionH:      SerPosH(this.Drawing.PositionH),
+			positionV:      SerPosV(this.Drawing.PositionV),
+			simplePos:      SerSimplePos(this.Drawing.SimplePos),
 			distB:          this.Drawing.Distance ? this.Drawing.Distance.B : this.Drawing.Distance,
 			distL:          this.Drawing.Distance ? this.Drawing.Distance.L : this.Drawing.Distance,
 			distR:          this.Drawing.Distance ? this.Drawing.Distance.R : this.Drawing.Distance,
@@ -10361,1702 +12404,13 @@
 			layoutInCell:   this.Drawing.LayoutInCell,
 			locked:         this.Drawing.Locked,
 			relativeHeight: this.Drawing.RelativeHeight,
-			wrapType:       GetWrapType(this.Drawing.wrappingType)
+			wrapType:       GetWrapType(this.Drawing.wrappingType),
+			type:           "drawing"
 		};
 
-		function HandleShape(oShapeObject)
-		{
-
-		};
-
-		function HandleImage(oImgObject)
-		{
-			oDrawingObject["inline"]["blipFill"] = oImgObject.blipFill;
-			oDrawingObject["inline"]["cNvPicPr"] = oImgObject.nvPicPr;
-			oDrawingObject["inline"]["spPr"]     = oImgObject.spPr;
-		};
-		function HandleHlink(oHlink)
-		{
-			if (!oHlink)
-				return oHlink;
-			
-			return {
-				action:         oHlink.action,
-				endSnd:         oHlink.endSnd,
-				highlightClick: oHlink.highlightClick,
-				history:        oHlink.history,
-				id:             oHlink.id,
-				invalidUrl:     oHlink.invalidUrl,
-				tgtFrame:       oHlink.tgtFrame,
-				tooltip:        oHlink.tooltip
-			}
-		};
-		function HandleExternalData(oExtData)
-		{
-			if (!oExtData)
-				return oExtData;
-			
-			return {
-				autoUpdate: oExtData.autoUpdate,
-				id:         oExtData.id
-			}
-		};
-		function HandleProtection(oProtection)
-		{
-			if (!oProtection)
-				return oProtection;
-			
-			return {
-				chartObject:   oProtection.chartObject,
-				data:          oProtection.data,
-				formatting:    oProtection.formatting,
-				selection:     oProtection.selection,
-				userInterface: oProtection.userInterface
-			}
-		};
-		function HandlePivotSource(oPivotSource)
-		{
-			if (!oPivotSource)
-				return oPivotSource;
-			
-			return {
-				fmtId: oPivotSource.fmtId,
-				name:  oPivotSource.name
-			}
-		};
-		function HandleSimplePos(oSimplePos)
-		{
-			if (!oSimplePos)
-				return oSimplePos;
-			
-			return {
-				x: oSimplePos.X,
-				y: oSimplePos.Y
-			}
-		};
-		function HandlePosV(oPosV)
-		{
-			if (!oPosV)
-				return oPosV;
-			
-			return {
-				align:        oPosV.Align,
-				relativeFrom: oPosV.RelativeFrom
-			}
-		};
-		function HandlePosH(oPosH)
-		{
-			if (!oPosH)
-				return oPosH;
-			
-			return {
-				align:        oPosH.Align,
-				relativeFrom: oPosH.RelativeFrom
-			}
-		};
-		function HandleExtent(oExtent)
-		{
-			if (!oExtent)
-				return oExtent;
-
-			return {
-				cy: oExtent.H,
-				cx: oExtent.W
-			}
-		};
-		function HandleEffectExtent(oEffExt)
-		{
-			if (!oEffExt)
-				return oEffExt;
-
-			return {
-				b: oEffExt.B,
-				l: oEffExt.L,
-				r: oEffExt.R,
-				t: oEffExt.T
-			}
-		};
-		function GetWrapType(nType)
-		{
-			switch (nType)
-			{
-				case WRAPPING_TYPE_NONE:
-					return "none";
-				case WRAPPING_TYPE_SQUARE:
-					return "square";
-				case WRAPPING_TYPE_THROUGH:
-					return "through";
-				case WRAPPING_TYPE_TIGHT:
-					return "tight";
-				case WRAPPING_TYPE_TOP_AND_BOTTOM:
-					return "top_and_bottom";
-				default:
-					return "none";
-			}
-		};
-		function HandleGrapicObject(oGraphicObj)
-		{
-			if (!oGraphicObj)
-				return null;
-
-			if (oGraphicObj.isChart())
-				return HandleChartSpace(oGraphicObj);
-			if (oGraphicObj.isImage())
-				return HandleImage(oGraphicObj);
-			if (oGraphicObj.isShape())
-				return HandleShape(oGraphicObj);
-			
-			return null;
-		};
-		function HandleDocPr(oDocPr)
-		{
-			if (!oDocPr)
-				return null;
-			
-			return {
-				hlinkClick: HandleHlink(oDocPr.hlinkClick),
-				hlinkHover: HandleHlink(oDocPr.hlinkHover),
-				descr:      oDocPr.descr,
-				hidden:     oDocPr.isHidden,
-				id:         oDocPr.id,
-				name:       oDocPr.name,
-				title:      oDocPr.title
-			}
-		};
-		function HandleNumLit(oNumLit)
-		{
-			if (!oNumLit)
-				return null;
-
-			var arrResultPts = [];
-			for (var nItem = 0; nItem < oNumLit.pts.length; nItem++)
-			{
-				arrResultPts.push({
-					v:          oNumLit.pts[nItem].val,
-					formatCode: oNumLit.pts[nItem].formatCode,
-					idx:        oNumLit.pts[nItem].idx,
-				});
-			}
-
-			return {
-				formatCode: oNumLit.formatCode,
-				pt:         arrResultPts,
-				ptCount:    oNumLit.ptCount
-			}
-		};
-		function HandleStrLit(oStrLit)
-		{
-			if (!oStrLit)
-				return oStrLit;
-
-			var arrResultPts = [];
-			for (var nItem = 0; nItem < oStrLit.pts.length; nItem++)
-			{
-				arrResultPts.push({
-					v:   oStrLit.pts[nItem].val,
-					idx: oStrLit.pts[nItem].idx,
-				});
-			}
-
-			return {
-				pt:         arrResultPts,
-				ptCount:    oStrLit.ptCount
-			}
-		};
-		function HandleErrBars(oErrBars)
-		{
-			if (!oErrBars)
-				return oErrBars;
-
-			return {
-				errBarType: oErrBars.errBarType,
-				errDir:     oErrBars.errDir,
-				errValType: oErrBars.errValType,
-				minus: {
-					numLit: HandleNumLit(oErrBars.minus.numLit),
-					numRef: HandleNumRef(oErrBars.minus.numRef)
-				},
-				noEndCap: oErrBars.noEndCap,
-				plus: {
-					numLit: HandleNumLit(oErrBars.plus.numLit),
-					numRef: HandleNumRef(oErrBars.plus.numRef)
-				},
-				spPr: HandleSpPr(oErrBars.spPr),
-				val:  oErrBars.val
-			}
-		};
-		function HandleDataPoints(arrDpts)
-		{
-			var arrResultDataPoints = [];
-
-			for (var nItem = 0; nItem < arrDpts.length; nItem++)
-			{
-				arrResultDataPoints.push({
-					bubble3D:         arrDpts[nItem].bubble3D,
-					explosion:        arrDpts[nItem].explosion,
-					idx:              arrDpts[nItem].idx,
-					invertIfNegative: arrDpts[nItem].invertIfNegative,
-					marker:           HandleMarker(arrDpts[nItem].marker),
-					pictureOptions:   HandlePicOptions(arrDpts[nItem].pictureOptions),
-					spPr:             HandleSpPr(arrDpts[nItem].spPr)
-				});
-			}
-
-			return arrResultDataPoints;
-		};
-		function HandleMultiLvlStrRef(oRef)
-		{
-			if (!oRef)
-				return oRef;
-			
-			return {
-				f:                oRef.f,
-				multiLvlStrCache: HandleMultiLvlStrCache(oRef.multiLvlStrCache)
-			}
-		};
-		function HandleMultiLvlStrCache(oCache)
-		{
-			if (!oChange)
-				return oChange;
-
-			var arrLvl = [];
-
-			for (var nPoint = 0; nPoint < oChange.lvl.length; nPoint++)
-			{
-				arrLvl.push({
-					v:   oChange.lvl[nPoint].val,
-					idx: oChange.lvl[nPoint].idx
-				});
-			}
-			
-			return {
-				lvl:     arrLvl,
-				ptCount: oCache.ptCount
-			}
-		};
-		function HandleTrendline(oTrendLine)
-		{
-			if (!oTrendLine)
-				return oTrendLine;
-
-			return {
-				backward:  oTrendLine.backward,
-				dispEq:    oTrendLine.dispEq,
-				dispRSqr:  oTrendLine.dispRSqr,
-				forward:   oTrendLine.forward,
-				intercept: oTrendLine.intercept,
-				name:      oTrendLine.name,
-				order:     oTrendLine.order,
-				period:    oTrendLine.period,
-				spPr:      HandleSpPr(oTrendLine.spPr),
-				trendlineLbl: {
-					layout: HandleLayout(oTrendLine.trendlineLbl.layout),
-					numFmt: HandleNumFmt(oTrendLine.trendlineLbl.numFmt),
-					spPr:   HandleSpPr(oTrendLine.trendlineLbl.spPr),
-					tx:     HandleChartTx(oTrendLine.trendlineLbl.tx),
-					txPr:   HandleTxPr(oTrendLine.trendlineLbl.txPr)
-				},
-				trendlineType: oTrendLine.trendlineType
-			}
-		};
-		function HandlePicOptions(oPicOptions)
-		{
-			if (!oPicOptions)
-				return oPicOptions;
-
-			return {
-				applyToEnd:       oPicOptions.applyToEnd,
-				applyToFront:     oPicOptions.applyToFront,
-				applyToSides:     oPicOptions.applyToSides,
-				pictureFormat:    oPicOptions.pictureFormat,
-				pictureStackUnit: oPicOptions.pictureStackUnit
-			};
-		};
-		function HandleCBarSeries(arrSeries)
-		{
-			var arrResultSeries = [];
-
-			for (var nItem = 0; nItem < arrSeries.length; nItem++)
-			{
-				arrResultSeries.push({
-					cat: {
-						multiLvlStrRef: HandleMultiLvlStrRef(arrSeries[nItem].cat.multiLvlStrRef),
-						numLit:         HandleNumLit(arrSeries[nItem].cat.numLit),
-						numRef:         HandleNumRef(arrSeries[nItem].cat.numRef),
-						strLit:         HandleStrLit(arrSeries[nItem].cat.strLit),
-						strRef:         HandleStrRef(arrSeries[nItem].cat.strRef)
-					},
-					dLbls:            HandleDLbls(arrSeries[nItem].dLbls),
-					dPt:              HandleDataPoints(arrSeries[nItem].dPt),
-					errBars:          HandleErrBars(arrSeries[nItem].errBars),
-					idx:              arrSeries[nItem].idx,
-					invertIfNegative: arrSeries[nItem].invertIfNegative,
-					order:            arrSeries[nItem].order,
-					pictureOptions:   HandlePicOptions(arrSeries[nItem].pictureOptions),
-					shape:            arrSeries[nItem].shape,
-					spPr:             HandleSpPr(arrSeries[nItem].spPr),
-					trendline:        HandleTrendline(arrSeries[nItem].trendline),
-					tx:               HandleSerTx(arrSeries[nItem].tx),
-					val : {
-						numLit: HandleNumLit(arrSeries[nItem].val.numLit),
-						numRef: HandleNumRef(arrSeries[nItem].val.numRef)
-					}
-				});
-			}
-
-			return arrResultSeries;
-		};
-		function HandleStrRef(oStrRef)
-		{
-			if (!oStrRef)
-				return oStrRef;
-
-			var arrResultPts = [];
-			for (var nItem = 0; nItem < oStrRef.strCache.pts.length; nItem++)
-			{
-				arrResultPts.push({
-					v:   oStrRef.strCache.pts[nItem].val,
-					idx: oStrRef.strCache.pts[nItem].idx
-				});
-			}
-
-			var oResultStrRef = {
-				f: oStrRef.f,
-				strCache: {
-					ptCount: oStrRef.ptCount,
-					pt:      arrResultPts
-				}
-			}
-
-			return oResultStrRef;
-		};
-		function HandleNumRef(oNumRef)
-		{
-			if (!oNumRef)
-				return oNumRef;
-
-			var arrResultPts = [];
-			for (var nItem = 0; nItem < oNumRef.numCache.pts.length; nItem++)
-			{
-				arrResultPts.push({
-					v:          oNumRef.numCache.pts[nItem].val,
-					formatCode: oNumRef.numCache.pts[nItem].formatCode,
-					idx:        oNumRef.numCache.pts[nItem].idx,
-				});
-			}
-
-			return {
-				f: oNumRef.f,
-				numCache: { 
-					formatCode: oNumRef.formatCode,
-					ptCount:    oNumRef.ptCount,
-					pt:         arrResultPts
-				}
-			}
-		};
-		function HandleGeometry(oGeometry)
-		{
-			if (!oGeometry)
-				return oGeometry;
-			
-			var arrAhPolarResult = [];
-			var arrAhXYResult    = [];
-			var arrAvResult      = [];
-			var arrCxnResult     = [];
-			var arrGdResult      = [];
-			var arrPathResult    = [];
-			for (var nItem = 0; nItem < oGeometry.ahPolarLst.length; nItem++)
-			{
-				arrAhPolarResult.push({
-					pos: {
-						x: oGeometry.ahPolarLst[nItem].posX,
-						y: oGeometry.ahPolarLst[nItem].posY
-					},
-					gdRefAng: oGeometry.ahPolarLst[nItem].gdRefAng,
-					gdRefR: oGeometry.ahPolarLst[nItem].gdRefR,
-					maxAng: oGeometry.ahPolarLst[nItem].maxAng,
-					maxR: oGeometry.ahPolarLst[nItem].maxR,
-					minAng: oGeometry.ahPolarLst[nItem].minAng,
-					minR: oGeometry.ahPolarLst[nItem].minR
-				});
-			}
-			for (var nItem = 0; nItem < oGeometry.ahXYLst.length; nItem++)
-			{
-				arrAhXYResult.push({
-					pos: {
-						x: oGeometry.ahXYLst[nItem].posX,
-						y: oGeometry.ahXYLst[nItem].posY
-					},
-					gdRefX: oGeometry.ahXYLst[nItem].gdRefX,
-					gdRefY: oGeometry.ahXYLst[nItem].gdRefY,
-					maxX: oGeometry.ahXYLst[nItem].maxX,
-					maxY: oGeometry.ahXYLst[nItem].maxY,
-					minX: oGeometry.ahXYLst[nItem].minX,
-					minY: oGeometry.ahXYLst[nItem].minY
-				});
-			}
-			for (var nItem = 0; nItem < oGeometry.avLst.length; nItem++)
-			{
-				arrAvResult.push({
-					fmla: oGeometry.avLst[nItem].formula,
-					name: oGeometry.avLst[nItem].Name
-				});
-			}
-			for (var nItem = 0; nItem < oGeometry.cnxLst.length; nItem++)
-			{
-				arrCxnResult.push({
-					pos: {
-						x: oGeometry.cnxLst[nItem].x,
-						y: oGeometry.cnxLst[nItem].y
-					},
-					ang: oGeometry.cnxLst[nItem].ang
-				});
-			}
-			for (var nItem = 0; nItem < oGeometry.gdLst.length; nItem++)
-			{
-				arrGdResult.push({
-					fmla: oGeometry.gdLst[nItem].formula,
-					name: oGeometry.gdLst[nItem].Name
-				});
-			}
-			for (var nItem = 0; nItem < oGeometry.pathLst.length; nItem++)
-			{
-				var arrCommands = [];
-				for (var nCommand = 0; nCommand < oGeometry.pathLst[nItem].ArrPathCommandInfo.length; nCommand++)
-				{
-					var arrObjKeys = Object.keys(oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand]);
-					var oCommand   = {};
-					switch (oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand].id)
-					{
-						case 0:
-							oCommand["id"] =  "moveTo";
-							break;
-						case 1:
-							oCommand["id"] =  "lnTo";
-							break;
-						case 2:
-							oCommand["id"] =  "arcTo";
-							break;
-						case 3:
-							oCommand["id"] =  "cubicBezTo";
-							break;
-						case 4:
-							oCommand["id"] =  "quadBezTo";
-							break;
-						case 5:
-							oCommand["id"] =  "close";
-							break;
-					}
-					if (oCommand["id"] !== "arcTo" && oCommand["id"] !== "close")
-						oCommand["pt"] = {};
-					for (var nKey = 0; nKey < arrObjKeys.length; nKey++)
-					{
-						if (arrObjKeys[nKey] === "id")
-							continue;
-						if (!oCommand["pt"])
-							oCommand[arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
-						else 
-							oCommand["pt"][arrObjKeys[nKey].toLowerCase()] = oGeometry.pathLst[nItem].ArrPathCommandInfo[nCommand][arrObjKeys[nKey]];
-					}
-
-					arrCommands.push(oCommand);
-				}
-				arrPathResult.push({
-					commands: arrCommands,
-					extrusionOk: oGeometry.pathLst[nItem].extrusionOk,
-					fill: oGeometry.pathLst[nItem].fill,
-					h: oGeometry.pathLst[nItem].pathH,
-					stroke: oGeometry.pathLst[nItem].stroke,
-					w: oGeometry.pathLst[nItem].pathW
-				});
-			}
-			return {
-				ahLst: {
-					ahPolar: arrAhPolarResult,
-					ahXY:    arrAhXYResult
-				},
-				avLst:   arrAvResult,
-				cnxLst:  arrCxnResult,
-				gdLst:   arrGdResult,
-				pathLst: arrPathResult,
-				rect:    oGeometry.rectS
-			}
-		};
-		function HandleSpPr(oSpPr)
-		{
-			if (!oSpPr)
-				return oSpPr;
-
-			var oXfrm = oSpPr.xfrm ? {
-				ext: {
-					cx: oSpPr.xfrm.extX,
-					cy: oSpPr.xfrm.extY
-				},
-				off: {
-					x: oSpPr.xfrm.offX,
-					y: oSpPr.xfrm.offY
-				},
-				flipH: oSpPr.xfrm.flipH,
-				flipV: oSpPr.xfrm.flipV,
-				rot: oSpPr.xfrm.rot
-			} : oSpPr.xfrm;
-
-			var oEffectLst = oSpPr.effectProps ? HandleEffectLst(oSpPr.effectProps.EffectLst) : oSpPr.effectProps;
-			var oEffectDag = oSpPr.effectProps ? HandleEffectDag(oSpPr.effectProps.EffectDag) : oSpPr.effectProps;
-			var oLineJoin  = oSpPr.ln.Join ? {lim : oSpPr.ln.Join.limit} : oSpPr.ln.Join;
-			if (oLineJoin)
-			{
-				switch (oSpPr.ln.Join.type)
-				{
-					case 0:
-						oLineJoin["type"] = "empty";
-						break;
-					case 1:
-						oLineJoin["type"] = "round";
-						break;
-					case 2:
-						oLineJoin["type"] = "bevel";
-						break;
-					case 3:
-						oLineJoin["type"] = "miter";
-						break;
-				}
-			}
-			
-			return {
-				custGeom:  HandleGeometry(oSpPr.geometry),
-				effectDag: oEffectDag,
-				effectLst: oEffectLst,
-				ln: {
-					fill:     HandleFill(oSpPr.ln.Fill),
-					lineJoin: oLineJoin,
-					
-					algn:     oSpPr.ln.algn,
-					cap:      oSpPr.ln.cap,
-					cmpd:     oSpPr.ln.cmpd,
-					w:        oSpPr.ln.w,
-
-					headEnd:  oSpPr.ln.headEnd ? 
-					{
-						len:  oSpPr.ln.headEnd.len,
-						type: oSpPr.ln.headEnd.type,
-						w:    oSpPr.ln.headEnd.w
-					} : oSpPr.ln.headEnd,
-
-					prstDash: oSpPr.ln.prstDash,
-
-					tailEnd:  oSpPr.ln.tailEnd ? 
-					{
-						len: oSpPr.ln.tailEnd.len,
-						type: oSpPr.ln.tailEnd.type,
-						w: oSpPr.ln.tailEnd.w
-					} : oSpPr.ln.prstDash,
-				},
-
-				fill:   HandleFill(oSpPr.Fill),
-				xfrm:   oXfrm,
-				bwMode: oSpPr.bwMode
-			}
-		};
-		function HandleEffectLst(oEffectLst)
-		{
-			if (!oEffectLst)
-				return oEffectLst;
-			
-			return {
-				blur: oEffectLst.blur ? 
-				{
-					grow: oEffectLst.blur.grow,
-					rad:  oEffectLst.blur.rad
-				} : oEffectLst.blur,
-
-				fillOverlay: oEffectLst.fillOverlay ? 
-				{
-					fill:  HandleFill(oEffectLst.fillOverlay.fill),
-					blend: oEffectLst.fillOverlay.blend
-				} : oEffectLst.fillOverlay,
-
-				glow: oEffectLst.glow ? 
-				{
-					color: HandleColor(oEffectLst.glow.color),
-					rad:   oEffectLst.glow.rad
-				} : oEffectLst.glow,
-
-				innerShdw: oEffectLst.innerShdw ? 
-				{
-					color:   HandleColor(oEffectLst.innerShdw.color),
-					blurRad: oEffectLst.innerShdw.blurRad,
-					dir:     oEffectLst.innerShdw.dir,
-					dist:    oEffectLst.innerShdw.dist
-				} : oEffectLst.innerShdw,
-
-				outerShdw: oEffectLst.outerShdw ? 
-				{
-					color:        HandleColor(oEffectLst.outerShdw.color),
-					algn:         oEffectLst.outerShdw.algn,
-					blurRad:      oEffectLst.outerShdw.blurRad,
-					dir:          oEffectLst.outerShdw.dir,
-					dist:         oEffectLst.outerShdw.dist,
-					kx:           oEffectLst.outerShdw.kx,
-					ky:           oEffectLst.outerShdw.ky,
-					rotWithShape: oEffectLst.outerShdw.rotWithShape,
-					sx:           oEffectLst.outerShdw.sx,
-					sy:           oEffectLst.outerShdw.sy
-				} : oEffectLst.outerShdw,
-
-				prstShdw: oEffectLst.prstShdw ? 
-				{
-					color: HandleColor(oEffectLst.prstShdw.color),
-					dir:   oEffectLst.prstShdw.dir,
-					dist:  oEffectLst.prstShdw.dis,
-					prst:  oEffectLst.prstShdw.prst
-				} : oEffectLst.prstShdw,
-
-				reflection: oEffectLst.reflection ?
-				{
-					algn:         oEffectLst.reflection.algn,
-					blurRad:      oEffectLst.reflection.blurRad,
-					dir:          oEffectLst.reflection.dir,
-					dist:         oEffectLst.reflection.dist,
-					endA:         oEffectLst.reflection.endA,
-					endPos:       oEffectLst.reflection.endPos,
-					fadeDir:      oEffectLst.reflection.fadeDir,
-					kx:           oEffectLst.reflection.kx,
-					ky:           oEffectLst.reflection.ky,
-					rotWithShape: oEffectLst.reflection.rotWithShape,
-					stA:          oEffectLst.reflection.stA,
-					stPos:        oEffectLst.reflection.stPos,
-					sx:           oEffectLst.reflection.sx,
-					sy:           oEffectLst.reflection.sy
-				} : oEffectLst.reflection,
-
-				softEdge: oEffectLst.softEdge ? 
-				{
-					rad: oEffectLst.softEdge.rad
-				} : oEffectLst.softEdge
-			}
-		};
-		function HandleEffectDag(oEffectDag)
-		{
-			if (!oEffectDag)
-				return oEffectDag;
-			
-			var arrEffectLst = [];
-			for (var nEffect = 0; nEffect < oEffectDag.effectList.length; nEffect++)
-			{
-				var oElm = null;
-				if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaBiLevel)
-				{
-					oElm = {
-						elm: {
-							thresh: oEffectDag.effectList[nEffect].tresh
-						},
-						type: "alphaBiLvl"
-					}
-										
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaCeiling)
-				{
-					oElm = {
-						elm: null,
-						type: "alphaCeiling"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaFloor)
-				{
-					oElm = {
-						elm: null,
-						type: "alphaFloor"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaInv)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].unicolor)
-						},
-						type: "alphaInv"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaMod)
-				{
-					oElm = {
-						elm: {
-							cont: HandleEffectDag(oEffectDag.effectList[nEffect].cont)
-						},
-						type: "alphaMod"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaModFix)
-				{
-					oElm = {
-						elm: {
-							amt: oEffectDag.effectList[nEffect].amt
-						},
-						type: "alphaModFix"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaOutset)
-				{
-					oElm = {
-						elm: {
-							rad: oEffectDag.effectList[nEffect].rad
-						},
-						type: "alphaOutset"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CAlphaRepl)
-				{
-					oElm = {
-						elm: {
-							a: oEffectDag.effectList[nEffect].a
-						},
-						type: "alphaRepl"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBiLevel)
-				{
-					oElm = {
-						elm: {
-							thresh: oEffectDag.effectList[nEffect].thresh
-						},
-						type: "biLvl"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBlend)
-				{
-					oElm = {
-						elm: {
-							cont: HandleEffectDag(oEffectDag.effectList[nEffect].cont),
-							blend: oEffectDag.effectList[nEffect].blend
-						},
-						type: "blend"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CBlur)
-				{
-					oElm = {
-						elm: {
-							grow: oEffectDag.effectList[nEffect].grow,
-							rad: oEffectDag.effectList[nEffect].rad
-						},
-						type: "blur"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CClrChange)
-				{
-					oElm = {
-						elm: {
-							clrFrom: HandleColor(oEffectDag.effectList[nEffect].clrFrom),
-							clrTo: HandleColor(oEffectDag.effectList[nEffect].clrTo),
-							useA: oEffectDag.effectList[nEffect].useA
-						},
-						type: "clrChange"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CClrRepl)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].color)
-						},
-						type: "clrRepl"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CEffectContainer)
-				{
-					oElm = {
-						elm: HandleEffectDag(oEffectDag.effectList[nEffect]),
-						type: "effCont"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CDuotone)
-				{
-					var arrColors = [];
-					for (var nColor = 0; nColor < oEffectDag.effectList[nEffect].colors.length; nColor++)
-					{
-						arrColors.push(HandleColor(oEffectDag.effectList[nEffect].colors[nColor]));
-					}
-					oElm = {
-						elm: {
-							colors: arrColors
-						},
-						type: "duotone"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CEffectElement)
-				{
-					oElm = {
-						elm: {
-							ref: oEffectDag.effectList[nEffect].ref
-						},
-						type: "effect"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CFillEffect)
-				{
-					oElm = {
-						elm: {
-							fill: HandleFill(oEffectDag.effectList[nEffect].fill)
-						},
-						type: "fill"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CFillOverlay)
-				{
-					oElm = {
-						elm: {
-							fill: HandleFill(oEffectDag.effectList[nEffect].fill),
-							blend: oEffectDag.effectList[nEffect].blend
-						},
-						type: "fillOvrl"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CGlow)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].color),
-							rad: oEffectDag.effectList[nEffect].rad
-						},
-						type: "glow"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CGrayscl)
-				{
-					oElm = {
-						elm: null,
-						type: "gray"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CHslEffect)
-				{
-					oElm = {
-						elm: {
-							hue: oEffectDag.effectList[nEffect].h,
-							lum: oEffectDag.effectList[nEffect].l,
-							sat: oEffectDag.effectList[nEffect].s
-						},
-						type: "hsl"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CInnerShdw)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].color),
-							blurRad: oEffectDag.effectList[nEffect].blurRad,
-							dir: oEffectDag.effectList[nEffect].dir,
-							dist: oEffectDag.effectList[nEffect].dist
-						},
-						type: "innerShdw"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CLumEffect)
-				{
-					oElm = {
-						elm: {
-							bright: oEffectDag.effectList[nEffect].bright,
-							contrast: oEffectDag.effectList[nEffect].contrast
-						},
-						type: "lum"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.COuterShdw)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].color),
-							algn: oEffectDag.effectList[nEffect].algn,
-							blurRad: oEffectDag.effectList[nEffect].blurRad,
-							dir: oEffectDag.effectList[nEffect].dir,
-							dist: oEffectDag.effectList[nEffect].dist,
-							kx: oEffectDag.effectList[nEffect].kx,
-							ky: oEffectDag.effectList[nEffect].ky,
-							rotWithShape: oEffectDag.effectList[nEffect].rotWithShape,
-							sx: oEffectDag.effectList[nEffect].sx,
-							sy: oEffectDag.effectList[nEffect].sy
-						},
-						type: "outerShdw"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CPrstShdw)
-				{
-					oElm = {
-						elm: {
-							color: HandleColor(oEffectDag.effectList[nEffect].color),
-							dir: oEffectDag.effectList[nEffect].dir,
-							dist: oEffectDag.effectList[nEffect].dis,
-							prst: oEffectDag.effectList[nEffect].prst
-						},
-						type: "prstShdw"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CReflection)
-				{
-					oElm = {
-						elm: {
-							algn: oEffectDag.effectList[nEffect].algn,
-							blurRad: oEffectDag.effectList[nEffect].blurRad,
-							dir: oEffectDag.effectList[nEffect].dir,
-							dist: oEffectDag.effectList[nEffect].dist,
-							endA: oEffectDag.effectList[nEffect].endA,
-							endPos: oEffectDag.effectList[nEffect].endPos,
-							fadeDir: oEffectDag.effectList[nEffect].fadeDir,
-							kx: oEffectDag.effectList[nEffect].kx,
-							ky: oEffectDag.effectList[nEffect].ky,
-							rotWithShape: oEffectDag.effectList[nEffect].rotWithShape,
-							stA: oEffectDag.effectList[nEffect].stA,
-							stPos: oEffectDag.effectList[nEffect].stPos,
-							sx: oEffectDag.effectList[nEffect].sx,
-							sy: oEffectDag.effectList[nEffect].sy
-						},
-						type: "reflection"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CRelOff)
-				{
-					oElm = {
-						elm: {
-							tx: oEffectDag.effectList[nEffect].tx,
-							ty: oEffectDag.effectList[nEffect].ty
-						},
-						type: "relOff"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CSoftEdge)
-				{
-					oElm = {
-						elm: {
-							rad: oEffectDag.effectList[nEffect].rad
-						},
-						type: "softEdge"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CTintEffect)
-				{
-					oElm = {
-						elm: {
-							amt: oEffectDag.effectList[nEffect].amt,
-							hue: oEffectDag.effectList[nEffect].hue
-						},
-						type: "tint"
-					}
-				}
-				else if (oEffectDag.effectList[nEffect] instanceof AscFormat.CXfrmEffect)
-				{
-					oElm = {
-						elm: {
-							kx: oEffectDag.effectList[nEffect].kx,
-							ky: oEffectDag.effectList[nEffect].ky,
-							sx: oEffectDag.effectList[nEffect].sx,
-							sy: oEffectDag.effectList[nEffect].sy,
-							tx: oEffectDag.effectList[nEffect].tx,
-							ty: oEffectDag.effectList[nEffect].ty
-						},
-						type: "xfrm"
-					}
-				}
-				arrEffectLst.push(oElm);
-			}
-			return {
-				effectList: arrEffectLst,
-				name: oEffectDag.name,
-				type: oEffectDag.type
-			}
-		};
-		function HandleFill(oFill)
-		{
-			if (!oFill)
-				return oFill;
-
-			var arrColorMods = [];
-			var oColor = oFill.fill.color ? {
-				red:   oFill.fill.color.RGBA.R,
-				green: oFill.fill.color.RGBA.G,
-				blue:  oFill.fill.color.RGBA.B,
-				alpha: oFill.fill.color.RGBA.A 
-			} : oFill.fill.color;
-			if (oFill.fill.Mods)
-			{
-				for (var nMod = 0; nMod < oFill.fill.Mods.length; nMod++)
-				{
-					arrColorMods.push({
-						name: oFill.fill.Mods[nMod].name,
-						val: oFill.fill.Mods[nMod].val
-					});
-				}
-			}
-
-			return {
-				color: oColor,
-				mods: arrColorMods
-			}
-		};
-		function HandleShd(oShd)
-		{
-			if (!oShd)
-				return oShd;
-
-			return {
-				val: oShd.Value,
-				color: {
-					auto: oShd.Color.Auto,
-					r:    oShd.Color.r,
-					g:    oShd.Color.g,
-					b:    oShd.Color.b
-				},
-				fill: {
-					auto: oShd.Fill.Auto,
-					r:    oShd.Fill.r,
-					g:    oShd.Fill.g,
-					b:    oShd.Fill.b
-				},
-				fillRef: oShd.FillRef ? {
-					idx:   oShd.FillRef.idx,
-					color: HandleColor(oShd.FillRef.Color)
-				} : oShd.FillRef,
-				themeColor: HandleFill(oShd.FillRef.Unifill),
-				themeFill:  HandleFill(oShd.FillRef.themeFill)
-			}
-		};
-		function HandleColor(oColor)
-		{
-			if (!oColor)
-				return oColor;
-
-			var arrColorMods = [];
-			var oColor = oColor.color ? {
-				red:   oColor.color.RGBA.R,
-				green: oColor.color.RGBA.G,
-				blue:  oColor.color.RGBA.B,
-				alpha: oColor.color.RGBA.A 
-			} : oColor.color;
-			if (oColor.Mods)
-			{
-				for (var nMod = 0; nMod < oColor.Mods.length; nMod++)
-				{
-					arrColorMods.push({
-						name: oColor.Mods[nMod].name,
-						val:  oColor.Mods[nMod].val
-					});
-				}
-			}
-
-			return {
-				color: oColor,
-				mods: arrColorMods
-			}
-		};
-		function HandleTxPr(oTxPr)
-		{
-			if (!oTxPr)
-				return oTxPr;
-
-			return {
-				bodyPr: {
-					flatTx:           oTxPr.bodyPr.flatTx,
-					normAutofit:      oTxPr.bodyPr.textFit ? {
-						fontScale:      oTxPr.bodyPr.fontScale,
-						lnSpcReduction: oTxPr.bodyPr.lnSpcReduction
-					} : oTxPr.bodyPr.flatTx,
-					prstTxWarp:       HandleGeometry(oTxPr.bodyPr.prstTxWarp),
-					anchor:           oTxPr.bodyPr.anchor,
-					anchorCtr:        oTxPr.bodyPr.anchorCtr,
-					bIns:             oTxPr.bodyPr.bIns,
-					compatLnSpc:      oTxPr.bodyPr.compatLnSpc,
-					forceAA:          oTxPr.bodyPr.forceAA,
-					fromWordArt:      oTxPr.bodyPr.fromWordArt,
-					horzOverflow:     oTxPr.bodyPr.horzOverflow,
-					lIns:             oTxPr.bodyPr.lIns,
-					numCol:           oTxPr.bodyPr.numCol,
-					rIns:             oTxPr.bodyPr.rIns,
-					rot:              oTxPr.bodyPr.rot,
-					rtlCol:           oTxPr.bodyPr.rtlCol,
-					spcCol:           oTxPr.bodyPr.spcCol,
-					spcFirstLastPara: oTxPr.bodyPr.spcFirstLastPara,
-					tIns:             oTxPr.bodyPr.tIns,
-					upright:          oTxPr.bodyPr.upright,
-					vert:             oTxPr.bodyPr.vert,
-					vertOverflow:     oTxPr.bodyPr.vertOverflow,
-					wrap:             oTxPr.bodyPr.wrap
-				},
-				lstStyle: HandleLstStyle(oTxPr.lstStyle),
-				content: []
-			}
-		};
-		function HandleLstStyle(oListStyle)
-		{
-			if (!oListStyle)
-				return oListStyle;
-			
-			var arrResult = [];
-
-			for (var nLvl = 0; nLvl < oListStyle.levels.length; nLvl++)
-			{
-				arrResult.push(HandleParaPr(oListStyle.levels[nLvl]));
-			}
-
-			return arrResult;
-		};
-		function HandleParaPr(oParaPr)
-		{
-			if (!oParaPr)
-				return oParaPr;
-
-			return {
-				contextualSpacing: oParaPr.ContextualSpacing,
-				framePr:           oParaPr.FramePr ? 
-				{
-					dropCap: oParaPr.FramePr.DropCap,
-					h:       oParaPr.FramePr.H,
-					hAnchor: oParaPr.FramePr.HAnchor,
-					hRule:   oParaPr.FramePr.HRule,
-					hSpace:  oParaPr.FramePr.HSpace,
-					lines:   oParaPr.FramePr.Lines,
-					vAnchor: oParaPr.FramePr.VAnchor,
-					vSpace:  oParaPr.FramePr.VSpace,
-					w:       oParaPr.FramePr.W,
-					wrap:    oParaPr.FramePr.Wrap,
-					x:       oParaPr.FramePr.X,
-					xAlign:  oParaPr.FramePr.XAlign,
-					y:       oParaPr.FramePr.Y,
-					yAlign:  oParaPr.FramePr.YAlign
-				} :  oParaPr.FramePr,
-				ind:               oParaPr.Ind ? 
-				{
-					left:      oParaPr.Ind.Left, /// start ?
-					right:     oParaPr.Ind.Right, /// end ?
-					firstLine: oParaPr.Ind.FirstLine
-				} : oParaPr.Ind,
-				jc:                oParaPr.Jc,
-				keepLine:          oParaPr.KeepLines,
-				keepNext:          oParaPr.KeepNext,
-				numPr:             oParaPr.NumPr ? {
-					ilvl:  oParaPr.NumPr.Lvl,
-					numId: oParaPr.NumPr.NumId
-				} : oParaPr.NumPr,
-				outlineLvl:        oParaPr.OutlineLvl,
-				pageBreakBefore:   oParaPr.PageBreakBefore,
-				pBdr:              oParaPr.Brd ? 
-				{
-					between: oParaPr.Brd.Between,
-					bottom:  oParaPr.Brd.Bottom,
-					left:    oParaPr.Brd.Left,
-					right:   oParaPr.Brd.Right,
-					top:     oParaPr.Brd.Top
-				} : oParaPr.Brd,
-				pPrChange:         HandleParaPr(oParaPr.PrChange),
-				pStyle:            oParaPr.PStyle,
-				shd:               HandleShd(oParaPr.Shd),
-				spacing:           oParaPr.Spacing ? 
-				{
-					line:              oParaPr.Spacing.Line,
-					lineRule:          oParaPr.Spacing.LineRule,
-					before:            oParaPr.Spacing.Before,
-					beforePct:         oParaPr.Spacing.BeforePct,
-					beforeAutoSpacing: oParaPr.Spacing.BeforeAutoSpacing,
-					after:             oParaPr.Spacing.After,
-					afterPct:          oParaPr.Spacing.AfterPct,
-					afterAutoSpacing:  oParaPr.Spacing.AfterAutoSpacing
-				} : oParaPr.Spacing,
-				tabs:              HandleTabs(oParaPr.Tabs),
-				widowControl:      oParaPr.WidowControl
-			}
-		};
-		function HandleTabs(oTabs)
-		{
-			if (!oTabs)
-				return oTabs;
-				
-			var oTabs = {
-				tabs: []
-			};
-
-			for (var nTab = 0; nTab < oTabs.Tabs.length; nTab++)
-			{
-				oTabs.tabs.push({
-					val:    oTabs.Tabs[nTab].Value,
-					pos:    oTabs.Tabs[nTab].Pos,
-					leader: oTabs.Tabs[nTab].Leader
-				});
-			}
-
-			return oTabs;
-		};
-		function HandleSerTx(oTx)
-		{
-			if (!oTx)
-				return oTx;
-
-			return {
-				strRef: HandleStrRef(oTx.strRef),
-				v:      oTx.val
-			}
-		};
-		function HandleChartTx(oTx)
-		{
-			if (!oTx)
-				return oTx;
-
-			return {
-				strRef: HandleStrRef(oTx.strRef),
-				rich:   HandleTxPr(oTx.rich)
-			}
-		};
-		function HandleScaling(oScaling)
-		{
-			if (!oScaling)
-				return oScaling;
-			
-			return {
-				logBase:     oScaling.logBase,
-				max:         oScaling.max,
-				min:         oScaling.min,
-				orientation: oScaling.orientation
-			}
-		};
-		function HandleNumFmt(oNumFmt)
-		{
-			if (!oNumFmt)
-				return oNumFmt;
-			
-			return {
-				formatCode:   oNumFmt.formatCode,
-				sourceLinked: oNumFmt.sourceLinked
-			}
-		};
-		function HandleDispUnits(oDispUnits)
-		{
-			if (!oDispUnits)
-				return oDispUnits;
-			
-			return {
-				builtInUnit: oDispUnits.builtInUnit,
-				custUnit:    oDispUnits.custUnit,
-				dispUnitsLbl: {
-					layout: HandleLayout(oDispUnits.dispUnitsLbl.layout),
-					spPr:   HandleSpPr(oDispUnits.dispUnitsLbl.spPr),
-					tx:     HandleChartTx(oDispUnits.dispUnitsLbl.tx),
-					txPr:   HandleTxPr(oDispUnits.dispUnitsLbl.txPr)
-				}
-			}
-		};
-		function HandleValAx(oValAx)
-		{
-			if (!oValAx)
-				return oValAx;
-			
-			return {
-				axId:           oValAx.axId,
-				axPos:          oValAx.axPos,
-				crossAx:        oValAx.crossAx.axId,
-				crossBetween:   oValAx.crossBetween,
-				crosses:        oValAx.crosses,
-				crossesAt:      oValAx.crossesAt,
-				delete:         oValAx.bDelete,
-				dispUnits:      HandleDispUnits(oValAx.dispUnits),
-				extLst:         oValAx.extLst, /// ???
-				majorGridlines: HandleSpPr(oValAx.majorGridlines),
-				majorTickMark:  oValAx.majorTickMark,
-				majorUnit:      oValAx.majorUnit,
-				minorGridlines: HandleSpPr(oValAx.minorGridlines),
-				minorTickMark:  oValAx.minorTickMark,
-				minorUnit:      oValAx.minorUnit,
-				numFmt:         HandleNumFmt(oValAx.numFmt),
-				scaling:        HandleScaling(oValAx.scaling),
-				spPr:           HandleSpPr(oValAx.spPr),
-				tickLblPos:     oValAx.tickLblPos,
-				title:          HandleTitle(oValAx.title),
-				txPr:           HandleTxPr(oValAx.txPr)
-			}
-		};
-		function HandlePlotArea(oPlotArea)
-		{
-			if (!oPlotArea)
-				return oPlotArea;
-
-			return {
-				barChart: HandleBarCharts(oPlotArea.charts),
-				catAx:    HandleCatAx(oPlotArea.catAx),
-				dateAx:   HandleDateAx(oPlotArea.dateAx),
-				dTable:   HandleDataTable(oPlotArea.dTable),
-				layout:   HandleLayout(oPlotArea.layout),
-				serAx:    HandleSerAx(oPlotArea.serAx),
-				spPr:     HandleSpPr(oPlotArea.spPr),
-				valAx:    HandleValAx(oPlotArea.valAx)
-			}
-		};
-		function HandleDataTable(oData)
-		{
-			if (!oData)
-				return oData;
-
-			return {
-				showHorzBorder: oData.showHorzBorder,
-				showKeys:       oData.showKeys,
-				showOutline:    oData.showOutline,
-				showVertBorder: oData.showVertBorder,
-				spPr:           HandleSpPr(oData.spPr),
-				txPr:           HandleTxPr(oData.txPr)
-			};
-		};
-		function HandleSerAx(oSerAx)
-		{
-			if (!oSerAx)
-				return oSerAx;
-
-			return {
-				axId:           oSerAx.axId,
-				axPos:          oSerAx.axPos,
-				crossAx:        oSerAx.crossAx.axId,
-				crosses:        oSerAx.crosses,
-				crossesAt:      oSerAx.crossesAt,
-				delete:         oSerAx.bDelete,
-				extLst:         oSerAx.extLst, /// ?
-				majorGridlines: HandleSpPr(oSerAx.majorGridlines),
-				majorTickMark:  oSerAx.majorTickMark,
-				minorGridlines: HandleSpPr(oSerAx.minorGridlines),
-				minorTickMark:  oSerAx.minorTickMark,
-				numFrm:         HandleNumFmt(oSerAx.numFmt),
-				scaling:        HandleScaling(oSerAx.scaling),
-				spPr:           HandleSpPr(oSerAx.spPr),
-				tickLblPos:     oSerAx.tickLblPos,
-				tickLblSkip:    oSerAx.tickLblSkip,
-				tickMarkSkip:   oSerAx.tickMarkSkip,
-				title:          HandleTitle(oSerAx.title),
-				txPr:           HandleTxPr(oSerAx.txPr)
-			}
-		};
-		function HandleCatAx(oCatAx)
-		{
-			if (!oCatAx)
-				return oCatAx;
-
-			return {
-				auto:           oCatAx.auto,
-				axId:           oCatAx.axId,
-				axPos:          oCatAx.axPos,
-				crossAx:        oCatAx.crossAx.axId,
-				crosses:        oCatAx.crosses,
-				crossesAt:      oCatAx.crossesAt,
-				delete:         oCatAx.bDelete,
-				extLst:         oCatAx.extLst, /// ?
-				lblAlgn:        oCatAx.lblAlgn,
-				lblOffset:      oCatAx.lblOffset,
-				majorGridlines: HandleSpPr(oCatAx.majorGridlines),
-				majorTickMark:  oCatAx.majorTickMark,
-				minorGridlines: HandleSpPr(oCatAx.minorGridlines),
-				minorTickMark:  oCatAx.minorTickMark,
-				noMultiLvlLbl:  oCatAx.noMultiLvlLbl,
-				numFrm:         HandleNumFmt(oCatAx.numFmt),
-				scaling:        HandleScaling(oCatAx.scaling),
-				spPr:           HandleSpPr(oCatAx.spPr),
-				tickLblPos:     oCatAx.tickLblPos,
-				tickLblSkip:    oCatAx.tickLblSkip,
-				tickMarkSkip:   oCatAx.tickMarkSkip,
-				title:          HandleTitle(oCatAx.title),
-				txPr:           HandleTxPr(oCatAx.txPr)
-			}
-		};
-		function HandleDateAx(oDateAx)
-		{
-			if (!oDateAx)
-				return oDateAx;
-
-			return {
-				auto:           oDateAx.auto,
-				axId:           oDateAx.axId,
-				axPos:          oDateAx.axPos,
-				baseTimeUnit:   oDateAx.baseTimeUnit,
-				crossAx:        oDateAx.crossAx.axId,
-				crosses:        oDateAx.crosses,
-				crossesAt:      oDateAx.crossesAt,
-				delete:         oDateAx.bDelete,
-				extLst:         oDateAx.extLst,
-				lblOffset:      oDateAx.lblOffset,
-				majorGridlines: HandleSpPr(oDateAx.majorGridlines),
-				majorTickMark:  oDateAx.majorTickMark,
-				majorTimeUnit:  oDateAx.majorTimeUnit,
-				majorUnit:      oDateAx.majorUnit,
-				minorGridlines: HandleSpPr(oDateAx.minorGridlines),
-				minorTickMark:  oDateAx.minorTickMark,
-				minorTimeUnit:  oDateAx.minorTimeUnit,
-				minorUnit:      oDateAx.minorUnit,
-				numFrm:         HandleNumFmt(oDateAx.numFmt),
-				scaling:        HandleScaling(oDateAx.scaling),
-				spPr:           HandleSpPr(oDateAx.spPr),
-				tickLblPos:     oDateAx.tickLblPos,
-				title:          HandleTitle(oDateAx.title),
-				txPr:           HandleTxPr(oDateAx.txPr)
-			}
-		};
-		function HandleLayout(oLayout)
-		{
-			if (!oLayout)
-				return oLayout;
-			
-			return {
-				h:            oLayout.h,
-				hMode:        oLayout.hMode,
-				layoutTarget: oLayout.layoutTarget,
-				w:            oLayout.w,
-				wMode:        oLayout.wMode,
-				x:            oLayout.x,
-				xMode:        oLayout.xMode,
-				y:            oLayout.y,
-				yMode:        oLayout.yMode
-			}
-		};
-		function HandleDlbl(oDlbl)
-		{
-			if (!oDlbl)
-				return oDlbl;
-			
-			return {
-				delete:         oDlbl.bDelete,
-				dLblPos:        oDlbl.dLblPos,
-				idx:            oDlbl.idx,
-				layout:         HandleLayout(oDlbl.layout),
-				numFmt:         HandleNumFmt(oDlbl.numFmt),
-				separator:      oDlbl.separator,
-				showBubbleSize: oDlbl.showBubbleSize,
-				showCatName:    oDlbl.showCatName,
-				showLegendKey:  oDlbl.showLegendKey,
-				showPercent:    oDlbl.showPercent,
-				showSerName:    oDlbl.showSerName,
-				showVal:        oDlbl.showVal,
-				spPr:           HandleSpPr(oDlbl.spPr),
-				txPr:           HandleTxPr(oDlbl.txPr),
-				tx:             HandleChartTx(oDlbl.tx)
-			}
-		};
-		function HandleDLbls(dLbls)
-		{
-			if (!dLbls)
-				return dLbls;
-			
-			return {
-				delete:          dLbls.bDelete,
-				dLbl:            dLbls.dLbl,
-				dLblPos:         dLbls.dLblPos,
-				leaderLines:     HandleSpPr(dLbls.leaderLines),
-				numFmt:          HandleNumFmt(dLbls.numFmt),
-				separator:       dLbls.separator,
-				showBubbleSize:  dLbls.showBubbleSize,
-				showCatName:     dLbls.showCatName,
-				showLeaderLines: dLbls.showLeaderLines,
-				showLegendKey:   dLbls.showLegendKey,
-				showPercent:     dLbls.showPercent,
-				showSerName:     dLbls.showSerName,
-				showVal:         dLbls.showVal,
-				spPr:            HandleSpPr(dLbls.spPr),
-				txPr:            HandleTxPr(dLbls.txPr)
-			}
-		};
-		function HandleBarCharts(arrBarCharts)
-		{
-			var arrResult = [];
-
-			for (var nItem = 0; nItem < arrBarCharts.length; nItem++)
-			{
-				arrResult.push({
-					axId:       [arrBarCharts[nItem].axId[0].axId, arrBarCharts[nItem].axId[1].axId],
-					barDir:     arrBarCharts[nItem].barDir,
-					dLbls:      HandleDLbls(arrBarCharts[nItem].dLbls),
-					gapWidth:   arrBarCharts[nItem].gapWidth,
-					grouping:   arrBarCharts[nItem].grouping,
-					overlap:    arrBarCharts[nItem].overlap,
-					serLines:   HandleSpPr(arrBarCharts[nItem].serLines),
-					ser:        HandleCBarSeries(arrBarCharts[nItem].series),
-					varyColors: arrBarCharts[nItem].varyColors
-				})
-			}
-
-			return arrResult;
-		};
-		function HandleTitle(oTitle)
-		{
-			if (!oTitle)
-				return oTitle;
-			
-			return {
-				layout:  HandleLayout(oTitle.layout),
-				overlay: oTitle.overlay,
-				spPr:    HandleSpPr(oTitle.spPr),
-				tx:      HandleChartTx(oTitle.tx),
-				txPr:    HandleTxPr(oTitle.txPr)
-			}
-		};
-		function HandlePrintSettings(oPrintSettings)
-		{
-			if (!oPrintSettings)
-				return oPrintSettings;
-
-			return {
-				headerFooter: {
-					evenFooter:       oPrintSettings.headerFooter.evenFooter,
-					evenHeader:       oPrintSettings.headerFooter.evenHeader,
-					firstFooter:      oPrintSettings.headerFooter.firstFooter,
-					firstHeader:      oPrintSettings.headerFooter.firstHeader,
-					oddFooter:        oPrintSettings.headerFooter.oddFooter,
-					oddHeader:        oPrintSettings.headerFooter.oddHeader,
-					alignWithMargins: oPrintSettings.headerFooter.alignWithMargins,
-					differentFirst:   oPrintSettings.headerFooter.differentFirst,
-					differentOddEven: oPrintSettings.headerFooter.differentOddEven
-				},
-				pageMargins: {
-					b:      oPrintSettings.pageMargins.b,
-					footer: oPrintSettings.pageMargins.footer,
-					header: oPrintSettings.pageMargins.header,
-					l:      oPrintSettings.pageMargins.l,
-					r:      oPrintSettings.pageMargins.r,
-					t:      oPrintSettings.pageMargins.t,
-				},
-				pageSetup: {
-					blackAndWhite:    oPrintSettings.pageSetup.blackAndWhite,
-					copies:           oPrintSettings.pageSetup.copies,
-					draft:            oPrintSettings.pageSetup.draft,
-					firstPageNumber:  oPrintSettings.pageSetup.firstPageNumber,
-					horizontalDpi:    oPrintSettings.pageSetup.horizontalDpi,
-					orientation:      oPrintSettings.pageSetup.orientation,
-					paperHeight:      oPrintSettings.pageSetup.paperHeight,
-					paperSize:        oPrintSettings.pageSetup.paperSize,
-					paperWidth:       oPrintSettings.pageSetup.paperWidth,
-					useFirstPageNumb: oPrintSettings.pageSetup.useFirstPageNumb,
-					verticalDpi:      oPrintSettings.pageSetup.verticalDpi
-				}
-			}
-		};
-		function HandleWall(oWall)
-		{
-			if (!oWall)
-				return oWall;
-			
-			return {
-				pictureOptions: HandlePicOptions(oWall.pictureOptions),
-				spPr:           HandleSpPr(oWall.spPr),
-				thickness:      oWall.thickness
-			}
-		};
-		function HandleMarker(oMarker)
-		{
-			if (!oMarker)
-				return oMarker;
-			
-			return {
-				size:   oMarker.size,
-				spPr:   HandleSpPr(oMarker.spPr),
-				symbol: oMarker.symbol
-			}
-		};
-		function HandlePivotFmt(oFmt)
-		{
-			if (!oFmt)
-				return oFmt;
-			
-			return {
-				dLbl:   HandleDlbl(oFmt.dLbl),
-				idx:    oFmt.idx,
-				marker: HandleMarker(oFmt.marker),
-				spPr:   HandleSpPr(oFmt.spPr),
-				txPr:   HandleTxPr(oFmt.txPr)
-			}
-		};
-		function HandlePivotFmts(arrFmts)
-		{
-			var arrResult = [];
-
-			for (var nItem = 0; nItem < arrFmts.length; nItem++)
-			{
-				arrResult.push(HandlePivotFmt(arrFmts[nItem]));
-			}
-
-			return arrResult;
-		};
-		function HandleView3D(oView3D)
-		{
-			if (!oView3D)
-				return oView3D;
-			
-			return {
-				depthPercent: oView3D.depthPercent,
-				hPercent:     oView3D.hPercent,
-				perspective:  oView3D.perspective,
-				rAngAx:       oView3D.rAngAx,
-				rotX:         oView3D.rotX,
-				rotY:         oView3D.rotY
-			}
-		};
-		function HandleLegendEntry(oLegendEntry)
-		{
-			if (!oLegendEntry)
-				return oLegendEntry;
-			
-			return {
-				delete: oLegendEntry.bDelete,
-				idx:    oLegendEntry.idx,
-				txPr:   HandleTxPr(oLegendEntry.txPr)
-			}
-		};
-		function HandleLegendEntries(arrEntries)
-		{
-			var arrResults = [];
-
-			for (var nItem = 0; nItem < arrEntries.length; nItem++)
-			{
-				arrResults.push(HandleLegendEntry(arrEntries[nItem]));	
-			}
-
-			return arrResults;
-		};
-		function HandleChartSpace(oChartSpace)
-		{
-			if (!oChartSpace)
-				return oChartSpace;
-
-			return {
-				chart: {
-					autoTitleDeleted: oChartSpace.chart.autoTitleDeleted,
-					backwall:         HandleWall(oChartSpace.chart.backWall),
-					dispBlanksAs:     oChartSpace.chart.dispBlanksAs,
-					floor:            HandleWall(oChartSpace.chart.floor),
-					legend: {
-						layout:      HandleLayout(oChartSpace.chart.legend.layout),
-						legendEntry: HandleLegendEntries(oChartSpace.chart.legend.legendEntryes),
-						legendPos:   oChartSpace.chart.legend.legendPos,
-						overlay:     oChartSpace.chart.legend.overlay,
-						spPr:        HandleSpPr(oChartSpace.chart.legend.spPr),
-						txPr:        HandleTxPr(oChartSpace.chart.legend.txPr)
-					},
-					pivotFmts:        HandlePivotFmts(oChartSpace.chart.pivotFmts),
-					plotArea:         HandlePlotArea(oChartSpace.chart.plotArea),
-					plotVisOnly:      oChartSpace.chart.plotVisOnly,
-					showDLblsOverMax: oChartSpace.chart.showDLblsOverMax,
-					sideWall:         HandleWall(oChartSpace.chart.sideWall),
-					title:            HandleTitle(oChartSpace.chart.title),
-					view3D:           HandleView3D(oChartSpace.chart.view3D)
-				},
-				clrMapOvr:      oChartSpace.clrMapOvr ? oChartSpace.clrMapOvr.color_map : oChartSpace.clrMapOvr,
-				date1904:       oChartSpace.date1904,
-				externalData:   HandleExternalData(oChartSpace.externalData),
-				lang:           oChartSpace.lang,
-				pivotSource:    HandlePivotSource(oChartSpace.pivotSource),
-				printSettings:  HandlePrintSettings(oChartSpace.printSettings),
-				protection:     HandleProtection(oChartSpace.protection),
-				roundedCorners: oChartSpace.roundedCorners,
-				spPr:           HandleSpPr(oChartSpace.spPr),
-				style:          oChartSpace.style,
-				txPr:           HandleTxPr(oChartSpace.txPr),
-				userShapes:     oChartSpace.userShapes
-			};
-			
-
-			//delete oDrawingObject["inline"]["chart"]["parent"];
-			//delete oDrawingObject["inline"]["chart"]["legent"]["parent"];
-		};
 		
-		return;
+
+		return JSON.stringify(oDrawingObject);
 	};
  
 
@@ -13196,6 +13550,35 @@
 
 		return new ApiInlineLvlSdt(oInlineSdt);
 	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiInlineLvlSdt
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiInlineLvlSdt.prototype.ToJSON = function()
+	{
+		var oInlineSdt = 
+		{
+			sdtPr: SerSdtPr(this.Sdt.Pr),
+			content: [],
+			type: "inlineSdt"
+		}
+
+		var TempElm = null;
+		for (var nElm = 0; nElm < this.Sdt.Content.length; nElm++)
+		{
+			TempElm = this.Sdt.Content[nElm];
+
+			if (TempElm instanceof AscCommonWord.ParaRun)
+				oInlineSdt.content.push(JSON.parse(new ApiRun(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.ParaHyperlink)
+				oInlineSdt.content.push(JSON.parse(new ApiHyperlink(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.CInlineLevelSdt)
+				oInlineSdt.content.push(JSON.parse(new ApiInlineLvlSdt(TempElm).ToJSON()));
+		}
+
+		return JSON.stringify(oInlineSdt);
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -13664,6 +14047,35 @@
 
 		this.Sdt.SelectContentControl();
 		Document.UpdateSelection();
+	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiBlockLvlSdt
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiBlockLvlSdt.prototype.ToJSON = function()
+	{
+		var oBlockSdt = 
+		{
+			sdtPr: SerSdtPr(this.Sdt.Pr),
+			sdtContent: [],
+			type: "blockSdt"
+		}
+
+		var TempElm = null;
+		for (var nElm = 0; nElm < this.Sdt.Content.Content.length; nElm++)
+		{
+			TempElm = this.Sdt.Content.Content[nElm];
+
+			if (TempElm instanceof AscCommonWord.Paragraph)
+				oBlockSdt.sdtContent.push(JSON.parse(new ApiParagraph(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.CTable)
+				oBlockSdt.sdtContent.push(JSON.parse(new ApiTable(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.CBlockLevelSdt)
+				oBlockSdt.sdtContent.push(JSON.parse(new ApiBlockLvlSdt(TempElm).ToJSON()));
+		}
+
+		return JSON.stringify(oBlockSdt);
 	};
 
 	/**
