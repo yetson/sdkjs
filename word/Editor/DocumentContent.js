@@ -2036,6 +2036,9 @@ CDocumentContent.prototype.Get_CurrentPage_Relative = function()
 };
 CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 {
+	if (!Stats.GetWorkingState())
+		return;
+
 	var Start = 0,
 	    End   = this.Content.length - 1;
 	if (Stats.isUseSelection)
@@ -2047,7 +2050,7 @@ CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 	{
 		var Element = this.Content[Index];
 		Element.CollectDocumentStatistics(Stats);
-		Stats.Add_Line(Element.Lines.length);
+		// Stats.Update_Line(Element.Lines.length);
 	}
 };
 CDocumentContent.prototype.Document_CreateFontMap = function(FontMap)
@@ -2603,7 +2606,12 @@ CDocumentContent.prototype.AddNewParagraph = function(bForceAdd)
 					}
 					else
 					{
+						var Statistics = this.GetLogicDocument().Statistics;
+						Statistics.bAdd = false;
+						Item.CollectDocumentStatistics(Statistics);
 						Item.Split(NewParagraph);
+						Statistics.bAdd = true;
+						Item.CollectDocumentStatistics(Statistics);
 					}
 
 					NewParagraph.Correct_Content();
@@ -3364,6 +3372,7 @@ CDocumentContent.prototype.ClearParagraphFormatting = function(isClearParaPr, is
 };
 CDocumentContent.prototype.Remove = function(Count, bOnlyText, bRemoveOnlySelection, bOnTextAdd, isWord)
 {
+	console.log("CDocumentContent.prototype.Remove");
 	if (true === this.ApplyToAll)
 	{
 		this.SelectAll();
@@ -4433,6 +4442,7 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
     var Para        = NearPos.Paragraph;
     var ParaNearPos = Para.Get_ParaNearestPos(NearPos);
     var LastClass   = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
+	var Statistics  = this.GetLogicDocument().Statistics;
 
 	this.private_CheckSelectedContentBeforePaste(SelectedContent, NearPos);
 
@@ -4461,7 +4471,11 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
         if (null !== InsertMathContent)
         {
             MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
+			Statistics.bAdd = false;
+			MathContent.Paragraph.CollectDocumentStatistics(Statistics);
             MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
+			Statistics.bAdd = true;
+			MathContent.Paragraph.CollectDocumentStatistics(Statistics);
         }
     }
     else if (para_Run === LastClass.Type)
@@ -4582,6 +4596,11 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
             var PrevPos    = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
 
             PrevClass.Add_ToContent(PrevPos + 1, NewElement);
+			Statistics.bAdd = false;
+			if (PrevClass.GetType() === type_Paragraph)
+				PrevClass.CollectDocumentStatistics(Statistics);
+			else
+				PrevClass.Paragraph.CollectDocumentStatistics(Statistics);
 
             // TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас
             //       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
@@ -4621,6 +4640,12 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
             {
                 PrevClass.Correct_Content();
             }
+			Statistics.bAdd = true;
+			if (PrevClass.GetType() === type_Paragraph)
+				PrevClass.CollectDocumentStatistics(Statistics);
+			else
+				PrevClass.Paragraph.CollectDocumentStatistics(Statistics);
+			console.log(Statistics);
         }
 		else if (Asc.c_oSpecialPasteProps.overwriteCells === SelectedContent.InsertOptions.Table && 1 === ElementsCount && type_Table === FirstElement.Element.GetType() && this.Parent && this.Parent instanceof CTableCell)
 		{
@@ -4638,6 +4663,10 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
             // начале или конце параграфа, тогда делить не надо
             Para.Cursor_MoveToNearPos(NearPos);
             Para.RemoveSelection();
+
+			Statistics.bAdd = false;
+			Para.CollectDocumentStatistics(Statistics);
+			Statistics.Off();
 
             var bAddEmptyPara = false;
 
@@ -4745,6 +4774,14 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
             this.Selection.StartPos = DstIndex;
             this.Selection.EndPos   = LastPos;
 			this.CurPos.ContentPos  = LastPos;
+
+			Statistics.On();
+			Statistics.bAdd = true;
+			var End = DstIndex + ElementsCount + ((bConcatE) ? -1 : 0);
+			for (var i = DstIndex; i <= End; i++)
+				this.Content[i].CollectDocumentStatistics(Statistics);
+
+			console.log(Statistics);
         }
 
         if (true === bNeedSelect)
@@ -7422,17 +7459,32 @@ CDocumentContent.prototype.Internal_Content_Add = function(Position, NewObject, 
 		this.Internal_Content_Add(this.Content.length, new Paragraph(this.DrawingDocument, this, this.bPresentation === true));
 
 	this.private_ReindexContent(Position);
+
+	if (NewObject.CollectDocumentStatistics)
+	{
+		var Statistics = this.GetLogicDocument().Statistics;
+		Statistics.bAdd = true;
+		NewObject.CollectDocumentStatistics(Statistics);
+		// console.log(Statistics);
+	}
 };
 CDocumentContent.prototype.Internal_Content_Remove = function(Position, Count, isCorrectContent)
 {
+	console.log("CDocumentContent.prototype.Internal_Content_Remove");
 	if (Position < 0 || Position >= this.Content.length || Count <= 0)
 		return;
 
 	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
 	var NextObj = this.Content[Position + Count] ? this.Content[Position + Count] : null;
 
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
 	for (var Index = 0; Index < Count; Index++)
+	{
 		this.Content[Position + Index].PreDelete();
+		if (this.Content[Position + Index].CollectDocumentStatistics && !this.Content[Position + Index].IsTable())
+			this.Content[Position + Index].CollectDocumentStatistics(Statistics);
+	}
 
 	History.Add(new CChangesDocumentContentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
 	var Elements = this.Content.splice(Position, Count);
@@ -7471,9 +7523,15 @@ CDocumentContent.prototype.Refresh_ContentChanges = function()
 };
 CDocumentContent.prototype.Internal_Content_RemoveAll = function()
 {
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
 	var Count = this.Content.length;
 	for (var Index = 0; Index < Count; Index++)
+	{
 		this.Content[Index].PreDelete();
+		if (this.Content[Index].CollectDocumentStatistics && !this.Content[Index].IsTable())
+			this.Content[Index].CollectDocumentStatistics(Statistics);
+	}
 
 	History.Add(new CChangesDocumentRemoveItem(this, 0, this.Content.slice(0, this.Content.length)));
 	this.Content = [];
@@ -8664,9 +8722,21 @@ CDocumentContent.prototype.IsStartFromNewPage = function()
 };
 CDocumentContent.prototype.PreDelete = function()
 {
+	var Statistics = this.GetLogicDocument().Statistics;
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		this.Content[nIndex].PreDelete();
+		// Выключаем статистику (если это таблица), потому что при удалении shape внутри которого есть таблицы, эти таблицы вычитаются из статистики 2 раза
+		if (this.Content[nIndex].IsTable())
+		{
+			Statistics.Off();
+			this.Content[nIndex].PreDelete();
+			Statistics.On();
+		}
+		else
+		{
+			this.Content[nIndex].PreDelete();
+		}
+			
 	}
 
 	this.RemoveSelection();

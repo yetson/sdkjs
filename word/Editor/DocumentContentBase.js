@@ -1149,6 +1149,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					nStartPos = this.Selection.EndPos;
 				}
 
+				this.GetLogicDocument().Statistics.Off();
 				for (var nIndex = nEndPos; nIndex >= nStartPos; --nIndex)
 				{
 					var oElement = this.Content[nIndex];
@@ -1163,6 +1164,7 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				oSdt.Content.Selection.EndPos   = oSdt.Content.GetElementsCount() - 1;
 
 				this.Add_ToContent(nStartPos, oSdt);
+				this.GetLogicDocument().Statistics.On();
 				this.Selection.StartPos = nStartPos;
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
@@ -1178,7 +1180,9 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 				oSdt.SetDefaultTextPr(this.GetDirectTextPr());
 				oSdt.SetPlaceholder(c_oAscDefaultPlaceholderName.Text);
+				this.GetLogicDocument().Statistics.Off();
 				oSdt.ReplaceContentWithPlaceHolder(false);
+				this.GetLogicDocument().Statistics.On();
 
 				var nContentPos = this.CurPos.ContentPos;
 				if (oElement.IsCursorAtBegin())

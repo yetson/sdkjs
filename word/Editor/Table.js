@@ -3555,6 +3555,9 @@ CTable.prototype.StartTrackTable = function()
 };
 CTable.prototype.CollectDocumentStatistics = function(Stats)
 {
+	if (!Stats.GetWorkingState())
+		return;
+
 	if (Stats.isUseSelection)
 	{
 		var Cells = this.GetSelectionArray();
@@ -13875,12 +13878,18 @@ CTable.prototype.RemoveTableCells = function()
 		oDeletedFirstCellPos = {Row : 0, Cell : 0};
 
 	// Удалим все ячейки
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
 	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
 	{
 		var oRow = this.Content[nCurRow];
 		for (var nIndex = arrDeleteInfo[nCurRow].length - 1; nIndex >= 0; --nIndex)
 		{
 			var nCurCell = arrDeleteInfo[nCurRow][nIndex];
+			var oCell = oRow.GetCell(nCurCell);
+			if (oCell.Content && oCell.Content.CollectDocumentStatistics)
+				oCell.Content.CollectDocumentStatistics(Statistics);
+
 			oRow.RemoveCell(nCurCell);
 		}
 	}

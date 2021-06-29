@@ -1354,11 +1354,12 @@ function CStatistics(LogicDocument)
     this.LogicDocument  = LogicDocument;
     this.Api            = LogicDocument.Get_Api();
 	this.isUseSelection = false;
+	this.IsWorking      = true;
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
     this.PagesId  = null; // Id таймера для подсчета страниц
 
-    this.StartPos = 0;
+	this.bAdd = false;
 
     this.Pages           = 0;
     this.Words           = 0;
@@ -1383,15 +1384,40 @@ CStatistics.prototype =
 		this.Lines           = 0;
 
 
+		this.bAdd = true;
         var LogicDocument = this.LogicDocument;
-		var Selected = LogicDocument.GetSelectedContent();
-		this.isUseSelection = (LogicDocument.Selection.Use && Selected.Elements.length !== 0 && Selected.DrawingObjects.length === 0);
-        this.StartPos = (this.isUseSelection) ? Math.min(this.LogicDocument.Selection.StartPos, this.LogicDocument.Selection.EndPos) : 0;
         this.PagesId = setTimeout(function(){LogicDocument.Statistics_GetPagesInfo();}, 1);
-        this.Id      = null;//setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
-		LogicDocument.Statistics_GetParagraphsInfo();
+        this.Id      = setTimeout(function(){LogicDocument.Statistics_GetParagraphsInfo();}, 1);
         // this.Send();
     },
+
+	Refresh : function ()
+	{
+		this.Pages           = 0;
+        this.Words           = 0;
+        this.Paragraphs      = 0;
+        this.SymbolsWOSpaces = 0;
+        this.SymbolsWhSpaces = 0;
+		this.Lines           = 0;
+
+		var LogicDocument = this.LogicDocument;
+		var Selected = LogicDocument.GetSelectedContent();
+	},
+
+	Off : function ()
+	{
+		this.IsWorking = false;
+	},
+
+	On : function ()
+	{
+		this.IsWorking = true;
+	},
+
+	GetWorkingState : function ()
+	{
+		return this.IsWorking;
+	},
 
     Next_ParagraphsInfo : function(StartPos)
     {
@@ -1423,11 +1449,11 @@ CStatistics.prototype =
 
     Stop_ParagraphsInfo : function()
     {
-        // if (null != this.Id)
-        // {
-        //     clearTimeout(this.Id);
-        //     this.Id = null;
-        // }
+        if (null != this.Id)
+        {
+            clearTimeout(this.Id);
+            this.Id = null;
+        }
 
         this.Check_Stop();
     },
@@ -1458,20 +1484,40 @@ CStatistics.prototype =
 //-----------------------------------------------------------------------------------
 // Функции для пополнения статистики
 //-----------------------------------------------------------------------------------
-    Add_Paragraph : function (Count)
+    Update_Paragraph : function (Count)
     {
-        if ( "undefined" != typeof( Count ) )
-            this.Paragraphs += Count;
-        else
-            this.Paragraphs++;
+		if (this.bAdd)
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Paragraphs += Count;
+			else
+				this.Paragraphs++;
+		}
+		else
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Paragraphs -= Count;
+			else
+				this.Paragraphs--;
+		}
     },
 
-    Add_Word : function(Count)
+    Update_Word : function(Count)
     {
-        if ( "undefined" != typeof( Count ) )
-            this.Words += Count;
-        else
-            this.Words++;
+		if (this.bAdd)
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Words += Count;
+			else
+				this.Words++;
+		}
+		else
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Words -= Count;
+			else
+				this.Words--;
+		}
     },
 
     Update_Pages : function(PagesCount)
@@ -1479,18 +1525,37 @@ CStatistics.prototype =
         this.Pages = PagesCount;
     },
 
-    Add_Symbol : function(bSpace)
+    Update_Symbol : function(bSpace)
     {
-        this.SymbolsWhSpaces++;
-        if ( true != bSpace )
-            this.SymbolsWOSpaces++;
+		if (this.bAdd)
+		{
+			this.SymbolsWhSpaces++;
+			if ( true != bSpace )
+				this.SymbolsWOSpaces++;
+		}
+		else
+		{
+			this.SymbolsWhSpaces--;
+			if ( true != bSpace )
+				this.SymbolsWOSpaces--;
+		}
     },
-	Add_Line : function (Count)
+	Update_Line : function (Count)
 	{
-		if ( "undefined" != typeof( Count ) )
-            this.Lines += Count;
-        else
-            this.Lines++;
+		if (this.bAdd)
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Lines += Count;
+			else
+				this.Lines++;
+		}
+		else
+		{
+			if ( "undefined" != typeof( Count ) )
+				this.Lines -= Count;
+			else
+				this.Lines--;
+		}
 	}
 };
 
@@ -8891,9 +8956,11 @@ CDocument.prototype.GetSelectedContent = function(bUseHistory, oPr)
 			oSelectedContent.SetSaveNumberingValues(oPr.SaveNumberingValues);
 	}
 
+	this.Statistics.Off();
 	oSelectedContent.SetMoveTrack(isTrack, this.TrackMoveId);
 	this.Controller.GetSelectedContent(oSelectedContent);
 	oSelectedContent.On_EndCollectElements(this, false);
+	this.Statistics.On();
 
 	if (!bUseHistory)
 		History.TurnOn();
@@ -8962,6 +9029,7 @@ CDocument.prototype.Can_InsertContent = function(SelectedContent, NearPos)
 };
 CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 {
+	// TODO посмотреть вставку во все элементы, возможжно ндо перенести подсчет статистики от сюда в Paragraph.Internal_Content_Add и т.д.
 	var Para        = NearPos.Paragraph;
 	var ParaNearPos = Para.Get_ParaNearestPos(NearPos);
 	var LastClass   = ParaNearPos.Classes[ParaNearPos.Classes.length - 1];
@@ -8993,7 +9061,12 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
         if (null !== InsertMathContent)
 		{
 			MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
+			this.Statistics.bAdd = false;
+			MathContent.Paragraph.CollectDocumentStatistics(this.Statistics);
 			MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
+			this.Statistics.bAdd = true;
+			MathContent.Paragraph.CollectDocumentStatistics(this.Statistics);
+			console.log(this.Statistics);
 		}
 	}
 	else if (para_Run === LastClass.Type)
@@ -9076,6 +9149,8 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			if (LastClass instanceof ParaRun && LastClass.GetParent() instanceof CInlineLevelSdt && LastClass.GetParent().IsPlaceHolder())
 			{
 				var oInlineLeveLSdt = LastClass.GetParent();
+				this.Statistics.bAdd = false;
+				oInlineLeveLSdt.Parent.CollectDocumentStatistics(this.Statistics);
 				oInlineLeveLSdt.ReplacePlaceHolderWithContent();
 
 				LastClass = oInlineLeveLSdt.GetElement(0);
@@ -9092,6 +9167,11 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			var PrevPos    = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
 
 			PrevClass.Add_ToContent(PrevPos + 1, NewElement);
+			this.Statistics.bAdd = false;
+			if (PrevClass.GetType() === type_Paragraph)
+				PrevClass.CollectDocumentStatistics(this.Statistics);
+			else
+				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
 
 			// TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас
 			//       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
@@ -9131,6 +9211,12 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			{
 				PrevClass.Correct_Content();
 			}
+			this.Statistics.bAdd = true;
+			if (PrevClass.GetType() === type_Paragraph)
+				PrevClass.CollectDocumentStatistics(this.Statistics);
+			else
+				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
+			console.log(this.Statistics);
 		}
 		else
 		{
@@ -9144,6 +9230,10 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			// начале или конце параграфа, тогда делить не надо
 			Para.Cursor_MoveToNearPos(NearPos);
 			Para.RemoveSelection();
+
+			this.Statistics.bAdd = false;
+			Para.CollectDocumentStatistics(this.Statistics);
+			this.Statistics.Off();
 
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
@@ -9258,6 +9348,19 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			this.Selection.StartPos = DstIndex;
 			this.Selection.EndPos   = LastPos;
 			this.CurPos.ContentPos  = LastPos;
+			
+			this.Statistics.On();
+			this.Statistics.bAdd = true;
+			var End = DstIndex + ElementsCount + ((bConcatE) ? -1 : 0);
+			for (var i = DstIndex; i <= End; i++)
+			{
+				if (!this.Content[i])
+					break;
+
+				this.Content[i].CollectDocumentStatistics(this.Statistics);
+			}
+
+			console.log(this.Statistics);
 		}
         SelectedContent.CheckSignatures();
 		if (docpostype_DrawingObjects !== this.CurPos.Type)
@@ -11301,6 +11404,14 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, isCorre
 
 	if (type_Paragraph === NewObject.GetType())
 		this.DocumentOutline.CheckParagraph(NewObject);
+
+	// здесь должно сработать при вставки СС
+	if (NewObject.CollectDocumentStatistics)
+	{
+		this.Statistics.bAdd = true;
+		NewObject.CollectDocumentStatistics(this.Statistics);
+		console.log(this.Statistics);
+	}
 };
 CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrectContent)
 {
@@ -11312,9 +11423,12 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrec
 	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
 	var NextObj = this.Content[Position + Count] ? this.Content[Position + Count] : null;
 
+	this.Statistics.bAdd = false;
 	for (var Index = 0; Index < Count; Index++)
 	{
 		this.Content[Position + Index].PreDelete();
+		if (this.Content[Position + Index].CollectDocumentStatistics && ! this.Content[Position + Index].IsTable())
+			this.Content[Position + Index].CollectDocumentStatistics(this.Statistics);
 	}
 
 	this.History.Add(new CChangesDocumentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
@@ -11346,6 +11460,7 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrec
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
+	console.log(this.Statistics);
 
 	return ChangePos;
 };
@@ -12800,7 +12915,10 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 
 		if (null !== sText)
 		{
+			this.Statistics.bAdd = false;
 			var oHyperRun = new ParaRun(oHyperlink.GetParagraph());
+			var oParagraph = oHyperRun.GetParagraph();
+			oParagraph.CollectDocumentStatistics(this.Statistics);
 			oHyperRun.Set_Pr(oHyperlink.GetTextPr().Copy());
 			oHyperRun.Set_Color(undefined);
 			oHyperRun.Set_Underline(undefined);
@@ -12813,6 +12931,8 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 
 			this.RemoveSelection();
 			oHyperlink.MoveCursorOutsideElement(false);
+			this.Statistics.bAdd = true;
+			oParagraph.CollectDocumentStatistics(this.Statistics);
 		}
 	}
 	else if (oClass instanceof CFieldInstructionHYPERLINK)
@@ -14233,6 +14353,8 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY, isUpda
 
 	if (true === this.Selection.Use && true !== this.Selection.Start)
 		this.private_OnSelectionEnd();
+	else
+		this.OnSelectStatisticsChange();
 
 	this.private_CheckCursorInPlaceHolder();
 };
@@ -15921,7 +16043,21 @@ CDocument.prototype.GetColumnSize = function()
 };
 CDocument.prototype.private_OnSelectionEnd = function()
 {
+	// возможно здесь надо сделать через timeout (чтобы не было задержки для пользователя)
 	this.Api.sendEvent("asc_onSelectionEnd");
+	var SelectedStatistics = new CStatistics(this);
+	SelectedStatistics.bAdd = true;
+	SelectedStatistics.isUseSelection = true;
+
+	var Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+	var End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	for (var i = Start; i <= End; i++)
+		this.Content[i].CollectDocumentStatistics(SelectedStatistics);
+
+	var bounds = this.GetSelectionBounds();
+	SelectedStatistics.Update_Pages( ( (bounds.Direction === 1 ? bounds.End.Page - bounds.Start.Page : bounds.Start.Page - bounds.End.Page) + 1) );
+	// отправить статитстику в интерфейс
+	console.log(SelectedStatistics);
 };
 CDocument.prototype.AddPageCount = function()
 {
@@ -16055,6 +16191,7 @@ CDocument.prototype.private_SetCurrentSpecialForm = function(oForm)
  */
 CDocument.prototype.AddContentControlCheckBox = function(oPr)
 {
+	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16063,14 +16200,19 @@ CDocument.prototype.AddContentControlCheckBox = function(oPr)
 	var oTextPr = this.GetDirectTextPr();
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
+	{
+		this.Statistics.On();
 		return;
+	}
 
 	oCC.ApplyCheckBoxPr(oPr, oTextPr);
 	oCC.MoveCursorToStartPos();
 
 	this.UpdateSelection();
 	this.UpdateTracks();
-
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16079,14 +16221,21 @@ CDocument.prototype.AddContentControlCheckBox = function(oPr)
  */
 CDocument.prototype.AddContentControlPicture = function()
 {
+	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
+	{
+		this.Statistics.On();
 		return null;
+	}
 
 	oCC.SetPlaceholderText(AscCommon.translateManager.getValue("Click to load image"));
 	oCC.ApplyPicturePr(true);
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16095,6 +16244,7 @@ CDocument.prototype.AddContentControlPicture = function()
  */
 CDocument.prototype.AddContentControlComboBox = function(oPr)
 {
+	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16105,10 +16255,16 @@ CDocument.prototype.AddContentControlComboBox = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
+	{
+		this.Statistics.On();
 		return null;
+	}
 
 	oCC.ApplyComboBoxPr(oPr);
 	oCC.SelectContentControl();
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16117,6 +16273,7 @@ CDocument.prototype.AddContentControlComboBox = function(oPr)
  */
 CDocument.prototype.AddContentControlDropDownList = function(oPr)
 {
+	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16127,10 +16284,16 @@ CDocument.prototype.AddContentControlDropDownList = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
+	{
+		this.Statistics.On();
 		return null;
+	}
 
 	oCC.ApplyDropDownListPr(oPr);
 	oCC.SelectContentControl();
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16139,6 +16302,7 @@ CDocument.prototype.AddContentControlDropDownList = function(oPr)
  */
 CDocument.prototype.AddContentControlDatePicker = function(oPr)
 {
+	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16146,10 +16310,16 @@ CDocument.prototype.AddContentControlDatePicker = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
+	{
+		this.Statistics.On();
 		return null;
+	}
 
 	oCC.ApplyDatePickerPr(oPr);
 	oCC.SelectContentControl();
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16159,6 +16329,7 @@ CDocument.prototype.AddContentControlDatePicker = function(oPr)
  */
 CDocument.prototype.AddContentControlTextForm = function(oPr)
 {
+	this.Statistics.Off();
 	if (!oPr)
 		oPr = new CSdtTextFormPr();
 
@@ -16216,6 +16387,9 @@ CDocument.prototype.AddContentControlTextForm = function(oPr)
 	this.UpdateSelection();
 	this.UpdateTracks();
 
+	this.Statistics.On();
+	this.Statistics.bAdd = true;
+	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16360,16 +16534,12 @@ CDocument.prototype.Statistics_Start = function()
 };
 CDocument.prototype.Statistics_GetParagraphsInfo = function()
 {
-	var Count = (this.Statistics.isUseSelection) ? Math.max(this.Selection.StartPos, this.Selection.EndPos) : this.Content.length - 1;
-
 	var Index    = 0;
 	var CurIndex = 0;
-	for (Index = this.Statistics.StartPos; Index <= Count; ++Index, ++CurIndex)
+	for (Index = 0; Index <= (this.Content.length - 1); ++Index, ++CurIndex)
 	{
 		var Element = this.Content[Index];
-		Element.CollectDocumentStatistics(this.Statistics);
-		if ( (Index !== Count || !Element.IsEmpty()) && Element.Lines)
-			this.Statistics.Add_Line(Element.Lines.length);
+		Element.CollectDocumentStatistics(this.Statistics); // не уверен, что так будет лучше, true);
 
 		if (CurIndex > 20)
 		{
@@ -16380,7 +16550,7 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 		}
 	}
 
-	if (Index >= Count)
+	if (Index >= this.Content.length - 1)
 		this.Statistics.Stop_ParagraphsInfo();
 };
 CDocument.prototype.Statistics_GetPagesInfo = function()
@@ -16393,13 +16563,6 @@ CDocument.prototype.Statistics_GetPagesInfo = function()
 	{
 		var Start = 0,
 			End   = this.Pages.length - 1;
-		if (this.Statistics.isUseSelection)
-		{
-			// если есть селект, то считаем только заселекченные страницы
-			var bounds = this.GetSelectionBounds();
-			Start = Math.min(bounds.Start.Page, bounds.End.Page);
-			End   = Math.max(bounds.Start.Page, bounds.End.Page);
-		}
 		this.Statistics.Update_Pages(End - Start + 1);
 
 		for (var CurPage = Start; CurPage <= End; ++CurPage)
@@ -16415,6 +16578,36 @@ CDocument.prototype.Statistics_Stop = function()
 {
 	this.Statistics.Stop();
 };
+// событие изменения селекта если выделена таблица или не выделено ничего
+CDocument.prototype.OnSelectStatisticsChange = function()
+{
+	// подумать, чтобы пустые клики не отправлять
+	if (this.Selection.Use && !this.IsSelectionEmpty())
+	{
+		var SelectedStatistics = new CStatistics(this);
+		SelectedStatistics.bAdd = true;
+		SelectedStatistics.isUseSelection = true;
+
+		var Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		var End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+		for (var i = Start; i <= End; i++)
+			this.Content[i].CollectDocumentStatistics(SelectedStatistics);
+
+		// для подсчета количества страниц
+		var bounds = this.GetSelectionBounds();
+		SelectedStatistics.Update_Pages( ( (bounds.Direction === 1 ? bounds.End.Page - bounds.Start.Page : bounds.Start.Page - bounds.End.Page) + 1) );
+		
+		// отправить статитстику в интерфейс
+		console.log(SelectedStatistics);
+	}
+	else
+	{
+		console.log("Normal Statistics")
+		// TODO: отправить обычную статистику
+	}
+	
+};
+
 //----------------------------------------------------------------------------------------------------------------------
 // Функции для работы с MailMerge
 //----------------------------------------------------------------------------------------------------------------------
@@ -18249,7 +18442,11 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				}
 				else
 				{
+					this.Statistics.bAdd = false;
+					Item.CollectDocumentStatistics(this.Statistics);
 					Item.Split(NewParagraph);
+					this.Statistics.bAdd = true;
+					Item.CollectDocumentStatistics(this.Statistics);
 				}
 
 				NewParagraph.Correct_Content();
@@ -18638,7 +18835,8 @@ CDocument.prototype.controller_AddToParagraph = function(ParaItem, bRecalculate)
 					}
 					else if (!oInfo.IsMixedSelection())
 					{
-						ParaItem.SetText(this.GetSelectedText({MathAdd : true}));
+						// чтобы заселеченный текст не удалялся, а добавлялся в формулу
+						ParaItem.SetText(this.GetSelectedText(false, {MathAdd : true}));
 					}
 				}
 
@@ -21676,13 +21874,24 @@ CDocument.prototype.ClearContentControl = function(Id)
 
 	this.RemoveSelection();
 
-	if (oContentControl.GetContentControlType
-		&& (c_oAscSdtLevelType.Block === oContentControl.GetContentControlType()
-		|| c_oAscSdtLevelType.Inline === oContentControl.GetContentControlType()))
+	var oType = oContentControl.GetContentControlType ? oContentControl.GetContentControlType() : null;
+	if (c_oAscSdtLevelType.Block === oType || c_oAscSdtLevelType.Inline === oType)
 	{
+		// Для того, что бы при вызове из плагина InsertAndReplaceCC правильно работало со статистикой
+		var oElement = (c_oAscSdtLevelType.Block === oType) ? oContentControl : oContentControl.Paragraph;
+		if (oElement.CollectDocumentStatistics)
+		{
+			this.Statistics.bAdd = false;
+			oElement.CollectDocumentStatistics(this.Statistics);
+		}
 		oContentControl.ClearContentControl();
 		oContentControl.SetThisElementCurrent();
 		oContentControl.MoveCursorToStartPos();
+		if (oElement.CollectDocumentStatistics)
+		{
+			this.Statistics.bAdd = true;
+			oElement.CollectDocumentStatistics(this.Statistics);
+		}
 	}
 
 	return oContentControl;
@@ -24421,10 +24630,14 @@ CDocument.prototype.AddParaMath = function(nType)
 	if ((undefined === nType || c_oAscMathType.Default_Text === nType) && (!this.IsSelectionUse() || !this.IsTextSelectionUse()))
 	{
 		this.Remove(1, true, false, true);
+		this.Statistics.Off();
 		var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 		if (!oCC)
+		{
+			this.Statistics.On();
 			return;
-
+		}
+		this.Statistics.On();
 		oCC.ApplyContentControlEquationPr();
 		oCC.SelectContentControl();
 	}
@@ -24972,7 +25185,9 @@ CDocument.prototype.ConvertTextToTable = function(oProps)
 		{
 			IsReplace = true;
 		}
+		this.Statistics.Off();
 		this.private_ConvertTextToTable(oSelectedContent, oProps);
+		this.Statistics.On();
 		var oParagraph = this.GetCurrentParagraph();
 		var oParent = oParagraph.GetParent();
 		if (oSelectedContent && oParent)
@@ -25297,7 +25512,9 @@ CDocument.prototype.ConvertTableToText = function(oProps)
 			var nIndex     = oTable.GetIndex();
 			var oParagraph = new Paragraph(this.GetDrawingDocument());
 
+			this.Statistics.Off();
 			oParent.RemoveFromContent(nIndex, 1, true);
+			this.Statistics.On();
 			oParent.AddToContent(nIndex, oParagraph, true);
 
 			oParagraph.Document_SetThisElementCurrent(false);
@@ -25371,21 +25588,36 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 							{
 								isNewPar = true;
 							}
+							this.Statistics.bAdd = false;
+							oElement.CollectDocumentStatistics(this.Statistics);
+							this.Statistics.Off();
 							oNewParagraph.Concat(oElement, true);
+							this.Statistics.On();
 							break;
 						case type_Table:
 							var oNestedContent = (oProps.nested) ? this.private_ConvertTableToText(oElement, oProps) : [oElement];
+							if (!oProps.nested)
+							{
+								this.Statistics.bAdd = false;
+								oElement.CollectDocumentStatistics(this.Statistics);
+							}
 							if (j == 0 && ArrNewContent[ArrNewContent.length-1].IsEmpty() && bAdd)
 								ArrNewContent.pop();
 							
-							if (k)
+							if (k && oProps.nested)
+							{
+								this.Statistics.Off();
 								ArrNewContent[ArrNewContent.length - 1].Concat(oNestedContent.shift(), true);
+								this.Statistics.On();
+							}
 
 							ArrNewContent = ArrNewContent.concat(oNestedContent);
 							isNewPar = true;
 							break;
 						default:
 							ArrNewContent.push(oElement);
+							if (oElement.CollectDocumentStatistics)
+								oElement.CollectDocumentStatistics(this.Statistics);
 							isNewPar = true;
 							if (j == 0 && ArrNewContent[ArrNewContent.length-1].IsEmpty() && bAdd)
 								ArrNewContent.pop();
@@ -25426,6 +25658,7 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 			{
 				oTable.RemoveTableRow(i);
 			}
+			this.Statistics.bAdd = false;
 			if (!oSelectetRows.IsSelectionToEnd && oSelectetRows.Start) {
 				var oNewTable = oTable.Split(); 
 				ArrNewContent.push(oNewTable);
@@ -25439,6 +25672,7 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 			{
 				ArrNewContent.push(oTable);
 			}
+			oTable.CollectDocumentStatistics(this.Statistics);
 		}
 
 		for (var i = 0; i < ArrNewContent.length; i++)

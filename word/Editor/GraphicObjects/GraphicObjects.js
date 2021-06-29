@@ -3164,7 +3164,11 @@ CGraphicObjects.prototype =
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.PreDelete();
+                    var bWork = this.document.Statistics.GetWorkingState();
+                    this.document.Statistics.Off();
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
+                    if (bWork)
+                        this.document.Statistics.On();
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
                 this.resetSelection();

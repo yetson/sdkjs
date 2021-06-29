@@ -3812,7 +3812,18 @@ PasteProcessor.prototype =
 	//from WORD to WORD
 	_pasteBinaryFromWordToWord: function (base64FromWord, bIsOnlyFromBinary) {
 		var oThis = this;
-		var aContent = this.ReadFromBinary(base64FromWord);
+		var aContent;
+		// при чтении некоторых элементов они ошибочно попадают в статистику, поэтому просто выключим её на период чтения данных
+		if (oThis.oLogicDocument)
+		{
+			oThis.oLogicDocument.Statistics.Off();
+			aContent = this.ReadFromBinary(base64FromWord);
+			oThis.oLogicDocument.Statistics.On();
+		}
+		else
+		{
+			aContent = this.ReadFromBinary(base64FromWord);
+		}
 
 		if (null === aContent) {
 			return null;

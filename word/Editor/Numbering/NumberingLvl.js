@@ -779,14 +779,14 @@ CNumberingLvl.prototype.CollectDocumentStatistics = function(oStats)
 		}
 
 		if (true === bSymbol)
-			oStats.Add_Symbol(bSpace);
+			oStats.Update_Symbol(bSpace);
 
 		if (true === bNewWord)
-			oStats.Add_Word();
+			oStats.Update_Word();
 	}
 
 	if (Asc.c_oAscNumberingSuff.Tab === this.Suff || Asc.c_oAscNumberingSuff.Space === this.Suff)
-		oStats.Add_Symbol(true);
+		oStats.Update_Symbol(true);
 };
 /**
  * Все нумерованные значение переделываем на заданный уровень

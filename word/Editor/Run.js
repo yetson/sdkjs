@@ -2672,7 +2672,7 @@ ParaRun.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, n
 	}
 };
 
-ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
+ParaRun.prototype.CollectDocumentStatistics = function(ParaStats, IsUndoRedo)
 {
     var Start = 0,
 		End   = this.Content.length;
@@ -2719,12 +2719,18 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats)
 
 			ParaStats.Word = false;
 		}
+        else if (IsUndoRedo && para_Drawing === ItemType)
+        {
+            var Content = Item.GetAllDocContents();
+            for (var j = 0; j < Content.length; j++)
+                Content[j].CollectDocumentStatistics(ParaStats.Stats);
+        }
 
 		if (true === bSymbol)
-			ParaStats.Stats.Add_Symbol(bSpace);
+			ParaStats.Stats.Update_Symbol(bSpace);
 
 		if (true === bNewWord)
-			ParaStats.Stats.Add_Word();
+			ParaStats.Stats.Update_Word();
 	}
 };
 

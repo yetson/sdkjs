@@ -2947,10 +2947,16 @@ ParaDrawing.prototype.PreDelete = function()
 		//TODO: remove
 		return;
 	}
+	// добавил подсчет статистики здесь, так как в ran-ах он не учитывается.
+	var Statistics = this.LogicDocument ? this.LogicDocument.Statistics : null;
+	if (Statistics)
+		Statistics.bAdd = false;
 	var arrDocContents = this.GetAllDocContents();
 	for (var nIndex = 0, nCount = arrDocContents.length; nIndex < nCount; ++nIndex)
 	{
 		arrDocContents[nIndex].PreDelete();
+		if (Statistics)
+			arrDocContents[nIndex].CollectDocumentStatistics(Statistics);
 	}
 	var oGrObject = this.GraphicObj;
 	if(oGrObject && oGrObject.signatureLine)

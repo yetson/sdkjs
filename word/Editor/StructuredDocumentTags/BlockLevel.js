@@ -539,12 +539,25 @@ CBlockLevelSdt.prototype.AddInlineTable = function(nCols, nRows, nMode)
 };
 CBlockLevelSdt.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlySelection, bOnAddText, isWord)
 {
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
+	this.CollectDocumentStatistics(Statistics);
+	Statistics.Off();
 	if (this.IsPlaceHolder())
 	{
 		if (!bOnAddText)
+		{
+			Statistics.On();
+			Statistics.bAdd = true;
+			this.CollectDocumentStatistics(Statistics);
 			return false;
+		}
 
 		this.private_ReplacePlaceHolderWithContent();
+		Statistics.On();
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
 		return true;
 	}
 
@@ -556,9 +569,17 @@ CBlockLevelSdt.prototype.Remove = function(nCount, isRemoveWholeElement, bRemove
 		&& this.CanBeEdited())
 	{
 		this.private_ReplaceContentWithPlaceHolder();
+		Statistics.On();
+		Statistics.bAdd = true;
+		this.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
 		return true;
 	}
 
+	Statistics.On();
+	Statistics.bAdd = true;
+	this.CollectDocumentStatistics(Statistics);
+	console.log(Statistics);
 	return bResult;
 };
 CBlockLevelSdt.prototype.Is_Empty = function()
@@ -1321,6 +1342,7 @@ CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
 	if (this.Parent.Content[nElementPos] !== this)
 		return;
 
+	this.GetLogicDocument().Statistics.Off();
 	var nParentCurPos            = this.Parent.CurPos.ContentPos;
 	var nParentSelectionStartPos = this.Parent.Selection.StartPos;
 	var nParentSelectionEndPos   = this.Parent.Selection.EndPos;
@@ -1347,6 +1369,7 @@ CBlockLevelSdt.prototype.RemoveContentControlWrapper = function()
 		this.Parent.Selection.EndPos = nParentSelectionEndPos + nCount - 1;
 
 	this.Content.RemoveFromContent(0, this.Content.Content.length, false);
+	this.GetLogicDocument().Statistics.On();
 };
 CBlockLevelSdt.prototype.IsTableFirstRowOnNewPage = function()
 {
@@ -1548,6 +1571,10 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 	if (!oPr || this.IsBuiltInTableOfContents())
 		return;
 
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
+	this.CollectDocumentStatistics(Statistics);
+	Statistics.Off();
 	if (oPr && !(oPr instanceof CContentControlPr))
 	{
 		var oTemp = new CContentControlPr(c_oAscSdtLockType.Block);
@@ -1556,6 +1583,10 @@ CBlockLevelSdt.prototype.SetContentControlPr = function(oPr)
 	}
 
 	oPr.SetToContentControl(this);
+	Statistics.On();
+	Statistics.bAdd = true;
+	this.CollectDocumentStatistics(Statistics);
+	console.log(Statistics);
 };
 CBlockLevelSdt.prototype.GetContentControlPr = function()
 {

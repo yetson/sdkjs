@@ -2002,8 +2002,26 @@ CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = functio
 CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = function(ParaStats)
 {
 	var Count = this.Content.length;
-	for (var Index = 0; Index < Count; Index++)
-		this.Content[Index].CollectDocumentStatistics(ParaStats);
+	if (this.kind && (this.kind === MATH_NARY || this.kind === MATH_RADICAL))
+	{
+		var arr = [this.getBase()];
+		if (this.kind === MATH_NARY)
+		{
+			if (!this.Pr.subHide)
+			arr.push(this.LowerIterator)
+		
+			if (!this.Pr.supHide)
+				arr.push(this.UpperIterator)
+		}
+		else if (!this.Pr.degHide)
+			arr.push(this.getDegree());
+
+		for (var Index = 0; Index < arr.length; Index++)
+			arr[Index].CollectDocumentStatistics(ParaStats);
+	}
+	else
+		for (var Index = 0; Index < Count; Index++)
+			this.Content[Index].CollectDocumentStatistics(ParaStats);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Create_FontMap = function(Map)
 {

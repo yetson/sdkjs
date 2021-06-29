@@ -459,7 +459,9 @@ CInlineLevelSdt.prototype.Remove = function(nDirection, bOnAddText)
 		&& true === this.Paragraph.LogicDocument.IsFillingFormMode())
 		|| (this === this.Paragraph.LogicDocument.CheckInlineSdtOnDelete)))
 	{
+		this.GetLogicDocument().Statistics.Off();
 		this.private_ReplaceContentWithPlaceHolder();
+		this.GetLogicDocument().Statistics.On();
 		return true;
 	}
 
@@ -903,9 +905,16 @@ CInlineLevelSdt.prototype.private_FillPlaceholderContent = function()
 		if (this.IsContentControlEquation())
 		{
 			var oParaMath = new ParaMath();
+			oLogicDocument.Statistics.bAdd = false;
+			if (oParagraph)
+				oParagraph.CollectDocumentStatistics(oLogicDocument.Statistics);
+
 			oParaMath.Root.Load_FromMenu(c_oAscMathType.Default_Text, this.GetParagraph(), null, oFirstParagraph.GetText());
 			oParaMath.Root.Correct_Content(true);
 			this.AddToContent(0, oParaMath);
+			oLogicDocument.Statistics.bAdd = true;
+			if (oParagraph)
+				oParagraph.CollectDocumentStatistics(oLogicDocument.Statistics);
 		}
 		else
 		{
@@ -1159,6 +1168,11 @@ CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 	if (!oPr)
 		return;
 
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
+	Statistics.Off();
 	if (oPr && !(oPr instanceof CContentControlPr))
 	{
 		var oTemp = new CContentControlPr(c_oAscSdtLockType.Inline);
@@ -1167,6 +1181,11 @@ CInlineLevelSdt.prototype.SetContentControlPr = function(oPr)
 	}
 
 	oPr.SetToContentControl(this);
+	Statistics.On();
+	Statistics.bAdd = true;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
+	console.log(Statistics);
 };
 CInlineLevelSdt.prototype.GetContentControlPr = function()
 {
@@ -1611,6 +1630,10 @@ CInlineLevelSdt.prototype.ApplyDropDownListPr = function(oPr)
  */
 CInlineLevelSdt.prototype.SelectListItem = function(sValue)
 {
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
 	var oList = null;
 	if (this.IsComboBox())
 		oList = this.Pr.ComboBox;
@@ -1684,6 +1707,10 @@ CInlineLevelSdt.prototype.SelectListItem = function(sValue)
 				oRun.AddText(sText);
 		}
 	}
+	Statistics.bAdd = true;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
+	console.log(Statistics);
 };
 CInlineLevelSdt.prototype.private_UpdateListContent = function()
 {
@@ -1741,6 +1768,11 @@ CInlineLevelSdt.prototype.private_UpdateDatePickerContent = function()
 	if (!this.Pr.Date)
 		return;
 
+	var Statistics = this.GetLogicDocument().Statistics;
+	Statistics.bAdd = false;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
+
 	if (this.IsPlaceHolder())
 		this.ReplacePlaceHolderWithContent();
 
@@ -1797,6 +1829,11 @@ CInlineLevelSdt.prototype.private_UpdateDatePickerContent = function()
 
 	if (oRun)
 		oRun.AddText(sText);
+	
+	Statistics.bAdd = true;
+	if (this.GetParagraph())
+		this.GetParagraph().CollectDocumentStatistics(Statistics);
+	console.log(Statistics);
 };
 /**
  * Является ли данный контейнер специальной текстовой формой
