@@ -1400,7 +1400,6 @@ CStatistics.prototype =
 		this.Lines           = 0;
 
 		var LogicDocument = this.LogicDocument;
-		var Selected = LogicDocument.GetSelectedContent();
 	},
 
 	Off : function ()
@@ -1477,6 +1476,7 @@ CStatistics.prototype =
             SymbolsWSCount : this.SymbolsWhSpaces,
 			LineCount      : this.Lines
         };
+		console.log(Stats);
 
         this.Api.sync_DocInfoCallback(Stats);
     },
@@ -16047,6 +16047,11 @@ CDocument.prototype.private_OnSelectionEnd = function()
 	var SelectedStatistics = new CStatistics(this);
 	SelectedStatistics.bAdd = true;
 	var Selected = this.GetSelectedContent();
+	if (!Selected.Elements.length)
+	{
+		console.log("Normal Statistic");
+		return;
+	}
 	for (var i = 0; i < Selected.Elements.length; i++)
 		Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
 
@@ -16535,7 +16540,7 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 	for (Index = 0; Index <= (this.Content.length - 1); ++Index, ++CurIndex)
 	{
 		var Element = this.Content[Index];
-		Element.CollectDocumentStatistics(this.Statistics); // не уверен, что так будет лучше, true);
+		Element.CollectDocumentStatistics(this.Statistics, true); // не уверен, что так будет лучше, true);
 
 		if (CurIndex > 20)
 		{
@@ -16561,10 +16566,12 @@ CDocument.prototype.Statistics_GetPagesInfo = function()
 			End   = this.Pages.length - 1;
 		this.Statistics.Update_Pages(End - Start + 1);
 
-		for (var CurPage = Start; CurPage <= End; ++CurPage)
-		{
-			this.DrawingObjects.documentStatistics(CurPage, this.Statistics);
-		}
+		// возможно здесь ещё добавить подчет количества линий, но это придётся каждый раз тогда по всему документу проходиться
+ 
+		// for (var CurPage = Start; CurPage <= End; ++CurPage)
+		// {
+		// 	this.DrawingObjects.documentStatistics(CurPage, this.Statistics);
+		// }
 
 
 		this.Statistics.Stop_PagesInfo();
@@ -16577,6 +16584,7 @@ CDocument.prototype.Statistics_Stop = function()
 // событие изменения селекта если выделена таблица или не выделено ничего
 CDocument.prototype.OnSelectStatisticsChange = function()
 {
+	// возможно здесь надо сделать через timeout (чтобы не было задержки для пользователя)
 	// подумать, чтобы пустые клики не отправлять
 	if (this.Selection.Use && !this.IsSelectionEmpty())
 	{

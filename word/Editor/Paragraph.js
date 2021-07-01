@@ -11088,7 +11088,7 @@ Paragraph.prototype.Get_CurrentPage_Relative = function()
 	this.Internal_Recalculate_CurPos(this.CurPos.ContentPos, true, false, false);
 	return this.private_GetRelativePageIndex(this.CurPos.PagesPos);
 };
-Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsUndoRedo)
+Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsCalcPD)
 {
 	if (!Stats.GetWorkingState())
 		return;
@@ -11100,11 +11100,11 @@ Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsUndoRedo)
 	for (var Index = Start; Index <= End; Index++)
 	{
 		var Item = this.Content[Index];
-		Item.CollectDocumentStatistics(ParaStats, IsUndoRedo);
+		Item.CollectDocumentStatistics(ParaStats, IsCalcPD);
 	}
 
 	// линии надо считать, даже если параграф пустой
-	if ( (!this.IsEmpty() || Stats.EndPos !== this.Index) && !this.Parent.IsInTable() )
+	if (!this.IsEmpty() || (Stats.LogicDocument.Content.length - 1) !== this.Index)
 		Stats.Update_Line(this.Lines.length);
 
 	if (false === ParaStats.EmptyParagraph)

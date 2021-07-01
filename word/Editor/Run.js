@@ -2672,7 +2672,7 @@ ParaRun.prototype.GetPrevRunElements = function(oRunElements, isUseContentPos, n
 	}
 };
 
-ParaRun.prototype.CollectDocumentStatistics = function(ParaStats, IsUndoRedo)
+ParaRun.prototype.CollectDocumentStatistics = function(ParaStats, IsCalcPD)
 {
     var Start = 0,
 		End   = this.Content.length;
@@ -2715,7 +2715,7 @@ ParaRun.prototype.CollectDocumentStatistics = function(ParaStats, IsUndoRedo)
 
 			ParaStats.Word = false;
 		}
-        else if (IsUndoRedo && para_Drawing === ItemType)
+        else if (IsCalcPD && para_Drawing === ItemType)
         {
             var Content = Item.GetAllDocContents();
             for (var j = 0; j < Content.length; j++)
