@@ -14352,9 +14352,8 @@ CDocument.prototype.private_UpdateCursorXY = function(bUpdateX, bUpdateY, isUpda
 
 	if (true === this.Selection.Use && true !== this.Selection.Start)
 		this.private_OnSelectionEnd();
-	else
-		this.OnSelectStatisticsChange();
 
+	this.OnSelectStatisticsChange();
 	this.private_CheckCursorInPlaceHolder();
 };
 CDocument.prototype.private_MoveCursorDown = function(StartX, StartY, AddToSelect)
@@ -16042,23 +16041,7 @@ CDocument.prototype.GetColumnSize = function()
 };
 CDocument.prototype.private_OnSelectionEnd = function()
 {
-	// возможно здесь надо сделать через timeout (чтобы не было задержки для пользователя)
 	this.Api.sendEvent("asc_onSelectionEnd");
-	var SelectedStatistics = new CStatistics(this);
-	SelectedStatistics.bAdd = true;
-	var Selected = this.GetSelectedContent();
-	if (!Selected.Elements.length)
-	{
-		console.log("Normal Statistic");
-		return;
-	}
-	for (var i = 0; i < Selected.Elements.length; i++)
-		Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
-
-	var bounds = this.GetSelectionBounds();
-	SelectedStatistics.Update_Pages(bounds.End.Page - bounds.Start.Page + 1);
-	// отправить статитстику в интерфейс
-	console.log(SelectedStatistics);
 };
 CDocument.prototype.AddPageCount = function()
 {
@@ -16585,28 +16568,20 @@ CDocument.prototype.Statistics_Stop = function()
 CDocument.prototype.OnSelectStatisticsChange = function()
 {
 	// возможно здесь надо сделать через timeout (чтобы не было задержки для пользователя)
-	// подумать, чтобы пустые клики не отправлять
-	if (this.Selection.Use && !this.IsSelectionEmpty())
+	var Selected = this.GetSelectedContent();
+	if (this.Selection.Use && !this.Selection.Start && Selected.Elements.length && !this.IsSelectionEmpty())
 	{
 		var SelectedStatistics = new CStatistics(this);
 		SelectedStatistics.bAdd = true;
-		var Selected = this.GetSelectedContent();
 		for (var i = 0; i < Selected.Elements.length; i++)
 			Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
 
 		// для подсчета количества страниц
 		var bounds = this.GetSelectionBounds();
 		SelectedStatistics.Update_Pages(bounds.End.Page - bounds.Start.Page + 1);
-
 		// отправить статитстику в интерфейс
 		console.log(SelectedStatistics);
-	}
-	else
-	{
-		console.log("Normal Statistics")
-		// TODO: отправить обычную статистику
-	}
-	
+	}	
 };
 
 //----------------------------------------------------------------------------------------------------------------------
