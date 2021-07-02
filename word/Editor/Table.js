@@ -3555,17 +3555,26 @@ CTable.prototype.StartTrackTable = function()
 };
 CTable.prototype.CollectDocumentStatistics = function(Stats)
 {
-	if (!Stats.GetWorkingState())
+	if (!Stats.GetWorkingState() || !this.Is_UseInDocument())
 		return;
 
-	for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
+	if (Stats.isUseSelection)
 	{
-		var Row        = this.Content[CurRow];
-		var CellsCount = Row.Get_CellsCount();
-
-		for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+		var Cells = this.GetSelectionArray();
+		for (var Index = 0; Index < Cells.length; Index++)
 		{
-			Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
+			var Row = this.Content[Cells[Index].Row];
+			Row.GetCell(Cells[Index].Cell).Content.CollectDocumentStatistics(Stats);
+		}
+	}
+	else
+	{
+		for (var CurRow = 0; CurRow < this.Content.length; CurRow++)
+		{
+			var Row        = this.Content[CurRow];
+			var CellsCount = Row.Get_CellsCount();
+			for (var CurCell = 0; CurCell < CellsCount; CurCell++)
+				Row.Get_Cell(CurCell).Content.CollectDocumentStatistics(Stats);
 		}
 	}
 };

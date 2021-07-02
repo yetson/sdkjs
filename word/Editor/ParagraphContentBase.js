@@ -2001,7 +2001,6 @@ CParagraphContentWithParagraphLikeContent.prototype.GetPrevRunElements = functio
 };
 CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = function(ParaStats)
 {
-	var Count = this.Content.length;
 	if (this.kind && (this.kind === MATH_NARY || this.kind === MATH_RADICAL))
 	{
 		var arr = [this.getBase()];
@@ -2020,7 +2019,16 @@ CParagraphContentWithParagraphLikeContent.prototype.CollectDocumentStatistics = 
 			arr[Index].CollectDocumentStatistics(ParaStats);
 	}
 	else
-		for (var Index = 0; Index < Count; Index++)
+	{
+		var Start = 0,
+			End   = this.Content.length;
+		if (ParaStats.Stats.isUseSelection)
+		{
+			Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+			End   = Math.max(this.Selection.StartPos, this.Selection.EndPos) + 1;
+		}
+	}
+		for (var Index = Start; Index < End; Index++)
 			this.Content[Index].CollectDocumentStatistics(ParaStats);
 };
 CParagraphContentWithParagraphLikeContent.prototype.Create_FontMap = function(Map)

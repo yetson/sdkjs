@@ -1354,11 +1354,12 @@ function CStatistics(LogicDocument)
     this.LogicDocument  = LogicDocument;
     this.Api            = LogicDocument.Get_Api();
 	this.IsWorking      = true;
+	this.isUseSelection = false; // для статистики по селекту
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
     this.PagesId  = null; // Id таймера для подсчета страниц
 
-	this.bAdd = false;
+	this.bAdd = false; // флаг, указывающий добавляем или вычитаем из статистики объекты
 
     this.Pages           = 0;
     this.Words           = 0;
@@ -16568,17 +16569,22 @@ CDocument.prototype.Statistics_Stop = function()
 CDocument.prototype.OnSelectStatisticsChange = function()
 {
 	// возможно здесь надо сделать через timeout (чтобы не было задержки для пользователя)
-	var Selected = this.GetSelectedContent();
-	if (this.Selection.Use && !this.Selection.Start && Selected.Elements.length && !this.IsSelectionEmpty())
+	if (this.Selection.Use && !this.Selection.Start && !this.IsSelectionEmpty())
 	{
 		var SelectedStatistics = new CStatistics(this);
 		SelectedStatistics.bAdd = true;
-		for (var i = 0; i < Selected.Elements.length; i++)
-			Selected.Elements[i].Element.CollectDocumentStatistics(SelectedStatistics);
+		SelectedStatistics.isUseSelection = true;
+		var Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		var End   = Math.max(this.Selection.StartPos, this.Selection.EndPos)
+		for (var i = Start; i <= End; i++)
+			this.Content[i].CollectDocumentStatistics(SelectedStatistics);
 
 		// для подсчета количества страниц
 		var bounds = this.GetSelectionBounds();
 		SelectedStatistics.Update_Pages(bounds.End.Page - bounds.Start.Page + 1);
+		// для подсчета символах в графических объектах
+		for (var i = bounds.Start.Page; i <= bounds.End.Page; i++)
+			this.DrawingObjects.documentStatistics(i, SelectedStatistics);
 		// отправить статитстику в интерфейс
 		console.log(SelectedStatistics);
 	}	

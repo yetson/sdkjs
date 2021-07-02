@@ -2036,11 +2036,16 @@ CDocumentContent.prototype.Get_CurrentPage_Relative = function()
 };
 CDocumentContent.prototype.CollectDocumentStatistics = function(Stats)
 {
-	if (!Stats.GetWorkingState())
+	if (!Stats.GetWorkingState() || !this.Is_UseInDocument())
 		return;
 
 	var Start = 0,
 	    End   = this.Content.length - 1;
+	if (Stats.isUseSelection)
+	{
+		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	}
 
 	for (var Index = Start; Index <= End; Index++)
 	{

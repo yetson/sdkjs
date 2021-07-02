@@ -11090,17 +11090,33 @@ Paragraph.prototype.Get_CurrentPage_Relative = function()
 };
 Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsCalcPD)
 {
-	if (!Stats.GetWorkingState())
+	// добавить проверку на то в документе ли этот параграф
+	if (!Stats.GetWorkingState() || !this.Is_UseInDocument())
 		return;
 		
 	var ParaStats = new CParagraphStatistics(Stats);
 	var Start = 0,
 		End   = this.Content.length - 1;
+	if (Stats.isUseSelection)
+	{
+		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
+	}
 
 	for (var Index = Start; Index <= End; Index++)
 	{
 		var Item = this.Content[Index];
-		Item.CollectDocumentStatistics(ParaStats, IsCalcPD);
+		if (Item.GetType() === para_Math && Stats.isUseSelection)
+		{
+			Item = Item.CopyContent(true)[0];
+			Stats.isUseSelection = false;
+			Item.CollectDocumentStatistics(ParaStats);
+			Stats.isUseSelection = true;
+		}
+		else
+		{
+			Item.CollectDocumentStatistics(ParaStats, IsCalcPD);
+		}
 	}
 
 	// линии надо считать, даже если параграф пустой
