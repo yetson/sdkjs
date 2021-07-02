@@ -2563,8 +2563,11 @@ function CDocument(DrawingDocument, isMainLogicDocument)
 		isFastCollaboration : false
 	};
 
-	this.SpecialForms = {}; // Список специальных форм в документе
-	this.CurrentForm  = null;
+	this.SpecialForms            = {}; // Список специальных форм в документе
+	this.CurrentForm             = null;
+	this.HighlightRequiredFields = true;  // Выделяем ли обязательные поля
+	this.RequiredFieldsBorder    = new CDocumentBorder();
+	this.RequiredFieldsBorder.SetSimpleColor(255, 0, 0);
 
 	this.LastBulletList   = undefined; // Последний примененный маркированный список
 	this.LastNumberedList = undefined; // Последний примененный нумерованный список
@@ -24799,6 +24802,30 @@ CDocument.prototype.ConvertFormAnchorType = function(sId, isToAnchor)
 	}
 
 	return false;
+};
+/**
+ * Подсвечиваем ли обязательные поля
+ * @returns {boolean}
+ */
+CDocument.prototype.IsHighlightRequiredFields = function()
+{
+	return this.HighlightRequiredFields;
+};
+/**
+ * Выставляем нужно ли подсвечивать обязательные поля
+ * @param {boolean} isHighlight
+ */
+CDocument.prototype.SetHighlightRequiredFields = function(isHighlight)
+{
+	this.HighlightRequiredFields = isHighlight;
+};
+/**
+ * Получаем границу подсветки для обязательных полей
+ * @returns {CDocumentBorder}
+ */
+CDocument.prototype.GetRequiredFieldsBorder = function()
+{
+	return this.RequiredFieldsBorder;
 };
 /**
  *  Функция, которая используется для отрисовки символа конца секции
