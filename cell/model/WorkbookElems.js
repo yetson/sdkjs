@@ -4681,6 +4681,8 @@ StyleManager.prototype =
 		this.outlineLevel = 0;
 		this.flags = g_nRowFlag_init;
 		this._hasChanged = false;
+
+		this._tempCell = new AscCommonExcel.Cell(worksheet);
 	}
 	Row.prototype.clear = function () {
 		this.index = null;
@@ -5154,6 +5156,26 @@ StyleManager.prototype =
 		stream.WriteByte(0);
 		stream.WriteULong(0);
 		stream.XlsbEndRecord();
+	};
+	Row.prototype.onStartNode = function(elem, attr, uq, tagend, getStrNode) {
+		var attrVals;
+		if ('c' === elem) {
+			this._tempCell.clear();
+			if (this._tempCell.readAttributes) {
+				this._tempCell.readAttributes(attr, uq);
+			}
+			return this._tempCell;
+		}
+		return this;
+	};
+	Row.prototype.onEndNode = function(prevContext, elem) {
+		var res = true;
+		if ('c' === elem) {
+			this._tempCell.saveContent();
+		} else {
+			res = false;
+		}
+		return res;
 	};
 
 	function getStringFromMultiText(multiText) {
