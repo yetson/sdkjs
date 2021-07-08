@@ -236,7 +236,6 @@ CHistory.prototype =
         this.Document.RemoveSelection(true);
 
         var Point = null;
-        var Statistics = this.Document.Statistics;
         if (undefined !== Options && null !== Options && true === Options.All)
         {
             while (this.Index >= 0)
@@ -267,123 +266,11 @@ CHistory.prototype =
                 var Item = Point.Items[Index];
 				if (Item.Data)
 				{
-                    var IsAddStat = (Item.Data.hasOwnProperty("Add") && Item.Data.Items.length) || (Item.Data.Type === AscDFH.historyitem_Paragraph_Numbering);
-                    if (IsAddStat && Statistics)
-                    {
-                        if ( Item.Data.Add && ( Item.Class === this.Document || ( Item.Class instanceof CDocumentContent && Item.Class.Is_UseInDocument() ) ) )
-                        {
-                            Statistics.bAdd = false;
-                            for (var k = 0; k < Item.Data.Items.length; k++)
-                            {
-                                if (Item.Data.Items[k].CollectDocumentStatistics)
-                                    Item.Data.Items[k].CollectDocumentStatistics(Statistics, true);
-                            }
-                        }
-                        else if (Item.Class.GetType)
-                        {
-                            Statistics.bAdd = false;
-                            switch (Item.Class.GetType()) {
-                                case type_Paragraph:
-                                    Item.Class.CollectDocumentStatistics(Statistics, true);
-                                    break;
-                                case type_Table:
-                                    if (Item.Class.IsUseInDocument())
-                                    {
-                                        var Row = Item.Data.Items[0];
-                                        var CellsCount = Row.Get_CellsCount();
-                                        Statistics.bAdd = !Item.Data.Add;
-                                        for (var CurCell = 0; CurCell < CellsCount; CurCell++)
-                                        {
-                                            var Cell = Row.Get_Cell(CurCell);
-                                            var CellContent = Cell.Content.Content;
-                                            var ContentCount = CellContent.length;
-                                            for (var Pos = 0; Pos < ContentCount; Pos++)
-                                                if (CellContent[Pos].CollectDocumentStatistics)
-                                                    CellContent[Pos].CollectDocumentStatistics(Statistics);
-                                        }
-                                    }
-                                    break;
-                                case para_Run:
-                                case para_Math_Run:
-                                case para_Math_Content:
-                                case para_InlineLevelSdt:
-                                    Item.Class.Paragraph.CollectDocumentStatistics(Statistics, true);
-                                    break;
-                            }
-                        }
-                        else if (Item.Class.Get_Cell)
-                        {
-                            Statistics.bAdd = !Item.Data.Add;
-                            var Cell = Item.Data.Items[0];
-                            var CellContent = Cell.Content.Content;
-                            var ContentCount = CellContent.length;
-                            for (var Pos = 0; Pos < ContentCount; Pos++)
-                                if (CellContent[Pos].CollectDocumentStatistics)
-                                    CellContent[Pos].CollectDocumentStatistics(Statistics);
-                        }
-                        
-                    }
 					Item.Data.Undo();
-                    if (IsAddStat && Statistics)
-                    {
-                        if ( !Item.Data.Add && ( Item.Class === this.Document || ( Item.Class instanceof CDocumentContent && Item.Class.Is_UseInDocument() ) ) )
-                        {
-                            Statistics.bAdd = true;
-                            for (var k = 0; k < Item.Data.Items.length; k++)
-                            {
-                                if (Item.Data.Items[k].CollectDocumentStatistics)
-                                    Item.Data.Items[k].CollectDocumentStatistics(Statistics, true);
-                            }
-                        }
-                        else if (Item.Class.GetType)
-                        {
-                            Statistics.bAdd = true;
-                            switch (Item.Class.GetType()) {
-                                case type_Paragraph:
-                                    Item.Class.CollectDocumentStatistics(Statistics, true);
-                                    break;
-                                case type_Table:
-                                    if (Item.Class.IsUseInDocument())
-                                    {
-                                        var Row = Item.Data.Items[0];
-                                        var CellsCount = Row.Get_CellsCount();
-                                        Statistics.bAdd = !Item.Data.Add;
-                                        for (var CurCell = 0; CurCell < CellsCount; CurCell++)
-                                        {
-                                            var Cell = Row.Get_Cell(CurCell);
-                                            var CellContent = Cell.Content.Content;
-                                            var ContentCount = CellContent.length;
-                                            for (var Pos = 0; Pos < ContentCount; Pos++)
-                                                if (CellContent[Pos].CollectDocumentStatistics)
-                                                    CellContent[Pos].CollectDocumentStatistics(Statistics);
-                                        }
-                                    }
-                                    break;
-                                case para_Run:
-                                case para_Math_Run:
-                                case para_Math_Content:
-                                case para_InlineLevelSdt:
-                                    Item.Class.Paragraph.CollectDocumentStatistics(Statistics, true);
-                                    break;
-                            }
-                        }
-                        else if (Item.Class.Get_Cell)
-                        {
-                            Statistics.bAdd = !Item.Data.Add;
-                            var Cell = Item.Data.Items[0];
-                            var CellContent = Cell.Content.Content;
-                            var ContentCount = CellContent.length;
-                            for (var Pos = 0; Pos < ContentCount; Pos++)
-                                if (CellContent[Pos].CollectDocumentStatistics)
-                                    CellContent[Pos].CollectDocumentStatistics(Statistics);
-                        }
-                        
-                    }
 					arrChanges.push(Item.Data);
 				}
 				this.private_UpdateContentChangesOnUndo(Item);
             }
-            console.log(Statistics);
         }
 
         if (null != Point)
@@ -408,7 +295,6 @@ CHistory.prototype =
         this.Document.RemoveSelection(true);
         
         var Point = this.Points[++this.Index];
-        var Statistics = this.Document.Statistics;
 
         // Выполняем все действия в прямом порядке
         for ( var Index = 0; Index < Point.Items.length; Index++ )
@@ -417,107 +303,11 @@ CHistory.prototype =
 
 			if (Item.Data)
 			{
-                var IsAddStat = (Item.Data.hasOwnProperty("Add") && Item.Data.Items.length) || (Item.Data.Type === AscDFH.historyitem_Paragraph_Numbering);
-                if (IsAddStat && Statistics)
-                {
-                    var flag = false;
-                    if (Item.Class instanceof CDocumentContent)
-                    {
-                        if ( (Item.Class.Parent.isShape && Item.Class.Parent.isShape()) || (Item.Class.IsTableCellContent() && Item.Class.Is_UseInDocument()) )
-                            flag = true;
-                        else if (Item.Class.Parent.IsUseInDocument && Item.Class.Parent.Is_UseInDocument(Item.Class.Id))
-                            flag = true
-                    }
-                    if (Item.Class === this.Document || flag)
-                    {
-                        Statistics.bAdd = Item.Data.Add;
-                        for (var k = 0; k < Item.Data.Items.length; k++)
-                        {
-                            if (Item.Data.Items[k].CollectDocumentStatistics)
-                                Item.Data.Items[k].CollectDocumentStatistics(Statistics, true);
-                        }
-                    }
-                    else if (Item.Class.GetType)
-                    {
-                        Statistics.bAdd = false;
-                        switch (Item.Class.GetType()) {
-                            case type_Paragraph:
-                                var El = Item.Class;
-                                if (!El.IsEmpty() && El.Is_UseInDocument())
-                                    El.CollectDocumentStatistics(Statistics, true);
-                                break;
-                            case type_Table:
-                                if (Item.Class.Is_UseInDocument())
-                                {
-                                    var Row = Item.Data.Items[0];
-                                    var CellsCount = Row.Get_CellsCount();
-                                    Statistics.bAdd = Item.Data.Add;
-                                    for (var CurCell = 0; CurCell < CellsCount; CurCell++)
-                                    {
-                                        var Cell = Row.Get_Cell(CurCell);
-                                        var CellContent = Cell.Content.Content;
-                                        var ContentCount = CellContent.length;
-                                        for (var Pos = 0; Pos < ContentCount; Pos++)
-                                            if (CellContent[Pos].CollectDocumentStatistics)
-                                                CellContent[Pos].CollectDocumentStatistics(Statistics);
-                                    }
-                                }
-                                break;
-                            case para_Run:
-                            case para_Math_Run:
-                            case para_Math_Content:
-                            case para_InlineLevelSdt:
-                                var Par = Item.Class.Paragraph;
-                                if (Par.Is_UseInDocument())
-                                    Par.CollectDocumentStatistics(Statistics, true);
-                                break;
-                        }
-                    }
-                    else if (Item.Class.Get_Cell)
-                    {
-                        Statistics.bAdd = Item.Data.Add;
-                        var Cell = Item.Data.Items[0];
-                        var CellContent = Cell.Content.Content;
-                        var ContentCount = CellContent.length;
-                        for (var Pos = 0; Pos < ContentCount; Pos++)
-                            if (CellContent[Pos].CollectDocumentStatistics)
-                                CellContent[Pos].CollectDocumentStatistics(Statistics);
-                    }
-                    
-                }
 				Item.Data.Redo();
-                if (IsAddStat && Statistics)
-                {
-                    if (Item.Class === this.Document)
-                    {
-                        // здесь ничего делать не надо
-                    }
-                    else if (Item.Class.GetType)
-                    {
-                        Statistics.bAdd = true;
-                        switch (Item.Class.GetType()) {
-                            case type_Paragraph:
-                                var El = Item.Class;
-                                if (!El.IsEmpty() && El.Is_UseInDocument())
-                                    El.CollectDocumentStatistics(Statistics, true);
-                                break;
-                            case para_Run:
-                            case para_Math_Run:
-                            case para_Math_Content:
-                            case para_InlineLevelSdt:
-                                var Par = Item.Class.Paragraph;
-                                if (Par.Is_UseInDocument())
-                                    Par.CollectDocumentStatistics(Statistics, true);
-                                break;
-                        }
-                    }
-                    
-                }
 				arrChanges.push(Item.Data);
 			}
 			this.private_UpdateContentChangesOnRedo(Item);
         }
-        console.log(Statistics);
 
         // Восстанавливаем состояние на следующую точку
         var State = null;

@@ -1354,7 +1354,6 @@ function CStatistics(LogicDocument)
     this.LogicDocument  = LogicDocument;
     this.Api            = LogicDocument.Get_Api();
 	this.IsWorking      = true;
-	this.CurElementId   = null;  // Id текущего элемента, который если встречается ещё раз, то обрабаотывать не нужно
 	this.isUseSelection = false; // для статистики по селекту
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
@@ -1487,38 +1486,18 @@ CStatistics.prototype =
 //-----------------------------------------------------------------------------------
     Update_Paragraph : function (Count)
     {
-		if (this.bAdd)
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Paragraphs += Count;
-			else
-				this.Paragraphs++;
-		}
-		else
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Paragraphs -= Count;
-			else
-				this.Paragraphs--;
-		}
+		if ("undefined" === typeof( Count ) )
+			Count = 1;
+		
+		this.Paragraphs += (this.bAdd ? Count : -Count);
     },
 
     Update_Word : function(Count)
     {
-		if (this.bAdd)
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Words += Count;
-			else
-				this.Words++;
-		}
-		else
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Words -= Count;
-			else
-				this.Words--;
-		}
+		if ("undefined" === typeof( Count ) )
+			Count = 1;
+		
+		this.Words += (this.bAdd ? Count : -Count);
     },
 
     Update_Pages : function(PagesCount)
@@ -1528,35 +1507,16 @@ CStatistics.prototype =
 
     Update_Symbol : function(bSpace)
     {
-		if (this.bAdd)
-		{
-			this.SymbolsWhSpaces++;
-			if ( true != bSpace )
-				this.SymbolsWOSpaces++;
-		}
-		else
-		{
-			this.SymbolsWhSpaces--;
-			if ( true != bSpace )
-				this.SymbolsWOSpaces--;
-		}
+		this.SymbolsWhSpaces += this.bAdd ? 1 : -1;
+		this.SymbolsWOSpaces += !bSpace ? this.bAdd ? 1 : -1 : 0;
     },
+
 	Update_Line : function (Count)
 	{
-		if (this.bAdd)
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Lines += Count;
-			else
-				this.Lines++;
-		}
-		else
-		{
-			if ( "undefined" != typeof( Count ) )
-				this.Lines -= Count;
-			else
-				this.Lines--;
-		}
+		if ("undefined" === typeof( Count ) )
+			Count = 1;
+
+		this.Lines += this.bAdd ? Count : -Count;
 	}
 };
 
@@ -9060,12 +9020,7 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
         if (null !== InsertMathContent)
 		{
 			MathContent.Add_ToContent(MathContentPos + 1, NewMathRun);
-			this.Statistics.bAdd = false;
-			MathContent.Paragraph.CollectDocumentStatistics(this.Statistics);
 			MathContent.Insert_MathContent(InsertMathContent.Root, MathContentPos + 1, true);
-			this.Statistics.bAdd = true;
-			MathContent.Paragraph.CollectDocumentStatistics(this.Statistics);
-			console.log(this.Statistics);
 		}
 	}
 	else if (para_Run === LastClass.Type)
@@ -9148,8 +9103,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			if (LastClass instanceof ParaRun && LastClass.GetParent() instanceof CInlineLevelSdt && LastClass.GetParent().IsPlaceHolder())
 			{
 				var oInlineLeveLSdt = LastClass.GetParent();
-				this.Statistics.bAdd = false;
-				oInlineLeveLSdt.Parent.CollectDocumentStatistics(this.Statistics);
 				oInlineLeveLSdt.ReplacePlaceHolderWithContent();
 
 				LastClass = oInlineLeveLSdt.GetElement(0);
@@ -9166,11 +9119,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			var PrevPos    = ParaNearPos.NearPos.ContentPos.Data[ParaNearPos.Classes.length - 2];
 
 			PrevClass.Add_ToContent(PrevPos + 1, NewElement);
-			this.Statistics.bAdd = false;
-			if (PrevClass.GetType() === type_Paragraph)
-				PrevClass.CollectDocumentStatistics(this.Statistics);
-			else if (PrevClass.GetType() !== para_InlineLevelSdt)
-				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
 
 			// TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас
 			//       в текста была выделена автофигура выделение шло для автофигур, тогда здесь можно будет убрать.
@@ -9210,12 +9158,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			{
 				PrevClass.Correct_Content();
 			}
-			this.Statistics.bAdd = true;
-			if (PrevClass.GetType() === type_Paragraph)
-				PrevClass.CollectDocumentStatistics(this.Statistics);
-			else if (PrevClass.GetType() !== para_InlineLevelSdt)
-				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
-			console.log(this.Statistics);
 		}
 		else
 		{
@@ -9229,9 +9171,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			// начале или конце параграфа, тогда делить не надо
 			Para.Cursor_MoveToNearPos(NearPos);
 			Para.RemoveSelection();
-
-			this.Statistics.bAdd = false;
-			Para.CollectDocumentStatistics(this.Statistics);
 
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
@@ -9346,18 +9285,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			this.Selection.StartPos = DstIndex;
 			this.Selection.EndPos   = LastPos;
 			this.CurPos.ContentPos  = LastPos;
-			
-			this.Statistics.bAdd = true;
-			var End = DstIndex + ElementsCount + ((bConcatE) ? -1 : 0);
-			for (var i = DstIndex; i <= End; i++)
-			{
-				if (!this.Content[i])
-					break;
-
-				this.Content[i].CollectDocumentStatistics(this.Statistics);
-			}
-
-			console.log(this.Statistics);
 		}
         SelectedContent.CheckSignatures();
 		if (docpostype_DrawingObjects !== this.CurPos.Type)
@@ -11412,13 +11339,8 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrec
 	var PrevObj = this.Content[Position - 1] ? this.Content[Position - 1] : null;
 	var NextObj = this.Content[Position + Count] ? this.Content[Position + Count] : null;
 
-	this.Statistics.bAdd = false;
 	for (var Index = 0; Index < Count; Index++)
-	{
 		this.Content[Position + Index].PreDelete();
-		if (this.Content[Position + Index].CollectDocumentStatistics && ! this.Content[Position + Index].IsTable())
-			this.Content[Position + Index].CollectDocumentStatistics(this.Statistics);
-	}
 
 	this.History.Add(new CChangesDocumentRemoveItem(this, Position, this.Content.slice(Position, Position + Count)));
 	var Elements = this.Content.splice(Position, Count);
@@ -11449,7 +11371,6 @@ CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrec
 
 	// Запоминаем, что нам нужно произвести переиндексацию элементов
 	this.private_ReindexContent(Position);
-	console.log(this.Statistics);
 
 	return ChangePos;
 };
@@ -12904,10 +12825,8 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 
 		if (null !== sText)
 		{
-			this.Statistics.bAdd = false;
 			var oHyperRun = new ParaRun(oHyperlink.GetParagraph());
 			var oParagraph = oHyperRun.GetParagraph();
-			oParagraph.CollectDocumentStatistics(this.Statistics);
 			oHyperRun.Set_Pr(oHyperlink.GetTextPr().Copy());
 			oHyperRun.Set_Color(undefined);
 			oHyperRun.Set_Underline(undefined);
@@ -12920,8 +12839,6 @@ CDocument.prototype.ModifyHyperlink = function(oHyperProps)
 
 			this.RemoveSelection();
 			oHyperlink.MoveCursorOutsideElement(false);
-			this.Statistics.bAdd = true;
-			oParagraph.CollectDocumentStatistics(this.Statistics);
 		}
 	}
 	else if (oClass instanceof CFieldInstructionHYPERLINK)
@@ -16501,6 +16418,7 @@ CDocument.prototype.Statistics_GetPagesInfo = function()
 		this.Statistics.Update_Pages(End - Start + 1);
 
 		// возможно здесь ещё добавить подчет количества линий, но это придётся каждый раз тогда по всему документу проходиться
+		// либо узнать, как посчитать количество выделенных линий, возможно есть какой-то вариант, как со страницами (нужно будет это делать только в первом и последнем элементе)
  
 		// for (var CurPage = Start; CurPage <= End; ++CurPage)
 		// {
@@ -18374,11 +18292,7 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 				}
 				else
 				{
-					this.Statistics.bAdd = false;
-					Item.CollectDocumentStatistics(this.Statistics);
 					Item.Split(NewParagraph);
-					this.Statistics.bAdd = true;
-					Item.CollectDocumentStatistics(this.Statistics);
 				}
 
 				NewParagraph.Correct_Content();
@@ -18386,8 +18300,6 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 
 				var nContentPos = this.CurPos.ContentPos + 1;
 				this.AddToContent(nContentPos, NewParagraph);
-				this.Statistics.bAdd = true;
-				NewParagraph.CollectDocumentStatistics(this.Statistics);
 				this.CurPos.ContentPos = nContentPos;
 			}
 
@@ -25502,17 +25414,10 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 							{
 								isNewPar = true;
 							}
-							this.Statistics.bAdd = false;
-							oElement.CollectDocumentStatistics(this.Statistics);
 							oNewParagraph.Concat(oElement, true);
 							break;
 						case type_Table:
 							var oNestedContent = (oProps.nested) ? this.private_ConvertTableToText(oElement, oProps) : [oElement];
-							if (!oProps.nested)
-							{
-								this.Statistics.bAdd = false;
-								oElement.CollectDocumentStatistics(this.Statistics);
-							}
 							if (j == 0 && ArrNewContent[ArrNewContent.length-1].IsEmpty() && bAdd)
 								ArrNewContent.pop();
 							
@@ -25526,8 +25431,6 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 							break;
 						default:
 							ArrNewContent.push(oElement);
-							if (oElement.CollectDocumentStatistics)
-								oElement.CollectDocumentStatistics(this.Statistics);
 							isNewPar = true;
 							if (j == 0 && ArrNewContent[ArrNewContent.length-1].IsEmpty() && bAdd)
 								ArrNewContent.pop();
@@ -25568,7 +25471,6 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 			{
 				oTable.RemoveTableRow(i);
 			}
-			this.Statistics.bAdd = false;
 			if (!oSelectetRows.IsSelectionToEnd && oSelectetRows.Start) {
 				var oNewTable = oTable.Split(); 
 				ArrNewContent.push(oNewTable);
@@ -25582,7 +25484,6 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 			{
 				ArrNewContent.push(oTable);
 			}
-			oTable.CollectDocumentStatistics(this.Statistics);
 		}
 
 		for (var i = 0; i < ArrNewContent.length; i++)

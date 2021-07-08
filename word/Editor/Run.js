@@ -1668,12 +1668,6 @@ ParaRun.prototype.ConcatToContent = function(arrNewItems)
  */
 ParaRun.prototype.AddText = function(sString, nPos)
 {
-    var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
-	if (Statistics && this.Paragraph)
-	{
-		Statistics.bAdd = false;
-		this.Paragraph.CollectDocumentStatistics(Statistics);
-	}
 	var nCharPos = undefined !== nPos && null !== nPos && -1 !== nPos ? nPos : this.Content.length;
 
 	var oTextForm = this.GetTextForm();
@@ -1745,11 +1739,6 @@ ParaRun.prototype.AddText = function(sString, nPos)
 			else
 				this.AddToContent(nCharPos++, new ParaText(nCharCode), true);
 		}
-	}
-    if (Statistics && this.Paragraph)
-	{
-		Statistics.bAdd = true;
-		this.Paragraph.CollectDocumentStatistics(Statistics);
 	}
 };
 /**

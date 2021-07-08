@@ -1149,15 +1149,10 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					nStartPos = this.Selection.EndPos;
 				}
 
-				if (oLogicDocument.Statistics)
-					oLogicDocument.Statistics.bAdd = false;
 
 				for (var nIndex = nEndPos; nIndex >= nStartPos; --nIndex)
 				{
 					var oElement = this.Content[nIndex];
-					if (oLogicDocument.Statistics)
-						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
-
 					oSdt.Content.Add_ToContent(0, oElement);
 					this.Remove_FromContent(nIndex, 1);
 					oElement.SelectAll(1);
@@ -1174,11 +1169,6 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				this.CurPos.ContentPos  = nStartPos;
 
 				oLogicDocument.RemoveCommentsOnPreDelete = true;
-				if (oLogicDocument.Statistics)
-				{
-					oLogicDocument.Statistics.bAdd = true;
-					oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
-				}
 				return oSdt;
 			}
 		}
@@ -1196,45 +1186,19 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				if (oElement.IsCursorAtBegin())
 				{
 					this.AddToContent(nContentPos, oSdt);
-					if (oLogicDocument.Statistics)
-					{
-						oLogicDocument.Statistics.bAdd = true;
-						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
-					}
 					this.CurPos.ContentPos = nContentPos;
 				}
 				else if (oElement.IsCursorAtEnd())
 				{
 					this.AddToContent(nContentPos + 1, oSdt);
-					if (oLogicDocument.Statistics)
-					{
-						oLogicDocument.Statistics.bAdd = true;
-						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
-					}
 					this.CurPos.ContentPos = nContentPos + 1;
 				}
 				else
 				{
 					var oNewParagraph = new Paragraph(this.DrawingDocument, this);
-					{
-						oLogicDocument.Statistics.bAdd = false;
-						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
-					}
 					oElement.Split(oNewParagraph);
-					if (oLogicDocument.Statistics)
-					{
-						oLogicDocument.Statistics.bAdd = true;
-						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
-					}
-
 					this.AddToContent(nContentPos + 1, oNewParagraph);
 					this.AddToContent(nContentPos + 1, oSdt);
-					if (oLogicDocument.Statistics)
-					{
-						oLogicDocument.Statistics.bAdd = true;
-						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
-						oNewParagraph.CollectDocumentStatistics(oLogicDocument.Statistics);
-					}
 					this.CurPos.ContentPos = nContentPos + 1;
 				}
 				oSdt.MoveCursorToStartPos(false);

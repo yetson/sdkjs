@@ -3161,16 +3161,9 @@ CGraphicObjects.prototype =
             {
                 var first_selected = this.selectedObjects[0];
                 var arr_drawings_ = [];
-                var Statistics = this.document ? this.document.Statistics : null;
                 for(var i = 0; i < this.selectedObjects.length; ++i)
                 {
                     this.selectedObjects[i].parent.PreDelete();
-                    if (Statistics)
-                    {
-                        Statistics.bAdd = false;
-                        this.selectedObjects[i].documentStatistics(Statistics);
-                    }
-
                     this.selectedObjects[i].parent.Remove_FromDocument(false);
                     arr_drawings_.push(this.selectedObjects[i].parent);
                 }
