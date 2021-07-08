@@ -1423,6 +1423,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Check_Content = function()
 };
 CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos, Item, UpdatePosition)
 {
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = false;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+	}
     this.Content.splice(Pos, 0, Item);
     this.private_UpdateTrackRevisions();
 	this.private_UpdateDocumentOutline();
@@ -1499,9 +1505,22 @@ CParagraphContentWithParagraphLikeContent.prototype.Add_ToContent = function(Pos
 
     if (Item.SetParagraph)
     	Item.SetParagraph(this.GetParagraph());
+
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = true;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+		console.log(Statistics);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = function(Pos, Count, UpdatePosition)
 {
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = false;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+	}
 	for (var nIndex = Pos; nIndex < Pos + Count; ++nIndex)
 	{
 		this.Content[nIndex].PreDelete();
@@ -1601,6 +1620,12 @@ CParagraphContentWithParagraphLikeContent.prototype.Remove_FromContent = functio
         else if (ContentPos.Data[Depth] > Pos)
             ContentPos.Data[Depth] = Math.max(0, Pos);
     }
+
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = true;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+	}
 };
 CParagraphContentWithParagraphLikeContent.prototype.Remove = function(Direction, bOnAddText)
 {
@@ -4385,6 +4410,12 @@ CParagraphContentWithParagraphLikeContent.prototype.GetFirstRun = function()
 };
 CParagraphContentWithParagraphLikeContent.prototype.MakeSingleRunElement = function(isClearRun)
 {
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = false;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+	}
 	if (this.Content.length !== 1 || para_Run !== this.Content[0].Type)
 	{
 		var oRun = new ParaRun(this.GetParagraph(), false);
@@ -4442,6 +4473,11 @@ CParagraphContentWithParagraphLikeContent.prototype.MakeSingleRunElement = funct
 	if (false !== isClearRun)
 		oRun.ClearContent();
 
+	if (Statistics && this.Paragraph)
+	{
+		Statistics.bAdd = true;
+		this.Paragraph.CollectDocumentStatistics(Statistics);
+	}
 	return oRun;
 };
 CParagraphContentWithParagraphLikeContent.prototype.ClearContent = function()

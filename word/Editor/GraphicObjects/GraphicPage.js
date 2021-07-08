@@ -189,13 +189,13 @@ CGraphicPage.prototype =
         {
             if (Statistics.isUseSelection)
             {
-                if(cur_array[i].documentStatistics && cur_array[i].selected)
+                if (cur_array[i].documentStatistics && cur_array[i].selected)
                     cur_array[i].documentStatistics(Statistics);
             }
             else
             {
-                if(cur_array[i].documentStatistics)
-                cur_array[i].documentStatistics(Statistics);
+                if (cur_array[i].documentStatistics)
+                    cur_array[i].documentStatistics(Statistics);
             }  
         }
     },

@@ -4616,7 +4616,7 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
 				Statistics.bAdd = false;
 				if (PrevClass.GetType() === type_Paragraph)
 					PrevClass.CollectDocumentStatistics(Statistics);
-				else
+				else if (PrevClass.GetType() !== para_InlineLevelSdt)
 					PrevClass.Paragraph.CollectDocumentStatistics(Statistics);
 			}
 
@@ -4663,7 +4663,7 @@ CDocumentContent.prototype.InsertContent = function(SelectedContent, NearPos)
 				Statistics.bAdd = true;
 				if (PrevClass.GetType() === type_Paragraph)
 					PrevClass.CollectDocumentStatistics(Statistics);
-				else
+				else if (PrevClass.GetType() !== para_InlineLevelSdt)
 					PrevClass.Paragraph.CollectDocumentStatistics(Statistics);
 				console.log(Statistics);
 			}
@@ -7487,7 +7487,7 @@ CDocumentContent.prototype.Internal_Content_Add = function(Position, NewObject, 
 
 	this.private_ReindexContent(Position);
 
-	if (NewObject.CollectDocumentStatistics && this.GetLogicDocument())
+	if (NewObject.CollectDocumentStatistics && NewObject.GetType() !== type_BlockLevelSdt && this.GetLogicDocument())
 	{
 		var Statistics = this.GetLogicDocument().Statistics;
 		Statistics.bAdd = true;
@@ -7510,7 +7510,7 @@ CDocumentContent.prototype.Internal_Content_Remove = function(Position, Count, i
 		for (var Index = 0; Index < Count; Index++)
 		{
 			this.Content[Position + Index].PreDelete();
-			if (this.Content[Position + Index].CollectDocumentStatistics && !this.Content[Position + Index].IsTable())
+			if (this.Content[Position + Index].CollectDocumentStatistics && !this.Content[Position + Index].IsTable() && this.Is_UseInDocument())
 				this.Content[Position + Index].CollectDocumentStatistics(Statistics);
 		}
 	}
@@ -8764,21 +8764,9 @@ CDocumentContent.prototype.IsStartFromNewPage = function()
 };
 CDocumentContent.prototype.PreDelete = function()
 {
-	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		// Выключаем статистику (если это таблица), потому что при удалении shape внутри которого есть таблицы, эти таблицы вычитаются из статистики 2 раза
-		if (this.Content[nIndex].IsTable() && Statistics)
-		{
-			Statistics.Off();
-			this.Content[nIndex].PreDelete();
-			Statistics.On();
-		}
-		else
-		{
-			this.Content[nIndex].PreDelete();
-		}
-			
+		this.Content[nIndex].PreDelete();	
 	}
 
 	this.RemoveSelection();

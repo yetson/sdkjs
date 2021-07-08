@@ -14362,6 +14362,25 @@ CTable.prototype.private_RemoveRow = function(nIndex)
 
 	this.Content[nIndex].PreDelete();
 
+	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	if (Statistics)
+	{
+		Statistics.bAdd = false;
+		var CellsCount = this.Content[nIndex].Get_CellsCount();
+        for ( var CurCell = 0; CurCell < CellsCount; CurCell++ )
+        {
+            var Cell = this.Content[nIndex].Get_Cell( CurCell );
+
+            var CellContent = Cell.Content.Content;
+            var ContentCount = CellContent.length;
+            for ( var Pos = 0; Pos < ContentCount; Pos++ )
+            {
+				if (CellContent[Pos].CollectDocumentStatistics && !CellContent[Pos].IsTable() && Statistics)
+					CellContent[Pos].CollectDocumentStatistics(Statistics);
+            }
+        }
+	}
+
 	History.Add(new CChangesTableRemoveRow(this, nIndex, [this.Content[nIndex]]));
 
 	this.Rows--;

@@ -1149,10 +1149,15 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 					nStartPos = this.Selection.EndPos;
 				}
 
-				this.GetLogicDocument().Statistics.Off();
+				if (oLogicDocument.Statistics)
+					oLogicDocument.Statistics.bAdd = false;
+
 				for (var nIndex = nEndPos; nIndex >= nStartPos; --nIndex)
 				{
 					var oElement = this.Content[nIndex];
+					if (oLogicDocument.Statistics)
+						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
+
 					oSdt.Content.Add_ToContent(0, oElement);
 					this.Remove_FromContent(nIndex, 1);
 					oElement.SelectAll(1);
@@ -1164,12 +1169,16 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				oSdt.Content.Selection.EndPos   = oSdt.Content.GetElementsCount() - 1;
 
 				this.Add_ToContent(nStartPos, oSdt);
-				this.GetLogicDocument().Statistics.On();
 				this.Selection.StartPos = nStartPos;
 				this.Selection.EndPos   = nStartPos;
 				this.CurPos.ContentPos  = nStartPos;
 
 				oLogicDocument.RemoveCommentsOnPreDelete = true;
+				if (oLogicDocument.Statistics)
+				{
+					oLogicDocument.Statistics.bAdd = true;
+					oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
+				}
 				return oSdt;
 			}
 		}
@@ -1180,28 +1189,52 @@ CDocumentContentBase.prototype.private_AddContentControl = function(nContentCont
 				var oSdt = new CBlockLevelSdt(editor.WordControl.m_oLogicDocument, this);
 				oSdt.SetDefaultTextPr(this.GetDirectTextPr());
 				oSdt.SetPlaceholder(c_oAscDefaultPlaceholderName.Text);
-				this.GetLogicDocument().Statistics.Off();
 				oSdt.ReplaceContentWithPlaceHolder(false);
-				this.GetLogicDocument().Statistics.On();
+				var oLogicDocument = this instanceof CDocument ? this : this.LogicDocument;
 
 				var nContentPos = this.CurPos.ContentPos;
 				if (oElement.IsCursorAtBegin())
 				{
 					this.AddToContent(nContentPos, oSdt);
+					if (oLogicDocument.Statistics)
+					{
+						oLogicDocument.Statistics.bAdd = true;
+						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
+					}
 					this.CurPos.ContentPos = nContentPos;
 				}
 				else if (oElement.IsCursorAtEnd())
 				{
 					this.AddToContent(nContentPos + 1, oSdt);
+					if (oLogicDocument.Statistics)
+					{
+						oLogicDocument.Statistics.bAdd = true;
+						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
+					}
 					this.CurPos.ContentPos = nContentPos + 1;
 				}
 				else
 				{
 					var oNewParagraph = new Paragraph(this.DrawingDocument, this);
+					{
+						oLogicDocument.Statistics.bAdd = false;
+						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
+					}
 					oElement.Split(oNewParagraph);
+					if (oLogicDocument.Statistics)
+					{
+						oLogicDocument.Statistics.bAdd = true;
+						oElement.CollectDocumentStatistics(oLogicDocument.Statistics);
+					}
 
 					this.AddToContent(nContentPos + 1, oNewParagraph);
 					this.AddToContent(nContentPos + 1, oSdt);
+					if (oLogicDocument.Statistics)
+					{
+						oLogicDocument.Statistics.bAdd = true;
+						oSdt.CollectDocumentStatistics(oLogicDocument.Statistics);
+						oNewParagraph.CollectDocumentStatistics(oLogicDocument.Statistics);
+					}
 					this.CurPos.ContentPos = nContentPos + 1;
 				}
 				oSdt.MoveCursorToStartPos(false);

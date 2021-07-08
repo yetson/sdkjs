@@ -3463,6 +3463,7 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 	{
 		Statistics.bAdd = false;
 		this.CollectDocumentStatistics(Statistics);
+		Statistics.CurElementId = this.GetId();
 	}
 
 	if (true === this.Selection.Use)
@@ -3705,6 +3706,7 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 			if (Statistics)
 			{
 				Statistics.bAdd = true;
+				Statistics.CurElementId = null;
 				this.CollectDocumentStatistics(Statistics);
 				console.log(Statistics);
 			}
@@ -3732,6 +3734,7 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 				if (Statistics)
 				{
 					Statistics.bAdd = true;
+					Statistics.CurElementId = null;
 					this.CollectDocumentStatistics(Statistics);
 					console.log(Statistics);
 				}
@@ -3776,6 +3779,7 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 				if (Statistics)
 				{
 					Statistics.bAdd = true;
+					Statistics.CurElementId = null;
 					this.CollectDocumentStatistics(Statistics);
 					console.log(Statistics);
 				}
@@ -3895,6 +3899,7 @@ Paragraph.prototype.Remove = function(nCount, isRemoveWholeElement, bRemoveOnlyS
 	if (Statistics)
 	{
 		Statistics.bAdd = true;
+		Statistics.CurElementId = null;
 		this.CollectDocumentStatistics(Statistics);
 		console.log(Statistics);
 	}
@@ -8824,7 +8829,6 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 	{
 		Statistics.bAdd = false;
 		this.CollectDocumentStatistics(Statistics);
-		Statistics.Off();
 	}
 	this.RemoveNumPr();
 
@@ -9001,7 +9005,6 @@ Paragraph.prototype.ApplyNumPr = function(sNumId, nLvl)
 	this.UpdateDocumentOutline();
 	if (Statistics)
 	{
-		Statistics.On();
 		Statistics.bAdd = true;
 		this.CollectDocumentStatistics(Statistics);
 		console.log(Statistics);
@@ -11090,50 +11093,52 @@ Paragraph.prototype.Get_CurrentPage_Relative = function()
 };
 Paragraph.prototype.CollectDocumentStatistics = function(Stats, IsCalcPD)
 {
-	// добавить проверку на то в документе ли этот параграф
-	if (!Stats.GetWorkingState() || !this.Is_UseInDocument())
+	if (!Stats.GetWorkingState() || !this.Is_UseInDocument() || this.GetId() === Stats.CurElementId)
 		return;
-		
-	var ParaStats = new CParagraphStatistics(Stats);
-	var Start = 0,
-		End   = this.Content.length - 1;
-	if (Stats.isUseSelection)
+	
+	if (!this.IsEmpty())
 	{
-		Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
-		End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
-	}
-
-	for (var Index = Start; Index <= End; Index++)
-	{
-		var Item = this.Content[Index];
-		if (Item.GetType() === para_Math && Stats.isUseSelection)
+		var ParaStats = new CParagraphStatistics(Stats);
+		var Start = 0,
+			End   = this.Content.length - 1;
+		if (Stats.isUseSelection)
 		{
-			Item = Item.CopyContent(true)[0];
-			Stats.isUseSelection = false;
-			Item.CollectDocumentStatistics(ParaStats);
-			Stats.isUseSelection = true;
+			Start = Math.min(this.Selection.StartPos, this.Selection.EndPos);
+			End   = Math.max(this.Selection.StartPos, this.Selection.EndPos);
 		}
-		else
+
+		for (var Index = Start; Index <= End; Index++)
 		{
-			Item.CollectDocumentStatistics(ParaStats, IsCalcPD);
+			var Item = this.Content[Index];
+			if (Item.GetType() === para_Math && Stats.isUseSelection)
+			{
+				Item = Item.CopyContent(true)[0];
+				Stats.isUseSelection = false;
+				Item.CollectDocumentStatistics(ParaStats);
+				Stats.isUseSelection = true;
+			}
+			else
+			{
+				Item.CollectDocumentStatistics(ParaStats, IsCalcPD);
+			}
+		}
+
+		if (false === ParaStats.EmptyParagraph)
+		{
+			var oNumPr = this.GetNumPr();
+			if (oNumPr)
+			{
+				var oNum = this.Parent.GetNumbering().GetNum(oNumPr.NumId);
+				if (oNum)
+					oNum.GetLvl(oNumPr.Lvl).CollectDocumentStatistics(Stats);
+			}
+			Stats.Update_Paragraph();
 		}
 	}
-
 	// линии надо считать, даже если параграф пустой
-	if (!this.IsEmpty() || (Stats.LogicDocument.Content.length - 1) !== this.Index)
+	if (Stats.LogicDocument.Content.length - 1 !== this.Index)
 		Stats.Update_Line(this.Lines.length);
-
-	if (false === ParaStats.EmptyParagraph)
-	{
-		var oNumPr = this.GetNumPr();
-		if (oNumPr)
-		{
-			var oNum = this.Parent.GetNumbering().GetNum(oNumPr.NumId);
-			if (oNum)
-				oNum.GetLvl(oNumPr.Lvl).CollectDocumentStatistics(Stats);
-		}
-		Stats.Update_Paragraph();
-	}
+	
 };
 Paragraph.prototype.Get_ParentTextTransform = function()
 {
@@ -12321,7 +12326,7 @@ Paragraph.prototype.Split = function(NewParagraph)
  */
 Paragraph.prototype.Concat = function(Para, isUseConcatedStyle)
 {
-	var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
+	var Statistics = this.GetLogicDocument() && Para.Is_UseInDocument() && this.Is_UseInDocument() ? this.GetLogicDocument().Statistics : null;
 	if (Statistics)
 	{
 		Statistics.bAdd = false;
@@ -14819,16 +14824,6 @@ Paragraph.prototype.AddContentControl = function(nContentControlType)
 	}
 	else
 	{
-		var Statistics = this.GetLogicDocument() ? this.GetLogicDocument().Statistics : null;
-		if (Statistics)
-		{
-			var bWork = Statistics.GetWorkingState();
-			Statistics.On();
-			Statistics.bAdd = false;
-			this.CollectDocumentStatistics(Statistics);
-			if(!bWork)
-				Statistics.Off();
-		}
 		var oContentControl = new CInlineLevelSdt();
 		oContentControl.SetDefaultTextPr(this.GetDirectTextPr());
 		oContentControl.SetPlaceholder(c_oAscDefaultPlaceholderName.Text);

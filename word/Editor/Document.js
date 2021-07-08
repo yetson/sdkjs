@@ -1354,6 +1354,7 @@ function CStatistics(LogicDocument)
     this.LogicDocument  = LogicDocument;
     this.Api            = LogicDocument.Get_Api();
 	this.IsWorking      = true;
+	this.CurElementId   = null;  // Id текущего элемента, который если встречается ещё раз, то обрабаотывать не нужно
 	this.isUseSelection = false; // для статистики по селекту
 
     this.Id       = null; // Id таймера для подсчета всего кроме страниц
@@ -8956,11 +8957,9 @@ CDocument.prototype.GetSelectedContent = function(bUseHistory, oPr)
 			oSelectedContent.SetSaveNumberingValues(oPr.SaveNumberingValues);
 	}
 
-	this.Statistics.Off();
 	oSelectedContent.SetMoveTrack(isTrack, this.TrackMoveId);
 	this.Controller.GetSelectedContent(oSelectedContent);
 	oSelectedContent.On_EndCollectElements(this, false);
-	this.Statistics.On();
 
 	if (!bUseHistory)
 		History.TurnOn();
@@ -9170,7 +9169,7 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			this.Statistics.bAdd = false;
 			if (PrevClass.GetType() === type_Paragraph)
 				PrevClass.CollectDocumentStatistics(this.Statistics);
-			else
+			else if (PrevClass.GetType() !== para_InlineLevelSdt)
 				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
 
 			// TODO: Заглушка для переноса автофигур и картинок. Когда разрулим ситуацию так, чтобы когда у нас
@@ -9214,7 +9213,7 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			this.Statistics.bAdd = true;
 			if (PrevClass.GetType() === type_Paragraph)
 				PrevClass.CollectDocumentStatistics(this.Statistics);
-			else
+			else if (PrevClass.GetType() !== para_InlineLevelSdt)
 				PrevClass.Paragraph.CollectDocumentStatistics(this.Statistics);
 			console.log(this.Statistics);
 		}
@@ -9233,7 +9232,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 
 			this.Statistics.bAdd = false;
 			Para.CollectDocumentStatistics(this.Statistics);
-			this.Statistics.Off();
 
 			var bAddEmptyPara          = false;
 			var bDoNotIncreaseDstIndex = false;
@@ -9349,7 +9347,6 @@ CDocument.prototype.InsertContent = function(SelectedContent, NearPos)
 			this.Selection.EndPos   = LastPos;
 			this.CurPos.ContentPos  = LastPos;
 			
-			this.Statistics.On();
 			this.Statistics.bAdd = true;
 			var End = DstIndex + ElementsCount + ((bConcatE) ? -1 : 0);
 			for (var i = DstIndex; i <= End; i++)
@@ -11404,14 +11401,6 @@ CDocument.prototype.Internal_Content_Add = function(Position, NewObject, isCorre
 
 	if (type_Paragraph === NewObject.GetType())
 		this.DocumentOutline.CheckParagraph(NewObject);
-
-	// здесь должно сработать при вставки СС
-	if (NewObject.CollectDocumentStatistics)
-	{
-		this.Statistics.bAdd = true;
-		NewObject.CollectDocumentStatistics(this.Statistics);
-		console.log(this.Statistics);
-	}
 };
 CDocument.prototype.Internal_Content_Remove = function(Position, Count, isCorrectContent)
 {
@@ -16176,7 +16165,6 @@ CDocument.prototype.private_SetCurrentSpecialForm = function(oForm)
  */
 CDocument.prototype.AddContentControlCheckBox = function(oPr)
 {
-	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16185,19 +16173,13 @@ CDocument.prototype.AddContentControlCheckBox = function(oPr)
 	var oTextPr = this.GetDirectTextPr();
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
-	{
-		this.Statistics.On();
 		return;
-	}
 
 	oCC.ApplyCheckBoxPr(oPr, oTextPr);
 	oCC.MoveCursorToStartPos();
 
 	this.UpdateSelection();
 	this.UpdateTracks();
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16206,21 +16188,14 @@ CDocument.prototype.AddContentControlCheckBox = function(oPr)
  */
 CDocument.prototype.AddContentControlPicture = function()
 {
-	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
-	{
-		this.Statistics.On();
 		return null;
-	}
 
 	oCC.SetPlaceholderText(AscCommon.translateManager.getValue("Click to load image"));
 	oCC.ApplyPicturePr(true);
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16229,7 +16204,6 @@ CDocument.prototype.AddContentControlPicture = function()
  */
 CDocument.prototype.AddContentControlComboBox = function(oPr)
 {
-	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16240,16 +16214,10 @@ CDocument.prototype.AddContentControlComboBox = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
-	{
-		this.Statistics.On();
 		return null;
-	}
 
 	oCC.ApplyComboBoxPr(oPr);
 	oCC.SelectContentControl();
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16258,7 +16226,6 @@ CDocument.prototype.AddContentControlComboBox = function(oPr)
  */
 CDocument.prototype.AddContentControlDropDownList = function(oPr)
 {
-	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16269,16 +16236,10 @@ CDocument.prototype.AddContentControlDropDownList = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
-	{
-		this.Statistics.On();
 		return null;
-	}
 
 	oCC.ApplyDropDownListPr(oPr);
 	oCC.SelectContentControl();
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16287,7 +16248,6 @@ CDocument.prototype.AddContentControlDropDownList = function(oPr)
  */
 CDocument.prototype.AddContentControlDatePicker = function(oPr)
 {
-	this.Statistics.Off();
 	this.RemoveTextSelection();
 
 	if (!oPr)
@@ -16295,16 +16255,10 @@ CDocument.prototype.AddContentControlDatePicker = function(oPr)
 
 	var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 	if (!oCC)
-	{
-		this.Statistics.On();
 		return null;
-	}
 
 	oCC.ApplyDatePickerPr(oPr);
 	oCC.SelectContentControl();
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16314,7 +16268,6 @@ CDocument.prototype.AddContentControlDatePicker = function(oPr)
  */
 CDocument.prototype.AddContentControlTextForm = function(oPr)
 {
-	this.Statistics.Off();
 	if (!oPr)
 		oPr = new CSdtTextFormPr();
 
@@ -16372,9 +16325,6 @@ CDocument.prototype.AddContentControlTextForm = function(oPr)
 	this.UpdateSelection();
 	this.UpdateTracks();
 
-	this.Statistics.On();
-	this.Statistics.bAdd = true;
-	oCC.Paragraph.CollectDocumentStatistics(this.Statistics);
 	return oCC;
 };
 /**
@@ -16524,7 +16474,7 @@ CDocument.prototype.Statistics_GetParagraphsInfo = function()
 	for (Index = 0; Index <= (this.Content.length - 1); ++Index, ++CurIndex)
 	{
 		var Element = this.Content[Index];
-		Element.CollectDocumentStatistics(this.Statistics, true); // не уверен, что так будет лучше, true);
+		Element.CollectDocumentStatistics(this.Statistics, true); // не уверен, что так будет лучше, может быть лучше оставить это в отдельной функции, так как они могли не прогрузиться ещё (это не точно)
 
 		if (CurIndex > 20)
 		{
@@ -16586,7 +16536,7 @@ CDocument.prototype.OnSelectStatisticsChange = function()
 		for (var i = bounds.Start.Page; i <= bounds.End.Page; i++)
 			this.DrawingObjects.documentStatistics(i, SelectedStatistics);
 		// отправить статитстику в интерфейс
-		console.log(SelectedStatistics);
+		// console.log(SelectedStatistics);
 	}	
 };
 
@@ -18436,6 +18386,8 @@ CDocument.prototype.controller_AddNewParagraph = function(bRecalculate, bForceAd
 
 				var nContentPos = this.CurPos.ContentPos + 1;
 				this.AddToContent(nContentPos, NewParagraph);
+				this.Statistics.bAdd = true;
+				NewParagraph.CollectDocumentStatistics(this.Statistics);
 				this.CurPos.ContentPos = nContentPos;
 			}
 
@@ -21859,21 +21811,9 @@ CDocument.prototype.ClearContentControl = function(Id)
 	var oType = oContentControl.GetContentControlType ? oContentControl.GetContentControlType() : null;
 	if (c_oAscSdtLevelType.Block === oType || c_oAscSdtLevelType.Inline === oType)
 	{
-		// Для того, что бы при вызове из плагина InsertAndReplaceCC правильно работало со статистикой
-		var oElement = (c_oAscSdtLevelType.Block === oType) ? oContentControl : oContentControl.Paragraph;
-		if (oElement.CollectDocumentStatistics)
-		{
-			this.Statistics.bAdd = false;
-			oElement.CollectDocumentStatistics(this.Statistics);
-		}
 		oContentControl.ClearContentControl();
 		oContentControl.SetThisElementCurrent();
 		oContentControl.MoveCursorToStartPos();
-		if (oElement.CollectDocumentStatistics)
-		{
-			this.Statistics.bAdd = true;
-			oElement.CollectDocumentStatistics(this.Statistics);
-		}
 	}
 
 	return oContentControl;
@@ -24612,14 +24552,10 @@ CDocument.prototype.AddParaMath = function(nType)
 	if ((undefined === nType || c_oAscMathType.Default_Text === nType) && (!this.IsSelectionUse() || !this.IsTextSelectionUse()))
 	{
 		this.Remove(1, true, false, true);
-		this.Statistics.Off();
 		var oCC = this.AddContentControl(c_oAscSdtLevelType.Inline);
 		if (!oCC)
-		{
-			this.Statistics.On();
 			return;
-		}
-		this.Statistics.On();
+
 		oCC.ApplyContentControlEquationPr();
 		oCC.SelectContentControl();
 	}
@@ -25167,9 +25103,7 @@ CDocument.prototype.ConvertTextToTable = function(oProps)
 		{
 			IsReplace = true;
 		}
-		this.Statistics.Off();
 		this.private_ConvertTextToTable(oSelectedContent, oProps);
-		this.Statistics.On();
 		var oParagraph = this.GetCurrentParagraph();
 		var oParent = oParagraph.GetParent();
 		if (oSelectedContent && oParent)
@@ -25494,9 +25428,7 @@ CDocument.prototype.ConvertTableToText = function(oProps)
 			var nIndex     = oTable.GetIndex();
 			var oParagraph = new Paragraph(this.GetDrawingDocument());
 
-			this.Statistics.Off();
 			oParent.RemoveFromContent(nIndex, 1, true);
-			this.Statistics.On();
 			oParent.AddToContent(nIndex, oParagraph, true);
 
 			oParagraph.Document_SetThisElementCurrent(false);
@@ -25572,9 +25504,7 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 							}
 							this.Statistics.bAdd = false;
 							oElement.CollectDocumentStatistics(this.Statistics);
-							this.Statistics.Off();
 							oNewParagraph.Concat(oElement, true);
-							this.Statistics.On();
 							break;
 						case type_Table:
 							var oNestedContent = (oProps.nested) ? this.private_ConvertTableToText(oElement, oProps) : [oElement];
@@ -25588,9 +25518,7 @@ CDocument.prototype.private_ConvertTableToText = function(oTable, oProps)
 							
 							if (k && oProps.nested)
 							{
-								this.Statistics.Off();
 								ArrNewContent[ArrNewContent.length - 1].Concat(oNestedContent.shift(), true);
-								this.Statistics.On();
 							}
 
 							ArrNewContent = ArrNewContent.concat(oNestedContent);
