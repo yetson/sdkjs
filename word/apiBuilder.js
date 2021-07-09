@@ -1239,24 +1239,24 @@
 
 		return {
 			val: oShd.Value,
-			color: {
+			color: oShd.Color ? {
 				auto: oShd.Color.Auto,
 				r:    oShd.Color.r,
 				g:    oShd.Color.g,
 				b:    oShd.Color.b
-			},
-			fill: {
+			} : oShd.Color,
+			fill: oShd.Fill ? {
 				auto: oShd.Fill.Auto,
 				r:    oShd.Fill.r,
 				g:    oShd.Fill.g,
 				b:    oShd.Fill.b
-			},
+			} : oShd.Fill,
 			fillRef: oShd.FillRef ? {
 				idx:   oShd.FillRef.idx,
 				color: SerColor(oShd.FillRef.Color)
 			} : oShd.FillRef,
-			themeColor: SerFill(oShd.FillRef.Unifill),
-			themeFill:  SerFill(oShd.FillRef.themeFill)
+			themeColor: SerFill(oShd.Unifill), // Unifill
+			themeFill:  SerFill(oShd.themeFill)
 		}
 	};
 	function SerColor(oColor)
@@ -1345,6 +1345,477 @@
 
 		return arrResult;
 	};
+	function SerStyle(oStyle)
+	{
+		if (!oStyle)
+			return !oStyle;
+
+
+		var sStyleType = "";
+		switch (oStyle.Type)
+		{
+			case styletype_Paragraph:
+				sStyleType = "paragraphStyle";
+				break;
+			case styletype_Numbering:
+				sStyleType = "numberingStyle";
+				break;
+			case styletype_Table:
+				sStyleType = "tableStyle";
+				break;
+			case styletype_Character:
+				sStyleType = "characterStyle";
+				break;
+			default:
+				sStyleType = "paragraphStyle";
+				break;
+		}
+
+		return {
+			basedOn:        BasedOn,
+			hidden:         hidden,
+			link:           Link,
+			name:           Name,
+			next:           Next,
+			pPr:            SerParaPr(ParaPr),
+			qFormat:        qFormat,
+			rPr:            SerTextPr(TextPr),
+			semiHidden:     semiHidden,
+			tblPr:          SerTablePr(TablePr),
+			tblStylePr:     null,
+			tcPr:           SerTableCellPr(TableCellPr),
+			trPr:           SerTableRowPr(TableRowPr),
+			uiPriority:     uiPriority,
+			unhideWhenUsed: unhideWhenUsed,
+			customStyle:    Custom,
+			styleId:        Id,
+			type:           sStyleType
+		}
+	};
+	function SerTableStylePr(oPr, oTable)
+	{
+		if (!oPr)
+			return oPr;
+
+		return {
+			pPr:   SerParaPr(ParaPr),
+			rPr:   SerTextPr(TextPr),
+			tblPr: SerTablePr(TablePr, oTable),
+			tcPr:  SerTableCellPr(TableCellPr),
+			trPr:  SerTableRowPr(TableRowPr),
+			type:  undefined
+		}
+	};
+	function SerTableMeasurement(oMeasurement)
+	{
+		if (!oMeasurement)
+			return oMeasurement;
+
+		switch (oMeasurement.Type)
+		{
+			case tblwidth_Auto:
+				return undefined;
+			case tblwidth_Mm:
+				return {
+					type: "dxa",
+					w:    private_MM2Twips(oTable.TableW.W)
+				};
+			case tblwidth_Nil:
+				return {
+					type: "nil",
+					w:    0
+				};
+			case tblwidth_Pct:
+				return {
+					type: "pct",
+					w:    oTable.TableW.W
+				};
+		}
+
+		return undefined;
+	};
+	function SerTablePr(oPr, oTable)
+	{
+		if (!oPr)
+			return oPr;
+
+		var sJc          = undefined;
+		var sLayoutType  = oPr.TableLayout ? (oPr.TableLayout === tbllayout_Fixed ? "fixed" : "autofit") : oPr.TableLayout;
+		var sOverlapType = oTable ? (oTable.AllowOverlap ? "overlap" : "never") : "never";
+		switch (oPr.Jc)
+		{
+			case AscCommon.align_Left:
+				sJc = "start";
+				break;
+			case AscCommon.align_Center:
+				sJc = "center";
+				break;
+			case AscCommon.align_Right:
+				sJc = "end";
+				break;
+		}
+
+		// table look
+		var oTableLook = oTable ? (oTable.TableLook ? {
+			firstColumn: oTable.TableLook.m_bFirst_Col,
+			firstRow:    oTable.TableLook.m_bFirst_Row,
+			lastColumn:  oTable.TableLook.m_bLast_Col,
+			lastRow:     oTable.TableLook.m_bLast_Row,
+			noHBand:     !oTable.TableLook.m_bBand_Hor,
+			noVBand:     !oTable.TableLook.m_bBand_Ver
+		} : undefined) : undefined;
+		
+		// anchorH
+		var sHorAnchor = undefined;
+		if (oTable && oTable.PositionH)
+		{
+			switch (oTable.PositionH.RelativeFrom)
+			{
+				case Asc.c_oAscHAnchor.Margin:
+					sHorAnchor = "margin";
+					break;
+				case Asc.c_oAscHAnchor.Text:
+					sHorAnchor = "text";
+					break;
+				case Asc.c_oAscHAnchor.Page:
+					sHorAnchor = "page";
+					break;
+			}
+		}
+
+		// anchorV
+		var sVerAnchor = undefined;
+		if (oTable && oTable.PositionV)
+		{
+			switch (oTable.PositionV.RelativeFrom)
+			{
+				case Asc.c_oAscHAnchor.Margin:
+					sVerAnchor = "margin";
+					break;
+				case Asc.c_oAscHAnchor.Text:
+					sVerAnchor = "text";
+					break;
+				case Asc.c_oAscHAnchor.Page:
+					sVerAnchor = "page";
+					break;
+			}
+		}
+
+		// alignH
+		var sHorAlign = undefined;
+		if (oTable && oTable.PositionH && oTable.PositionH.Align)
+		{
+			switch (oTable.PositionH.Value)
+			{
+				case c_oAscYAlign.Bottom:
+					sHorAlign = "bottom";
+					break;
+				case c_oAscYAlign.Center:
+					sHorAlign = "center";
+					break;
+				case c_oAscYAlign.Inline:
+					sHorAlign = "inline";
+					break;
+				case c_oAscYAlign.Inside:
+					sHorAlign = "inside";
+					break;
+				case c_oAscYAlign.Outside:
+					sHorAlign = "outside";
+					break;
+				case c_oAscYAlign.Top:
+					sHorAlign = "top";
+					break;
+			}
+		}
+
+		// alignV
+		var sVerAlign = undefined;
+		if (oTable && oTable.PositionV && oTable.PositionV.Align)
+		{
+			switch (oTable.PositionV.Value)
+			{
+				case c_oAscYAlign.Center:
+					sHorAlign = "center";
+					break;
+				case c_oAscYAlign.Inside:
+					sHorAlign = "inside";
+					break;
+				case c_oAscYAlign.Left:
+					sHorAlign = "left";
+					break;
+				case c_oAscYAlign.Outside:
+					sHorAlign = "outside";
+					break;
+				case c_oAscYAlign.Right:
+					sHorAlign = "right";
+					break;
+			}
+		}
+
+		// tablePosPr
+		var oTblPosPr = oTable ? (oTable.PositionH && oTable.PositionV ? {
+			horzAnchor:     sHorAnchor,
+			vertAnchor:     sVerAnchor,
+			tblpXSpec:      sHorAlign,
+			tblpYSpec:      sVerAlign,
+			tblpX:          private_MM2Twips(oTable.PositionH.Value),
+			tblpY:          private_MM2Twips(oTable.PositionV.Value),
+			bottomFromText: private_MM2Twips(oTable.Distance.B),
+			leftFromText:   private_MM2Twips(oTable.Distance.L),
+			rightFromText:  private_MM2Twips(oTable.Distance.R),
+			topFromText:    private_MM2Twips(oTable.Distance.T)
+
+		} : undefined) : undefined;
+
+		// table style
+		var oTableStyle = oTable ? private_GetLogicDocument().Styles.Get(oTable.TableStyle) : undefined;
+
+		// tableW
+		var oTableW = oTable && oTable.TableW ? SerTableMeasurement(oTable.TableW) : undefined;
+
+		return {
+			jc:         sJc,
+			shd:        SerShd(Shd),
+
+			tblBorders: {
+				bottom:  SerBorder(oPr.TableBorders.Bottom),
+				end:     SerBorder(oPr.TableBorders.Right),
+				insideH: SerBorder(oPr.TableBorders.InsideH),
+				insideV: SerBorder(oPr.TableBorders.InsideV),
+				start:   SerBorder(oPr.TableBorders.Left),
+				top:     SerBorder(oPr.TableBorders.Top)
+			},
+			tblCaption: oPr.TableCaption,
+
+			tblCellMar: oPr.TableCellMar ? {
+				bottom: oPr.TableCellMar.Bottom ? private_MM2Twips(oPr.TableCellMar.Bottom.W) : oPr.TableCellMar.Bottom,
+				left:   oPr.TableCellMar.Left   ? private_MM2Twips(oPr.TableCellMar.Left.W)   : oPr.TableCellMar.Left,
+				right:  oPr.TableCellMar.Right  ? private_MM2Twips(oPr.TableCellMar.Right.W)  : oPr.TableCellMar.Right,
+				top:    oPr.TableCellMar.Top    ? private_MM2Twips(oPr.TableCellMar.Top.W)    : oPr.TableCellMar.Top
+			} : oPr.TableCellMar,
+
+			tblCellSpacing:      oPr.TableCellMar.TableCellSpacing ? private_MM2Twips(oPr.TableCellMar.TableCellSpacing) : oPr.TableCellMar.TableCellSpacing,
+			tblDescription:      oPr.TableDescription,
+			tblInd:              oPr.TableInd ? private_MM2Twips(oPr.TableInd) : oPr.TableInd,
+			tblLayout:           sLayoutType,
+			tblLook:             oTableLook,
+			tblOverlap:          sOverlapType,
+			tblpPr:              oTblPosPr,
+			tblPrChange:         SerTablePr(oPr.PrChange),
+			tblStyle:            oTableStyle ? SerStyle(oTableStyle) : oTableStyle,
+			tblStyleColBandSize: undefined, /// ???
+			tblStyleRowBandSize: undefined, /// ???
+			tblW:                oTableW
+		}
+	};
+	function SerTable(oTable)
+	{
+		if (!oTable)
+			return oTable;
+
+		var oTableObj = {
+			tblGrid: {},
+			tblPr:   SerTablePr(oTable.Pr, oTable),
+			content: [],
+			type:    "table"
+		}
+
+		for (var nRow = 0; nRow < oTable.Content.length; nRow++)
+			oTableObj["content"].push(SerTableRow(oTable.Content[nRow]));
+
+		return oTableObj;	
+	};
+	function SerTableCellPr(oPr)
+	{
+		if (!oPr)
+			return oPr;
+
+		var sHMerge = oPr.HMerge ? (oPr.HMerge === 2 ? "continue" : "restart") : "restart";
+		var sVMerge = oPr.VMerge ? (oPr.VMerge === 2 ? "continue" : "restart") : "restart";
+		var sVAlign = undefined;
+
+		if (oPr.VAlign)
+		{
+			switch (oPr.VAlign)
+			{
+				case vertalignjc_Top:
+					sVAlign = "top";
+					break;
+				case vertalignjc_Center:
+					sVAlign = "center";
+					break;
+				case vertalignjc_Bottom:
+					sVAlign = "bottom";
+					break;
+			}
+		}
+
+		return {
+			gridSpan: GridSpan,
+			hMerge:   sHMerge,
+			noWrap:   NoWrap,
+			shd:      SerShd(Shd),
+
+			tcBorders: {
+				bottom:  SerBorder(oPr.TableBorders.Bottom),
+				end:     SerBorder(oPr.TableBorders.Right),
+				start:   SerBorder(oPr.TableBorders.Left),
+				top:     SerBorder(oPr.TableBorders.Top)
+			},
+
+			tcMar: oPr.TableCellMar ? {
+				bottom: oPr.TableCellMar.Bottom ? private_MM2Twips(oPr.TableCellMar.Bottom.W) : oPr.TableCellMar.Bottom,
+				left:   oPr.TableCellMar.Left   ? private_MM2Twips(oPr.TableCellMar.Left.W)   : oPr.TableCellMar.Left,
+				right:  oPr.TableCellMar.Right  ? private_MM2Twips(oPr.TableCellMar.Right.W)  : oPr.TableCellMar.Right,
+				top:    oPr.TableCellMar.Top    ? private_MM2Twips(oPr.TableCellMar.Top.W)    : oPr.TableCellMar.Top
+			} : oPr.TableCellMar,
+
+			tcPrChange:    SerTableCellPr(oPr.PrChange),
+			tcW:           oPr.TableCellW ? SerTableMeasurement(oPr.TableCellW) : oPr.TableCellW,
+			textDirection: oPr.TextDirection,
+			vAlign:        sVAlign,
+			vMerge:        sVMerge
+		}
+	};
+	function SerTableCell(oCell)
+	{
+		if (!oCell)
+			return oCell;
+
+		return {
+			content: SerDocContent(oCell.Content),
+			tcPr:    SerTableCellPr(oCell.Pr),
+			id:      oCell.Id,
+			type:    "tblCell"
+		}
+	};
+	function SerTableRow(oRow)
+	{
+		if (!oRow)
+			return oRow;
+
+		var oRowObj = {
+			content: [],
+			trPr:    SerTableRowPr(oRow.Pr),
+			type:    "tblRow"
+		}
+		
+		for (var nCell = 0; nCell < oRow.Content.length; nCell++)
+		{
+			oRowObj["content"].push(SerTableCell(oRow.Content[nCell]));
+		}
+
+		return oRowObj;
+	};
+	function SerTableRowPr(oPr)
+	{
+		if (!oPr)
+			return oPr;
+
+		// rowJc
+		var sRowJc;
+		switch (oPr.Jc)
+		{
+			case align_Left:
+				sRowJc = "start";
+				break;
+			case align_Center:
+				sRowJc = "center";
+				break;
+			case align_Right:
+				sRowJc = "end";
+				break;
+			default:
+				sRowJc = undefined;
+				break;
+		}
+
+		// rowHeight
+		var oRowHeight = undefined;
+		if (oPr.Height)
+		{
+			switch (oPr.Height.HRule)
+			{
+				case linerule_AtLeast:
+					oRowHeight = {
+						val:   private_MM2Twips(oPr.Height.Value),
+						hRule: "atLeast"
+					};
+					break;
+				case linerule_Auto:
+					oRowHeight = {
+						val:   private_MM2Twips(oPr.Height.Value),
+						hRule: "auto"
+					};
+					break;
+				case linerule_Exact:
+					oRowHeight = {
+						val:   private_MM2Twips(oPr.Height.Value),
+						hRule: "exact"
+					};
+					break;
+			}
+		}
+
+		return {
+			cantSplit:      oPr.CantSplit,
+			gridAfter:      oPr.GridAfter,
+			gridBefore:     oPr.GridBefore,
+			jc:             sRowJc,
+			tblCellSpacing: private_MM2Twips(oPr.TableCellSpacing),
+			tblHeader:      oPr.TableHeader,
+			trHeight:       oRowHeight,
+			trPrChange:     SerTableRowPr(oPr.PrChange),
+			wAfter:         SerTableMeasurement(oPr.WAfter),
+			wBefore:        SerTableMeasurement(oPr.WBefore)
+		}
+	};
+	function SerBorder(oBorder)
+	{
+		if (!oBorder)
+			return oBorder;
+
+		var sBorderType = "none";
+		if (oBorder.Type === border_Single)
+			sBorderType = "single";
+
+		return {
+			color: oBorder.Color ? {
+				auto: oBorder.Color.Auto,
+				r:    oBorder.Color.r,
+				g:    oBorder.Color.g,
+				b:    oBorder.Color.b
+			} : oBorder.Color,
+
+			sz:         oBorder.Size,
+			space:      oBorder.Space,
+			themeColor: SerFill(oBorder.Unifill),
+			value:      sBorderType
+		}
+	};
+	function SerDocContent(oDocContent)
+	{
+		var oDocContentObj = 
+		{
+			content: [],
+			type:    "docContent"
+		}
+
+		var TempElm = null;
+		for (var nElm = 0; nElm < this.Document.Content.length; nElm++)
+		{
+			TempElm = this.Document.Content[nElm];
+
+			if (TempElm instanceof AscCommonWord.Paragraph)
+				oDocContentObj["content"].push(JSON.parse(new ApiParagraph(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.CTable)
+				oDocContentObj["content"].push(JSON.parse(new ApiTable(TempElm).ToJSON()));
+			else if (TempElm instanceof AscCommonWord.CBlockLevelSdt)
+				oDocContentObj["content"].push(JSON.parse(new ApiBlockLvlSdt(TempElm).ToJSON()));
+		}
+
+		return oDocContentObj;
+	};
 	function SerParaPr(oParaPr)
 	{
 		if (!oParaPr)
@@ -1416,20 +1887,20 @@
 		if (!oTabs)
 			return oTabs;
 			
-		var oTabs = {
+		var oTabsObj = {
 			tabs: []
 		};
 
 		for (var nTab = 0; nTab < oTabs.Tabs.length; nTab++)
 		{
-			oTabs.tabs.push({
+			oTabsObj.tabs.push({
 				val:    oTabs.Tabs[nTab].Value,
 				pos:    oTabs.Tabs[nTab].Pos,
 				leader: oTabs.Tabs[nTab].Leader
 			});
 		}
 
-		return oTabs;
+		return oTabsObj;
 	};
 	function SerSerTx(oTx)
 	{
@@ -2219,7 +2690,7 @@
 			text:          oSdtPr.Text
 		}
 	};
-	function SetParaMath(oParaMath)
+	function SerParaMath(oParaMath)
 	{
 		if (!oParaMath)
 			return oParaMath;
@@ -2228,12 +2699,491 @@
 			oMathParaPr: {
 				jc: oParaMath.Jc
 			},
-			content: [],
+			content: SerMathContent(oParaMath.Root),
 			type: "paraMath"
 		}
-		return {
+		
+		function SerMathContent(oMathContent)
+		{
+			if (!oMathContent)
+				return oMathContent;
 
+			var oTempElm   = null;
+			var arrContent = [];
+
+			if (oMathContent.constructor.name === "CDenominator" || oMathContent.constructor.name === "CNumerator")
+				arrContent.push(SerFracArg(oMathContent));
+			else 
+			{
+				for (var nElm = 0; nElm < oMathContent.Content.length; nElm++)
+				{
+					oTempElm = oMathContent.Content[nElm];
+					if (oTempElm instanceof AscCommonWord.ParaRun)
+						arrContent.push(JSON.parse(new ApiRun(oTempElm).ToJSON()));
+					else if (oTempElm instanceof AscCommonWord.CFraction)
+						arrContent.push(SerFraction(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CDegree)
+						arrContent.push(SerDegree(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CDegreeSubSup)
+						arrContent.push(SerSubDegree(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CRadical)
+						arrContent.push(SerRadical(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CNary)
+						arrContent.push(SerNary(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CEqArray)
+						arrContent.push(SerEqArray(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CDelimiter)
+						arrContent.push(SerDelimiter(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CMathFunc)
+						arrContent.push(SerMathFunc(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CAccent)
+						arrContent.push(SerAccent(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CGroupCharacter)
+						arrContent.push(SerGroupCharacter(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CBorderBox)
+						arrContent.push(SerBorderBox(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CBar)
+						arrContent.push(SerBar(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CLimit)
+						arrContent.push(SerLimit(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CBox)
+						arrContent.push(SerBox(oTempElm));
+					else if (oTempElm instanceof AscCommonWord.CMathMatrix)
+						arrContent.push(SerMathMatrix(oTempElm));
+				}
+			}
+
+			return arrContent;
+		};
+
+		function SerFraction(oFraction)
+		{
+			if (!oFraction)
+				return oFraction;
+			
+			var sFracType = "";
+			switch (oFraction.Pr.type)
+			{
+				case BAR_FRACTION:
+					sFracType = "bar";
+					break;
+				case SKEWED_FRACTION:
+					sFracType = "skw";
+					break;
+				case LINEAR_FRACTION:
+					sFracType = "lin";
+					break;
+				default:
+					sFracType = "noBar";
+					break;
+			}
+
+			var oFractionObj = {
+				fPr: {
+					ctrlPr: SerTextPr(oFraction.CtrPrp),
+					type:   sFracType
+				},
+				num: SerFracArg(oFraction.Denominator),
+				den: SerFracArg(oFraction.Numerator),     
+				type:    "fraction"
+			}
+
+			return oFractionObj;
+		};
+		function SerFracArg(oFractionArg)
+		{
+			if (!oFractionArg)
+				return oFractionArg;
+
+			var sArgType = "";
+			if (oFractionArg.constructor.name === "CDenominator")
+				sArgType = "den";
+			else if (oFractionArg.constructor.name === "CNumerator")
+				sArgType = "num";
+
+			return {
+				argPr: {
+					argSize: oFractionArg.ArgSize.value
+				},  
+				ctrlPr:  SerTextPr(oFractionArg.CtrPrp),
+				content: SerMathContent(oFractionArg.elements[0][0]),
+				type:    sArgType
+			}
+		};
+		function SerDegree(oDegree)
+		{
+			if (!oDegree)
+				return oDegree;
+
+			var oDegreeObj = {
+				e: SerMathContent(oDegree.baseContent),
+			}
+			switch (oDegree.Pr.type)
+			{
+				case DEGREE_SUPERSCRIPT:
+					oDegreeObj["type"]   = "superScript";
+					oDegreeObj["sSupPr"] = {
+						ctrlPr: SerTextPr(oDegree.CtrPrp)
+					}
+					oDegreeObj["sup"]    = SerMathContent(oDegree.iterContent);
+					break;
+				case DEGREE_SUBSCRIPT:
+					oDegreeObj["type"]   = "supScript";
+					oDegreeObj["sSubPr"] = {
+						ctrlPr: SerTextPr(oDegree.CtrPrp)
+					}
+					oDegreeObj["sub"]    = SerMathContent(oDegree.iterContent);
+					break;
+			}
+
+			return oDegreeObj;
+		};
+		function SerSubDegree(oDegreeSubSup)
+		{
+			if (!oDegreeSubSup)
+				return oDegreeSubSup;
+
+			var oDegreeObj = {
+				e:   SerMathContent(oDegreeSubSup.baseContent),
+				sup: SerMathContent(oDegreeSubSup.iters.elements[0][0]),
+				sub: SerMathContent(oDegreeSubSup.iters.elements[1][0])
+			}
+
+			switch (oDegreeSubSup.Pr.type)
+			{
+				case DEGREE_SubSup:
+					oDegreeObj["type"]      = "subSupScript";
+					oDegreeObj["sSubSupPr"] = {
+						ctrlPr: SerTextPr(oDegreeSubSup.CtrPrp)
+					}
+					break;
+				case DEGREE_PreSubSup:
+					oDegreeObj["type"]      = "preSubSupScript";
+					oDegreeObj["sPrePr"]    = {
+						ctrlPr: SerTextPr(oDegreeSubSup.CtrPrp)
+					}
+					break;
+			}
+
+
+			return oDegreeObj;
+		};
+		function SerRadical(oRadical)
+		{
+			if (!oRadical)
+				return oRadical;
+
+			var sRadType = oRadical.Pr.type === 0 ? "radSquare" : "radDegree";
+
+			return {
+				radPr: {
+					ctrlPr:  SerTextPr(oRadical.CtrPrp),
+					degHide: oRadical.Pr.degHide
+				},
+				e:     SerMathContent(oRadical.RealBase),
+				deg:   SerMathContent(oRadical.Iterator),
+				type:  sRadType
+			}
+		};
+		function SerNary(oNary)
+		{
+			if (!oNary)
+				return oNary;
+
+			var sLimLoc = "";
+			switch (oNary.Pr.limLoc)
+			{
+				case NARY_UndOvr:
+					sLimLoc = "undOvr";
+					break;
+				case NARY_SubSup:
+					sLimLoc = "subSup";
+					break;
+			}
+			return {
+				e:      SerMathContent(oNary.Arg),
+				sup:    SerMathContent(oNary.UpperIterator),
+				sub:    SerMathContent(oNary.LowerIterator),
+				naryPr: {
+					chr:     oNary.Pr.chr,
+					ctrlPr:  SerTextPr(oNary.CtrPrp),
+					grow:    oNary.Pr.grow,
+					limLoc:  sLimLoc,
+					subHide: oNary.Pr.subHide,
+					supHide: oNary.Pr.supHide
+				},
+				type:   "nary"
+			}
+		};
+		function SerEqArray(oEqArray)
+		{
+			if (!oEqArray)
+				return oEqArray;
+
+			var oEqArrayObj = {
+				eqArrPr: {
+					baseJc:  oEqArray.Pr.baseJc,
+					ctrlPr:  SerTextPr(oEqArray.CtrPrp),
+					maxDist: oEqArray.Pr.maxDist,
+					objDist: oEqArray.Pr.objDist,
+					rSp:     oEqArray.Pr.rSp,
+					rSpRule: oEqArray.Pr.rSpRule
+				},
+				e:  [],
+				type: "eqArray"
+			}
+
+			for (var nArg = 0; nArg < oEqArray.elements.length; nArg++)
+				oEqArrayObj["e"].push(SerMathContent(oEqArray.elements[nArg][0]));
+
+			return oEqArrayObj;
+		};
+		function SerDelimiter(oDelimiter)
+		{
+			if (!oDelimiter)
+				return oDelimiter;
+
+			var oDelimiterObj = {
+				dPr:  {
+					begChr: oDelimiter.Pr.begChr,
+					ctrlPr: SerTextPr(oDelimiter.CtrPrp),
+					endChr: oDelimiter.Pr.endChr,
+					grow:   oDelimiter.Pr.grow,
+					sepChr: oDelimiter.Pr.sepChr,
+					shp:    oDelimiter.Pr.shp
+				},
+				e:    [],
+				type: "delimiter"
+			}
+
+			for (var nArg = 0; nArg < oDelimiter.elements[0].length; nArg++)
+				oDelimiterObj["e"].push(SerMathContent(oDelimiter.elements[0][nArg]));
+
+			return oDelimiterObj;
+		};
+		function SerMathFunc(oMathFunc)
+		{
+			if (!oMathFunc)
+				return oMathFunc;
+
+			return {
+				fName:  SerMathContent(oMathFunc.elements[0][0]),
+				e:      SerMathContent(oMathFunc.elements[0][1]),
+				funcPr: {
+					ctrlPr: SerTextPr(oMathFunc.CtrPrp)
+				},
+				type: "mathFunc"
+			}
+		};
+		function SerAccent(oAccent)
+		{
+			if (!oAccent)
+				return oAccent;
+
+			return {
+				accPr: {
+					ctrlPr: SerTextPr(oAccent.CtrPrp),
+					chr:    oAccent.Pr.chr
+				},
+				e:    SerMathContent(oAccent.elements[0][0]),
+				type: "accent"
+			}
+		};
+		function SerGroupCharacter(oGrpChar)
+		{
+			if (!oGrpChar)
+				return oGrpChar;
+
+			return {
+				groupChrPr: {
+					chr:    oGrpChar.Pr.chr,
+					ctrlPr: SerTextPr(oGrpChar.CtrPrp),
+					pos:    oGrpChar.Pr.pos,
+					vertJc: oGrpChar.Pr.vertJc
+				},
+				e:    SerMathContent(oGrpChar.elements[0][0]),
+				type: "groupChr"
+			}
+		};
+		function SerBorderBox(oBox)
+		{
+			if (!oBox)
+				return oBox;
+
+			return {
+				borderBoxPr: {
+					ctrlPr:     SerTextPr(oBox.CtrPrp),
+					hideBot:    oBox.Pr.hideBot,
+					hideLeft:   oBox.Pr.hideLeft,
+					hideRight:  oBox.Pr.hideRight,
+					hideTop:    oBox.Pr.hideTop,
+					strikeBLTR: oBox.Pr.strikeBLTR,
+					strikeH:    oBox.Pr.strikeH,
+					strikeTLBR: oBox.Pr.strikeTLBR,
+					strikeV:    oBox.Pr.strikeV
+				},
+				e:    SerMathContent(oBox.elements[0][0]),
+				type: "borderBox"
+			}
+		};
+		function SerBox(oBox)
+		{
+			if (!oBox)
+				return oBox;
+
+			return {
+				boxPr: {
+					ctrlPr:  SerTextPr(oBox.CtrPrp),
+					aln:     oBox.Pr.aln,
+					brk:     oBox.Pr.brk,
+					diff:    oBox.Pr.diff,
+					noBreak: oBox.Pr.noBreak,
+					opEmu:   oBox.Pr.opEmu
+				},
+				e:      SerMathContent(oBox.elements[0][0]),
+				type:   "box"
+			}
+		};
+		function SerBar(oBar)
+		{
+			if (!oBar)
+				return oBar;
+			
+			return {
+				barPr: {
+					ctrlPr: SerTextPr(oBar.CtrPrp),
+					pos:    oBar.Pr.pos
+				},
+				e:     SerMathContent(oBar.elements[0][0]),
+				type:  "bar"
+			}
+		};
+		function SerLimit(oLimit)
+		{
+			if (!oLimit)
+				return oLimit;
+
+			var oLimObj = {
+				e:     SerMathContent(oLimit.getFName()),
+				limit: SerMathContent(oLimit.getIterator())
+			}
+			
+			if (oLimit.Pr.type === 1)
+			{
+				oLimObj["type"]     = "limUpp";
+				oLimObj["limUppPr"] = {
+					ctrlPr: SerTextPr(oLimit.CtrPrp)
+				};
+			}
+			else
+			{
+				oLimObj["type"]     = "limLow";
+				oLimObj["limLowPr"] = {
+					ctrlPr: SerTextPr(oLimit.CtrPrp)
+				};
+			}
+				
+			return oLimObj;
+		};
+		function SerMathMatrix(oMatrix)
+		{
+			if (!oMatrix)
+				return oMatrix;
+
+			var arrMatrixRow = [];
+
+			for (var nRow = 0; nRow < oMatrix.elements.length; nRow++)
+			{
+				var arrCells = [];
+				for (var nCell = 0; nCell < oMatrix.elements[nRow].length; nCell++)
+					arrCells.push(SerMathContent(oMatrix.elements[nRow][nCell]));
+				
+				arrMatrixRow.push(arrCells);
+			}
+			return {
+				mPr: {
+					baseJc:  oMatrix.Pr.baseJc,
+					cGp:     oMatrix.Pr.cGp,
+					cGpRule: oMatrix.Pr.cGpRule,
+					cSp:     oMatrix.Pr.cSp,
+					ctrlPr:  SerTextPr(oMatrix.CtrPrp),
+					mcs: {
+						mc: {
+							mcPr: {
+								count: oMatrix.Pr.mcs.count,
+								mcJc:  oMatrix.Pr.mcs.mcJc
+							}
+						}
+					},
+					plcHide: oMatrix.Pr.plcHide,
+					rSp:     oMatrix.Pr.rSp,
+					rSpRule: oMatrix.Pr.rSpRule
+				},
+				mr:   arrMatrixRow,
+				type: "matrix"
+			}
+		};
+
+		return oMathObject;
+	};
+	function SerParaComment(oComment)
+	{
+		if (!oComment || !oComment.Paragraph)
+			return null;
+
+		var isStartComment   = oComment.Start;
+		var oTempComment     = null;
+		var oCommentObj      = {
+			id: oComment.CommentId
+		};
+		if (isStartComment)
+			oCommentObj["type"] = "commentRangeStart";
+		else
+			oCommentObj["type"] = "commentRangeEnd";
+
+		for (var nElm = 0; nElm < oComment.Paragraph.Content.length; nElm++)
+		{
+			if (oComment.Paragraph.Content[nElm] instanceof AscCommon.ParaComment)
+			{
+				oTempComment = oComment.Paragraph.Content[nElm];
+				if (oTempComment.CommentId === oComment.CommentId && oTempComment.Start !== isStartComment)
+				{
+					return oCommentObj;
+				}
+			}
 		}
+
+		return null;
+	};
+	function SerParaBookmar(oBookmark)
+	{
+		if (!oBookmark || !oBookmark.Paragraph)
+			return null;
+
+		var isStartBookmark   = oBookmark.Start;
+		var oTempBookmark     = null;
+		var oBookmarkObj      = {
+			id:   oBookmark.BookmarkId,
+			name: oBookmark.BookmarkName
+		};
+		if (isStartBookmark)
+			oBookmarkObj["type"] = "bookmarkStart";
+		else
+			oBookmarkObj["type"] = "bookmarkEnd";
+
+		for (var nElm = 0; nElm < oBookmark.Paragraph.Content.length; nElm++)
+		{
+			if (oBookmark.Paragraph.Content[nElm] instanceof AscCommonWord.CParagraphBookmark)
+			{
+				oTempBookmark = oBookmark.Paragraph.Content[nElm];
+				if (oTempBookmark.CommentId === oBookmark.CommentId && oTempBookmark.Start !== isStartBookmark)
+				{
+					return oBookmarkObj;
+				}
+			}
+		}
+
+		return null;
 	};
 	// end of serialize functions
 
@@ -5422,6 +6372,15 @@
 
 		return Range;
 	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiDocumentContent
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiDocumentContent.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerDocContent(this.Document));
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -7488,7 +8447,9 @@
 			type: "paragraph"
 		};
 		
-		var oTempElm = null;
+		var oTempElm    = null;
+		var oTempResult = null;
+
 		for (var nElm = 0; nElm < this.Paragraph.Content.length; nElm++)
 		{
 			oTempElm = this.Paragraph.Content[nElm];
@@ -7497,12 +8458,24 @@
 			{
 				var oRunObject = JSON.parse(new ApiRun(oTempElm).ToJSON());
 				if (oRunObject.content.length !== 0)
-					oParaObject.content.push(oRunObject);
+					oParaObject["content"].push(oRunObject);
 			}
-			else if (oTempElm instanceof AscCommonWord.CTable)
-				oParaObject.content.push(JSON.parse(new ApiTable(oTempElm).ToJSON()));
+			else if (oTempElm instanceof AscCommonWord.ParaMath)
+				oParaObject["content"].push(SerParaMath(oTempElm));
 			else if (oTempElm instanceof AscCommonWord.ParaHyperlink)
-				oParaObject.content.push(JSON.parse(new ApiHyperlink(oTempElm).ToJSON()));		
+				oParaObject["content"].push(JSON.parse(new ApiHyperlink(oTempElm).ToJSON()));
+			else if (oTempElm instanceof AscCommon.ParaComment)
+			{
+				oTempResult = SerParaComment(oTempElm);
+				if (oTempResult)
+					oParaObject["content"].push(oTempResult);
+			}
+			else if (oTempElm instanceof AscCommonWord.CParagraphBookmark)
+			{
+				oTempResult = SerParaBookmar(oTempElm);
+				if (oTempResult)
+					oParaObject["content"].push(oTempResult);
+			}
 		}
 
 		return JSON.stringify(oParaObject);
@@ -8163,22 +9136,80 @@
 			type:    "run"
 		}
 		
-		function SerPageNum(oPageNum) /// ???
+		if (this.Run.Type === para_Math_Run)
+			oRunObject["mathPr"] = this.Run.MathPrp;
+
+		function SerPageNum(oPageNum)
 		{
 			if (!oPageNum)
 				return oPageNum;
 
 			return {
-
+				type: "pgNum"
 			}
 		};
 		function SerPageCount(oPageCount)
 		{
 			if (!oPageCount)
-				return oPageCount;
+				return [];
 
-			return {
+			return ToComplexField(oPageCount);
+		};
+		function ToComplexField(oElement)
+		{
+			var arrComplexFieldRuns = [];
+			var oFldCharBegin = {
+				type:        "fldChar",
+				fldCharType: "begin"
+			}
+			var oFldCharSep   = {
+				type:        "fldChar",
+				fldCharType: "separate"
+			}
+			var oFldCharEnd   = {
+				type:        "fldChar",
+				fldCharType: "end"
+			}
+			var oInstrText    = {
+				type: "instrText"
+			}
+
+			var sResultOfField = "";
+			arrComplexFieldRuns.push(oFldCharBegin);
+			switch (oElement.Type)
+			{
+				case para_PageCount:
+					oInstrText["instr"] = "PAGE";
+					sResultOfField      = oElement.String;
+			}
+			arrComplexFieldRuns.push(oInstrText);
+			arrComplexFieldRuns.push(oFldCharSep);
+			arrComplexFieldRuns.push(sResultOfField);
+			arrComplexFieldRuns.push(oFldCharEnd);
+
+			return arrComplexFieldRuns;
+		};
+		function SerParaNewLine(oParaNewLine)
+		{
+			if (!oParaNewLine)
+				return oParaNewLine;
 				
+			var sBreakType = "";
+			switch (oParaNewLine.BreakType)
+			{
+				case AscCommonWord.break_Line:
+					sBreakType = "textWrapping";
+					break;
+				case AscCommonWord.break_Page:
+					sBreakType = "page";
+					break;
+				case AscCommonWord.break_Column:
+					sBreakType = "column";
+					break;
+			}
+			return {
+				type: "break",
+				breakType: sBreakType
 			}
 		};
 		var ContentLen        = this.Run.Content.length;
@@ -8192,8 +9223,14 @@
 			switch (ItemType)
 			{
 				case para_PageNum:
+					oRunObject["content"].push(sTempRunText);
+					oRunObject["content"].push(SerPageNum(Item));
+					sTempRunText = '';
 					break;
 				case para_PageCount:
+					oRunObject["content"].push(sTempRunText);
+					oRunObject["content"] = oRunObject["content"].concat(SerPageCount(Item));
+					sTempRunText = '';
 					break;
 				case para_Drawing:
 				{
@@ -8206,18 +9243,32 @@
 				{
 					break;
 				}
-				case para_Text :
+				case para_Text:
 				{
 					sTempRunText += String.fromCharCode(Item.Value);
 					break;
 				}
-				case para_Space:
+				case para_Math_Text:
+				case para_Math_BreakOperator:
+				{
+					sTempRunText += String.fromCharCode(Item.value);
+					break;
+				}
 				case para_NewLine:
-				case para_Tab:
+					SerParaNewLine(Item);
+					break;
+				case para_Space:
 				{
 					sTempRunText += " ";
 					break;
 				}
+				case para_Tab:
+					oRunObject["content"].push(sTempRunText);
+					oRunObject["content"].push({
+						type: "tab"
+					});
+					sTempRunText = '';
+					break;
 			}
 		}
 		if (ContentLen !== 0)
@@ -9360,6 +10411,16 @@
 		
 		return true;
 	};
+	/**
+	 * Convert to JSON object. 
+	 * @memberof ApiTable
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiTable.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTable(this.Table));
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -9639,6 +10700,15 @@
 		}
 
 		return arrApiRanges;
+	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiTableRow
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiTableRow.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTableRow(this.Row));
 	};
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -9937,6 +11007,15 @@
 		}
 
 		return false;
+	};
+	/**
+	 * Convert to JSON object.
+	 * @memberof ApiTableCell
+	 * @typeofeditors ["CDE"]
+	 */
+	ApiTableCell.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTableCell(this.Cell));
 	};
 	
 	//------------------------------------------------------------------------------------------------------------------
@@ -11459,6 +12538,16 @@
 
 		this.private_OnChange();
 	};
+	/**
+	 * Convert to JSON object. 
+	 * @memberof ApiTablePr
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiTablePr.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTablePr(this.TablePr));
+	};
 
 	//------------------------------------------------------------------------------------------------------------------
 	//
@@ -11505,6 +12594,16 @@
 	{
 		this.RowPr.TableHeader = private_GetBoolean(isHeader);
 		this.private_OnChange();
+	};
+	/**
+	 * Convert to JSON object. 
+	 * @memberof ApiTableRowPr
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiTableRowPr.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTableRowPr(this.RowPr));
 	};
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -11772,6 +12871,16 @@
 	{
 		this.CellPr.NoWrap = private_GetBoolean(isNoWrap);
 		this.private_OnChange();
+	};
+	/**
+	 * Convert to JSON object. 
+	 * @memberof ApiTableCellPr
+	 * @typeofeditors ["CDE"]
+	 * @returns {JSON}
+	 */
+	ApiTableCellPr.prototype.ToJSON = function()
+	{
+		return JSON.stringify(SerTableCellPr(this.CellPr));
 	};
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -14988,7 +16097,10 @@
 	{
 		return 25.4 / 72.0 / 20 * twips;
 	}
-
+	function private_MM2Twips(mm)
+	{
+		return mm / (25.4 / 72.0 / 20);
+	}
 	function private_EMU2MM(EMU)
 	{
 		return EMU / 36000.0;
