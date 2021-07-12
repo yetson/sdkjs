@@ -1524,9 +1524,10 @@
 
 			var date = new cDate(start);
 			var startTime = date.getTime();
+			var startDate = start.getUTCDate();
 			for (var i = 0; i < difAbs; i++) {
 				date.setTime(startTime);
-				date.setUTCDate(start.getUTCDate() + i);
+				date.setUTCDate(startDate + i);
 
 				if (!_includeInHolidays(date, holidays) && !weekends[date.getUTCDay()]) {
 					count++;
