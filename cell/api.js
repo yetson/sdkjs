@@ -4717,6 +4717,16 @@ var editor;
     }
   };
 
+	spreadsheet_api.prototype._coAuthoringSetChanges = function(e, oColor)
+	{
+		var Count = e.length;
+		for (var Index = 0; Index < Count; ++Index) {
+			this.CoAuthoringApi.onSaveChanges(e[Index], null, true);
+		}
+		this.collaborativeEditing.applyChanges();
+		this._onUpdateAfterApplyChanges();
+	};
+
   spreadsheet_api.prototype.asc_nativeGetFile = function() {
     var oBinaryFileWriter = new AscCommonExcel.BinaryFileWriter(this.wbModel);
     return oBinaryFileWriter.Write();
