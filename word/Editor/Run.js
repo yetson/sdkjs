@@ -3458,10 +3458,10 @@ ParaRun.prototype.Recalculate_Range = function(PRS, ParaPr, Depth)
                                 SpaceLen = 0;
                                 WordLen = 0;
                             }
-                        }
-                        if (AscCommon.isEastAsianScript(Item.Value) && Item.CanBeAtBeginOfLine()) 
-                        {
-                            PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+                            if (AscCommon.isEastAsianScript(Item.Value) && Item.CanBeAtBeginOfLine()) 
+                            {
+                                PRS.Set_LineBreakPos(Pos, FirstItemOnLine);
+                            }
                         }
                     }
 
