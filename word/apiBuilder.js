@@ -1348,7 +1348,7 @@
 	function SerStyle(oStyle)
 	{
 		if (!oStyle)
-			return !oStyle;
+			return oStyle;
 
 
 		var sStyleType = "";
@@ -1371,39 +1371,68 @@
 				break;
 		}
 
+		// Style Conditional Table Formatting Properties
+		var oTblStylesPr = {
+			band1Horz:  SerTableStylePr(oStyle.TableBand1Horz),
+			band1Vert:  SerTableStylePr(oStyle.TableBand1Vert),
+			band2Horz:  SerTableStylePr(oStyle.TableBand2Horz),
+			band2Vert:  SerTableStylePr(oStyle.TableBand2Vert),
+			firstCol:   SerTableStylePr(oStyle.TableFirstCol),
+			firstRow:   SerTableStylePr(oStyle.TableFirstRow),
+			lastCol:    SerTableStylePr(oStyle.TableLastCol),
+			lastRow:    SerTableStylePr(oStyle.TableLastRow),
+			neCell:     SerTableStylePr(oStyle.TableTRCell),
+			nwCell:     SerTableStylePr(oStyle.TableTLCell),
+			seCell:     SerTableStylePr(oStyle.TableBRCell),
+			swCell:     SerTableStylePr(oStyle.TableBLCell),
+			wholeTable: SerTableStylePr(oStyle.TableWholeTable)
+		};
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBand1Horz, "band1Horz"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBand1Vert, "band1Vert"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBand2Horz, "band2Horz"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBand2Vert, "band2Vert"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableFirstCol, "firstCol"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableFirstRow, "firstRow"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableLastCol, "lastCol"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableLastRow, "lastRow"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableTRCell, "neCell"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableTLCell, "nwCell"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBRCell, "seCell"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableBLCell, "swCell"));
+		//arrTblStylePr.push(SerTableStylePr(oStyle.TableWholeTable, "wholeTable"));
+
 		return {
-			basedOn:        BasedOn,
-			hidden:         hidden,
-			link:           Link,
-			name:           Name,
-			next:           Next,
-			pPr:            SerParaPr(ParaPr),
-			qFormat:        qFormat,
-			rPr:            SerTextPr(TextPr),
-			semiHidden:     semiHidden,
-			tblPr:          SerTablePr(TablePr),
-			tblStylePr:     null,
-			tcPr:           SerTableCellPr(TableCellPr),
-			trPr:           SerTableRowPr(TableRowPr),
-			uiPriority:     uiPriority,
-			unhideWhenUsed: unhideWhenUsed,
-			customStyle:    Custom,
-			styleId:        Id,
+			basedOn:        oStyle.BasedOn,
+			hidden:         oStyle.hidden,
+			link:           oStyle.Link,
+			name:           oStyle.Name,
+			next:           oStyle.Next,
+			pPr:            SerParaPr(oStyle.ParaPr),
+			qFormat:        oStyle.qFormat,
+			rPr:            SerTextPr(oStyle.TextPr),
+			semiHidden:     oStyle.semiHidden,
+			tblPr:          SerTablePr(oStyle.TablePr),
+			tblStylePr:     oTblStylesPr,
+			tcPr:           SerTableCellPr(oStyle.TableCellPr),
+			trPr:           SerTableRowPr(oStyle.TableRowPr),
+			uiPriority:     oStyle.uiPriority,
+			unhideWhenUsed: oStyle.unhideWhenUsed,
+			customStyle:    oStyle.Custom,
+			styleId:        oStyle.Id,
 			type:           sStyleType
 		}
 	};
-	function SerTableStylePr(oPr, oTable)
+	function SerTableStylePr(oPr, sType)
 	{
 		if (!oPr)
 			return oPr;
 
 		return {
-			pPr:   SerParaPr(ParaPr),
-			rPr:   SerTextPr(TextPr),
-			tblPr: SerTablePr(TablePr, oTable),
-			tcPr:  SerTableCellPr(TableCellPr),
-			trPr:  SerTableRowPr(TableRowPr),
-			type:  undefined
+			pPr:   SerParaPr(oPr.ParaPr),
+			rPr:   SerTextPr(oPr.TextPr),
+			tblPr: SerTablePr(oPr.TablePr, null),
+			tcPr:  SerTableCellPr(oPr.TableCellPr),
+			trPr:  SerTableRowPr(oPr.TableRowPr),
 		}
 	};
 	function SerTableMeasurement(oMeasurement)
@@ -1418,7 +1447,7 @@
 			case tblwidth_Mm:
 				return {
 					type: "dxa",
-					w:    private_MM2Twips(oTable.TableW.W)
+					w:    private_MM2Twips(oMeasurement.W)
 				};
 			case tblwidth_Nil:
 				return {
@@ -1428,7 +1457,7 @@
 			case tblwidth_Pct:
 				return {
 					type: "pct",
-					w:    oTable.TableW.W
+					w:    oMeasurement.W
 				};
 		}
 
@@ -1440,7 +1469,7 @@
 			return oPr;
 
 		var sJc          = undefined;
-		var sLayoutType  = oPr.TableLayout ? (oPr.TableLayout === tbllayout_Fixed ? "fixed" : "autofit") : oPr.TableLayout;
+		var sLayoutType  = oPr.TableLayout == undefined ? oPr.TableLayout : (oPr.TableLayout === tbllayout_Fixed ? "fixed" : "autofit");
 		var sOverlapType = oTable ? (oTable.AllowOverlap ? "overlap" : "never") : "never";
 		switch (oPr.Jc)
 		{
@@ -1535,19 +1564,19 @@
 			switch (oTable.PositionV.Value)
 			{
 				case c_oAscYAlign.Center:
-					sHorAlign = "center";
+					sVerAlign = "center";
 					break;
 				case c_oAscYAlign.Inside:
-					sHorAlign = "inside";
+					sVerAlign = "inside";
 					break;
 				case c_oAscYAlign.Left:
-					sHorAlign = "left";
+					sVerAlign = "left";
 					break;
 				case c_oAscYAlign.Outside:
-					sHorAlign = "outside";
+					sVerAlign = "outside";
 					break;
 				case c_oAscYAlign.Right:
-					sHorAlign = "right";
+					sVerAlign = "right";
 					break;
 			}
 		}
@@ -1575,7 +1604,7 @@
 
 		return {
 			jc:         sJc,
-			shd:        SerShd(Shd),
+			shd:        SerShd(oPr.Shd),
 
 			tblBorders: {
 				bottom:  SerBorder(oPr.TableBorders.Bottom),
@@ -1603,8 +1632,8 @@
 			tblpPr:              oTblPosPr,
 			tblPrChange:         SerTablePr(oPr.PrChange),
 			tblStyle:            oTableStyle ? SerStyle(oTableStyle) : oTableStyle,
-			tblStyleColBandSize: undefined, /// ???
-			tblStyleRowBandSize: undefined, /// ???
+			tblStyleColBandSize: oPr.TableStyleColBandSize,
+			tblStyleRowBandSize: oPr.TableStyleRowBandSize,
 			tblW:                oTableW
 		}
 	};
@@ -1614,11 +1643,17 @@
 			return oTable;
 
 		var oTableObj = {
-			tblGrid: {},
+			tblGrid: [],
 			tblPr:   SerTablePr(oTable.Pr, oTable),
 			content: [],
 			type:    "table"
 		}
+
+		for (var nGrid = 0; nGrid < oTable.TableGrid.length; nGrid++)
+			oTableObj["tblGrid"].push({
+				w:    private_MM2Twips(oTable.TableGrid[nGrid]),
+				type: "gridCol"
+			});
 
 		for (var nRow = 0; nRow < oTable.Content.length; nRow++)
 			oTableObj["content"].push(SerTableRow(oTable.Content[nRow]));
@@ -1634,6 +1669,7 @@
 		var sVMerge = oPr.VMerge ? (oPr.VMerge === 2 ? "continue" : "restart") : "restart";
 		var sVAlign = undefined;
 
+		// alignV
 		if (oPr.VAlign)
 		{
 			switch (oPr.VAlign)
@@ -1650,17 +1686,41 @@
 			}
 		}
 
+		// text direction
+		var sTextDir = undefined;
+		switch (oPr.TextDirection)
+		{
+			case textdirection_LRTB:
+				sTextDir = "lrtb";
+				break;
+			case textdirection_TBRL:
+				sTextDir = "tbrl";
+				break;
+			case textdirection_BTLR:
+				sTextDir = "btlr";
+				break;
+			case textdirection_LRTBV:
+				sTextDir = "lrtbV";
+				break;
+			case textdirection_TBRLV:
+				sTextDir = "tbrlV";
+				break;
+			case textdirection_TBLRV:
+				sTextDir = "tblrV";
+				break;
+		}
+
 		return {
-			gridSpan: GridSpan,
+			gridSpan: oPr.GridSpan,
 			hMerge:   sHMerge,
-			noWrap:   NoWrap,
-			shd:      SerShd(Shd),
+			noWrap:   oPr.NoWrap,
+			shd:      SerShd(oPr.Shd),
 
 			tcBorders: {
-				bottom:  SerBorder(oPr.TableBorders.Bottom),
-				end:     SerBorder(oPr.TableBorders.Right),
-				start:   SerBorder(oPr.TableBorders.Left),
-				top:     SerBorder(oPr.TableBorders.Top)
+				bottom:  SerBorder(oPr.TableCellBorders.Bottom),
+				end:     SerBorder(oPr.TableCellBorders.Right),
+				start:   SerBorder(oPr.TableCellBorders.Left),
+				top:     SerBorder(oPr.TableCellBorders.Top)
 			},
 
 			tcMar: oPr.TableCellMar ? {
@@ -1672,7 +1732,7 @@
 
 			tcPrChange:    SerTableCellPr(oPr.PrChange),
 			tcW:           oPr.TableCellW ? SerTableMeasurement(oPr.TableCellW) : oPr.TableCellW,
-			textDirection: oPr.TextDirection,
+			textDirection: sTextDir,
 			vAlign:        sVAlign,
 			vMerge:        sVMerge
 		}
@@ -1744,7 +1804,7 @@
 					break;
 				case linerule_Auto:
 					oRowHeight = {
-						val:   private_MM2Twips(oPr.Height.Value),
+						val:   oPr.Height.Value,
 						hRule: "auto"
 					};
 					break;
@@ -1762,7 +1822,7 @@
 			gridAfter:      oPr.GridAfter,
 			gridBefore:     oPr.GridBefore,
 			jc:             sRowJc,
-			tblCellSpacing: private_MM2Twips(oPr.TableCellSpacing),
+			tblCellSpacing: oPr.TableCellSpacing ? private_MM2Twips(oPr.TableCellSpacing) : oPr.TableCellSpacing,
 			tblHeader:      oPr.TableHeader,
 			trHeight:       oRowHeight,
 			trPrChange:     SerTableRowPr(oPr.PrChange),
@@ -1787,6 +1847,11 @@
 				b:    oBorder.Color.b
 			} : oBorder.Color,
 
+			lineRef: oBorder.LineRef ? {
+				idx:   oBorder.LineRef.idx,
+				color: SerColor(oBorder.LineRef.Color)
+			} : oBorder.LineRef,
+
 			sz:         oBorder.Size,
 			space:      oBorder.Space,
 			themeColor: SerFill(oBorder.Unifill),
@@ -1802,9 +1867,9 @@
 		}
 
 		var TempElm = null;
-		for (var nElm = 0; nElm < this.Document.Content.length; nElm++)
+		for (var nElm = 0; nElm < oDocContent.Content.length; nElm++)
 		{
-			TempElm = this.Document.Content[nElm];
+			TempElm = oDocContent.Content[nElm];
 
 			if (TempElm instanceof AscCommonWord.Paragraph)
 				oDocContentObj["content"].push(JSON.parse(new ApiParagraph(TempElm).ToJSON()));
@@ -1821,9 +1886,39 @@
 		if (!oParaPr)
 			return oParaPr;
 
+		// paragraph style
+		var oParaStyle   = oParaPr.PStyle ? private_GetLogicDocument().Styles.Get(oParaPr.PStyle) : undefined;
+		
+		// spacing
+		var oSpacing = {
+			before:            oParaPr.Spacing.Before ? private_MM2Twips(oParaPr.Spacing.Before) : oParaPr.Spacing.Before,
+			beforePct:         oParaPr.Spacing.BeforePct,
+			beforeAutoSpacing: oParaPr.Spacing.BeforeAutoSpacing !== undefined ? (oParaPr.Spacing.BeforeAutoSpacing === true ? "on" : "off") : oParaPr.Spacing.BeforeAutoSpacing,
+			after:             oParaPr.Spacing.After ? private_MM2Twips(oParaPr.Spacing.After) : oParaPr.Spacing.After,
+			afterPct:          oParaPr.Spacing.AfterPct,
+			afterAutoSpacing:  oParaPr.Spacing.AfterAutoSpacing !== undefined ? (oParaPr.Spacing.AfterAutoSpacing === true ? "on" : "off") : oParaPr.Spacing.AfterAutoSpacing
+		};
+
+		switch (oParaPr.Spacing.LineRule)
+		{
+			case linerule_AtLeast:
+				oSpacing["lineRule"] = "atLeast";
+				oSpacing["line"]     = private_MM2Twips(oParaPr.Spacing.Line)
+				break;
+			case linerule_Auto:
+				oSpacing["lineRule"] = "auto";
+				oSpacing["line"]     = private_MM2Twips(oParaPr.Spacing.Line)
+				break;
+			case linerule_Exact:
+				oSpacing["lineRule"] = "exact";
+				oSpacing["line"]     = private_MM2Twips(oParaPr.Spacing.Line)
+				break;
+		}
+
 		return {
 			contextualSpacing: oParaPr.ContextualSpacing,
-			framePr:           oParaPr.FramePr ? 
+
+			framePr: oParaPr.FramePr ? 
 			{
 				dropCap: oParaPr.FramePr.DropCap,
 				h:       oParaPr.FramePr.H,
@@ -1840,46 +1935,44 @@
 				y:       oParaPr.FramePr.Y,
 				yAlign:  oParaPr.FramePr.YAlign
 			} :  oParaPr.FramePr,
-			ind:               oParaPr.Ind ? 
+
+			ind: oParaPr.Ind ? 
 			{
 				left:      oParaPr.Ind.Left, /// start ?
 				right:     oParaPr.Ind.Right, /// end ?
 				firstLine: oParaPr.Ind.FirstLine
 			} : oParaPr.Ind,
-			jc:                oParaPr.Jc,
-			keepLines:         oParaPr.KeepLines,
-			keepNext:          oParaPr.KeepNext,
-			numPr:             oParaPr.NumPr ? {
+
+			jc:        oParaPr.Jc,
+			keepLines: oParaPr.KeepLines,
+			keepNext:  oParaPr.KeepNext,
+
+			numPr: oParaPr.NumPr ? {
 				ilvl:  oParaPr.NumPr.Lvl,
 				numId: oParaPr.NumPr.NumId
 			} : oParaPr.NumPr,
-			outlineLvl:        oParaPr.OutlineLvl,
-			pageBreakBefore:   oParaPr.PageBreakBefore,
-			pBdr:              oParaPr.Brd ? 
+
+			outlineLvl:      oParaPr.OutlineLvl,
+			pageBreakBefore: oParaPr.PageBreakBefore,
+
+			pBdr: oParaPr.Brd ? 
 			{
-				between: oParaPr.Brd.Between,
-				bottom:  oParaPr.Brd.Bottom,
-				left:    oParaPr.Brd.Left,
-				right:   oParaPr.Brd.Right,
-				top:     oParaPr.Brd.Top
+				between: SerBorder(oParaPr.Brd.Between),
+				bottom:  SerBorder(oParaPr.Brd.Bottom),
+				left:    SerBorder(oParaPr.Brd.Left),
+				right:   SerBorder(oParaPr.Brd.Right),
+				top:     SerBorder(oParaPr.Brd.Top)
 			} : oParaPr.Brd,
-			pPrChange:         SerParaPr(oParaPr.PrChange),
-			pStyle:            oParaPr.PStyle,
-			shd:               SerShd(oParaPr.Shd),
-			spacing:           oParaPr.Spacing ? 
-			{
-				line:              oParaPr.Spacing.Line,
-				lineRule:          oParaPr.Spacing.LineRule,
-				before:            oParaPr.Spacing.Before,
-				beforePct:         oParaPr.Spacing.BeforePct,
-				beforeAutoSpacing: oParaPr.Spacing.BeforeAutoSpacing,
-				after:             oParaPr.Spacing.After,
-				afterPct:          oParaPr.Spacing.AfterPct,
-				afterAutoSpacing:  oParaPr.Spacing.AfterAutoSpacing
-			} : oParaPr.Spacing,
-			tabs:              SerTabs(oParaPr.Tabs),
-			widowControl:      oParaPr.WidowControl,
-			bullet:            SerBullet(oParaPr.Bullet)
+
+			pPrChange: SerParaPr(oParaPr.PrChange),
+			pStyle:    SerStyle(oParaStyle),
+			shd:       SerShd(oParaPr.Shd),
+
+			spacing: oSpacing,
+
+			tabs:         SerTabs(oParaPr.Tabs),
+			widowControl: oParaPr.WidowControl,
+			bullet:       SerBullet(oParaPr.Bullet)
 		}
 	};
 	function SerTabs(oTabs)
@@ -2566,6 +2659,26 @@
 		if (!oTextPr)
 			return oTextPr;
 		
+		// run style
+		var oRunStyle = oTextPr.RStyle ? private_GetLogicDocument().Styles.Get(oTextPr.RStyle) : undefined;
+		
+		var sVAlign = undefined;
+		// alignV
+		if (oTextPr.VAlign)
+		{
+			switch (oTextPr.VAlign)
+			{
+				case vertalignjc_Top:
+					sVAlign = "top";
+					break;
+				case vertalignjc_Center:
+					sVAlign = "center";
+					break;
+				case vertalignjc_Bottom:
+					sVAlign = "bottom";
+					break;
+			}
+		}
 		return {
 			b:         oTextPr.Bold,
 			bCs:       oTextPr.BoldCs,
@@ -2592,28 +2705,30 @@
 				val:      oTextPr.Lang.Val
 			} : oTextPr.Lang,
 			outline:   oTextPr.TextOutline,
-			position:  oTextPr.Position,
+			position:  2.0 * private_MM2Pt(oTextPr.Position), /// ???
 			rFonts:    oTextPr.RFonts ? {
 				ascii: oTextPr.RFonts.Ascii,
-				asciiTheme: oTextPr.RFonts.AsciiAsciiTheme,
-				cs: oTextPr.RFonts.AsciiCS,
-				cstheme: oTextPr.RFonts.AsciiCSTheme,
-				eastAsia: oTextPr.RFonts.AsciiEastAsia,
-				eastAsiaTheme: oTextPr.RFonts.AsciiEastAsiaTheme,
-				hAnsi: oTextPr.RFonts.AsciiHAnsi,
-				hAnsiTheme: oTextPr.RFonts.AsciiHAnsiTheme,
-				hint: oTextPr.RFonts.AsciiHint
+				asciiTheme: oTextPr.RFonts.AsciiTheme,
+				cs: oTextPr.RFonts.CS,
+				cstheme: oTextPr.RFonts.CSTheme,
+				eastAsia: oTextPr.RFonts.EastAsia,
+				eastAsiaTheme: oTextPr.RFonts.EastAsiaTheme,
+				hAnsi: oTextPr.RFonts.HAnsi,
+				hAnsiTheme: oTextPr.RFonts.HAnsiTheme,
+				hint: oTextPr.RFonts.Hint
 			} : oTextPr.RFonts,
 			rPrChange: SerTextPr(oTextPr.PrChange),
-			rStyle:    oTextPr.RStyle,
+			rStyle:    SerStyle(oRunStyle),
 			rtl:       oTextPr.RTL,
 			shd:       SerShd(oTextPr.Shd),
 			smallCaps: oTextPr.SmallCaps,
-			spacing:   oTextPr.Spacing,
+			spacing:   private_MM2Twips(oTextPr.Spacing),
 			strike:    oTextPr.Strikeout,
+			sz:        2.0 * oTextPr.FontSize,
+			szCs:      2.0 * oTextPr.FontSizeCS,
 			u:         oTextPr.Underline,
 			vanish:    oTextPr.Vanish,
-			vertAlign: oTextPr.VertAlign,
+			vertAlign: oTextPr.sVAlign,
 			FontRef:   null, /// FontRef, ///???,
 			Unifill:   null ///Unifill /// ???
 		}
@@ -16243,6 +16358,11 @@
 		return 25.4 / 72.0 / 8 * pt;
 	}
 
+	function private_MM2Pt(mm)
+	{
+		return mm / (25.4 / 72.0);
+	};
+	
 	function private_StartSilentMode()
 	{
 		private_GetLogicDocument().Start_SilentMode();
